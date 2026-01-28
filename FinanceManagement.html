@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>财务对账 - 天合短剧剪辑接单平台</title>
+  
+  <!-- Ant Design CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.css">
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .appLayout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 200px;
+      background: #fff;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .sidebarHeader {
+      padding: 20px 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1890ff;
+      text-decoration: none;
+      display: block;
+    }
+
+    .menu {
+      padding: 16px 0;
+    }
+
+    .menuItem {
+      display: block;
+      padding: 12px 24px;
+      color: #262626;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.3s;
+      border-left: 3px solid transparent;
+    }
+
+    .menuItem:hover {
+      background-color: #f0f0f0;
+      color: #1890ff;
+    }
+
+    .menuItem.active {
+      background-color: #e6f7ff;
+      color: #1890ff;
+      border-left-color: #1890ff;
+      font-weight: 500;
+    }
+
+    .menuItemIcon {
+      margin-right: 8px;
+      font-size: 16px;
+    }
+
+    .menuGroup {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    .menuGroupTitle {
+      padding: 8px 24px;
+      font-size: 12px;
+      color: #8c8c8c;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .mainContent {
+      flex: 1;
+      margin-left: 200px;
+      min-height: 100vh;
+      background: #f5f5f5;
+    }
+
+    .financePage {
+      padding: 24px;
+    }
+
+    .pageHeader {
+      background: #fff;
+      padding: 16px 24px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .statsCard {
+      background: #fff;
+      padding: 24px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .statsGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+    }
+
+    .statItem {
+      text-align: center;
+    }
+
+    .statLabel {
+      font-size: 14px;
+      color: #8c8c8c;
+      margin-bottom: 8px;
+    }
+
+    .statValue {
+      font-size: 24px;
+      font-weight: 600;
+      color: #262626;
+    }
+
+    .statValue.primary {
+      color: #1890ff;
+    }
+
+    .statValue.success {
+      color: #52c41a;
+    }
+
+    .statValue.warning {
+      color: #fa8c16;
+    }
+
+    .filterCard {
+      background: #fff;
+      padding: 16px 24px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .tableCard {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+
+      .mainContent {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+  
+  <!-- Day.js -->
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js"></script>
+  
+  <!-- Ant Design JS -->
+  <script src="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.js"></script>
+  
+  <!-- Babel Standalone for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo } = React;
+    const { Card, Table, Button, Tag, Space, Select, DatePicker, Typography, Statistic, Modal, Form, Input, InputNumber, message } = antd;
+    const { Title } = Typography;
+    const { Option } = Select;
+    const { RangePicker } = DatePicker;
+    const { TextArea } = Input;
+
+    const FinanceManagement = () => {
+      const [ledger, setLedger] = useState([]);
+      const [loading, setLoading] = useState(false);
+      const [filters, setFilters] = useState({
+        settlementStatus: '',
+        dateRange: null,
+      });
+      const [adjustModalVisible, setAdjustModalVisible] = useState(false);
+      const [settleModalVisible, setSettleModalVisible] = useState(false);
+      const [adjustForm] = Form.useForm();
+      const [currentRecord, setCurrentRecord] = useState(null);
+
+      useEffect(() => {
+        loadLedger();
+      }, []);
+
+      const loadLedger = () => {
+        setLoading(true);
+        
+        // 从订单数据生成账本
+        const orders = JSON.parse(localStorage.getItem('currentOrders') || '[]');
+        const acceptedOrders = orders.filter(o => o.status === 'Accepted');
+        
+        let ledgerData = acceptedOrders.map(order => ({
+          id: `ledger_${order.id}`,
+          orderId: order.id,
+          projectName: order.projectName || '测试项目',
+          taker: order.taker || '学员A',
+          amount: order.amount || Math.floor(Math.random() * 1000) + 500,
+          acceptTime: order.acceptTime || dayjs().subtract(Math.floor(Math.random() * 30), 'day').format('YYYY-MM-DD HH:mm:ss'),
+          deduction: 0,
+          settlementStatus: ['未结算', '已结算'][Math.floor(Math.random() * 2)],
+          settlementMonth: null,
+        }));
+
+        // 从localStorage读取已有账本数据
+        const savedLedger = JSON.parse(localStorage.getItem('financeLedger') || '[]');
+        if (savedLedger.length > 0) {
+          ledgerData = savedLedger;
+        } else {
+          localStorage.setItem('financeLedger', JSON.stringify(ledgerData));
+        }
+
+        setLedger(ledgerData);
+        setLoading(false);
+      };
+
+      const filteredLedger = useMemo(() => {
+        return ledger.filter(item => {
+          if (filters.settlementStatus && item.settlementStatus !== filters.settlementStatus) return false;
+          if (filters.dateRange && filters.dateRange[0] && filters.dateRange[1]) {
+            const acceptTime = dayjs(item.acceptTime);
+            if (acceptTime.isBefore(filters.dateRange[0]) || acceptTime.isAfter(filters.dateRange[1])) {
+              return false;
+            }
+          }
+          return true;
+        });
+      }, [ledger, filters]);
+
+      const stats = useMemo(() => {
+        const totalAmount = filteredLedger.reduce((sum, item) => sum + (item.amount || 0), 0);
+        const totalDeduction = filteredLedger.reduce((sum, item) => sum + (item.deduction || 0), 0);
+        const settledAmount = filteredLedger
+          .filter(item => item.settlementStatus === '已结算')
+          .reduce((sum, item) => sum + (item.amount || 0) - (item.deduction || 0), 0);
+        const unsettledAmount = filteredLedger
+          .filter(item => item.settlementStatus === '未结算')
+          .reduce((sum, item) => sum + (item.amount || 0) - (item.deduction || 0), 0);
+
+        return {
+          totalAmount,
+          totalDeduction,
+          settledAmount,
+          unsettledAmount,
+          totalCount: filteredLedger.length,
+          settledCount: filteredLedger.filter(item => item.settlementStatus === '已结算').length,
+        };
+      }, [filteredLedger]);
+
+      const handleAdjust = (record) => {
+        setCurrentRecord(record);
+        adjustForm.setFieldsValue({ deduction: record.deduction || 0, reason: '' });
+        setAdjustModalVisible(true);
+      };
+
+      const handleAdjustSubmit = () => {
+        adjustForm.validateFields().then(values => {
+          const updatedLedger = ledger.map(item =>
+            item.id === currentRecord.id
+              ? { ...item, deduction: values.deduction, adjustReason: values.reason, adjustTime: dayjs().format('YYYY-MM-DD HH:mm:ss') }
+              : item
+          );
+          setLedger(updatedLedger);
+          localStorage.setItem('financeLedger', JSON.stringify(updatedLedger));
+          setAdjustModalVisible(false);
+          adjustForm.resetFields();
+          message.success('扣款调整已保存');
+        });
+      };
+
+      const handleSettle = (record) => {
+        setCurrentRecord(record);
+        setSettleModalVisible(true);
+      };
+
+      const handleSettleSubmit = () => {
+        const updatedLedger = ledger.map(item =>
+          item.id === currentRecord.id
+            ? { ...item, settlementStatus: '已结算', settlementMonth: dayjs().format('YYYY-MM') }
+            : item
+        );
+        setLedger(updatedLedger);
+        localStorage.setItem('financeLedger', JSON.stringify(updatedLedger));
+        setSettleModalVisible(false);
+        message.success('已标记为已结算');
+      };
+
+      const handleExport = () => {
+        message.success('导出功能开发中');
+      };
+
+      const columns = [
+        { title: '订单号', dataIndex: 'orderId', key: 'orderId', width: 150 },
+        { title: '项目名', dataIndex: 'projectName', key: 'projectName', width: 200, ellipsis: true },
+        { title: '接单人', dataIndex: 'taker', key: 'taker', width: 120 },
+        { title: '金额', dataIndex: 'amount', key: 'amount', width: 120, render: (amount) => `¥${amount}` },
+        { title: '验收时间（入账）', dataIndex: 'acceptTime', key: 'acceptTime', width: 180 },
+        { title: '扣款调整', dataIndex: 'deduction', key: 'deduction', width: 120, render: (deduction) => 
+          deduction > 0 ? <span style={{ color: '#ff4d4f' }}>-¥{deduction}</span> : '-' },
+        { title: '结算状态', dataIndex: 'settlementStatus', key: 'settlementStatus', width: 100, render: (status) => 
+          <Tag color={status === '已结算' ? 'green' : 'orange'}>{status}</Tag> },
+        { title: '结算月份', dataIndex: 'settlementMonth', key: 'settlementMonth', width: 120, render: (month) => month || '-' },
+        { title: '操作', key: 'action', width: 200, render: (_, record) => (
+          <Space>
+            <Button size="small" onClick={() => handleAdjust(record)}>修改差额</Button>
+            {record.settlementStatus === '未结算' && (
+              <Button size="small" type="primary" onClick={() => handleSettle(record)}>标记已结算</Button>
+            )}
+          </Space>
+        )},
+      ];
+
+      return (
+        <div className="appLayout">
+          {/* 左侧导航栏 */}
+          <div className="sidebar">
+            <div className="sidebarHeader">
+              <a href="Home.html" className="logo">🎬 天合短剧平台</a>
+            </div>
+            <nav className="menu">
+              <a href="Home.html" className="menuItem">
+                <span className="menuItemIcon">🏠</span>
+                首页
+              </a>
+              <a href="ProjectHall.html" className="menuItem">
+                <span className="menuItemIcon">📋</span>
+                接单大厅
+              </a>
+              <a href="ProjectHall.html?tab=leaderboard" className="menuItem">
+                <span className="menuItemIcon">🏆</span>
+                天梯榜单
+              </a>
+              <a href="Account.html" className="menuItem">
+                <span className="menuItemIcon">💰</span>
+                账户与收益
+              </a>
+              <a href="MyProjects.html" className="menuItem">
+                <span className="menuItemIcon">🚀</span>
+                我的项目
+              </a>
+              
+              <div className="menuGroup">
+                <div className="menuGroupTitle">后台管理</div>
+                <a href="ReviewQueue.html" className="menuItem">
+                  <span className="menuItemIcon">✅</span>
+                  内容审核
+                </a>
+                <a href="ProjectManagement.html" className="menuItem">
+                  <span className="menuItemIcon">📋</span>
+                  项目管理
+                </a>
+                <a href="StudentManagement.html" className="menuItem">
+                  <span className="menuItemIcon">👥</span>
+                  学员管理
+                </a>
+                <a href="FinanceManagement.html" className="menuItem active">
+                  <span className="menuItemIcon">💰</span>
+                  财务对账
+                </a>
+                <a href="DashboardManagement.html" className="menuItem">
+                  <span className="menuItemIcon">📊</span>
+                  榜单与数据
+                </a>
+              </div>
+            </nav>
+          </div>
+
+          {/* 主内容区 */}
+          <div className="mainContent">
+            <div className="financePage">
+              <div className="pageHeader">
+                <Title level={2} style={{ margin: 0 }}>财务对账</Title>
+                <Button onClick={handleExport}>导出对账报表</Button>
+              </div>
+
+              {/* 统计卡片 */}
+              <div className="statsCard">
+                <div className="statsGrid">
+                  <div className="statItem">
+                    <div className="statLabel">验收订单数</div>
+                    <div className="statValue primary">{stats.totalCount}</div>
+                  </div>
+                  <div className="statItem">
+                    <div className="statLabel">应付金额</div>
+                    <div className="statValue success">¥{stats.totalAmount.toLocaleString()}</div>
+                  </div>
+                  <div className="statItem">
+                    <div className="statLabel">扣款调整</div>
+                    <div className="statValue warning">¥{stats.totalDeduction.toLocaleString()}</div>
+                  </div>
+                  <div className="statItem">
+                    <div className="statLabel">已结算金额</div>
+                    <div className="statValue success">¥{stats.settledAmount.toLocaleString()}</div>
+                  </div>
+                  <div className="statItem">
+                    <div className="statLabel">未结算金额</div>
+                    <div className="statValue warning">¥{stats.unsettledAmount.toLocaleString()}</div>
+                  </div>
+                  <div className="statItem">
+                    <div className="statLabel">已结算订单数</div>
+                    <div className="statValue primary">{stats.settledCount}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 筛选区 */}
+              <div className="filterCard">
+                <Space size="middle" wrap>
+                  <span>结算状态：</span>
+                  <Select
+                    style={{ width: 150 }}
+                    placeholder="全部"
+                    allowClear
+                    value={filters.settlementStatus}
+                    onChange={(value) => setFilters({ ...filters, settlementStatus: value || '' })}
+                  >
+                    <Option value="未结算">未结算</Option>
+                    <Option value="已结算">已结算</Option>
+                  </Select>
+
+                  <span>验收时间：</span>
+                  <RangePicker
+                    value={filters.dateRange}
+                    onChange={(dates) => setFilters({ ...filters, dateRange: dates })}
+                  />
+                </Space>
+              </div>
+
+              {/* 表格 */}
+              <div className="tableCard">
+                <Table
+                  columns={columns}
+                  dataSource={filteredLedger}
+                  loading={loading}
+                  rowKey="id"
+                  scroll={{ x: 1200 }}
+                  pagination={{ pageSize: 20, showTotal: (total) => `共 ${total} 条` }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* 修改差额弹窗 */}
+          <Modal
+            title="修改差额"
+            open={adjustModalVisible}
+            onOk={handleAdjustSubmit}
+            onCancel={() => { setAdjustModalVisible(false); adjustForm.resetFields(); }}
+            okText="确认"
+            cancelText="取消"
+            width={600}
+          >
+            <Form form={adjustForm} layout="vertical">
+              <Form.Item
+                name="deduction"
+                label="扣款金额"
+                rules={[{ required: true, message: '请输入扣款金额' }]}
+              >
+                <InputNumber min={0} style={{ width: '100%' }} placeholder="请输入扣款金额" />
+              </Form.Item>
+              <Form.Item
+                name="reason"
+                label="扣款原因"
+                rules={[{ required: true, message: '请填写扣款原因' }]}
+              >
+                <TextArea rows={4} placeholder="请填写扣款原因" />
+              </Form.Item>
+            </Form>
+          </Modal>
+
+          {/* 结算确认弹窗 */}
+          <Modal
+            title="确认结算"
+            open={settleModalVisible}
+            onOk={handleSettleSubmit}
+            onCancel={() => setSettleModalVisible(false)}
+            okText="确认"
+            cancelText="取消"
+          >
+            <p>确定将该订单标记为已结算？</p>
+            <p style={{ color: '#8c8c8c', fontSize: 12 }}>结算月份：{dayjs().format('YYYY-MM')}</p>
+          </Modal>
+        </div>
+      );
+    };
+
+    window.addEventListener('load', function() {
+      try {
+        ReactDOM.render(<FinanceManagement />, document.getElementById('root'));
+      } catch (error) {
+        console.error('渲染错误:', error);
+        document.getElementById('root').innerHTML = '<div style="padding: 20px; color: red;">页面加载失败，请检查浏览器控制台错误信息。</div>';
+      }
+    });
+  </script>
+</body>
+</html>

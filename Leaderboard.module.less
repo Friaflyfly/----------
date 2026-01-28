@@ -1,0 +1,164 @@
+.leaderboard {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 24px;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 16px;
+
+    .title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: #262626;
+    }
+
+    .typeTabs {
+      :global(.ant-tabs-tab) {
+        font-size: 15px;
+        font-weight: 500;
+        padding: 8px 20px;
+      }
+
+      :global(.ant-tabs-tab-active) {
+        .ant-tabs-tab-btn {
+          color: #1890ff;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+
+  .tableCard {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    background: #fff;
+
+    :global(.ant-card-body) {
+      padding: 24px;
+    }
+  }
+
+  .leaderboardTable {
+    :global(.ant-table-thead > tr > th) {
+      background-color: #fafafa;
+      font-weight: 600;
+      color: #262626;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    :global(.ant-table-tbody > tr) {
+      transition: all 0.3s;
+
+      &:hover {
+        background-color: #fafafa;
+      }
+    }
+
+    :global(.ant-table-tbody > tr > td) {
+      border-bottom: 1px solid #f0f0f0;
+      padding: 16px;
+    }
+
+    // 前三名特殊样式
+    :global(.firstPlace) {
+      background-color: #fffbe6 !important;
+      border-top: 2px solid #ffd700;
+
+      &:hover {
+        background-color: #fff7e6 !important;
+      }
+    }
+
+    :global(.secondPlace) {
+      background-color: #f5f5f5 !important;
+      border-top: 2px solid #c0c0c0;
+
+      &:hover {
+        background-color: #e8e8e8 !important;
+      }
+    }
+
+    :global(.thirdPlace) {
+      background-color: #fff7e6 !important;
+      border-top: 2px solid #cd7f32;
+
+      &:hover {
+        background-color: #ffecc7 !important;
+      }
+    }
+
+    // 高亮当前排序的值
+    :global(.highlightedValue) {
+      background-color: #e6f7ff;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      display: inline-block;
+    }
+  }
+
+  .paginationWrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
+
+    :global(.ant-pagination) {
+      :global(.ant-pagination-item-active) {
+        border-color: #1890ff;
+
+        a {
+          color: #1890ff;
+        }
+      }
+    }
+  }
+}
+
+// 响应式适配
+@media (max-width: 768px) {
+  .leaderboard {
+    padding: 16px;
+
+    .header {
+      flex-direction: column;
+      align-items: stretch;
+
+      .title {
+        font-size: 20px;
+        text-align: center;
+      }
+
+      .typeTabs {
+        :global(.ant-tabs-tab) {
+          padding: 6px 12px;
+          font-size: 14px;
+        }
+      }
+    }
+
+    .tableCard {
+      :global(.ant-card-body) {
+        padding: 12px;
+      }
+    }
+
+    .leaderboardTable {
+      :global(.ant-table) {
+        font-size: 12px;
+      }
+
+      :global(.ant-table-thead > tr > th),
+      :global(.ant-table-tbody > tr > td) {
+        padding: 8px 4px;
+      }
+    }
+  }
+}

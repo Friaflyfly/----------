@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>账户与收益看板 - 天合短剧剪辑接单平台</title>
+  
+  <!-- Ant Design CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.css">
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .appLayout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 200px;
+      background: #fff;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .sidebarHeader {
+      padding: 20px 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1890ff;
+      text-decoration: none;
+      display: block;
+    }
+
+    .menu {
+      padding: 16px 0;
+    }
+
+    .menuItem {
+      display: block;
+      padding: 12px 24px;
+      color: #262626;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.3s;
+      border-left: 3px solid transparent;
+    }
+
+    .menuItem:hover {
+      background-color: #f0f0f0;
+      color: #1890ff;
+    }
+
+    .menuItem.active {
+      background-color: #e6f7ff;
+      color: #1890ff;
+      border-left-color: #1890ff;
+      font-weight: 500;
+    }
+
+    .menuItemIcon {
+      margin-right: 8px;
+      font-size: 16px;
+    }
+
+    .menuGroup {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    .menuGroupTitle {
+      padding: 8px 24px;
+      font-size: 12px;
+      color: #8c8c8c;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+
+    .mainContent {
+      flex: 1;
+      margin-left: 200px;
+      min-height: 100vh;
+      background: #f5f5f5;
+    }
+
+    .accountPage {
+      padding: 24px;
+    }
+
+    .statsCard {
+      margin-bottom: 24px;
+    }
+
+    .statsGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .statCard {
+      background: #fff;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .statTitle {
+      font-size: 14px;
+      color: #8c8c8c;
+      margin-bottom: 8px;
+    }
+
+    .statValue {
+      font-size: 28px;
+      font-weight: 600;
+      color: #262626;
+    }
+
+    .statValue.primary {
+      color: #1890ff;
+    }
+
+    .statValue.success {
+      color: #52c41a;
+    }
+
+    .statValue.warning {
+      color: #fa8c16;
+    }
+
+    .detailCard {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .cardHeader {
+      padding: 16px 24px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cardTitle {
+      font-size: 16px;
+      font-weight: 600;
+      color: #262626;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+
+      .mainContent {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+  
+  <!-- Day.js -->
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js"></script>
+  
+  <!-- Ant Design JS -->
+  <script src="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.js"></script>
+  
+  <!-- Babel Standalone for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo } = React;
+    const { Card, Table, Statistic, Button, Tag, Space, Typography, message } = antd;
+    const { Title } = Typography;
+
+    const Account = () => {
+      const [earnings, setEarnings] = useState([]);
+      const [orders, setOrders] = useState([]);
+      const [loading, setLoading] = useState(true);
+
+      useEffect(() => {
+        // 从 localStorage 读取收益数据
+        const earningsData = JSON.parse(localStorage.getItem('earnings') || '[]');
+        setEarnings(earningsData);
+
+        // 从 localStorage 读取订单数据
+        const ordersData = JSON.parse(localStorage.getItem('currentOrders') || '[]');
+        setOrders(ordersData);
+
+        setLoading(false);
+
+        // 检查是否需要滚动到订单部分
+        if (sessionStorage.getItem('scrollToOrders') === 'true') {
+          sessionStorage.removeItem('scrollToOrders');
+          setTimeout(() => {
+            const ordersSection = document.getElementById('myOrders');
+            if (ordersSection) {
+              ordersSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }, 300);
+        }
+      }, []);
+
+      // 计算统计数据
+      const stats = useMemo(() => {
+        // 累计收益（总）
+        const totalRevenue = earnings.reduce((sum, item) => sum + (item.amount || 0), 0);
+
+        // 可提现余额（未结算收益）
+        const withdrawableBalance = earnings
+          .filter(item => item.status === '未结算')
+          .reduce((sum, item) => sum + (item.amount || 0), 0);
+
+        // 已完成订单数（已验收）
+        const completedOrders = orders.filter(order => order.status === 'Accepted').length;
+
+        // 进行中订单数
+        const inProgressOrders = orders.filter(order => 
+          ['InProgress', 'Submitted', 'NeedRevision', 'Approved'].includes(order.status)
+        ).length;
+
+        // 待修改订单数
+        const needRevisionOrders = orders.filter(order => order.status === 'NeedRevision').length;
+
+        return {
+          totalRevenue,
+          withdrawableBalance,
+          completedOrders,
+          inProgressOrders,
+          needRevisionOrders,
+        };
+      }, [earnings, orders]);
+
+      // 格式化金额
+      const formatAmount = (amount) => {
+        if (amount >= 10000) {
+          return `¥${(amount / 10000).toFixed(2)}万`;
+        }
+        return `¥${amount.toFixed(2)}`;
+      };
+
+      // 收益明细表格列
+      const columns = [
+        {
+          title: '订单号',
+          dataIndex: 'orderId',
+          key: 'orderId',
+          width: 180,
+        },
+        {
+          title: '项目名称',
+          dataIndex: 'projectName',
+          key: 'projectName',
+          ellipsis: true,
+        },
+        {
+          title: '金额',
+          dataIndex: 'amount',
+          key: 'amount',
+          width: 120,
+          align: 'right',
+          render: (amount) => (
+            <span style={{ fontWeight: 600, color: '#52c41a' }}>
+              {formatAmount(amount)}
+            </span>
+          ),
+        },
+        {
+          title: '入账时间',
+          dataIndex: 'acceptTime',
+          key: 'acceptTime',
+          width: 180,
+          render: (time) => time ? dayjs(time).format('YYYY-MM-DD HH:mm:ss') : '-',
+        },
+        {
+          title: '状态',
+          dataIndex: 'status',
+          key: 'status',
+          width: 100,
+          render: (status) => {
+            const statusMap = {
+              '未结算': { color: 'orange', text: '未结算' },
+              '已结算': { color: 'green', text: '已结算' },
+              '扣款': { color: 'red', text: '扣款' },
+            };
+            const config = statusMap[status] || { color: 'default', text: status };
+            return <Tag color={config.color}>{config.text}</Tag>;
+          },
+        },
+        {
+          title: '结算月份',
+          dataIndex: 'settlementMonth',
+          key: 'settlementMonth',
+          width: 120,
+          render: (month) => month || '-',
+        },
+        {
+          title: '备注',
+          dataIndex: 'note',
+          key: 'note',
+          ellipsis: true,
+          render: (note) => note || '-',
+        },
+      ];
+
+      // 导出收益明细
+      const handleExport = () => {
+        const csvContent = [
+          ['订单号', '项目名称', '金额', '入账时间', '状态', '结算月份', '备注'],
+          ...earnings.map(item => [
+            item.orderId || '',
+            item.projectName || '',
+            item.amount || 0,
+            item.acceptTime || '',
+            item.status || '',
+            item.settlementMonth || '',
+            item.note || '',
+          ]),
+        ].map(row => row.join(',')).join('\n');
+
+        const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `收益明细_${dayjs().format('YYYY-MM-DD')}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        message.success('导出成功！');
+      };
+
+      return (
+        <div className="appLayout">
+          {/* 左侧导航栏 */}
+          <div className="sidebar">
+            <div className="sidebarHeader">
+              <a href="Home.html" className="logo">🎬 天合短剧平台</a>
+            </div>
+            <nav className="menu">
+              <a href="Home.html" className="menuItem">
+                <span className="menuItemIcon">🏠</span>
+                首页
+              </a>
+              <a href="ProjectHall.html" className="menuItem">
+                <span className="menuItemIcon">📋</span>
+                接单大厅
+              </a>
+              <a href="ProjectHall.html?tab=leaderboard" className="menuItem">
+                <span className="menuItemIcon">🏆</span>
+                天梯榜单
+              </a>
+              <a href="Account.html" className="menuItem active">
+                <span className="menuItemIcon">💰</span>
+                账户与收益
+              </a>
+              <a href="MyProjects.html" className="menuItem">
+                <span className="menuItemIcon">🚀</span>
+                我的项目
+              </a>
+              
+              <div className="menuGroup">
+                <div className="menuGroupTitle">后台管理</div>
+                <a href="ReviewQueue.html" className="menuItem">
+                  <span className="menuItemIcon">✅</span>
+                  内容审核
+                </a>
+                <a href="ProjectManagement.html" className="menuItem">
+                  <span className="menuItemIcon">📋</span>
+                  项目管理
+                </a>
+                <a href="StudentManagement.html" className="menuItem">
+                  <span className="menuItemIcon">👥</span>
+                  学员管理
+                </a>
+                <a href="FinanceManagement.html" className="menuItem">
+                  <span className="menuItemIcon">💰</span>
+                  财务对账
+                </a>
+                <a href="DashboardManagement.html" className="menuItem">
+                  <span className="menuItemIcon">📊</span>
+                  榜单与数据
+                </a>
+              </div>
+            </nav>
+          </div>
+
+          {/* 主内容区 */}
+          <div className="mainContent">
+            <div className="accountPage">
+              <Title level={2} style={{ marginBottom: 24 }}>账户与收益看板</Title>
+
+              {/* 统计卡片 */}
+              <div className="statsGrid">
+                <div className="statCard">
+                  <div className="statTitle">累计收益（总）</div>
+                  <div className="statValue primary">{formatAmount(stats.totalRevenue)}</div>
+                </div>
+                <div className="statCard">
+                  <div className="statTitle">可提现余额</div>
+                  <div className="statValue success">{formatAmount(stats.withdrawableBalance)}</div>
+                  <div style={{ fontSize: 12, color: '#8c8c8c', marginTop: 8 }}>
+                    未结算收益/待打款余额
+                  </div>
+                </div>
+                <div className="statCard">
+                  <div className="statTitle">已完成订单数</div>
+                  <div className="statValue">{stats.completedOrders}</div>
+                  <div style={{ fontSize: 12, color: '#8c8c8c', marginTop: 8 }}>
+                    已验收订单
+                  </div>
+                </div>
+                <div className="statCard">
+                  <div className="statTitle">进行中订单数</div>
+                  <div className="statValue warning">{stats.inProgressOrders}</div>
+                  <div style={{ fontSize: 12, color: '#8c8c8c', marginTop: 8 }}>
+                    待修改：{stats.needRevisionOrders}
+                  </div>
+                </div>
+              </div>
+
+              {/* 我的订单 */}
+              <Card id="myOrders" className="detailCard" style={{ marginBottom: 24 }}>
+                <div className="cardHeader">
+                  <div className="cardTitle">我的订单</div>
+                </div>
+                <Table
+                  columns={[
+                    {
+                      title: '订单号',
+                      dataIndex: 'orderId',
+                      key: 'orderId',
+                      width: 180,
+                    },
+                    {
+                      title: '项目名称',
+                      dataIndex: 'projectName',
+                      key: 'projectName',
+                      ellipsis: true,
+                    },
+                    {
+                      title: '接单时间',
+                      dataIndex: 'takeTime',
+                      key: 'takeTime',
+                      width: 180,
+                      render: (time) => time ? dayjs(time).format('YYYY-MM-DD HH:mm:ss') : '-',
+                    },
+                    {
+                      title: '截止时间',
+                      dataIndex: 'dueTime',
+                      key: 'dueTime',
+                      width: 180,
+                      render: (time) => time ? dayjs(time).format('YYYY-MM-DD HH:mm:ss') : '-',
+                    },
+                    {
+                      title: '状态',
+                      dataIndex: 'status',
+                      key: 'status',
+                      width: 120,
+                      render: (status) => {
+                        const statusMap = {
+                          'InProgress': { color: 'blue', text: '进行中' },
+                          'Submitted': { color: 'green', text: '已提交' },
+                          'NeedRevision': { color: 'orange', text: '退回修改' },
+                          'Approved': { color: 'green', text: '审核通过' },
+                          'Accepted': { color: 'success', text: '已验收' },
+                          'Closed': { color: 'default', text: '已关闭' },
+                        };
+                        const config = statusMap[status] || { color: 'default', text: status };
+                        return <Tag color={config.color}>{config.text}</Tag>;
+                      },
+                    },
+                    {
+                      title: '操作',
+                      key: 'action',
+                      width: 120,
+                      render: (_, record) => (
+                        <Button
+                          type="link"
+                          onClick={() => {
+                            window.location.href = `ProjectSpace.html?orderId=${record.orderId}&projectId=${record.projectId}`;
+                          }}
+                        >
+                          进入空间
+                        </Button>
+                      ),
+                    },
+                  ]}
+                  dataSource={orders}
+                  rowKey="orderId"
+                  loading={loading}
+                  pagination={{
+                    pageSize: 10,
+                    showSizeChanger: true,
+                    showTotal: (total) => `共 ${total} 条记录`,
+                  }}
+                  style={{ padding: '16px 24px' }}
+                />
+              </Card>
+
+              {/* 收益明细 */}
+              <Card className="detailCard">
+                <div className="cardHeader">
+                  <div className="cardTitle">收益明细（账本）</div>
+                  <Button type="primary" onClick={handleExport}>
+                    导出明细
+                  </Button>
+                </div>
+                <Table
+                  columns={columns}
+                  dataSource={earnings}
+                  rowKey="orderId"
+                  loading={loading}
+                  pagination={{
+                    pageSize: 10,
+                    showSizeChanger: true,
+                    showTotal: (total) => `共 ${total} 条记录`,
+                  }}
+                  style={{ padding: '16px 24px' }}
+                />
+              </Card>
+
+              {/* 说明信息 */}
+              <Card style={{ marginTop: 24 }}>
+                <div style={{ color: '#8c8c8c', fontSize: 14, lineHeight: 1.8 }}>
+                  <p><strong>收益说明：</strong></p>
+                  <ul style={{ marginLeft: 20, marginTop: 8 }}>
+                    <li>收益在订单验收后自动入账，计入"累计收益"和"可提现余额"</li>
+                    <li>可提现余额 = 未结算收益（待打款余额），实际提现需线下进行</li>
+                    <li>财务线下打款后，收益状态将更新为"已结算"</li>
+                    <li>扣款调整由财务录入，会显示"扣款"状态并影响收益金额</li>
+                    <li>同一订单不重复计入收益</li>
+                  </ul>
+                </div>
+              </Card>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    function renderApp() {
+      if (typeof React === 'undefined' || typeof ReactDOM === 'undefined') {
+        setTimeout(renderApp, 100);
+        return;
+      }
+      
+      try {
+        ReactDOM.render(<Account />, document.getElementById('root'));
+      } catch (error) {
+        console.error('渲染错误:', error);
+        document.getElementById('root').innerHTML = '<div style="padding: 20px; color: red;">页面加载失败: ' + error.message + '</div>';
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      window.addEventListener('load', renderApp);
+    } else {
+      renderApp();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>项目详情 - 天合短剧剪辑接单平台</title>
+  
+  <!-- Ant Design CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.css">
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .appLayout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 200px;
+      background: #fff;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .sidebarHeader {
+      padding: 20px 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1890ff;
+      text-decoration: none;
+      display: block;
+    }
+
+    .menu {
+      padding: 16px 0;
+    }
+
+    .menuItem {
+      display: block;
+      padding: 12px 24px;
+      color: #262626;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.3s;
+      border-left: 3px solid transparent;
+    }
+
+    .menuItem:hover {
+      background-color: #f0f0f0;
+      color: #1890ff;
+    }
+
+    .menuItem.active {
+      background-color: #e6f7ff;
+      color: #1890ff;
+      border-left-color: #1890ff;
+      font-weight: 500;
+    }
+
+    .menuItemIcon {
+      margin-right: 8px;
+      font-size: 16px;
+    }
+
+    .menuGroup {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    .menuGroupTitle {
+      padding: 8px 24px;
+      font-size: 12px;
+      color: #8c8c8c;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .mainContent {
+      flex: 1;
+      margin-left: 200px;
+      min-height: 100vh;
+      background: #f5f5f5;
+    }
+
+    .projectDetailPage {
+      padding: 24px;
+    }
+
+    .pageHeader {
+      background: #fff;
+      padding: 16px 24px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .contentCard {
+      background: #fff;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .cardHeader {
+      padding: 16px 24px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .cardBody {
+      padding: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+
+      .mainContent {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+  
+  <!-- Day.js -->
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js"></script>
+  
+  <!-- Ant Design JS -->
+  <script src="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.js"></script>
+  
+  <!-- Babel Standalone for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const { Card, Button, Tag, Space, Typography, Descriptions, Tabs, Table, Empty, message, Modal, Form, Input, Select, DatePicker, Upload, InputNumber } = antd;
+    const { Title, Text } = Typography;
+    const { TabPane } = Tabs;
+    const { TextArea } = Input;
+    const { Option } = Select;
+
+    const ProjectDetail = () => {
+      const [projectData, setProjectData] = useState(null);
+      const [loading, setLoading] = useState(true);
+      const [activeTab, setActiveTab] = useState('basic');
+      const [orders, setOrders] = useState([]);
+
+      useEffect(() => {
+        loadProjectData();
+        loadProjectOrders();
+      }, []);
+
+      const getUrlParam = (name) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+      };
+
+      const loadProjectData = () => {
+        const projectId = getUrlParam('id');
+        if (!projectId) {
+          message.error('缺少项目ID参数');
+          setLoading(false);
+          return;
+        }
+
+        // 从 localStorage 读取项目数据
+        const projects = JSON.parse(localStorage.getItem('adminProjects') || '[]');
+        let project = projects.find(p => p.id === projectId);
+
+        if (!project) {
+          // 如果找不到，生成一个测试项目
+          project = generateTestProject(projectId);
+        }
+
+        // 补充完整字段
+        const fullProject = {
+          ...project,
+          // 基础信息
+          projectTags: project.projectTags || ['测试标签1', '测试标签2'],
+          contentGenre: project.contentGenre || '霸总',
+          // 成本与预算
+          budgetAmount: project.budgetAmount || project.unitPrice * project.episodeCount * 1.2,
+          expenseAmount: project.expenseAmount || 0,
+          projectNote: project.projectNote || '项目运营备注信息',
+          clientFeedback: project.clientFeedback || '',
+          // 交付与排期
+          deliveryCycleDays: project.deliveryCycleDays || 7,
+          productionDays: project.productionDays || null,
+          productionStartTime: project.productionStartTime || null,
+          // 人员与组织
+          participantMembers: project.participantMembers || [],
+          coordinator: project.coordinator || '张三',
+          // 接单配置
+          applyReviewRule: project.applyReviewRule || '运营审核',
+          candidates: project.candidates || [],
+          // 需求与素材
+          requirementText: project.requirementText || '项目需求描述：\n1. 需要高质量的剪辑效果\n2. 符合平台规范\n3. 按时交付',
+          requirementAttachments: project.requirementAttachments || [
+            { id: '1', name: '脚本大纲.docx', size: 102400 },
+            { id: '2', name: '分镜参考.pdf', size: 2048000 },
+          ],
+          deliveryRequirements: project.deliveryRequirements || {
+            namingRule: '项目名_集数_版本号.mp4',
+            resolution: '1920x1080',
+            bitrate: '5000kbps',
+            subtitleRule: 'SRT格式，UTF-8编码',
+          },
+          materialNote: project.materialNote || '素材包包含原始视频、BGM、字幕模板等',
+          materialPackageFiles: project.materialPackageFiles || [
+            { id: '1', name: '原始素材_第01-05集.zip', size: 1073741824 },
+            { id: '2', name: 'BGM音乐库.zip', size: 524288000 },
+          ],
+        };
+
+        setProjectData(fullProject);
+        setLoading(false);
+      };
+
+      const generateTestProject = (projectId) => {
+        return {
+          id: projectId,
+          projectName: `测试项目${projectId.slice(-1)}`,
+          category: '短剧',
+          difficulty: '精品',
+          participantTeam: '线上',
+          takeMode: '抢单',
+          coordinator: '张三',
+          status: 'Published',
+          unitPrice: 500,
+          episodeCount: 20,
+          quotaTotal: 5,
+          quotaTaken: 2,
+          dueTime: dayjs().add(10, 'day').format('YYYY-MM-DD HH:mm:ss'),
+          publishTime: dayjs().subtract(5, 'day').format('YYYY-MM-DD HH:mm:ss'),
+        };
+      };
+
+      const loadProjectOrders = () => {
+        const projectId = getUrlParam('id');
+        if (!projectId) return;
+
+        // 从 currentOrders 中筛选该项目的订单
+        const allOrders = JSON.parse(localStorage.getItem('currentOrders') || '[]');
+        const projectOrders = allOrders.filter(o => o.projectId === projectId);
+        setOrders(projectOrders);
+      };
+
+      const formatFileSize = (bytes) => {
+        if (!bytes) return '-';
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+        if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+      };
+
+      const getStatusTag = (status) => {
+        const statusMap = {
+          'InProgress': { color: 'blue', text: '进行中' },
+          'Submitted': { color: 'green', text: '已提交' },
+          'NeedRevision': { color: 'orange', text: '退回修改' },
+          'Approved': { color: 'green', text: '审核通过' },
+          'Accepted': { color: 'success', text: '已验收' },
+          'Closed': { color: 'default', text: '已关闭' },
+        };
+        const config = statusMap[status] || { color: 'default', text: status };
+        return <Tag color={config.color}>{config.text}</Tag>;
+      };
+
+      const handleViewOrderSpace = (order) => {
+        const orderId = order.orderId || order.id;
+        window.location.href = `ProjectSpace.html?orderId=${orderId}&projectId=${projectData.id}`;
+      };
+
+      if (loading) {
+        return (
+          <div className="appLayout">
+            <div className="sidebar" style={{ display: 'none' }}></div>
+            <div className="mainContent" style={{ marginLeft: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <div>加载中...</div>
+            </div>
+          </div>
+        );
+      }
+
+      if (!projectData) {
+        return (
+          <div className="appLayout">
+            <div className="sidebar" style={{ display: 'none' }}></div>
+            <div className="mainContent" style={{ marginLeft: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <Empty description="项目不存在" />
+            </div>
+          </div>
+        );
+      }
+
+      const orderColumns = [
+        { title: '订单号', dataIndex: 'orderId', key: 'orderId', width: 150, render: (val, r) => val || r.id },
+        { title: '接单人', dataIndex: 'taker', key: 'taker', width: 120 },
+        { title: '接单时间', dataIndex: 'takeTime', key: 'takeTime', width: 180, render: (t) => t ? dayjs(t).format('YYYY-MM-DD HH:mm:ss') : '-' },
+        { title: '截止时间', dataIndex: 'dueTime', key: 'dueTime', width: 180, render: (t) => t ? dayjs(t).format('YYYY-MM-DD HH:mm:ss') : '-' },
+        { title: '状态', dataIndex: 'status', key: 'status', width: 120, render: getStatusTag },
+        { title: '金额', dataIndex: 'amount', key: 'amount', width: 120, render: (amt) => amt ? `¥${amt}` : '-' },
+        { title: '操作', key: 'action', width: 150, render: (_, record) => (
+          <Button type="link" size="small" onClick={() => handleViewOrderSpace(record)}>查看协同空间</Button>
+        )},
+      ];
+
+      return (
+        <div className="appLayout">
+          {/* 左侧导航栏 */}
+          <div className="sidebar">
+            <div className="sidebarHeader">
+              <a href="Home.html" className="logo">🎬 天合短剧平台</a>
+            </div>
+            <nav className="menu">
+              <a href="Home.html" className="menuItem">
+                <span className="menuItemIcon">🏠</span>
+                首页
+              </a>
+              <a href="ProjectHall.html" className="menuItem">
+                <span className="menuItemIcon">📋</span>
+                接单大厅
+              </a>
+              <a href="ProjectHall.html?tab=leaderboard" className="menuItem">
+                <span className="menuItemIcon">🏆</span>
+                天梯榜单
+              </a>
+              <a href="Account.html" className="menuItem">
+                <span className="menuItemIcon">💰</span>
+                账户与收益
+              </a>
+              <a href="MyProjects.html" className="menuItem">
+                <span className="menuItemIcon">🚀</span>
+                我的项目
+              </a>
+              
+              <div className="menuGroup">
+                <div className="menuGroupTitle">后台管理</div>
+                <a href="ReviewQueue.html" className="menuItem">
+                  <span className="menuItemIcon">✅</span>
+                  内容审核
+                </a>
+                <a href="ProjectManagement.html" className="menuItem active">
+                  <span className="menuItemIcon">📋</span>
+                  项目管理
+                </a>
+                <a href="StudentManagement.html" className="menuItem">
+                  <span className="menuItemIcon">👥</span>
+                  学员管理
+                </a>
+                <a href="FinanceManagement.html" className="menuItem">
+                  <span className="menuItemIcon">💰</span>
+                  财务对账
+                </a>
+                <a href="DashboardManagement.html" className="menuItem">
+                  <span className="menuItemIcon">📊</span>
+                  榜单与数据
+                </a>
+              </div>
+            </nav>
+          </div>
+
+          {/* 主内容区 */}
+          <div className="mainContent">
+            <div className="projectDetailPage">
+              <div className="pageHeader">
+                <Title level={2} style={{ margin: 0 }}>项目详情</Title>
+                <Space>
+                  <Button onClick={() => window.location.href = 'ProjectManagement.html'}>
+                    返回列表
+                  </Button>
+                  {projectData.status !== 'Archived' && (
+                    <Button type="primary" onClick={() => message.info('编辑功能开发中')}>
+                      编辑项目
+                    </Button>
+                  )}
+                </Space>
+              </div>
+
+              <div className="contentCard">
+                <Tabs activeKey={activeTab} onChange={setActiveTab}>
+                  {/* 基础信息 */}
+                  <TabPane tab="基础信息" key="basic">
+                    <Descriptions column={2} bordered>
+                      <Descriptions.Item label="项目ID">{projectData.id}</Descriptions.Item>
+                      <Descriptions.Item label="项目名称">{projectData.projectName}</Descriptions.Item>
+                      <Descriptions.Item label="内容分类">{projectData.category}</Descriptions.Item>
+                      <Descriptions.Item label="内容类别">{projectData.contentGenre}</Descriptions.Item>
+                      <Descriptions.Item label="项目标签">
+                        <Space>
+                          {projectData.projectTags && projectData.projectTags.map((tag, idx) => (
+                            <Tag key={idx} color="blue">{tag}</Tag>
+                          ))}
+                        </Space>
+                      </Descriptions.Item>
+                      <Descriptions.Item label="难度">
+                        <Tag color={projectData.difficulty === '精品' ? 'gold' : 'default'}>
+                          {projectData.difficulty}
+                        </Tag>
+                      </Descriptions.Item>
+                      <Descriptions.Item label="参与团队">{projectData.participantTeam}</Descriptions.Item>
+                      <Descriptions.Item label="项目状态">
+                        <Tag color={
+                          projectData.status === 'Published' ? 'green' :
+                          projectData.status === 'Draft' ? 'default' :
+                          projectData.status === 'Archived' ? 'purple' : 'orange'
+                        }>
+                          {projectData.status === 'Published' ? '已发布' :
+                           projectData.status === 'Draft' ? '草稿' :
+                           projectData.status === 'Archived' ? '已归档' :
+                           projectData.status === 'Closed' ? '已关闭' : '已满/已截止'}
+                        </Tag>
+                      </Descriptions.Item>
+                    </Descriptions>
+                  </TabPane>
+
+                  {/* 成本与预算 */}
+                  <TabPane tab="成本与预算" key="budget">
+                    <Descriptions column={2} bordered>
+                      <Descriptions.Item label="预算金额">
+                        <Text strong style={{ color: '#1890ff' }}>¥{projectData.budgetAmount?.toLocaleString() || 0}</Text>
+                      </Descriptions.Item>
+                      <Descriptions.Item label="已发生支出">
+                        <Text style={{ color: '#ff4d4f' }}>¥{projectData.expenseAmount?.toLocaleString() || 0}</Text>
+                      </Descriptions.Item>
+                      <Descriptions.Item label="项目备注" span={2}>
+                        <div style={{ whiteSpace: 'pre-wrap', maxHeight: 200, overflow: 'auto' }}>
+                          {projectData.projectNote || '-'}
+                        </div>
+                      </Descriptions.Item>
+                      <Descriptions.Item label="甲方反馈" span={2}>
+                        <div style={{ whiteSpace: 'pre-wrap', maxHeight: 200, overflow: 'auto' }}>
+                          {projectData.clientFeedback || '-'}
+                        </div>
+                      </Descriptions.Item>
+                    </Descriptions>
+                  </TabPane>
+
+                  {/* 交付与排期 */}
+                  <TabPane tab="交付与排期" key="schedule">
+                    <Descriptions column={2} bordered>
+                      <Descriptions.Item label="交付周期">{projectData.deliveryCycleDays}天</Descriptions.Item>
+                      <Descriptions.Item label="集数">{projectData.episodeCount}集</Descriptions.Item>
+                      <Descriptions.Item label="交付时间（截止时间）">
+                        {projectData.dueTime ? dayjs(projectData.dueTime).format('YYYY-MM-DD HH:mm:ss') : '-'}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="单价">¥{projectData.unitPrice}/集</Descriptions.Item>
+                      <Descriptions.Item label="制作天数">{projectData.productionDays || '-'}</Descriptions.Item>
+                      <Descriptions.Item label="制作开始时间">
+                        {projectData.productionStartTime ? dayjs(projectData.productionStartTime).format('YYYY-MM-DD HH:mm:ss') : '-'}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="发布时间">
+                        {projectData.publishTime ? dayjs(projectData.publishTime).format('YYYY-MM-DD HH:mm:ss') : '-'}
+                      </Descriptions.Item>
+                    </Descriptions>
+                  </TabPane>
+
+                  {/* 人员与订单 */}
+                  <TabPane tab="人员与订单" key="personnel">
+                    {/* 人员与组织信息 */}
+                    <div style={{ marginBottom: 24 }}>
+                      <Title level={4} style={{ marginBottom: 16 }}>人员与组织</Title>
+                      <Descriptions column={2} bordered>
+                        <Descriptions.Item label="统筹人员">{projectData.coordinator}</Descriptions.Item>
+                        <Descriptions.Item label="参与成员">
+                          {projectData.participantMembers && projectData.participantMembers.length > 0 ? (
+                            <Space>
+                              {projectData.participantMembers.map((member, idx) => (
+                                <Tag key={idx}>{member.name || member}</Tag>
+                              ))}
+                            </Space>
+                          ) : '-'}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="接单模式">
+                          <Tag color={projectData.takeMode === '抢单' ? 'orange' : 'cyan'}>
+                            {projectData.takeMode === '抢单' ? '🔥 抢单' : '👤 报名'}
+                          </Tag>
+                        </Descriptions.Item>
+                        <Descriptions.Item label="名额">{projectData.quotaTotal}人</Descriptions.Item>
+                        <Descriptions.Item label="已接单数">{projectData.quotaTaken}/{projectData.quotaTotal}</Descriptions.Item>
+                        <Descriptions.Item label="报名审核策略">
+                          {projectData.applyReviewRule || '-'}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="指定候选人" span={2}>
+                          {projectData.candidates && projectData.candidates.length > 0 ? (
+                            <Space>
+                              {projectData.candidates.map((candidate, idx) => (
+                                <Tag key={idx}>{candidate.name || candidate}</Tag>
+                              ))}
+                            </Space>
+                          ) : '未指定'}
+                        </Descriptions.Item>
+                      </Descriptions>
+                    </div>
+
+                    {/* 项目内订单列表 */}
+                    <div>
+                      <Title level={4} style={{ marginBottom: 16 }}>项目内订单</Title>
+                      {orders.length > 0 ? (
+                        <Table
+                          columns={orderColumns}
+                          dataSource={orders}
+                          rowKey={(r) => r.orderId || r.id}
+                          pagination={{ pageSize: 10, showTotal: (total) => `共 ${total} 条` }}
+                        />
+                      ) : (
+                        <Empty description="该项目暂无订单" />
+                      )}
+                    </div>
+                  </TabPane>
+
+                  {/* 需求与素材 */}
+                  <TabPane tab="需求与素材" key="requirements">
+                    <Descriptions column={1} bordered>
+                      <Descriptions.Item label="项目需求（文本）">
+                        <div style={{ whiteSpace: 'pre-wrap', maxHeight: 300, overflow: 'auto', padding: 12, background: '#f5f5f5', borderRadius: 4 }}>
+                          {projectData.requirementText || '-'}
+                        </div>
+                      </Descriptions.Item>
+                      <Descriptions.Item label="项目需求（附件）">
+                        {projectData.requirementAttachments && projectData.requirementAttachments.length > 0 ? (
+                          <Space direction="vertical">
+                            {projectData.requirementAttachments.map((file, idx) => (
+                              <div key={idx}>
+                                <Button type="link" onClick={() => message.info('下载功能开发中')}>
+                                  📎 {file.name}
+                                </Button>
+                                <span style={{ marginLeft: 8, color: '#8c8c8c', fontSize: 12 }}>
+                                  ({formatFileSize(file.size)})
+                                </span>
+                              </div>
+                            ))}
+                          </Space>
+                        ) : '-'}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="交付要求">
+                        {projectData.deliveryRequirements ? (
+                          <div style={{ padding: 12, background: '#fff7e6', borderRadius: 4 }}>
+                            {Object.entries(projectData.deliveryRequirements).map(([key, value]) => (
+                              <div key={key} style={{ marginBottom: 8 }}>
+                                <Text strong>{key === 'namingRule' ? '命名规范' : 
+                                              key === 'resolution' ? '分辨率' : 
+                                              key === 'bitrate' ? '码率' : 
+                                              key === 'subtitleRule' ? '字幕规范' : key}：</Text>
+                                <span style={{ marginLeft: 8 }}>{value}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : '-'}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="素材说明">
+                        <div style={{ whiteSpace: 'pre-wrap', maxHeight: 200, overflow: 'auto' }}>
+                          {projectData.materialNote || '-'}
+                        </div>
+                      </Descriptions.Item>
+                      <Descriptions.Item label="素材包">
+                        {projectData.materialPackageFiles && projectData.materialPackageFiles.length > 0 ? (
+                          <Space direction="vertical">
+                            {projectData.materialPackageFiles.map((file, idx) => (
+                              <div key={idx}>
+                                <Button type="link" onClick={() => message.info('下载功能开发中')}>
+                                  📦 {file.name}
+                                </Button>
+                                <span style={{ marginLeft: 8, color: '#8c8c8c', fontSize: 12 }}>
+                                  ({formatFileSize(file.size)})
+                                </span>
+                              </div>
+                            ))}
+                          </Space>
+                        ) : '-'}
+                      </Descriptions.Item>
+                    </Descriptions>
+                  </TabPane>
+                </Tabs>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    window.addEventListener('load', function() {
+      try {
+        ReactDOM.render(<ProjectDetail />, document.getElementById('root'));
+      } catch (error) {
+        console.error('渲染错误:', error);
+        document.getElementById('root').innerHTML = '<div style="padding: 20px; color: red;">页面加载失败，请检查浏览器控制台错误信息。</div>';
+      }
+    });
+  </script>
+</body>
+</html>

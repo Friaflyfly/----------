@@ -1,0 +1,8 @@
+当前项目是基于 @接单平台1.0｜一期MVP PRD.pdf 的原型开发。 强制规范：
+
+必须使用 React 和 Ant Design (antd) 组件库。
+
+样式必须使用 Less，并采用 CSS Modules 模式（文件名格式：xxx.module.less）。
+
+严禁使用 Tailwind CSS。 4. 所有交互逻辑需严格对齐 PRD 中的‘状态机’ 。”
+输出内容格式为html文件，使用antd组件库，不需要其他格式。

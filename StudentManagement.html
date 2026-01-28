@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学员管理 - 天合短剧剪辑接单平台</title>
+  
+  <!-- Ant Design CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.css">
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .appLayout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 200px;
+      background: #fff;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .sidebarHeader {
+      padding: 20px 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1890ff;
+      text-decoration: none;
+      display: block;
+    }
+
+    .menu {
+      padding: 16px 0;
+    }
+
+    .menuItem {
+      display: block;
+      padding: 12px 24px;
+      color: #262626;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.3s;
+      border-left: 3px solid transparent;
+    }
+
+    .menuItem:hover {
+      background-color: #f0f0f0;
+      color: #1890ff;
+    }
+
+    .menuItem.active {
+      background-color: #e6f7ff;
+      color: #1890ff;
+      border-left-color: #1890ff;
+      font-weight: 500;
+    }
+
+    .menuItemIcon {
+      margin-right: 8px;
+      font-size: 16px;
+    }
+
+    .menuGroup {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    .menuGroupTitle {
+      padding: 8px 24px;
+      font-size: 12px;
+      color: #8c8c8c;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .mainContent {
+      flex: 1;
+      margin-left: 200px;
+      min-height: 100vh;
+      background: #f5f5f5;
+    }
+
+    .studentPage {
+      padding: 24px;
+    }
+
+    .pageHeader {
+      background: #fff;
+      padding: 16px 24px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .contentCard {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+
+      .mainContent {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+  
+  <!-- Day.js -->
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js"></script>
+  
+  <!-- Ant Design JS -->
+  <script src="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.js"></script>
+  
+  <!-- Babel Standalone for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo } = React;
+    const { Card, Table, Button, Tag, Space, Select, Input, Tabs, Typography, Modal, Form, message, Popconfirm } = antd;
+    const { Title } = Typography;
+    const { Option } = Select;
+    const { TabPane } = Tabs;
+    const { TextArea } = Input;
+    const { Search } = Input;
+
+    const StudentManagement = () => {
+      const [activeTab, setActiveTab] = useState('talent');
+      const [talentList, setTalentList] = useState([]);
+      const [pendingList, setPendingList] = useState([]);
+      const [loading, setLoading] = useState(false);
+      const [freezeModalVisible, setFreezeModalVisible] = useState(false);
+      const [freezeForm] = Form.useForm();
+      const [currentStudent, setCurrentStudent] = useState(null);
+
+      useEffect(() => {
+        loadData();
+      }, []);
+
+      const loadData = () => {
+        setLoading(true);
+        
+        // 加载人才库
+        let talent = JSON.parse(localStorage.getItem('talentPool') || '[]');
+        if (talent.length === 0) {
+          talent = generateMockTalent();
+          localStorage.setItem('talentPool', JSON.stringify(talent));
+        }
+        setTalentList(talent);
+
+        // 加载入驻审核队列
+        let pending = JSON.parse(localStorage.getItem('pendingStudents') || '[]');
+        if (pending.length === 0) {
+          pending = generateMockPending();
+          localStorage.setItem('pendingStudents', JSON.stringify(pending));
+        }
+        setPendingList(pending);
+
+        setLoading(false);
+      };
+
+      const generateMockTalent = () => {
+        const statuses = ['Active', 'Training', 'Paused', 'Frozen', 'Exited'];
+        return Array.from({ length: 20 }, (_, i) => ({
+          id: `student_${String(i + 1).padStart(6, '0')}`,
+          nickname: `学员${i + 1}`,
+          username: `user${i + 1}`,
+          status: statuses[Math.floor(Math.random() * statuses.length)],
+          skills: ['剪辑', '调色', '特效'].slice(0, Math.floor(Math.random() * 3) + 1),
+          level: Math.floor(Math.random() * 5) + 1,
+          concurrencyUsed: Math.floor(Math.random() * 3),
+          concurrencyLimit: 5,
+          totalOrders: Math.floor(Math.random() * 50),
+          onTimeRate: (Math.random() * 0.3 + 0.7).toFixed(2),
+          passRate: (Math.random() * 0.2 + 0.8).toFixed(2),
+          revisionRounds: (Math.random() * 2 + 1).toFixed(1),
+          freezeReason: i === 2 ? '违反平台规则' : null,
+        }));
+      };
+
+      const generateMockPending = () => {
+        return [
+          { id: 'pending_1', nickname: '张三', username: 'zhangsan', applyTime: dayjs().subtract(2, 'day').format('YYYY-MM-DD HH:mm:ss'), portfolio: 'portfolio1.zip' },
+          { id: 'pending_2', nickname: '李四', username: 'lisi', applyTime: dayjs().subtract(1, 'day').format('YYYY-MM-DD HH:mm:ss'), portfolio: 'portfolio2.zip' },
+          { id: 'pending_3', nickname: '王五', username: 'wangwu', applyTime: dayjs().subtract(3, 'hour').format('YYYY-MM-DD HH:mm:ss') },
+        ];
+      };
+
+      const handleApprove = (student) => {
+        const updatedPending = pendingList.filter(s => s.id !== student.id);
+        setPendingList(updatedPending);
+        localStorage.setItem('pendingStudents', JSON.stringify(updatedPending));
+
+        const newTalent = {
+          ...student,
+          id: `student_${Date.now()}`,
+          status: 'Training',
+          skills: [],
+          level: 1,
+          concurrencyUsed: 0,
+          concurrencyLimit: 5,
+          totalOrders: 0,
+          onTimeRate: '0.00',
+          passRate: '0.00',
+          revisionRounds: '0.0',
+        };
+        const updatedTalent = [...talentList, newTalent];
+        setTalentList(updatedTalent);
+        localStorage.setItem('talentPool', JSON.stringify(updatedTalent));
+        message.success('已通过入驻审核');
+      };
+
+      const handleReject = (student, reason) => {
+        const updatedPending = pendingList.filter(s => s.id !== student.id);
+        setPendingList(updatedPending);
+        localStorage.setItem('pendingStudents', JSON.stringify(updatedPending));
+        message.success('已驳回');
+      };
+
+      const handleFreeze = () => {
+        freezeForm.validateFields().then(values => {
+          const updatedTalent = talentList.map(s => 
+            s.id === currentStudent.id 
+              ? { ...s, status: 'Frozen', freezeReason: values.reason }
+              : s
+          );
+          setTalentList(updatedTalent);
+          localStorage.setItem('talentPool', JSON.stringify(updatedTalent));
+          setFreezeModalVisible(false);
+          freezeForm.resetFields();
+          message.success('已冻结');
+        });
+      };
+
+      const handleUnfreeze = (student) => {
+        const updatedTalent = talentList.map(s => 
+          s.id === student.id 
+            ? { ...s, status: 'Active', freezeReason: null }
+            : s
+        );
+        setTalentList(updatedTalent);
+        localStorage.setItem('talentPool', JSON.stringify(updatedTalent));
+        message.success('已解冻');
+      };
+
+      const handleStatusChange = (student, newStatus) => {
+        const updatedTalent = talentList.map(s => 
+          s.id === student.id ? { ...s, status: newStatus } : s
+        );
+        setTalentList(updatedTalent);
+        localStorage.setItem('talentPool', JSON.stringify(updatedTalent));
+        message.success('状态已更新');
+      };
+
+      const handleViewOrders = (student) => {
+        message.info(`查看${student.nickname}的接单详情功能开发中`);
+      };
+
+      const getStatusTag = (status) => {
+        const statusMap = {
+          'Active': { color: 'green', text: '可接单' },
+          'Training': { color: 'blue', text: '在训' },
+          'Paused': { color: 'orange', text: '暂停' },
+          'Frozen': { color: 'red', text: '冻结' },
+          'Exited': { color: 'default', text: '退出' },
+        };
+        const config = statusMap[status] || { color: 'default', text: status };
+        return <Tag color={config.color}>{config.text}</Tag>;
+      };
+
+      const talentColumns = [
+        { title: '学员ID', dataIndex: 'id', key: 'id', width: 150 },
+        { title: '昵称', dataIndex: 'nickname', key: 'nickname', width: 120 },
+        { title: '状态', dataIndex: 'status', key: 'status', width: 100, render: getStatusTag },
+        { title: '技能标签', dataIndex: 'skills', key: 'skills', width: 150, render: (skills) => (
+          <Space size="small">{skills.map((s, i) => <Tag key={i}>{s}</Tag>)}</Space>
+        )},
+        { title: '等级', dataIndex: 'level', key: 'level', width: 80 },
+        { title: '并发占用/上限', key: 'concurrency', width: 120, render: (_, record) => 
+          `${record.concurrencyUsed}/${record.concurrencyLimit}` },
+        { title: '总接单量', dataIndex: 'totalOrders', key: 'totalOrders', width: 100, render: (count, record) => (
+          <a onClick={() => handleViewOrders(record)} style={{ color: '#1890ff', cursor: 'pointer' }}>{count}</a>
+        )},
+        { title: '准时率', dataIndex: 'onTimeRate', key: 'onTimeRate', width: 100, render: (rate) => `${(rate * 100).toFixed(0)}%` },
+        { title: '通过率', dataIndex: 'passRate', key: 'passRate', width: 100, render: (rate) => `${(rate * 100).toFixed(0)}%` },
+        { title: '修改轮次', dataIndex: 'revisionRounds', key: 'revisionRounds', width: 100 },
+        { title: '冻结原因', dataIndex: 'freezeReason', key: 'freezeReason', width: 150, render: (reason) => reason || '-' },
+        { title: '操作', key: 'action', width: 200, render: (_, record) => (
+          <Space size="small">
+            <Button size="small" onClick={() => message.info('编辑功能开发中')}>编辑</Button>
+            {record.status === 'Active' && (
+              <>
+                <Button size="small" onClick={() => handleStatusChange(record, 'Paused')}>暂停</Button>
+                <Button size="small" danger onClick={() => { setCurrentStudent(record); setFreezeModalVisible(true); }}>冻结</Button>
+              </>
+            )}
+            {record.status === 'Paused' && (
+              <Button size="small" onClick={() => handleStatusChange(record, 'Active')}>激活</Button>
+            )}
+            {record.status === 'Frozen' && (
+              <Button size="small" onClick={() => handleUnfreeze(record)}>解冻</Button>
+            )}
+          </Space>
+        )},
+      ];
+
+      const pendingColumns = [
+        { title: '申请时间', dataIndex: 'applyTime', key: 'applyTime', width: 180 },
+        { title: '昵称', dataIndex: 'nickname', key: 'nickname', width: 120 },
+        { title: '用户名', dataIndex: 'username', key: 'username', width: 120 },
+        { title: '作品集', dataIndex: 'portfolio', key: 'portfolio', width: 150, render: (portfolio) => 
+          portfolio ? <a href="#" onClick={(e) => { e.preventDefault(); message.info('下载作品集'); }}>下载</a> : <span style={{ color: '#8c8c8c' }}>未上传</span>
+        },
+        { title: '操作', key: 'action', width: 200, render: (_, record) => (
+          <Space>
+            <Popconfirm title="确定通过？" onConfirm={() => handleApprove(record)}>
+              <Button type="primary" size="small">通过</Button>
+            </Popconfirm>
+            <Popconfirm 
+              title="确定驳回？" 
+              onConfirm={() => {
+                Modal.confirm({
+                  title: '驳回原因',
+                  content: <Input placeholder="请输入驳回原因" id="rejectReason" />,
+                  onOk: () => {
+                    const reason = document.getElementById('rejectReason').value;
+                    if (!reason) {
+                      message.error('请填写驳回原因');
+                      return Promise.reject();
+                    }
+                    handleReject(record, reason);
+                  },
+                });
+              }}
+            >
+              <Button danger size="small">驳回</Button>
+            </Popconfirm>
+          </Space>
+        )},
+      ];
+
+      return (
+        <div className="appLayout">
+          {/* 左侧导航栏 */}
+          <div className="sidebar">
+            <div className="sidebarHeader">
+              <a href="Home.html" className="logo">🎬 天合短剧平台</a>
+            </div>
+            <nav className="menu">
+              <a href="Home.html" className="menuItem">
+                <span className="menuItemIcon">🏠</span>
+                首页
+              </a>
+              <a href="ProjectHall.html" className="menuItem">
+                <span className="menuItemIcon">📋</span>
+                接单大厅
+              </a>
+              <a href="ProjectHall.html?tab=leaderboard" className="menuItem">
+                <span className="menuItemIcon">🏆</span>
+                天梯榜单
+              </a>
+              <a href="Account.html" className="menuItem">
+                <span className="menuItemIcon">💰</span>
+                账户与收益
+              </a>
+              <a href="MyProjects.html" className="menuItem">
+                <span className="menuItemIcon">🚀</span>
+                我的项目
+              </a>
+              
+              <div className="menuGroup">
+                <div className="menuGroupTitle">后台管理</div>
+                <a href="ReviewQueue.html" className="menuItem">
+                  <span className="menuItemIcon">✅</span>
+                  内容审核
+                </a>
+                <a href="ProjectManagement.html" className="menuItem">
+                  <span className="menuItemIcon">📋</span>
+                  项目管理
+                </a>
+                <a href="StudentManagement.html" className="menuItem active">
+                  <span className="menuItemIcon">👥</span>
+                  学员管理
+                </a>
+                <a href="FinanceManagement.html" className="menuItem">
+                  <span className="menuItemIcon">💰</span>
+                  财务对账
+                </a>
+                <a href="DashboardManagement.html" className="menuItem">
+                  <span className="menuItemIcon">📊</span>
+                  榜单与数据
+                </a>
+              </div>
+            </nav>
+          </div>
+
+          {/* 主内容区 */}
+          <div className="mainContent">
+            <div className="studentPage">
+              <div className="pageHeader">
+                <Title level={2} style={{ margin: 0 }}>学员管理</Title>
+                <Button type="primary" onClick={() => message.info('新增学员功能开发中')}>新增学员</Button>
+              </div>
+
+              <div className="contentCard">
+                <Tabs activeKey={activeTab} onChange={setActiveTab}>
+                  <TabPane tab="人才库" key="talent">
+                    <Table
+                      columns={talentColumns}
+                      dataSource={talentList}
+                      loading={loading}
+                      rowKey="id"
+                      scroll={{ x: 1400 }}
+                      pagination={{ pageSize: 20, showTotal: (total) => `共 ${total} 条` }}
+                    />
+                  </TabPane>
+                  <TabPane tab="入驻审核队列" key="pending">
+                    <Table
+                      columns={pendingColumns}
+                      dataSource={pendingList}
+                      loading={loading}
+                      rowKey="id"
+                      pagination={{ pageSize: 20, showTotal: (total) => `共 ${total} 条` }}
+                    />
+                  </TabPane>
+                </Tabs>
+              </div>
+            </div>
+          </div>
+
+          {/* 冻结弹窗 */}
+          <Modal
+            title="冻结学员"
+            open={freezeModalVisible}
+            onOk={handleFreeze}
+            onCancel={() => { setFreezeModalVisible(false); freezeForm.resetFields(); }}
+            okText="确认冻结"
+            cancelText="取消"
+          >
+            <Form form={freezeForm} layout="vertical">
+              <Form.Item
+                name="reason"
+                label="冻结原因"
+                rules={[{ required: true, message: '请填写冻结原因' }]}
+              >
+                <TextArea rows={4} placeholder="请填写冻结原因" />
+              </Form.Item>
+            </Form>
+          </Modal>
+        </div>
+      );
+    };
+
+    window.addEventListener('load', function() {
+      try {
+        ReactDOM.render(<StudentManagement />, document.getElementById('root'));
+      } catch (error) {
+        console.error('渲染错误:', error);
+        document.getElementById('root').innerHTML = '<div style="padding: 20px; color: red;">页面加载失败，请检查浏览器控制台错误信息。</div>';
+      }
+    });
+  </script>
+</body>
+</html>

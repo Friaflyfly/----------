@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>内容审核 - 天合短剧剪辑接单平台</title>
+  
+  <!-- Ant Design CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.css">
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .appLayout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 200px;
+      background: #fff;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .sidebarHeader {
+      padding: 20px 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1890ff;
+      text-decoration: none;
+      display: block;
+    }
+
+    .menu {
+      padding: 16px 0;
+    }
+
+    .menuItem {
+      display: block;
+      padding: 12px 24px;
+      color: #262626;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.3s;
+      border-left: 3px solid transparent;
+    }
+
+    .menuItem:hover {
+      background-color: #f0f0f0;
+      color: #1890ff;
+    }
+
+    .menuItem.active {
+      background-color: #e6f7ff;
+      color: #1890ff;
+      border-left-color: #1890ff;
+      font-weight: 500;
+    }
+
+    .menuItemIcon {
+      margin-right: 8px;
+      font-size: 16px;
+    }
+
+    .menuGroup {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    .menuGroupTitle {
+      padding: 8px 24px;
+      font-size: 12px;
+      color: #8c8c8c;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .mainContent {
+      flex: 1;
+      margin-left: 200px;
+      min-height: 100vh;
+      background: #f5f5f5;
+    }
+
+    .reviewPage {
+      padding: 24px;
+    }
+
+    .pageHeader {
+      background: #fff;
+      padding: 16px 24px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .pageTitle {
+      font-size: 20px;
+      font-weight: 600;
+      color: #262626;
+      margin: 0;
+    }
+
+    .filterCard {
+      background: #fff;
+      padding: 16px 24px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .tableCard {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+
+      .mainContent {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+  
+  <!-- Day.js -->
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js"></script>
+  
+  <!-- Ant Design JS -->
+  <script src="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.js"></script>
+  
+  <!-- Babel Standalone for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo } = React;
+    const { Card, Table, Button, Tag, Space, Select, Input, Typography, Badge, message } = antd;
+    const { Title } = Typography;
+    const { Option } = Select;
+    const { Search } = Input;
+
+    const ReviewQueue = () => {
+      const [reviewList, setReviewList] = useState([]);
+      const [loading, setLoading] = useState(false);
+      const [filters, setFilters] = useState({
+        riskLevel: '',
+        search: '',
+      });
+
+      useEffect(() => {
+        loadReviewData();
+      }, []);
+
+      const loadReviewData = () => {
+        setLoading(true);
+        
+        // 确保有测试订单数据
+        ensureTestOrders();
+        
+        // 从 localStorage 读取审核数据
+        let reviews = JSON.parse(localStorage.getItem('reviewQueue') || '[]');
+        
+        // 如果没有数据，生成测试数据
+        if (reviews.length === 0) {
+          reviews = generateMockReviewData();
+          localStorage.setItem('reviewQueue', JSON.stringify(reviews));
+        }
+
+        setReviewList(reviews);
+        setLoading(false);
+      };
+
+      // 确保有测试订单数据
+      const ensureTestOrders = () => {
+        let orders = JSON.parse(localStorage.getItem('currentOrders') || '[]');
+        const hasSubmitted = orders.some(o => o.status === 'Submitted');
+        
+        if (!hasSubmitted || orders.length === 0) {
+          // 生成测试订单，包含 Submitted 状态的订单用于审核
+          const testOrders = [
+            {
+              id: 'ORD000001',
+              orderId: 'ORD000001',
+              projectId: 'proj_1',
+              projectName: '霸道总裁爱上我',
+              taker: '学员A',
+              status: 'Submitted',
+              takeTime: dayjs().subtract(5, 'day').format('YYYY-MM-DD HH:mm:ss'),
+              dueTime: dayjs().add(2, 'day').format('YYYY-MM-DD HH:mm:ss'),
+              submitTime: dayjs().subtract(2, 'hour').format('YYYY-MM-DD HH:mm:ss'),
+              version: 'V1',
+              amount: 10000,
+            },
+            {
+              id: 'ORD000002',
+              orderId: 'ORD000002',
+              projectId: 'proj_2',
+              projectName: 'AI漫剧：穿越时空的冒险',
+              taker: '学员B',
+              status: 'Submitted',
+              takeTime: dayjs().subtract(4, 'day').format('YYYY-MM-DD HH:mm:ss'),
+              dueTime: dayjs().add(1, 'day').format('YYYY-MM-DD HH:mm:ss'),
+              submitTime: dayjs().subtract(4, 'hour').format('YYYY-MM-DD HH:mm:ss'),
+              version: 'V1',
+              amount: 8000,
+            },
+            {
+              id: 'ORD000003',
+              orderId: 'ORD000003',
+              projectId: 'proj_3',
+              projectName: '短剧：古装仙侠传奇',
+              taker: '学员C',
+              status: 'Submitted',
+              takeTime: dayjs().subtract(3, 'day').format('YYYY-MM-DD HH:mm:ss'),
+              dueTime: dayjs().add(3, 'day').format('YYYY-MM-DD HH:mm:ss'),
+              submitTime: dayjs().subtract(6, 'hour').format('YYYY-MM-DD HH:mm:ss'),
+              version: 'V2',
+              amount: 12000,
+            },
+            {
+              id: 'ORD000004',
+              orderId: 'ORD000004',
+              projectId: 'proj_4',
+              projectName: '综艺剪辑：真人秀精彩片段',
+              taker: '学员D',
+              status: 'Submitted',
+              takeTime: dayjs().subtract(2, 'day').format('YYYY-MM-DD HH:mm:ss'),
+              dueTime: dayjs().add(4, 'day').format('YYYY-MM-DD HH:mm:ss'),
+              submitTime: dayjs().subtract(1, 'hour').format('YYYY-MM-DD HH:mm:ss'),
+              version: 'V1',
+              amount: 6000,
+            },
+          ];
+
+          // 合并现有订单和测试订单（避免重复）
+          const existingIds = new Set(orders.map(o => o.orderId || o.id));
+          const newOrders = testOrders.filter(o => !existingIds.has(o.orderId));
+          orders = [...orders, ...newOrders];
+          localStorage.setItem('currentOrders', JSON.stringify(orders));
+
+          // 为每个测试订单创建协同空间数据（包含交付版本）
+          newOrders.forEach(order => {
+            const spaceKey = `orderSpace_${order.orderId}`;
+            const existingSpace = localStorage.getItem(spaceKey);
+            if (!existingSpace) {
+              const spaceData = {
+                orderId: order.orderId,
+                projectId: order.projectId,
+                projectName: order.projectName,
+                status: 'Submitted',
+                deliveries: [
+                  {
+                    id: `delivery_${Date.now()}_${order.orderId}`,
+                    version: order.version,
+                    fileName: `${order.projectName}_${order.version}.zip`,
+                    uploadTime: order.submitTime,
+                    uploader: order.taker,
+                    changeNote: '首次提交交付文件',
+                    status: 'Submitted',
+                    fileSize: Math.floor(Math.random() * 500000000) + 100000000,
+                  },
+                ],
+                revisions: [],
+                messages: [],
+              };
+              localStorage.setItem(spaceKey, JSON.stringify(spaceData));
+            }
+          });
+        }
+      };
+
+      const generateMockReviewData = () => {
+        const mockOrders = JSON.parse(localStorage.getItem('currentOrders') || '[]');
+        const submittedOrders = mockOrders.filter(order => order.status === 'Submitted');
+        
+        return submittedOrders.map((order, index) => {
+          const submitTime = dayjs().subtract(index * 2, 'hour');
+          const dueTime = dayjs(order.dueTime || submitTime.add(3, 'day'));
+          const waitHours = dayjs().diff(submitTime, 'hour');
+          
+          const riskLevels = ['低风险', '中风险', '高风险'];
+          const riskLevel = riskLevels[Math.floor(Math.random() * riskLevels.length)];
+          const tags = ['画面质量', '音频同步', '字幕规范', '时长符合', '内容合规'];
+          const hitTags = tags.slice(0, Math.floor(Math.random() * 3) + 1);
+
+          // 确保 orderId 字段正确（支持 orderId 和 id 两种）
+          const orderId = order.orderId || order.id || `ORD${String(index + 1).padStart(6, '0')}`;
+          
+          return {
+            id: `review_${orderId}`,
+            orderId: orderId,
+            projectName: order.projectName || '测试项目',
+            taker: order.taker || '学员A',
+            version: `V${order.version || 1}`,
+            submitTime: submitTime.format('YYYY-MM-DD HH:mm:ss'),
+            waitHours: waitHours,
+            dueTime: dueTime.format('YYYY-MM-DD HH:mm:ss'),
+            riskLevel: riskLevel,
+            hitTags: hitTags,
+            order: order,
+          };
+        });
+      };
+
+      // 过滤和排序数据
+      const filteredAndSortedData = useMemo(() => {
+        let filtered = reviewList.filter(item => {
+          if (filters.riskLevel && item.riskLevel !== filters.riskLevel) return false;
+          if (filters.search) {
+            const searchLower = filters.search.toLowerCase();
+            if (!item.orderId.toLowerCase().includes(searchLower) &&
+                !item.projectName.toLowerCase().includes(searchLower) &&
+                !item.taker.toLowerCase().includes(searchLower)) {
+              return false;
+            }
+          }
+          return true;
+        });
+
+        // 排序：临期优先 + 等待时长
+        filtered.sort((a, b) => {
+          const dueTimeA = dayjs(a.dueTime);
+          const dueTimeB = dayjs(b.dueTime);
+          const now = dayjs();
+          
+          // 临期优先：距离截止时间越近越靠前
+          const diffA = dueTimeA.diff(now, 'hour');
+          const diffB = dueTimeB.diff(now, 'hour');
+          
+          if (diffA < 0 && diffB >= 0) return -1; // A已超期，B未超期
+          if (diffA >= 0 && diffB < 0) return 1; // B已超期，A未超期
+          if (diffA < 0 && diffB < 0) return diffA - diffB; // 都超期，按超期时间排序
+          
+          // 都未超期，按等待时长排序（等待时间越长越靠前）
+          return b.waitHours - a.waitHours;
+        });
+
+        return filtered;
+      }, [reviewList, filters]);
+
+      const handleReview = (record) => {
+        window.location.href = `ReviewDetail.html?orderId=${record.orderId}`;
+      };
+
+      const getRiskLevelColor = (level) => {
+        const colorMap = {
+          '低风险': 'green',
+          '中风险': 'orange',
+          '高风险': 'red',
+        };
+        return colorMap[level] || 'default';
+      };
+
+      const formatWaitTime = (hours) => {
+        if (hours < 1) return '刚刚';
+        if (hours < 24) return `${hours}小时`;
+        return `${Math.floor(hours / 24)}天${hours % 24}小时`;
+      };
+
+      const columns = [
+        {
+          title: '订单号',
+          dataIndex: 'orderId',
+          key: 'orderId',
+          width: 150,
+          fixed: 'left',
+        },
+        {
+          title: '项目名',
+          dataIndex: 'projectName',
+          key: 'projectName',
+          width: 200,
+          ellipsis: true,
+        },
+        {
+          title: '接单人',
+          dataIndex: 'taker',
+          key: 'taker',
+          width: 120,
+        },
+        {
+          title: '版本号',
+          dataIndex: 'version',
+          key: 'version',
+          width: 100,
+        },
+        {
+          title: '提交审核时间',
+          dataIndex: 'submitTime',
+          key: 'submitTime',
+          width: 180,
+        },
+        {
+          title: '等待时长',
+          dataIndex: 'waitHours',
+          key: 'waitHours',
+          width: 120,
+          render: (hours) => (
+            <Tag color={hours > 24 ? 'red' : hours > 12 ? 'orange' : 'blue'}>
+              {formatWaitTime(hours)}
+            </Tag>
+          ),
+        },
+        {
+          title: '项目截止时间',
+          dataIndex: 'dueTime',
+          key: 'dueTime',
+          width: 180,
+          render: (time) => {
+            const dueTime = dayjs(time);
+            const now = dayjs();
+            const isOverdue = dueTime.isBefore(now);
+            return (
+              <span style={{ color: isOverdue ? '#ff4d4f' : '#262626' }}>
+                {time}
+                {isOverdue && <Badge status="error" style={{ marginLeft: 8 }} />}
+              </span>
+            );
+          },
+        },
+        {
+          title: 'AI预审风险等级',
+          dataIndex: 'riskLevel',
+          key: 'riskLevel',
+          width: 140,
+          render: (level) => (
+            <Tag color={getRiskLevelColor(level)}>{level}</Tag>
+          ),
+        },
+        {
+          title: '命中标签',
+          dataIndex: 'hitTags',
+          key: 'hitTags',
+          width: 200,
+          render: (tags) => (
+            <Space size="small" wrap>
+              {tags && tags.map((tag, idx) => (
+                <Tag key={idx} color="blue">{tag}</Tag>
+              ))}
+            </Space>
+          ),
+        },
+        {
+          title: '操作',
+          key: 'action',
+          width: 120,
+          fixed: 'right',
+          render: (_, record) => (
+            <Button type="primary" size="small" onClick={() => handleReview(record)}>
+              进入审核
+            </Button>
+          ),
+        },
+      ];
+
+      return (
+        <div className="appLayout">
+          {/* 左侧导航栏 */}
+          <div className="sidebar">
+            <div className="sidebarHeader">
+              <a href="Home.html" className="logo">🎬 天合短剧平台</a>
+            </div>
+            <nav className="menu">
+              <a href="Home.html" className="menuItem">
+                <span className="menuItemIcon">🏠</span>
+                首页
+              </a>
+              <a href="ProjectHall.html" className="menuItem">
+                <span className="menuItemIcon">📋</span>
+                接单大厅
+              </a>
+              <a href="ProjectHall.html?tab=leaderboard" className="menuItem">
+                <span className="menuItemIcon">🏆</span>
+                天梯榜单
+              </a>
+              <a href="Account.html" className="menuItem">
+                <span className="menuItemIcon">💰</span>
+                账户与收益
+              </a>
+              <a href="MyProjects.html" className="menuItem">
+                <span className="menuItemIcon">🚀</span>
+                我的项目
+              </a>
+              
+              <div className="menuGroup">
+                <div className="menuGroupTitle">后台管理</div>
+                <a href="ReviewQueue.html" className="menuItem active">
+                  <span className="menuItemIcon">✅</span>
+                  内容审核
+                </a>
+                <a href="ProjectManagement.html" className="menuItem">
+                  <span className="menuItemIcon">📋</span>
+                  项目管理
+                </a>
+                <a href="StudentManagement.html" className="menuItem">
+                  <span className="menuItemIcon">👥</span>
+                  学员管理
+                </a>
+                <a href="FinanceManagement.html" className="menuItem">
+                  <span className="menuItemIcon">💰</span>
+                  财务对账
+                </a>
+                <a href="DashboardManagement.html" className="menuItem">
+                  <span className="menuItemIcon">📊</span>
+                  榜单与数据
+                </a>
+              </div>
+            </nav>
+          </div>
+
+          {/* 主内容区 */}
+          <div className="mainContent">
+            <div className="reviewPage">
+              <div className="pageHeader">
+                <Title level={2} style={{ margin: 0 }}>内容审核</Title>
+              </div>
+
+              {/* 筛选区 */}
+              <div className="filterCard">
+                <Space size="middle" wrap>
+                  <span>AI预审风险等级：</span>
+                  <Select
+                    style={{ width: 150 }}
+                    placeholder="全部"
+                    allowClear
+                    value={filters.riskLevel}
+                    onChange={(value) => setFilters({ ...filters, riskLevel: value || '' })}
+                  >
+                    <Option value="低风险">低风险</Option>
+                    <Option value="中风险">中风险</Option>
+                    <Option value="高风险">高风险</Option>
+                  </Select>
+
+                  <Search
+                    placeholder="搜索订单号/项目名/接单人"
+                    style={{ width: 300 }}
+                    allowClear
+                    value={filters.search}
+                    onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                    onSearch={(value) => setFilters({ ...filters, search: value })}
+                  />
+                </Space>
+              </div>
+
+              {/* 表格 */}
+              <div className="tableCard">
+                <Table
+                  columns={columns}
+                  dataSource={filteredAndSortedData}
+                  loading={loading}
+                  rowKey="id"
+                  scroll={{ x: 1400 }}
+                  pagination={{
+                    pageSize: 20,
+                    showSizeChanger: true,
+                    showTotal: (total) => `共 ${total} 条`,
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // 等待所有资源加载完成后再渲染
+    window.addEventListener('load', function() {
+      try {
+        ReactDOM.render(<ReviewQueue />, document.getElementById('root'));
+      } catch (error) {
+        console.error('渲染错误:', error);
+        document.getElementById('root').innerHTML = '<div style="padding: 20px; color: red;">页面加载失败，请检查浏览器控制台错误信息。</div>';
+      }
+    });
+  </script>
+</body>
+</html>

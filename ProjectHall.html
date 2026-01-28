@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>接单大厅 - 天合短剧剪辑接单平台</title>
+  
+  <!-- Ant Design CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.css">
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .appLayout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 200px;
+      background: #fff;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .sidebarHeader {
+      padding: 20px 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1890ff;
+      text-decoration: none;
+      display: block;
+    }
+
+    .menu {
+      padding: 16px 0;
+    }
+
+    .menuItem {
+      display: block;
+      padding: 12px 24px;
+      color: #262626;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.3s;
+      border-left: 3px solid transparent;
+    }
+
+    .menuItem:hover {
+      background-color: #f0f0f0;
+      color: #1890ff;
+    }
+
+    .menuItem.active {
+      background-color: #e6f7ff;
+      color: #1890ff;
+      border-left-color: #1890ff;
+      font-weight: 500;
+    }
+
+    .menuItemIcon {
+      margin-right: 8px;
+      font-size: 16px;
+    }
+
+    .menuGroup {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    .menuGroupTitle {
+      padding: 8px 24px;
+      font-size: 12px;
+      color: #8c8c8c;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .mainContent {
+      flex: 1;
+      margin-left: 200px;
+      min-height: 100vh;
+      background: #f5f5f5;
+    }
+
+    .projectHall {
+      padding: 24px;
+    }
+
+    .categoryTabs {
+      background: #fff;
+      padding: 0 24px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .categoryTabs .ant-tabs-tab {
+      padding: 16px 24px;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .filterSection {
+      background: #fff;
+      padding: 16px 24px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .filterItem {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .filterLabel {
+      margin-right: 8px;
+      color: #666;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .projectCard {
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .projectCard:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .projectCard .ant-card-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .projectCard .ant-card-actions {
+      border-top: 1px solid #f0f0f0;
+      padding: 12px 20px;
+    }
+
+    .projectCard .ant-card-actions li {
+      margin: 0;
+      width: 100%;
+    }
+
+    .projectCard .ant-card-actions .ant-btn {
+      height: 40px;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .projectCard .ant-card-actions .ant-btn-primary:disabled {
+      background-color: #d9d9d9;
+      border-color: #d9d9d9;
+      color: #fff;
+      cursor: not-allowed;
+    }
+
+    .cardHeader {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .projectName {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: #262626;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .cardContent {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tagsSection {
+      margin-bottom: 12px;
+    }
+
+    .tagsSection .ant-tag {
+      margin-bottom: 8px;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 12px;
+    }
+
+    .metaInfo {
+      margin-bottom: 16px;
+    }
+
+    .metaInfo .ant-tag {
+      margin-right: 8px;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 12px;
+    }
+
+    .infoGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex: 1;
+    }
+
+    .infoItem {
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .infoLabel {
+      color: #8c8c8c;
+      margin-right: 4px;
+      white-space: nowrap;
+    }
+
+    .infoValue {
+      color: #262626;
+      font-weight: 500;
+      flex: 1;
+    }
+
+    .footerInfo {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 12px;
+      border-top: 1px solid #f0f0f0;
+      font-size: 12px;
+      color: #8c8c8c;
+    }
+
+    .quotaInfo {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .quotaInfo .remaining {
+      color: #52c41a;
+      font-weight: 500;
+    }
+
+    .dueTimeInfo {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .disabledReason {
+      margin-top: 12px;
+      padding: 8px 12px;
+      background-color: #fff7e6;
+      border: 1px solid #ffe58f;
+      border-radius: 4px;
+      color: #d46b08;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .emptyState {
+      text-align: center;
+      padding: 60px 20px;
+      color: #8c8c8c;
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+
+      .mainContent {
+        margin-left: 0;
+      }
+
+      .projectHall {
+        padding: 16px;
+      }
+
+      .filterSection {
+        padding: 12px 16px;
+      }
+
+      .filterItem {
+        width: 100%;
+        margin-bottom: 12px;
+      }
+
+      .filterLabel {
+        min-width: 80px;
+      }
+
+      .infoGrid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+  
+  <!-- Day.js -->
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js"></script>
+  
+  <!-- Ant Design JS -->
+  <script src="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.js"></script>
+  
+  <!-- Babel Standalone for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useMemo } = React;
+    const { Tabs, Card, Tag, Button, Select, DatePicker, Space, Row, Col, Badge, message } = antd;
+    const { TabPane } = Tabs;
+    const { Option } = Select;
+    const { RangePicker } = DatePicker;
+
+    // Mock 数据 - 生成可接单的项目（截止时间为未来日期）
+    const generateMockProjects = () => {
+      const now = dayjs();
+      return [
+        {
+          id: '1',
+          projectName: '霸道总裁爱上我',
+          category: '短剧',
+          projectTags: ['霸总', '女频'],
+          contentGenre: '霸总',
+          difficulty: '精品',
+          deliveryCycleDays: 7,
+          episodeCount: 20,
+          participantTeam: '线上',
+          takeMode: '抢单',
+          quotaTotal: 5,
+          quotaTaken: 2,
+          status: 'Published',
+          unitPrice: 500,
+          dueTime: now.add(5, 'day').format('YYYY-MM-DD HH:mm:ss'),
+          publishTime: now.subtract(2, 'day').format('YYYY-MM-DD HH:mm:ss'),
+          isTop: false,
+        },
+        {
+          id: '2',
+          projectName: 'AI漫剧：穿越时空的冒险',
+          category: 'AI漫剧',
+          projectTags: ['穿越', '男频'],
+          contentGenre: '穿越',
+          difficulty: '工厂',
+          deliveryCycleDays: 5,
+          episodeCount: 15,
+          participantTeam: '实训',
+          takeMode: '报名',
+          quotaTotal: 10,
+          quotaTaken: 3,
+          status: 'Published',
+          unitPrice: 300,
+          dueTime: now.add(7, 'day').format('YYYY-MM-DD HH:mm:ss'),
+          publishTime: now.subtract(1, 'day').format('YYYY-MM-DD HH:mm:ss'),
+          isTop: true,
+        },
+        {
+          id: '3',
+          projectName: '短视频：美食探店系列',
+          category: '短视频',
+          projectTags: ['美食', '生活'],
+          contentGenre: '女频',
+          difficulty: '工厂',
+          deliveryCycleDays: 3,
+          episodeCount: 10,
+          participantTeam: '线下',
+          takeMode: '抢单',
+          quotaTotal: 8,
+          quotaTaken: 8,
+          status: 'ClosedForTaking',
+          unitPrice: 200,
+          dueTime: now.add(3, 'day').format('YYYY-MM-DD HH:mm:ss'),
+          publishTime: now.subtract(3, 'day').format('YYYY-MM-DD HH:mm:ss'),
+          isTop: false,
+          disabledReason: '已满员',
+        },
+        {
+          id: '4',
+          projectName: '综艺剪辑：真人秀精彩片段',
+          category: '综艺',
+          projectTags: ['真人秀', '娱乐'],
+          contentGenre: '男频',
+          difficulty: '精品',
+          deliveryCycleDays: 10,
+          episodeCount: 12,
+          participantTeam: '线上',
+          takeMode: '报名',
+          quotaTotal: 6,
+          quotaTaken: 1,
+          status: 'Published',
+          unitPrice: 800,
+          dueTime: now.add(10, 'day').format('YYYY-MM-DD HH:mm:ss'),
+          publishTime: now.subtract(5, 'day').format('YYYY-MM-DD HH:mm:ss'),
+          isTop: false,
+        },
+        {
+          id: '5',
+          projectName: '短剧：古装仙侠传奇',
+          category: '短剧',
+          projectTags: ['古装', '仙侠', '女频'],
+          contentGenre: '女频',
+          difficulty: '精品',
+          deliveryCycleDays: 14,
+          episodeCount: 30,
+          participantTeam: '实训',
+          takeMode: '抢单',
+          quotaTotal: 3,
+          quotaTaken: 0,
+          status: 'Published',
+          unitPrice: 600,
+          dueTime: now.add(14, 'day').format('YYYY-MM-DD HH:mm:ss'),
+          publishTime: now.subtract(7, 'day').format('YYYY-MM-DD HH:mm:ss'),
+          isTop: false,
+        },
+        {
+          id: '6',
+          projectName: 'AI漫剧：科幻未来世界',
+          category: 'AI漫剧',
+          projectTags: ['科幻', '男频'],
+          contentGenre: '男频',
+          difficulty: '工厂',
+          deliveryCycleDays: 6,
+          episodeCount: 18,
+          participantTeam: '线上',
+          takeMode: '报名',
+          quotaTotal: 12,
+          quotaTaken: 4,
+          status: 'Published',
+          unitPrice: 350,
+          dueTime: now.add(8, 'day').format('YYYY-MM-DD HH:mm:ss'),
+          publishTime: now.subtract(4, 'day').format('YYYY-MM-DD HH:mm:ss'),
+          isTop: true,
+        },
+      ];
+    };
+
+    const mockProjects = generateMockProjects();
+
+    // 题材标签选项
+    const genreOptions = ['霸总', '穿越', '男频', '女频', '古装', '仙侠', '科幻', '美食', '生活', '真人秀', '娱乐'];
+
+    // 项目状态选项
+    const statusOptions = [
+      { label: '可接单', value: 'Published' },
+      { label: '已满', value: 'ClosedForTaking' },
+      { label: '已截止', value: 'ClosedForTaking' },
+    ];
+
+    // 排序选项
+    const sortOptions = [
+      { label: '推荐（置顶+最新）', value: 'recommend' },
+      { label: '单价', value: 'price' },
+      { label: '最新发布', value: 'latest' },
+      { label: '截止时间', value: 'dueTime' },
+    ];
+
+    const ProjectHall = () => {
+      const [activeCategory, setActiveCategory] = useState('短剧');
+      const [selectedGenres, setSelectedGenres] = useState([]);
+      const [dateRange, setDateRange] = useState(null);
+      const [selectedStatus, setSelectedStatus] = useState('');
+      const [sortBy, setSortBy] = useState('recommend');
+
+      // 过滤和排序项目
+      const filteredAndSortedProjects = useMemo(() => {
+        let filtered = mockProjects.filter((project) => {
+          // 分类过滤
+          if (project.category !== activeCategory) return false;
+
+          // 题材标签过滤
+          if (selectedGenres.length > 0) {
+            const hasMatchingGenre = selectedGenres.some((genre) =>
+              project.projectTags.includes(genre) || project.contentGenre === genre
+            );
+            if (!hasMatchingGenre) return false;
+          }
+
+          // 截止时间区间过滤
+          if (dateRange && dateRange[0] && dateRange[1]) {
+            const dueTime = dayjs(project.dueTime);
+            const startTime = dateRange[0];
+            const endTime = dateRange[1];
+            if (dueTime.isBefore(startTime) || dueTime.isAfter(endTime)) return false;
+          }
+
+          // 状态过滤
+          if (selectedStatus) {
+            if (selectedStatus === 'Published' && project.status !== 'Published') return false;
+            if (selectedStatus === 'ClosedForTaking' && project.status !== 'ClosedForTaking') return false;
+          }
+
+          return true;
+        });
+
+        // 排序
+        filtered.sort((a, b) => {
+          switch (sortBy) {
+            case 'recommend':
+              // 推荐：置顶优先，然后按最新发布
+              if (a.isTop !== b.isTop) return a.isTop ? -1 : 1;
+              return dayjs(b.publishTime).valueOf() - dayjs(a.publishTime).valueOf();
+            case 'price':
+              return b.unitPrice - a.unitPrice;
+            case 'latest':
+              return dayjs(b.publishTime).valueOf() - dayjs(a.publishTime).valueOf();
+            case 'dueTime':
+              return dayjs(a.dueTime).valueOf() - dayjs(b.dueTime).valueOf();
+            default:
+              return 0;
+          }
+        });
+
+        return filtered;
+      }, [activeCategory, selectedGenres, dateRange, selectedStatus, sortBy]);
+
+      // 处理接单按钮点击
+      const handleTakeOrder = (project) => {
+        // 检查是否已接单（幂等性检查）
+        const orders = JSON.parse(localStorage.getItem('currentOrders') || '[]');
+        const existingOrder = orders.find(o => 
+          (o.projectId === project.id) && 
+          (o.taker === '当前用户' || o.taker === '学员A')
+        );
+
+        if (existingOrder) {
+          message.warning('您已经接单了，请勿重复操作');
+          return;
+        }
+
+        if (project.takeMode === '抢单') {
+          // 抢单模式：直接创建订单
+          const orderId = `ORD${String(Date.now()).slice(-6)}`;
+          const newOrder = {
+            id: orderId,
+            orderId: orderId,
+            projectId: project.id,
+            projectName: project.projectName,
+            taker: '当前用户',
+            status: 'InProgress',
+            takeTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+            dueTime: dayjs(project.dueTime).format('YYYY-MM-DD HH:mm:ss'),
+            amount: project.unitPrice * project.episodeCount,
+            category: project.category,
+            unitPrice: project.unitPrice,
+            episodeCount: project.episodeCount,
+          };
+
+          orders.push(newOrder);
+          localStorage.setItem('currentOrders', JSON.stringify(orders));
+
+          message.success(`抢单成功！订单号：${orderId}，正在跳转到协同空间...`);
+          
+          // 1.5秒后跳转到协同空间
+          setTimeout(() => {
+            window.location.href = `ProjectSpace.html?orderId=${orderId}&projectId=${project.id}`;
+          }, 1500);
+        } else {
+          // 报名模式：创建报名记录
+          const applicationId = `APP${String(Date.now()).slice(-6)}`;
+          let applications = JSON.parse(localStorage.getItem('applications') || '[]');
+          
+          const existingApp = applications.find(a => 
+            a.projectId === project.id && 
+            a.applicant === '当前用户'
+          );
+
+          if (existingApp) {
+            message.warning('您已经报名了，请勿重复操作');
+            return;
+          }
+
+          const newApplication = {
+            id: applicationId,
+            projectId: project.id,
+            projectName: project.projectName,
+            applicant: '当前用户',
+            applyTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+            status: 'Pending',
+          };
+
+          applications.push(newApplication);
+          localStorage.setItem('applications', JSON.stringify(applications));
+
+          message.success('报名成功！等待运营审核，审核通过后将创建订单');
+        }
+      };
+
+      // 判断按钮是否禁用
+      const isButtonDisabled = (project) => {
+        const now = dayjs();
+        const dueTime = dayjs(project.dueTime);
+        return (
+          project.status === 'ClosedForTaking' ||
+          project.quotaTaken >= project.quotaTotal ||
+          now.isAfter(dueTime)
+        );
+      };
+
+      // 获取按钮禁用原因
+      const getDisabledReason = (project) => {
+        if (project.disabledReason) return project.disabledReason;
+        if (project.quotaTaken >= project.quotaTotal) return '已满员';
+        const now = dayjs();
+        const dueTime = dayjs(project.dueTime);
+        if (now.isAfter(dueTime)) return '已截止';
+        return '';
+      };
+
+      // 格式化截止时间显示
+      const formatDueTime = (dueTime) => {
+        const date = dayjs(dueTime);
+        const now = dayjs();
+        const diff = date.diff(now, 'day');
+        
+        if (diff < 0) return '已截止';
+        if (diff === 0) return '今日截止';
+        if (diff === 1) return '明日截止';
+        return `${diff}天后截止`;
+      };
+
+      return (
+        <div className="appLayout">
+          {/* 左侧导航栏 */}
+          <div className="sidebar">
+            <div className="sidebarHeader">
+              <a href="Home.html" className="logo">🎬 天合短剧平台</a>
+            </div>
+            <nav className="menu">
+              <a href="Home.html" className="menuItem">
+                <span className="menuItemIcon">🏠</span>
+                首页
+              </a>
+              <a href="ProjectHall.html" className="menuItem active">
+                <span className="menuItemIcon">📋</span>
+                接单大厅
+              </a>
+              <a href="ProjectHall.html?tab=leaderboard" className="menuItem">
+                <span className="menuItemIcon">🏆</span>
+                天梯榜单
+              </a>
+              <a href="Account.html" className="menuItem">
+                <span className="menuItemIcon">💰</span>
+                账户与收益
+              </a>
+              <a href="MyProjects.html" className="menuItem">
+                <span className="menuItemIcon">🚀</span>
+                我的项目
+              </a>
+              
+              <div className="menuGroup">
+                <div className="menuGroupTitle">后台管理</div>
+                <a href="ReviewQueue.html" className="menuItem">
+                  <span className="menuItemIcon">✅</span>
+                  内容审核
+                </a>
+                <a href="ProjectManagement.html" className="menuItem">
+                  <span className="menuItemIcon">📋</span>
+                  项目管理
+                </a>
+                <a href="StudentManagement.html" className="menuItem">
+                  <span className="menuItemIcon">👥</span>
+                  学员管理
+                </a>
+                <a href="FinanceManagement.html" className="menuItem">
+                  <span className="menuItemIcon">💰</span>
+                  财务对账
+                </a>
+                <a href="DashboardManagement.html" className="menuItem">
+                  <span className="menuItemIcon">📊</span>
+                  榜单与数据
+                </a>
+              </div>
+            </nav>
+          </div>
+
+          {/* 主内容区 */}
+          <div className="mainContent">
+            <div className="projectHall">
+              {/* 顶部分类 Tab */}
+              <div className="categoryTabs">
+                <Tabs
+                  activeKey={activeCategory}
+                  onChange={setActiveCategory}
+                  size="large"
+                >
+                  <TabPane tab="短剧" key="短剧" />
+                  <TabPane tab="AI漫剧" key="AI漫剧" />
+                  <TabPane tab="短视频" key="短视频" />
+                  <TabPane tab="综艺" key="综艺" />
+                </Tabs>
+              </div>
+
+              {/* 筛选和排序区 */}
+              <div className="filterSection">
+                <Space size="middle" wrap>
+              <div className="filterItem">
+                <span className="filterLabel">题材标签：</span>
+                <Select
+                  mode="multiple"
+                  placeholder="请选择题材标签"
+                  style={{ width: 200 }}
+                  value={selectedGenres}
+                  onChange={setSelectedGenres}
+                  allowClear
+                >
+                  {genreOptions.map((genre) => (
+                    <Option key={genre} value={genre}>
+                      {genre}
+                    </Option>
+                  ))}
+                </Select>
+              </div>
+
+              <div className="filterItem">
+                <span className="filterLabel">截止时间：</span>
+                <RangePicker
+                  style={{ width: 240 }}
+                  onChange={(dates) => {
+                    if (dates && dates[0] && dates[1]) {
+                      setDateRange([dates[0], dates[1]]);
+                    } else {
+                      setDateRange(null);
+                    }
+                  }}
+                />
+              </div>
+
+              <div className="filterItem">
+                <span className="filterLabel">项目状态：</span>
+                <Select
+                  placeholder="请选择状态"
+                  style={{ width: 150 }}
+                  value={selectedStatus}
+                  onChange={setSelectedStatus}
+                  allowClear
+                >
+                  {statusOptions.map((option) => (
+                    <Option key={option.value} value={option.value}>
+                      {option.label}
+                    </Option>
+                  ))}
+                </Select>
+              </div>
+
+              <div className="filterItem">
+                <span className="filterLabel">排序：</span>
+                <Select
+                  value={sortBy}
+                  onChange={setSortBy}
+                  style={{ width: 180 }}
+                >
+                  {sortOptions.map((option) => (
+                    <Option key={option.value} value={option.value}>
+                      {option.label}
+                    </Option>
+                  ))}
+                </Select>
+              </div>
+                </Space>
+              </div>
+
+              {/* 项目列表 */}
+              <div className="projectList">
+                <Row gutter={[16, 16]}>
+              {filteredAndSortedProjects.map((project) => {
+                const isDisabled = isButtonDisabled(project);
+                const disabledReason = getDisabledReason(project);
+                const remainingQuota = project.quotaTotal - project.quotaTaken;
+
+                return (
+                  <Col xs={24} sm={12} lg={8} xl={6} key={project.id}>
+                    <Card
+                      className="projectCard"
+                      hoverable
+                      actions={[
+                        <Button
+                          type="primary"
+                          block
+                          disabled={isDisabled}
+                          onClick={() => handleTakeOrder(project)}
+                          title={isDisabled ? disabledReason : ''}
+                        >
+                          {project.takeMode === '抢单' ? '一键抢单' : '点击报名'}
+                        </Button>,
+                      ]}
+                    >
+                      <div className="cardHeader">
+                        {project.isTop && (
+                          <Badge.Ribbon text="置顶" color="red">
+                            <div />
+                          </Badge.Ribbon>
+                        )}
+                        <h3 className="projectName">{project.projectName}</h3>
+                      </div>
+
+                      <div className="cardContent">
+                        {/* 项目标签和内容类别 */}
+                        <div className="tagsSection">
+                          {project.projectTags.map((tag) => (
+                            <Tag key={tag} color="blue">
+                              {tag}
+                            </Tag>
+                          ))}
+                          <Tag color="purple">{project.contentGenre}</Tag>
+                        </div>
+
+                        {/* 难度和参与团队 */}
+                        <div className="metaInfo">
+                          <Tag color={project.difficulty === '精品' ? 'gold' : 'default'}>
+                            {project.difficulty}
+                          </Tag>
+                          <Tag>{project.participantTeam}</Tag>
+                        </div>
+
+                        {/* 核心信息 */}
+                        <div className="infoGrid">
+                          <div className="infoItem">
+                            <span className="infoLabel">单价：</span>
+                            <span className="infoValue">¥{project.unitPrice}/集</span>
+                          </div>
+                          <div className="infoItem">
+                            <span className="infoLabel">集数：</span>
+                            <span className="infoValue">{project.episodeCount}集</span>
+                          </div>
+                          <div className="infoItem">
+                            <span className="infoLabel">交付周期：</span>
+                            <span className="infoValue">{project.deliveryCycleDays}天</span>
+                          </div>
+                          <div className="infoItem">
+                            <span className="infoLabel">接单模式：</span>
+                            <span className="infoValue">
+                              {project.takeMode === '抢单' ? (
+                                <Tag color="orange">
+                                  🔥 抢单
+                                </Tag>
+                              ) : (
+                                <Tag color="cyan">
+                                  👤 报名
+                                </Tag>
+                              )}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* 名额和截止时间 */}
+                        <div className="footerInfo">
+                          <div className="quotaInfo">
+                            👤 {project.quotaTaken}/{project.quotaTotal}
+                            {remainingQuota > 0 && (
+                              <span className="remaining">（剩余{remainingQuota}个名额）</span>
+                            )}
+                          </div>
+                          <div className="dueTimeInfo">
+                            🕐 {formatDueTime(project.dueTime)}
+                          </div>
+                        </div>
+
+                        {/* 禁用原因提示 */}
+                        {isDisabled && (
+                          <div className="disabledReason">
+                            {disabledReason}
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  </Col>
+                );
+              })}
+                </Row>
+
+                {filteredAndSortedProjects.length === 0 && (
+                  <div className="emptyState">
+                    <p>暂无符合条件的项目</p>
+                  </div>
+                )}
+              </div>
+          </div>
+        </div>
+      </div>
+    );
+    };
+
+    // 等待所有资源加载完成后再渲染
+    window.addEventListener('load', function() {
+      try {
+        ReactDOM.render(<ProjectHall />, document.getElementById('root'));
+      } catch (error) {
+        console.error('渲染错误:', error);
+        document.getElementById('root').innerHTML = '<div style="padding: 20px; color: red;">页面加载失败，请检查浏览器控制台错误信息。</div>';
+      }
+    });
+  </script>
+</body>
+</html>

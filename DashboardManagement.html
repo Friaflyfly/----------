@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>榜单与数据 - 天合短剧剪辑接单平台</title>
+  
+  <!-- Ant Design CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.css">
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .appLayout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 200px;
+      background: #fff;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .sidebarHeader {
+      padding: 20px 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1890ff;
+      text-decoration: none;
+      display: block;
+    }
+
+    .menu {
+      padding: 16px 0;
+    }
+
+    .menuItem {
+      display: block;
+      padding: 12px 24px;
+      color: #262626;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.3s;
+      border-left: 3px solid transparent;
+    }
+
+    .menuItem:hover {
+      background-color: #f0f0f0;
+      color: #1890ff;
+    }
+
+    .menuItem.active {
+      background-color: #e6f7ff;
+      color: #1890ff;
+      border-left-color: #1890ff;
+      font-weight: 500;
+    }
+
+    .menuItemIcon {
+      margin-right: 8px;
+      font-size: 16px;
+    }
+
+    .menuGroup {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    .menuGroupTitle {
+      padding: 8px 24px;
+      font-size: 12px;
+      color: #8c8c8c;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .mainContent {
+      flex: 1;
+      margin-left: 200px;
+      min-height: 100vh;
+      background: #f5f5f5;
+    }
+
+    .dashboardPage {
+      padding: 24px;
+    }
+
+    .pageHeader {
+      background: #fff;
+      padding: 16px 24px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .contentCard {
+      background: #fff;
+      padding: 24px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .metricGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .metricCard {
+      text-align: center;
+      padding: 16px;
+      border: 1px solid #f0f0f0;
+      border-radius: 8px;
+    }
+
+    .metricLabel {
+      font-size: 14px;
+      color: #8c8c8c;
+      margin-bottom: 8px;
+    }
+
+    .metricValue {
+      font-size: 24px;
+      font-weight: 600;
+      color: #262626;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+
+      .mainContent {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+  
+  <!-- Day.js -->
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js"></script>
+  
+  <!-- Ant Design JS -->
+  <script src="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.js"></script>
+  
+  <!-- Babel Standalone for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const { Card, Tabs, Typography, Statistic, Row, Col, Table, Tag, Space, Button, Form, InputNumber, message } = antd;
+    const { Title } = Typography;
+    const { TabPane } = Tabs;
+
+    const DashboardManagement = () => {
+      const [activeTab, setActiveTab] = useState('dashboard');
+      const [leaderboardConfig, setLeaderboardConfig] = useState({
+        refreshInterval: 24,
+        activeWeight: { login: 20, take: 20, submit: 20, deliver: 30 },
+      });
+      const [dashboardData, setDashboardData] = useState(null);
+
+      useEffect(() => {
+        loadDashboardData();
+        loadLeaderboardConfig();
+      }, []);
+
+      const loadDashboardData = () => {
+        // 模拟数据
+        const projects = JSON.parse(localStorage.getItem('adminProjects') || '[]');
+        const orders = JSON.parse(localStorage.getItem('currentOrders') || '[]');
+        const students = JSON.parse(localStorage.getItem('talentPool') || '[]');
+
+        const data = {
+          supply: {
+            publishedProjects: projects.filter(p => p.status === 'Published').length,
+            availableProjects: projects.filter(p => p.status === 'Published' && p.quotaTaken < p.quotaTotal).length,
+            takeRate: orders.length > 0 ? ((orders.filter(o => o.status !== 'ToBeTaken').length / orders.length) * 100).toFixed(1) : 0,
+          },
+          efficiency: {
+            avgDeliveryCycle: 5.2,
+            avgReviewCycle: 1.5,
+            overdueOrders: orders.filter(o => {
+              if (!o.dueTime) return false;
+              return dayjs().isAfter(dayjs(o.dueTime)) && !['Accepted', 'Closed'].includes(o.status);
+            }).length,
+          },
+          quality: {
+            passRate: 85.5,
+            avgRevisionRounds: 1.8,
+            topRejectReasons: ['画面质量问题', '音频同步问题', '字幕规范问题'],
+          },
+          revenue: {
+            acceptedOrders: orders.filter(o => o.status === 'Accepted').length,
+            totalAmount: orders.filter(o => o.status === 'Accepted').reduce((sum, o) => sum + (o.amount || 0), 0),
+            deductionAmount: 5000,
+          },
+          health: {
+            activeStudents: students.filter(s => s.status === 'Active').length,
+            fullCapacityStudents: students.filter(s => s.concurrencyUsed >= s.concurrencyLimit).length,
+            abnormalList: orders.filter(o => {
+              if (!o.dueTime) return false;
+              return dayjs().isAfter(dayjs(o.dueTime)) && !['Accepted', 'Closed'].includes(o.status);
+            }).slice(0, 5).map(o => ({
+              orderId: o.id,
+              projectName: o.projectName,
+              taker: o.taker,
+              reason: '超期未交付',
+            })),
+          },
+        };
+
+        setDashboardData(data);
+      };
+
+      const loadLeaderboardConfig = () => {
+        const saved = JSON.parse(localStorage.getItem('leaderboardConfig') || 'null');
+        if (saved) {
+          setLeaderboardConfig(saved);
+        }
+      };
+
+      const handleSaveConfig = () => {
+        localStorage.setItem('leaderboardConfig', JSON.stringify(leaderboardConfig));
+        message.success('配置已保存');
+      };
+
+      if (!dashboardData) {
+        return (
+          <div className="appLayout">
+            <div className="sidebar" style={{ display: 'none' }}></div>
+            <div className="mainContent" style={{ marginLeft: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <div>加载中...</div>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="appLayout">
+          {/* 左侧导航栏 */}
+          <div className="sidebar">
+            <div className="sidebarHeader">
+              <a href="Home.html" className="logo">🎬 天合短剧平台</a>
+            </div>
+            <nav className="menu">
+              <a href="Home.html" className="menuItem">
+                <span className="menuItemIcon">🏠</span>
+                首页
+              </a>
+              <a href="ProjectHall.html" className="menuItem">
+                <span className="menuItemIcon">📋</span>
+                接单大厅
+              </a>
+              <a href="ProjectHall.html?tab=leaderboard" className="menuItem">
+                <span className="menuItemIcon">🏆</span>
+                天梯榜单
+              </a>
+              <a href="Account.html" className="menuItem">
+                <span className="menuItemIcon">💰</span>
+                账户与收益
+              </a>
+              <a href="MyProjects.html" className="menuItem">
+                <span className="menuItemIcon">🚀</span>
+                我的项目
+              </a>
+              
+              <div className="menuGroup">
+                <div className="menuGroupTitle">后台管理</div>
+                <a href="ReviewQueue.html" className="menuItem">
+                  <span className="menuItemIcon">✅</span>
+                  内容审核
+                </a>
+                <a href="ProjectManagement.html" className="menuItem">
+                  <span className="menuItemIcon">📋</span>
+                  项目管理
+                </a>
+                <a href="StudentManagement.html" className="menuItem">
+                  <span className="menuItemIcon">👥</span>
+                  学员管理
+                </a>
+                <a href="FinanceManagement.html" className="menuItem">
+                  <span className="menuItemIcon">💰</span>
+                  财务对账
+                </a>
+                <a href="DashboardManagement.html" className="menuItem active">
+                  <span className="menuItemIcon">📊</span>
+                  榜单与数据
+                </a>
+              </div>
+            </nav>
+          </div>
+
+          {/* 主内容区 */}
+          <div className="mainContent">
+            <div className="dashboardPage">
+              <div className="pageHeader">
+                <Title level={2} style={{ margin: 0 }}>榜单与数据</Title>
+              </div>
+
+              <div className="contentCard">
+                <Tabs activeKey={activeTab} onChange={setActiveTab}>
+                  <TabPane tab="数据看板" key="dashboard">
+                    {/* 供需 */}
+                    <Title level={4}>供需</Title>
+                    <div className="metricGrid">
+                      <div className="metricCard">
+                        <div className="metricLabel">发布项目数</div>
+                        <div className="metricValue">{dashboardData.supply.publishedProjects}</div>
+                      </div>
+                      <div className="metricCard">
+                        <div className="metricLabel">可接项目数</div>
+                        <div className="metricValue">{dashboardData.supply.availableProjects}</div>
+                      </div>
+                      <div className="metricCard">
+                        <div className="metricLabel">接单转化率</div>
+                        <div className="metricValue">{dashboardData.supply.takeRate}%</div>
+                      </div>
+                    </div>
+
+                    {/* 效率 */}
+                    <Title level={4}>效率</Title>
+                    <div className="metricGrid">
+                      <div className="metricCard">
+                        <div className="metricLabel">平均交付周期（天）</div>
+                        <div className="metricValue">{dashboardData.efficiency.avgDeliveryCycle}</div>
+                      </div>
+                      <div className="metricCard">
+                        <div className="metricLabel">平均审核周期（天）</div>
+                        <div className="metricValue">{dashboardData.efficiency.avgReviewCycle}</div>
+                      </div>
+                      <div className="metricCard">
+                        <div className="metricLabel">临期/超期订单数</div>
+                        <div className="metricValue" style={{ color: dashboardData.efficiency.overdueOrders > 0 ? '#ff4d4f' : '#52c41a' }}>
+                          {dashboardData.efficiency.overdueOrders}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 质量 */}
+                    <Title level={4}>质量</Title>
+                    <div className="metricGrid">
+                      <div className="metricCard">
+                        <div className="metricLabel">通过率</div>
+                        <div className="metricValue">{dashboardData.quality.passRate}%</div>
+                      </div>
+                      <div className="metricCard">
+                        <div className="metricLabel">平均修改轮次</div>
+                        <div className="metricValue">{dashboardData.quality.avgRevisionRounds}</div>
+                      </div>
+                    </div>
+                    <div style={{ marginTop: 16 }}>
+                      <div style={{ marginBottom: 8 }}>退回原因 Top3：</div>
+                      <Space>
+                        {dashboardData.quality.topRejectReasons.map((reason, idx) => (
+                          <Tag key={idx} color={idx === 0 ? 'red' : idx === 1 ? 'orange' : 'default'}>
+                            {idx + 1}. {reason}
+                          </Tag>
+                        ))}
+                      </Space>
+                    </div>
+
+                    {/* 收益 */}
+                    <Title level={4}>收益</Title>
+                    <div className="metricGrid">
+                      <div className="metricCard">
+                        <div className="metricLabel">验收订单数</div>
+                        <div className="metricValue">{dashboardData.revenue.acceptedOrders}</div>
+                      </div>
+                      <div className="metricCard">
+                        <div className="metricLabel">应付金额</div>
+                        <div className="metricValue">¥{dashboardData.revenue.totalAmount.toLocaleString()}</div>
+                      </div>
+                      <div className="metricCard">
+                        <div className="metricLabel">扣款调整金额</div>
+                        <div className="metricValue">¥{dashboardData.revenue.deductionAmount.toLocaleString()}</div>
+                      </div>
+                    </div>
+
+                    {/* 健康度 */}
+                    <Title level={4}>健康度</Title>
+                    <div className="metricGrid">
+                      <div className="metricCard">
+                        <div className="metricLabel">Active 学员数</div>
+                        <div className="metricValue">{dashboardData.health.activeStudents}</div>
+                      </div>
+                      <div className="metricCard">
+                        <div className="metricLabel">满载人数</div>
+                        <div className="metricValue">{dashboardData.health.fullCapacityStudents}</div>
+                      </div>
+                    </div>
+                    {dashboardData.health.abnormalList.length > 0 && (
+                      <div style={{ marginTop: 16 }}>
+                        <div style={{ marginBottom: 8 }}>异常清单：</div>
+                        <Table
+                          dataSource={dashboardData.health.abnormalList}
+                          rowKey="orderId"
+                          pagination={false}
+                          size="small"
+                          columns={[
+                            { title: '订单号', dataIndex: 'orderId', key: 'orderId' },
+                            { title: '项目名', dataIndex: 'projectName', key: 'projectName' },
+                            { title: '接单人', dataIndex: 'taker', key: 'taker' },
+                            { title: '异常原因', dataIndex: 'reason', key: 'reason', render: (reason) => <Tag color="red">{reason}</Tag> },
+                          ]}
+                        />
+                      </div>
+                    )}
+                  </TabPane>
+
+                  <TabPane tab="榜单规则配置" key="config">
+                    <Form layout="vertical">
+                      <Form.Item label="刷新策略（小时）">
+                        <InputNumber
+                          min={1}
+                          max={168}
+                          value={leaderboardConfig.refreshInterval}
+                          onChange={(value) => setLeaderboardConfig({ ...leaderboardConfig, refreshInterval: value })}
+                        />
+                        <div style={{ marginTop: 8, color: '#8c8c8c', fontSize: 12 }}>
+                          榜单数据刷新间隔，建议设置为24小时
+                        </div>
+                      </Form.Item>
+
+                      <Title level={5}>近期活跃度权重配置</Title>
+                      <Form.Item label="登录次数权重（%）">
+                        <InputNumber
+                          min={0}
+                          max={100}
+                          value={leaderboardConfig.activeWeight.login}
+                          onChange={(value) => setLeaderboardConfig({
+                            ...leaderboardConfig,
+                            activeWeight: { ...leaderboardConfig.activeWeight, login: value }
+                          })}
+                        />
+                      </Form.Item>
+                      <Form.Item label="接单集数权重（%）">
+                        <InputNumber
+                          min={0}
+                          max={100}
+                          value={leaderboardConfig.activeWeight.take}
+                          onChange={(value) => setLeaderboardConfig({
+                            ...leaderboardConfig,
+                            activeWeight: { ...leaderboardConfig.activeWeight, take: value }
+                          })}
+                        />
+                      </Form.Item>
+                      <Form.Item label="提交集数权重（%）">
+                        <InputNumber
+                          min={0}
+                          max={100}
+                          value={leaderboardConfig.activeWeight.submit}
+                          onChange={(value) => setLeaderboardConfig({
+                            ...leaderboardConfig,
+                            activeWeight: { ...leaderboardConfig.activeWeight, submit: value }
+                          })}
+                        />
+                      </Form.Item>
+                      <Form.Item label="交付集数权重（%）">
+                        <InputNumber
+                          min={0}
+                          max={100}
+                          value={leaderboardConfig.activeWeight.deliver}
+                          onChange={(value) => setLeaderboardConfig({
+                            ...leaderboardConfig,
+                            activeWeight: { ...leaderboardConfig.activeWeight, deliver: value }
+                          })}
+                        />
+                      </Form.Item>
+
+                      <Button type="primary" onClick={handleSaveConfig}>保存配置</Button>
+                    </Form>
+                  </TabPane>
+                </Tabs>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    window.addEventListener('load', function() {
+      try {
+        ReactDOM.render(<DashboardManagement />, document.getElementById('root'));
+      } catch (error) {
+        console.error('渲染错误:', error);
+        document.getElementById('root').innerHTML = '<div style="padding: 20px; color: red;">页面加载失败，请检查浏览器控制台错误信息。</div>';
+      }
+    });
+  </script>
+</body>
+</html>

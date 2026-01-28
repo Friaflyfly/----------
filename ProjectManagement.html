@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>项目管理 - 天合短剧剪辑接单平台</title>
+  
+  <!-- Ant Design CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.css">
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .appLayout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 200px;
+      background: #fff;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .sidebarHeader {
+      padding: 20px 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1890ff;
+      text-decoration: none;
+      display: block;
+    }
+
+    .menu {
+      padding: 16px 0;
+    }
+
+    .menuItem {
+      display: block;
+      padding: 12px 24px;
+      color: #262626;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.3s;
+      border-left: 3px solid transparent;
+    }
+
+    .menuItem:hover {
+      background-color: #f0f0f0;
+      color: #1890ff;
+    }
+
+    .menuItem.active {
+      background-color: #e6f7ff;
+      color: #1890ff;
+      border-left-color: #1890ff;
+      font-weight: 500;
+    }
+
+    .menuItemIcon {
+      margin-right: 8px;
+      font-size: 16px;
+    }
+
+    .menuGroup {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    .menuGroupTitle {
+      padding: 8px 24px;
+      font-size: 12px;
+      color: #8c8c8c;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .mainContent {
+      flex: 1;
+      margin-left: 200px;
+      min-height: 100vh;
+      background: #f5f5f5;
+    }
+
+    .projectPage {
+      padding: 24px;
+    }
+
+    .pageHeader {
+      background: #fff;
+      padding: 16px 24px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .filterCard {
+      background: #fff;
+      padding: 16px 24px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .tableCard {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+
+      .mainContent {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+  
+  <!-- Day.js -->
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js"></script>
+  
+  <!-- Ant Design JS -->
+  <script src="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.js"></script>
+  
+  <!-- Babel Standalone for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo, useCallback } = React;
+    const { Card, Table, Button, Tag, Space, Select, Input, DatePicker, Typography, message, Popconfirm, Modal, Form, InputNumber } = antd;
+    const { Title, Text } = Typography;
+    const { Option } = Select;
+    const { RangePicker } = DatePicker;
+    const { Search } = Input;
+    const { TextArea } = Input;
+
+    const ProjectManagement = () => {
+      const [projects, setProjects] = useState([]);
+      const [loading, setLoading] = useState(false);
+      const [filters, setFilters] = useState({
+        status: '',
+        category: '',
+        takeMode: '',
+        difficulty: '',
+        participantTeam: '',
+        coordinator: '',
+        dueTimeRange: null,
+        search: '',
+      });
+      const [applicationModalVisible, setApplicationModalVisible] = useState(false);
+      const [currentProject, setCurrentProject] = useState(null);
+      const [applications, setApplications] = useState([]);
+      const [rejectModalVisible, setRejectModalVisible] = useState(false);
+      const [rejectingApp, setRejectingApp] = useState(null);
+      const [rejectForm] = Form.useForm();
+      const [approveModalVisible, setApproveModalVisible] = useState(false);
+      const [approvingApp, setApprovingApp] = useState(null);
+
+      useEffect(() => {
+        loadProjects();
+        ensureTestApplications();
+      }, []);
+
+      const loadProjects = () => {
+        setLoading(true);
+        let projectsData = JSON.parse(localStorage.getItem('adminProjects') || '[]');
+        
+        if (projectsData.length === 0) {
+          projectsData = generateMockProjects();
+          localStorage.setItem('adminProjects', JSON.stringify(projectsData));
+        }
+
+        setProjects(projectsData);
+        setLoading(false);
+      };
+
+      const ensureTestApplications = () => {
+        // 为"报名"模式的项目生成测试申请数据
+        const projects = JSON.parse(localStorage.getItem('adminProjects') || '[]');
+        const applicationProjects = projects.filter(p => p.takeMode === '报名');
+        let applications = JSON.parse(localStorage.getItem('applications') || '[]');
+
+        applicationProjects.forEach(project => {
+          const existingApps = applications.filter(app => app.projectId === project.id);
+          if (existingApps.length === 0) {
+            // 为该报名项目生成2-3个测试申请
+            const testApplicants = ['学员A', '学员B', '学员C'];
+            const testCount = Math.floor(Math.random() * 2) + 2; // 2-3个
+            
+            for (let i = 0; i < testCount; i++) {
+              const statuses = ['Pending', 'Approved', 'Rejected'];
+              const status = statuses[Math.floor(Math.random() * statuses.length)];
+              const applyTime = dayjs().subtract(Math.floor(Math.random() * 7), 'day');
+              
+              const application = {
+                id: `APP${project.id.slice(-3)}${String(i + 1).padStart(3, '0')}`,
+                projectId: project.id,
+                projectName: project.projectName,
+                applicant: testApplicants[i],
+                applyTime: applyTime.format('YYYY-MM-DD HH:mm:ss'),
+                status: status,
+              };
+
+              if (status === 'Approved') {
+                application.reviewer = '运营A';
+                application.reviewTime = applyTime.add(1, 'day').format('YYYY-MM-DD HH:mm:ss');
+              } else if (status === 'Rejected') {
+                application.reviewer = '运营A';
+                application.reviewTime = applyTime.add(1, 'day').format('YYYY-MM-DD HH:mm:ss');
+                application.rejectReason = '不符合项目要求';
+              }
+
+              applications.push(application);
+            }
+          }
+        });
+
+        localStorage.setItem('applications', JSON.stringify(applications));
+      };
+
+      const generateMockProjects = () => {
+        const categories = ['短剧', 'AI漫剧', '短视频', '综艺'];
+        const difficulties = ['精品', '工厂'];
+        const teams = ['实训', '线下', '线上'];
+        const takeModes = ['抢单', '报名'];
+        const coordinators = ['张三', '李四', '王五'];
+        const statuses = ['Draft', 'Published', 'ClosedForTaking', 'Closed', 'Archived'];
+
+        return Array.from({ length: 15 }, (_, i) => {
+          const category = categories[i % categories.length];
+          const status = statuses[Math.floor(Math.random() * statuses.length)];
+          const quotaTotal = Math.floor(Math.random() * 10) + 5;
+          const quotaTaken = Math.floor(Math.random() * quotaTotal);
+
+          return {
+            id: `proj_${String(i + 1).padStart(6, '0')}`,
+            projectName: `${category}项目${i + 1}`,
+            category: category,
+            difficulty: difficulties[i % difficulties.length],
+            participantTeam: teams[i % teams.length],
+            takeMode: takeModes[i % takeModes.length],
+            coordinator: coordinators[i % coordinators.length],
+            status: status,
+            unitPrice: Math.floor(Math.random() * 500) + 200,
+            episodeCount: Math.floor(Math.random() * 20) + 10,
+            quotaTotal: quotaTotal,
+            quotaTaken: quotaTaken,
+            dueTime: dayjs().add(Math.floor(Math.random() * 30), 'day').format('YYYY-MM-DD HH:mm:ss'),
+            publishTime: dayjs().subtract(Math.floor(Math.random() * 30), 'day').format('YYYY-MM-DD HH:mm:ss'),
+            orderStats: {
+              inProgress: Math.floor(Math.random() * 5),
+              submitted: Math.floor(Math.random() * 3),
+              needRevision: Math.floor(Math.random() * 2),
+              approved: Math.floor(Math.random() * 3),
+              accepted: Math.floor(Math.random() * 5),
+            },
+            totalAmount: (Math.floor(Math.random() * 500) + 200) * (Math.floor(Math.random() * 20) + 10),
+          };
+        });
+      };
+
+      const filteredProjects = useMemo(() => {
+        return projects.filter(project => {
+          if (filters.status && project.status !== filters.status) return false;
+          if (filters.category && project.category !== filters.category) return false;
+          if (filters.takeMode && project.takeMode !== filters.takeMode) return false;
+          if (filters.difficulty && project.difficulty !== filters.difficulty) return false;
+          if (filters.participantTeam && project.participantTeam !== filters.participantTeam) return false;
+          if (filters.coordinator && project.coordinator !== filters.coordinator) return false;
+          if (filters.dueTimeRange && filters.dueTimeRange[0] && filters.dueTimeRange[1]) {
+            const dueTime = dayjs(project.dueTime);
+            if (dueTime.isBefore(filters.dueTimeRange[0]) || dueTime.isAfter(filters.dueTimeRange[1])) {
+              return false;
+            }
+          }
+          if (filters.search) {
+            const searchLower = filters.search.toLowerCase();
+            if (!project.id.toLowerCase().includes(searchLower) &&
+                !project.projectName.toLowerCase().includes(searchLower)) {
+              return false;
+            }
+          }
+          return true;
+        });
+      }, [projects, filters]);
+
+      const getStatusTag = (status) => {
+        const statusMap = {
+          'Draft': { color: 'default', text: '草稿' },
+          'Published': { color: 'green', text: '已发布' },
+          'ClosedForTaking': { color: 'orange', text: '已满/已截止' },
+          'Closed': { color: 'red', text: '已关闭' },
+          'Archived': { color: 'purple', text: '已归档' },
+        };
+        const config = statusMap[status] || { color: 'default', text: status };
+        return <Tag color={config.color}>{config.text}</Tag>;
+      };
+
+      const handleNewProject = () => {
+        window.location.href = `ProjectEdit.html?mode=new`;
+      };
+
+      const handleEdit = (project) => {
+        window.location.href = `ProjectEdit.html?id=${project.id}`;
+      };
+
+      const handleView = (project) => {
+        window.location.href = `ProjectDetail.html?id=${project.id}`;
+      };
+
+      const handleViewApplications = (project) => {
+        if (!project || !project.id) {
+          message.error('项目信息不完整');
+          return;
+        }
+        setCurrentProject(project);
+        loadApplications(project.id);
+        setApplicationModalVisible(true);
+      };
+
+      const loadApplications = (projectId) => {
+        try {
+          const allApplications = JSON.parse(localStorage.getItem('applications') || '[]');
+          const projectApplications = allApplications.filter(app => app && app.projectId === projectId);
+          setApplications(projectApplications || []);
+        } catch (error) {
+          console.error('加载申请数据失败:', error);
+          setApplications([]);
+        }
+      };
+
+      const handleApproveConfirm = useCallback(() => {
+        if (!currentProject || !approvingApp) {
+          message.error('数据不完整');
+          return;
+        }
+
+        try {
+          // 检查是否已存在该申请人的订单（避免重复创建）
+          const orders = JSON.parse(localStorage.getItem('currentOrders') || '[]');
+          const existingOrder = orders.find(order => 
+            order.projectId === currentProject.id && order.taker === approvingApp.applicant
+          );
+
+          if (existingOrder) {
+            message.warning('该申请人已有订单，无需重复创建');
+            // 仍然更新申请状态
+            const allApplications = JSON.parse(localStorage.getItem('applications') || '[]');
+            const updatedApplications = allApplications.map(app => 
+              app.id === approvingApp.id 
+                ? { ...app, status: 'Approved', reviewer: '当前运营', reviewTime: dayjs().format('YYYY-MM-DD HH:mm:ss'), rejectReason: null }
+                : app
+            );
+            localStorage.setItem('applications', JSON.stringify(updatedApplications));
+            
+            setApproveModalVisible(false);
+            setApprovingApp(null);
+            setTimeout(() => {
+              loadApplications(currentProject.id);
+            }, 100);
+            return;
+          }
+
+          // 更新申请状态（清除驳回原因）
+          const allApplications = JSON.parse(localStorage.getItem('applications') || '[]');
+          const updatedApplications = allApplications.map(app => 
+            app.id === approvingApp.id 
+              ? { ...app, status: 'Approved', reviewer: '当前运营', reviewTime: dayjs().format('YYYY-MM-DD HH:mm:ss'), rejectReason: null }
+              : app
+          );
+          localStorage.setItem('applications', JSON.stringify(updatedApplications));
+
+          // 创建订单
+          const orderId = `ORD${String(Date.now()).slice(-6)}`;
+          const newOrder = {
+            id: orderId,
+            orderId: orderId,
+            projectId: currentProject.id,
+            projectName: currentProject.projectName,
+            taker: approvingApp.applicant,
+            takeTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+            dueTime: currentProject.dueTime,
+            status: 'InProgress',
+            amount: currentProject.unitPrice * currentProject.episodeCount,
+          };
+          orders.push(newOrder);
+          localStorage.setItem('currentOrders', JSON.stringify(orders));
+
+          // 更新项目已接单数
+          const updatedProjects = projects.map(p => 
+            p.id === currentProject.id 
+              ? { ...p, quotaTaken: (p.quotaTaken || 0) + 1 }
+              : p
+          );
+          setProjects(updatedProjects);
+          localStorage.setItem('adminProjects', JSON.stringify(updatedProjects));
+
+          // 更新当前项目数据
+          const updatedCurrentProject = {
+            ...currentProject,
+            quotaTaken: (currentProject.quotaTaken || 0) + 1
+          };
+          setCurrentProject(updatedCurrentProject);
+
+          setApproveModalVisible(false);
+          setApprovingApp(null);
+
+          // 延迟更新申请列表
+          setTimeout(() => {
+            if (currentProject && currentProject.id) {
+              loadApplications(currentProject.id);
+            }
+          }, 300);
+
+          message.success(`已通过 ${approvingApp.applicant} 的申请，订单已创建`);
+        } catch (error) {
+          console.error('审核通过失败:', error);
+          message.error('操作失败，请重试');
+        }
+      }, [currentProject, approvingApp, projects, setProjects, setCurrentProject, loadApplications]);
+
+      const handleApproveApplication = useCallback((application) => {
+        setApprovingApp(application);
+        setApproveModalVisible(true);
+      }, []);
+
+      const handleRejectApplication = useCallback((application) => {
+        setRejectingApp(application);
+        setRejectModalVisible(true);
+      }, []);
+
+      const handleRejectConfirm = () => {
+        rejectForm.validateFields().then(values => {
+          if (!rejectingApp || !currentProject) {
+            message.error('数据不完整');
+            return;
+          }
+
+          try {
+            const allApplications = JSON.parse(localStorage.getItem('applications') || '[]');
+            const wasApproved = rejectingApp.status === 'Approved';
+            
+            // 更新申请状态
+            const updatedApplications = allApplications.map(app => 
+              app.id === rejectingApp.id 
+                ? { 
+                    ...app, 
+                    status: 'Rejected', 
+                    reviewer: '当前运营', 
+                    reviewTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+                    rejectReason: values.reason
+                  }
+                : app
+            );
+            localStorage.setItem('applications', JSON.stringify(updatedApplications));
+
+            // 如果之前已通过，需要删除已创建的订单并减少已接单数
+            if (wasApproved) {
+              // 删除相关订单
+              const orders = JSON.parse(localStorage.getItem('currentOrders') || '[]');
+              const filteredOrders = orders.filter(order => {
+                // 删除该申请人针对该项目的订单
+                return !(order.projectId === currentProject.id && order.taker === rejectingApp.applicant);
+              });
+              localStorage.setItem('currentOrders', JSON.stringify(filteredOrders));
+
+              // 减少项目已接单数
+              const updatedProjects = projects.map(p => 
+                p.id === currentProject.id 
+                  ? { ...p, quotaTaken: Math.max(0, (p.quotaTaken || 0) - 1) }
+                  : p
+              );
+              setProjects(updatedProjects);
+              localStorage.setItem('adminProjects', JSON.stringify(updatedProjects));
+
+              // 更新当前项目数据
+              const updatedCurrentProject = {
+                ...currentProject,
+                quotaTaken: Math.max(0, (currentProject.quotaTaken || 0) - 1)
+              };
+              setCurrentProject(updatedCurrentProject);
+            }
+
+            // 延迟更新申请列表
+            setTimeout(() => {
+              loadApplications(currentProject.id);
+            }, 100);
+
+            setRejectModalVisible(false);
+            setRejectingApp(null);
+            rejectForm.resetFields();
+            message.success(wasApproved ? '已撤销通过并驳回申请，相关订单已删除' : '已驳回申请');
+          } catch (error) {
+            console.error('驳回申请失败:', error);
+            message.error('操作失败，请重试');
+          }
+        });
+      };
+
+      const handlePublish = (project) => {
+        const updatedProjects = projects.map(p => 
+          p.id === project.id ? { ...p, status: 'Published' } : p
+        );
+        setProjects(updatedProjects);
+        localStorage.setItem('adminProjects', JSON.stringify(updatedProjects));
+        message.success('项目已发布');
+      };
+
+      const handleUnpublish = (project) => {
+        const updatedProjects = projects.map(p => 
+          p.id === project.id ? { ...p, status: 'Draft' } : p
+        );
+        setProjects(updatedProjects);
+        localStorage.setItem('adminProjects', JSON.stringify(updatedProjects));
+        message.success('项目已下架');
+      };
+
+      const handleClose = (project) => {
+        const updatedProjects = projects.map(p => 
+          p.id === project.id ? { ...p, status: 'Closed' } : p
+        );
+        setProjects(updatedProjects);
+        localStorage.setItem('adminProjects', JSON.stringify(updatedProjects));
+        message.success('项目已关闭');
+      };
+
+      const handleArchive = (project) => {
+        const updatedProjects = projects.map(p => 
+          p.id === project.id ? { ...p, status: 'Archived' } : p
+        );
+        setProjects(updatedProjects);
+        localStorage.setItem('adminProjects', JSON.stringify(updatedProjects));
+        message.success('项目已归档');
+      };
+
+      const handleExport = () => {
+        message.success('导出功能开发中');
+      };
+
+      const columns = [
+        {
+          title: '项目ID',
+          dataIndex: 'id',
+          key: 'id',
+          width: 120,
+          fixed: 'left',
+        },
+        {
+          title: '项目名称',
+          dataIndex: 'projectName',
+          key: 'projectName',
+          width: 200,
+          ellipsis: true,
+        },
+        {
+          title: '分类',
+          dataIndex: 'category',
+          key: 'category',
+          width: 100,
+        },
+        {
+          title: '单价',
+          dataIndex: 'unitPrice',
+          key: 'unitPrice',
+          width: 100,
+          render: (price) => `¥${price}/集`,
+        },
+        {
+          title: '集数',
+          dataIndex: 'episodeCount',
+          key: 'episodeCount',
+          width: 80,
+        },
+        {
+          title: '截止时间',
+          dataIndex: 'dueTime',
+          key: 'dueTime',
+          width: 180,
+        },
+        {
+          title: '名额/已接单',
+          key: 'quota',
+          width: 120,
+          render: (_, record) => `${record.quotaTaken}/${record.quotaTotal}`,
+        },
+        {
+          title: '状态',
+          dataIndex: 'status',
+          key: 'status',
+          width: 120,
+          render: getStatusTag,
+        },
+        {
+          title: '负责人',
+          dataIndex: 'coordinator',
+          key: 'coordinator',
+          width: 100,
+        },
+        {
+          title: '订单统计',
+          key: 'orderStats',
+          width: 200,
+          render: (_, record) => {
+            const stats = record.orderStats || {};
+            return (
+              <div>
+                进行中:{stats.inProgress || 0} | 待审核:{stats.submitted || 0} | 
+                待修改:{stats.needRevision || 0} | 待验收:{stats.approved || 0} | 
+                已验收:{stats.accepted || 0}
+                <br />
+                <span style={{ color: '#52c41a', fontWeight: 600 }}>
+                  订单金额: ¥{record.totalAmount || 0}
+                </span>
+              </div>
+            );
+          },
+        },
+        {
+          title: '操作',
+          key: 'action',
+          width: 250,
+          fixed: 'right',
+          render: (_, record) => {
+            const isArchived = record.status === 'Archived';
+            const isApplicationMode = record.takeMode === '报名';
+            return (
+              <Space size="small">
+                {isArchived ? (
+                  // 已归档状态：只显示查看详情
+                  <Button size="small" onClick={() => handleView(record)}>查看详情</Button>
+                ) : (
+                  // 未归档状态：只显示编辑详情，以及其他操作按钮
+                  <>
+                    <Button size="small" onClick={() => handleEdit(record)}>编辑详情</Button>
+                    {isApplicationMode && (
+                      <Button size="small" type="link" onClick={() => handleViewApplications(record)}>
+                        查看申请
+                      </Button>
+                    )}
+                    {record.status === 'Draft' && (
+                      <Popconfirm title="确定发布该项目？" onConfirm={() => handlePublish(record)}>
+                        <Button size="small" type="primary">发布</Button>
+                      </Popconfirm>
+                    )}
+                    {record.status === 'Published' && (
+                      <Popconfirm title="确定下架该项目？" onConfirm={() => handleUnpublish(record)}>
+                        <Button size="small">下架</Button>
+                      </Popconfirm>
+                    )}
+                    {['Published', 'ClosedForTaking'].includes(record.status) && (
+                      <Popconfirm title="确定关闭该项目？" onConfirm={() => handleClose(record)}>
+                        <Button size="small" danger>关闭</Button>
+                      </Popconfirm>
+                    )}
+                    {record.status === 'Closed' && (
+                      <Popconfirm title="确定归档该项目？" onConfirm={() => handleArchive(record)}>
+                        <Button size="small">归档</Button>
+                      </Popconfirm>
+                    )}
+                  </>
+                )}
+              </Space>
+            );
+          },
+        },
+      ];
+
+      return (
+        <div className="appLayout">
+          {/* 左侧导航栏 */}
+          <div className="sidebar">
+            <div className="sidebarHeader">
+              <a href="Home.html" className="logo">🎬 天合短剧平台</a>
+            </div>
+            <nav className="menu">
+              <a href="Home.html" className="menuItem">
+                <span className="menuItemIcon">🏠</span>
+                首页
+              </a>
+              <a href="ProjectHall.html" className="menuItem">
+                <span className="menuItemIcon">📋</span>
+                接单大厅
+              </a>
+              <a href="ProjectHall.html?tab=leaderboard" className="menuItem">
+                <span className="menuItemIcon">🏆</span>
+                天梯榜单
+              </a>
+              <a href="Account.html" className="menuItem">
+                <span className="menuItemIcon">💰</span>
+                账户与收益
+              </a>
+              <a href="MyProjects.html" className="menuItem">
+                <span className="menuItemIcon">🚀</span>
+                我的项目
+              </a>
+              
+              <div className="menuGroup">
+                <div className="menuGroupTitle">后台管理</div>
+                <a href="ReviewQueue.html" className="menuItem">
+                  <span className="menuItemIcon">✅</span>
+                  内容审核
+                </a>
+                <a href="ProjectManagement.html" className="menuItem active">
+                  <span className="menuItemIcon">📋</span>
+                  项目管理
+                </a>
+                <a href="StudentManagement.html" className="menuItem">
+                  <span className="menuItemIcon">👥</span>
+                  学员管理
+                </a>
+                <a href="FinanceManagement.html" className="menuItem">
+                  <span className="menuItemIcon">💰</span>
+                  财务对账
+                </a>
+                <a href="DashboardManagement.html" className="menuItem">
+                  <span className="menuItemIcon">📊</span>
+                  榜单与数据
+                </a>
+              </div>
+            </nav>
+          </div>
+
+          {/* 主内容区 */}
+          <div className="mainContent">
+            <div className="projectPage">
+              <div className="pageHeader">
+                <Title level={2} style={{ margin: 0 }}>项目管理</Title>
+                <Space>
+                  <Button onClick={handleExport}>导出</Button>
+                  <Button type="primary" onClick={handleNewProject}>新建项目</Button>
+                </Space>
+              </div>
+
+              {/* 筛选区 */}
+              <div className="filterCard">
+                <Space size="middle" wrap>
+                  <span>状态：</span>
+                  <Select
+                    style={{ width: 120 }}
+                    placeholder="全部"
+                    allowClear
+                    value={filters.status}
+                    onChange={(value) => setFilters({ ...filters, status: value || '' })}
+                  >
+                    <Option value="Draft">草稿</Option>
+                    <Option value="Published">已发布</Option>
+                    <Option value="ClosedForTaking">已满/已截止</Option>
+                    <Option value="Closed">已关闭</Option>
+                    <Option value="Archived">已归档</Option>
+                  </Select>
+
+                  <span>分类：</span>
+                  <Select
+                    style={{ width: 120 }}
+                    placeholder="全部"
+                    allowClear
+                    value={filters.category}
+                    onChange={(value) => setFilters({ ...filters, category: value || '' })}
+                  >
+                    <Option value="短剧">短剧</Option>
+                    <Option value="AI漫剧">AI漫剧</Option>
+                    <Option value="短视频">短视频</Option>
+                    <Option value="综艺">综艺</Option>
+                  </Select>
+
+                  <span>接单模式：</span>
+                  <Select
+                    style={{ width: 120 }}
+                    placeholder="全部"
+                    allowClear
+                    value={filters.takeMode}
+                    onChange={(value) => setFilters({ ...filters, takeMode: value || '' })}
+                  >
+                    <Option value="抢单">抢单</Option>
+                    <Option value="报名">报名</Option>
+                  </Select>
+
+                  <span>难度：</span>
+                  <Select
+                    style={{ width: 120 }}
+                    placeholder="全部"
+                    allowClear
+                    value={filters.difficulty}
+                    onChange={(value) => setFilters({ ...filters, difficulty: value || '' })}
+                  >
+                    <Option value="精品">精品</Option>
+                    <Option value="工厂">工厂</Option>
+                  </Select>
+
+                  <span>参与团队：</span>
+                  <Select
+                    style={{ width: 120 }}
+                    placeholder="全部"
+                    allowClear
+                    value={filters.participantTeam}
+                    onChange={(value) => setFilters({ ...filters, participantTeam: value || '' })}
+                  >
+                    <Option value="实训">实训</Option>
+                    <Option value="线下">线下</Option>
+                    <Option value="线上">线上</Option>
+                  </Select>
+
+                  <span>负责人：</span>
+                  <Select
+                    style={{ width: 120 }}
+                    placeholder="全部"
+                    allowClear
+                    value={filters.coordinator}
+                    onChange={(value) => setFilters({ ...filters, coordinator: value || '' })}
+                  >
+                    <Option value="张三">张三</Option>
+                    <Option value="李四">李四</Option>
+                    <Option value="王五">王五</Option>
+                  </Select>
+
+                  <span>项目截止时间：</span>
+                  <RangePicker
+                    value={filters.dueTimeRange}
+                    onChange={(dates) => setFilters({ ...filters, dueTimeRange: dates })}
+                  />
+
+                  <Search
+                    placeholder="搜索项目ID/名称"
+                    style={{ width: 200 }}
+                    allowClear
+                    value={filters.search}
+                    onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                    onSearch={(value) => setFilters({ ...filters, search: value })}
+                  />
+                </Space>
+              </div>
+
+              {/* 表格 */}
+              <div className="tableCard">
+                <Table
+                  columns={columns}
+                  dataSource={filteredProjects}
+                  loading={loading}
+                  rowKey="id"
+                  scroll={{ x: 1600 }}
+                  pagination={{
+                    pageSize: 20,
+                    showSizeChanger: true,
+                    showTotal: (total) => `共 ${total} 条`,
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* 申请列表弹窗 */}
+          <Modal
+            title={`项目申请列表 - ${currentProject?.projectName || ''}`}
+            open={applicationModalVisible}
+            onCancel={() => {
+              setApplicationModalVisible(false);
+              setCurrentProject(null);
+              setApplications([]);
+            }}
+            footer={null}
+            width={900}
+          >
+            {currentProject && (
+              <div style={{ marginBottom: 16 }}>
+                <Space direction="vertical" style={{ width: '100%' }}>
+                  <div>
+                    <Text strong>项目信息：</Text>
+                    <Space style={{ marginLeft: 8 }}>
+                      <Tag>接单模式：{currentProject.takeMode}</Tag>
+                      <Tag>名额：{currentProject.quotaTotal}人</Tag>
+                      <Tag>已接单：{currentProject.quotaTaken}/{currentProject.quotaTotal}</Tag>
+                    </Space>
+                  </div>
+                  {currentProject.candidates && Array.isArray(currentProject.candidates) && currentProject.candidates.length > 0 && (
+                    <div>
+                      <Text strong>指定候选人：</Text>
+                      <Space style={{ marginLeft: 8 }}>
+                        {currentProject.candidates.map((candidate, idx) => {
+                          const candidateName = candidate && typeof candidate === 'object' ? candidate.name : candidate;
+                          return <Tag key={idx} color="blue">{candidateName || `候选人${idx + 1}`}</Tag>;
+                        })}
+                      </Space>
+                    </div>
+                  )}
+                </Space>
+              </div>
+            )}
+
+            <Table
+              columns={useMemo(() => [
+                { title: '申请单号', dataIndex: 'id', key: 'id', width: 120 },
+                { title: '申请人', dataIndex: 'applicant', key: 'applicant', width: 120 },
+                { title: '申请时间', dataIndex: 'applyTime', key: 'applyTime', width: 180 },
+                {
+                  title: '状态',
+                  dataIndex: 'status',
+                  key: 'status',
+                  width: 120,
+                  render: (status) => {
+                    const statusMap = {
+                      'Pending': { color: 'orange', text: '待审核' },
+                      'Approved': { color: 'green', text: '已通过' },
+                      'Rejected': { color: 'red', text: '已驳回' },
+                      'Cancelled': { color: 'default', text: '已取消' },
+                    };
+                    const config = statusMap[status] || { color: 'default', text: status };
+                    return <Tag color={config.color}>{config.text}</Tag>;
+                  },
+                },
+                {
+                  title: '审核人',
+                  dataIndex: 'reviewer',
+                  key: 'reviewer',
+                  width: 120,
+                  render: (reviewer) => reviewer || '-',
+                },
+                {
+                  title: '审核时间',
+                  dataIndex: 'reviewTime',
+                  key: 'reviewTime',
+                  width: 180,
+                  render: (time) => time || '-',
+                },
+                {
+                  title: '驳回原因',
+                  dataIndex: 'rejectReason',
+                  key: 'rejectReason',
+                  width: 200,
+                  render: (reason) => reason || '-',
+                },
+                {
+                  title: '操作',
+                  key: 'action',
+                  width: 150,
+                  render: (_, record) => {
+                    // 待审核状态：显示通过和驳回按钮
+                    if (record.status === 'Pending') {
+                      return (
+                        <Space size="small" key={`action-${record.id}`}>
+                          <Button 
+                            size="small" 
+                            type="primary"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleApproveApplication(record);
+                            }}
+                          >
+                            通过
+                          </Button>
+                          <Button 
+                            size="small" 
+                            danger 
+                            type="default"
+                            onClick={(e) => {
+                              if (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                              }
+                              if (handleRejectApplication) {
+                                handleRejectApplication(record);
+                              }
+                            }}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            驳回
+                          </Button>
+                        </Space>
+                      );
+                    }
+                    // 已通过状态：显示驳回按钮（允许撤销通过）
+                    if (record.status === 'Approved') {
+                      return (
+                        <Space size="small" key={`action-${record.id}`}>
+                          <Button 
+                            size="small" 
+                            danger
+                            type="default"
+                            onClick={(e) => {
+                              if (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                              }
+                              if (handleRejectApplication) {
+                                handleRejectApplication(record);
+                              }
+                            }}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            驳回
+                          </Button>
+                        </Space>
+                      );
+                    }
+                    // 已驳回状态：显示通过按钮（允许重新通过）
+                    if (record.status === 'Rejected') {
+                      return (
+                        <Space size="small" key={`action-${record.id}`}>
+                          <Button 
+                            size="small" 
+                            type="primary"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleApproveApplication(record);
+                            }}
+                          >
+                            通过
+                          </Button>
+                        </Space>
+                      );
+                    }
+                    // 其他状态（已取消）：不显示操作按钮
+                    return '-';
+                  },
+                },
+              ], [handleApproveApplication, handleRejectApplication])}
+              dataSource={applications}
+              rowKey="id"
+              pagination={{ pageSize: 10, showTotal: (total) => `共 ${total} 条` }}
+            />
+          </Modal>
+
+          {/* 通过确认弹窗 */}
+          <Modal
+            title="通过申请"
+            open={approveModalVisible}
+            onOk={handleApproveConfirm}
+            onCancel={() => {
+              setApproveModalVisible(false);
+              setApprovingApp(null);
+            }}
+            okText="确认通过"
+            cancelText="取消"
+            destroyOnClose
+          >
+            <div>
+              <p>确定通过该申请？通过后将自动创建订单。</p>
+              {approvingApp && (
+                <p style={{ marginTop: 8, color: '#8c8c8c', fontSize: 12 }}>
+                  申请人：{approvingApp.applicant}
+                </p>
+              )}
+            </div>
+          </Modal>
+
+          {/* 驳回原因弹窗 */}
+          <Modal
+            title={rejectingApp && rejectingApp.status === 'Approved' ? '驳回申请（将删除已创建的订单）' : '驳回申请'}
+            open={rejectModalVisible}
+            onOk={handleRejectConfirm}
+            onCancel={() => {
+              setRejectModalVisible(false);
+              setRejectingApp(null);
+              rejectForm.resetFields();
+            }}
+            okText="确认驳回"
+            cancelText="取消"
+            destroyOnClose
+          >
+            <Form form={rejectForm} layout="vertical">
+              <Form.Item
+                name="reason"
+                label="驳回原因"
+                rules={[{ required: true, message: '请输入驳回原因' }]}
+              >
+                <TextArea rows={4} placeholder="请填写驳回原因，该原因将通知申请人" />
+              </Form.Item>
+            </Form>
+          </Modal>
+        </div>
+      );
+    };
+
+    // 等待所有资源加载完成后再渲染
+    window.addEventListener('load', function() {
+      try {
+        ReactDOM.render(<ProjectManagement />, document.getElementById('root'));
+      } catch (error) {
+        console.error('渲染错误:', error);
+        document.getElementById('root').innerHTML = '<div style="padding: 20px; color: red;">页面加载失败，请检查浏览器控制台错误信息。</div>';
+      }
+    });
+  </script>
+</body>
+</html>

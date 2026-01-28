@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>审核详情 - 天合短剧剪辑接单平台</title>
+  
+  <!-- Ant Design CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.css">
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .appLayout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 200px;
+      background: #fff;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .sidebarHeader {
+      padding: 20px 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1890ff;
+      text-decoration: none;
+      display: block;
+    }
+
+    .menu {
+      padding: 16px 0;
+    }
+
+    .menuItem {
+      display: block;
+      padding: 12px 24px;
+      color: #262626;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.3s;
+      border-left: 3px solid transparent;
+    }
+
+    .menuItem:hover {
+      background-color: #f0f0f0;
+      color: #1890ff;
+    }
+
+    .menuItem.active {
+      background-color: #e6f7ff;
+      color: #1890ff;
+      border-left-color: #1890ff;
+      font-weight: 500;
+    }
+
+    .menuItemIcon {
+      margin-right: 8px;
+      font-size: 16px;
+    }
+
+    .menuGroup {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    .menuGroupTitle {
+      padding: 8px 24px;
+      font-size: 12px;
+      color: #8c8c8c;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .mainContent {
+      flex: 1;
+      margin-left: 200px;
+      min-height: 100vh;
+      background: #f5f5f5;
+    }
+
+    .reviewDetailPage {
+      padding: 24px;
+    }
+
+    .pageHeader {
+      background: #fff;
+      padding: 16px 24px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .contentCard {
+      background: #fff;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .cardHeader {
+      padding: 16px 24px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .cardBody {
+      padding: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+
+      .mainContent {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+  
+  <!-- Day.js -->
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js"></script>
+  
+  <!-- Ant Design JS -->
+  <script src="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.js"></script>
+  
+  <!-- Babel Standalone for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const { Card, Button, Tag, Space, Typography, Timeline, Descriptions, Modal, Form, Input, Select, message, Alert, Empty } = antd;
+    const { Title, Text } = Typography;
+    const { TextArea } = Input;
+    const { Option } = Select;
+
+    const ReviewDetail = () => {
+      const [orderData, setOrderData] = useState(null);
+      const [loading, setLoading] = useState(true);
+      const [approveModalVisible, setApproveModalVisible] = useState(false);
+      const [rejectModalVisible, setRejectModalVisible] = useState(false);
+      const [form] = Form.useForm();
+
+      useEffect(() => {
+        loadOrderData();
+      }, []);
+
+      const getUrlParam = (name) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+      };
+
+      // 获取协同空间数据
+      const getOrderSpaceData = (orderId) => {
+        const key = `orderSpace_${orderId}`;
+        const stored = localStorage.getItem(key);
+        if (stored) {
+          return JSON.parse(stored);
+        }
+        return null;
+      };
+
+      // 保存协同空间数据
+      const saveOrderSpaceData = (orderId, data) => {
+        const key = `orderSpace_${orderId}`;
+        localStorage.setItem(key, JSON.stringify(data));
+      };
+
+      // 确保有测试订单数据
+      const ensureTestOrder = (orderId) => {
+        let orders = JSON.parse(localStorage.getItem('currentOrders') || '[]');
+        const order = orders.find(o => (o.id === orderId) || (o.orderId === orderId));
+        
+        if (!order) {
+          // 如果订单不存在，创建一个测试订单
+          const testOrder = {
+            id: orderId,
+            orderId: orderId,
+            projectId: `proj_${orderId.slice(-1)}`,
+            projectName: `测试项目${orderId.slice(-1)}`,
+            taker: '学员A',
+            status: 'Submitted',
+            takeTime: dayjs().subtract(3, 'day').format('YYYY-MM-DD HH:mm:ss'),
+            dueTime: dayjs().add(2, 'day').format('YYYY-MM-DD HH:mm:ss'),
+            submitTime: dayjs().subtract(2, 'hour').format('YYYY-MM-DD HH:mm:ss'),
+            version: 'V1',
+            amount: 10000,
+          };
+          
+          orders.push(testOrder);
+          localStorage.setItem('currentOrders', JSON.stringify(orders));
+          
+          // 创建对应的协同空间数据
+          const spaceKey = `orderSpace_${orderId}`;
+          const existingSpace = localStorage.getItem(spaceKey);
+          if (!existingSpace) {
+            const spaceData = {
+              orderId: orderId,
+              projectId: testOrder.projectId,
+              projectName: testOrder.projectName,
+              status: 'Submitted',
+              deliveries: [
+                {
+                  id: `delivery_${Date.now()}_${orderId}`,
+                  version: 'V1',
+                  fileName: `${testOrder.projectName}_V1.zip`,
+                  uploadTime: testOrder.submitTime,
+                  uploader: testOrder.taker,
+                  changeNote: '首次提交交付文件',
+                  status: 'Submitted',
+                  fileSize: Math.floor(Math.random() * 500000000) + 100000000,
+                },
+              ],
+              revisions: [],
+              messages: [],
+            };
+            localStorage.setItem(spaceKey, JSON.stringify(spaceData));
+          }
+          
+          return testOrder;
+        }
+        
+        return order;
+      };
+
+      const loadOrderData = () => {
+        const orderId = getUrlParam('orderId');
+        if (!orderId) {
+          message.error('缺少订单ID参数');
+          setLoading(false);
+          return;
+        }
+
+        // 确保有测试订单数据
+        const order = ensureTestOrder(orderId);
+        
+        if (!order) {
+          message.error('订单不存在');
+          setLoading(false);
+          return;
+        }
+
+        // 从协同空间读取交付版本和修改记录
+        const spaceData = getOrderSpaceData(orderId);
+        const deliveries = spaceData?.deliveries || [];
+        const revisions = spaceData?.revisions || [];
+
+        // 获取最新交付版本的提交时间
+        const latestDelivery = deliveries.length > 0 ? deliveries[deliveries.length - 1] : null;
+        const submitTime = latestDelivery?.uploadTime || order.submitTime || dayjs().format('YYYY-MM-DD HH:mm:ss');
+
+        // 生成审核相关数据
+        const reviewData = {
+          ...order,
+          orderId: orderId, // 确保有 orderId 字段
+          aiReview: {
+            riskLevel: ['低风险', '中风险', '高风险'][Math.floor(Math.random() * 3)],
+            hitTags: ['画面质量', '音频同步', '字幕规范', '时长符合', '内容合规'].slice(0, Math.floor(Math.random() * 3) + 1),
+            score: Math.floor(Math.random() * 30) + 70,
+          },
+          deliveries: deliveries,
+          revisions: revisions,
+          submitTime: submitTime,
+          version: latestDelivery?.version || `V${deliveries.length || 1}`,
+        };
+
+        setOrderData(reviewData);
+        setLoading(false);
+      };
+
+      const handleApprove = () => {
+        form.validateFields().then(values => {
+          const orderId = orderData.orderId || orderData.id;
+          
+          // 更新订单状态（currentOrders）
+          const orders = JSON.parse(localStorage.getItem('currentOrders') || '[]');
+          const orderIndex = orders.findIndex(o => (o.id === orderId) || (o.orderId === orderId));
+          if (orderIndex !== -1) {
+            orders[orderIndex].status = 'Approved';
+            orders[orderIndex].approveTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
+            orders[orderIndex].approveNote = values.note || '';
+            localStorage.setItem('currentOrders', JSON.stringify(orders));
+          }
+
+          // 更新协同空间数据
+          const spaceData = getOrderSpaceData(orderId);
+          if (spaceData) {
+            const deliveries = spaceData.deliveries || [];
+            const latestDelivery = deliveries.length > 0 ? deliveries[deliveries.length - 1] : null;
+            
+            if (latestDelivery) {
+              // 更新最新交付版本状态为已通过
+              const updatedDeliveries = deliveries.map(d => 
+                d.id === latestDelivery.id ? { ...d, status: 'Approved' } : d
+              );
+
+              // 添加审核通过记录
+              const newRevision = {
+                id: `revision_${Date.now()}`,
+                version: latestDelivery.version,
+                type: 'approved',
+                reason: '审核通过',
+                content: values.note || '交付文件符合要求，审核通过',
+                reviewer: '审核员',
+                reviewTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+              };
+
+              const updatedSpaceData = {
+                ...spaceData,
+                deliveries: updatedDeliveries,
+                revisions: [...(spaceData.revisions || []), newRevision],
+                status: 'Approved',
+              };
+
+              saveOrderSpaceData(orderId, updatedSpaceData);
+            } else {
+              // 如果没有交付版本，只更新状态
+              const updatedSpaceData = {
+                ...spaceData,
+                status: 'Approved',
+              };
+              saveOrderSpaceData(orderId, updatedSpaceData);
+            }
+          }
+
+          message.success('审核通过！');
+          setTimeout(() => {
+            window.location.href = 'ReviewQueue.html';
+          }, 1000);
+        }).catch(err => {
+          console.error('表单验证失败:', err);
+        });
+      };
+
+      const handleReject = () => {
+        form.validateFields().then(values => {
+          if (!values.reason) {
+            message.error('请选择退回原因');
+            return;
+          }
+          if (!values.revisionPoints) {
+            message.error('请填写修改点');
+            return;
+          }
+
+          const orderId = orderData.orderId || orderData.id;
+
+          // 更新订单状态（currentOrders）
+          const orders = JSON.parse(localStorage.getItem('currentOrders') || '[]');
+          const orderIndex = orders.findIndex(o => (o.id === orderId) || (o.orderId === orderId));
+          if (orderIndex !== -1) {
+            orders[orderIndex].status = 'NeedRevision';
+            orders[orderIndex].rejectTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
+            orders[orderIndex].rejectReason = values.reason;
+            orders[orderIndex].revisionPoints = values.revisionPoints;
+            localStorage.setItem('currentOrders', JSON.stringify(orders));
+          }
+
+          // 更新协同空间数据
+          const spaceData = getOrderSpaceData(orderId);
+          if (spaceData) {
+            const deliveries = spaceData.deliveries || [];
+            const latestDelivery = deliveries.length > 0 ? deliveries[deliveries.length - 1] : null;
+            const version = latestDelivery?.version || `V${deliveries.length || 1}`;
+
+            // 更新最新交付版本状态为需要修改
+            const updatedDeliveries = deliveries.map(d => 
+              d.id === latestDelivery?.id ? { ...d, status: 'NeedRevision' } : d
+            );
+
+            // 添加退回修改记录
+            const newRevision = {
+              id: `revision_${Date.now()}`,
+              version: version,
+              type: 'revision',
+              reason: values.reason,
+              content: values.revisionPoints,
+              reviewer: '审核员',
+              reviewTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+            };
+
+            const updatedSpaceData = {
+              ...spaceData,
+              deliveries: updatedDeliveries,
+              revisions: [...(spaceData.revisions || []), newRevision],
+              status: 'NeedRevision',
+            };
+
+            saveOrderSpaceData(orderId, updatedSpaceData);
+          } else {
+            // 如果没有空间数据，创建一个基本的
+            const newRevision = {
+              id: `revision_${Date.now()}`,
+              version: 'V1',
+              type: 'revision',
+              reason: values.reason,
+              content: values.revisionPoints,
+              reviewer: '审核员',
+              reviewTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+            };
+
+            const basicSpaceData = {
+              orderId: orderId,
+              projectId: orderData.projectId,
+              projectName: orderData.projectName,
+              status: 'NeedRevision',
+              deliveries: [],
+              revisions: [newRevision],
+            };
+
+            saveOrderSpaceData(orderId, basicSpaceData);
+          }
+
+          message.success('已退回修改');
+          setTimeout(() => {
+            window.location.href = 'ReviewQueue.html';
+          }, 1000);
+        }).catch(err => {
+          console.error('表单验证失败:', err);
+        });
+      };
+
+      if (loading) {
+        return (
+          <div className="appLayout">
+            <div className="sidebar" style={{ display: 'none' }}></div>
+            <div className="mainContent" style={{ marginLeft: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <div>加载中...</div>
+            </div>
+          </div>
+        );
+      }
+
+      if (!orderData) {
+        return (
+          <div className="appLayout">
+            <div className="sidebar" style={{ display: 'none' }}></div>
+            <div className="mainContent" style={{ marginLeft: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <Empty description="订单不存在" />
+            </div>
+          </div>
+        );
+      }
+
+      const getRiskLevelColor = (level) => {
+        const colorMap = {
+          '低风险': 'green',
+          '中风险': 'orange',
+          '高风险': 'red',
+        };
+        return colorMap[level] || 'default';
+      };
+
+      return (
+        <div className="appLayout">
+          {/* 左侧导航栏 */}
+          <div className="sidebar">
+            <div className="sidebarHeader">
+              <a href="Home.html" className="logo">🎬 天合短剧平台</a>
+            </div>
+            <nav className="menu">
+              <a href="Home.html" className="menuItem">
+                <span className="menuItemIcon">🏠</span>
+                首页
+              </a>
+              <a href="ProjectHall.html" className="menuItem">
+                <span className="menuItemIcon">📋</span>
+                接单大厅
+              </a>
+              <a href="ProjectHall.html?tab=leaderboard" className="menuItem">
+                <span className="menuItemIcon">🏆</span>
+                天梯榜单
+              </a>
+              <a href="Account.html" className="menuItem">
+                <span className="menuItemIcon">💰</span>
+                账户与收益
+              </a>
+              <a href="MyProjects.html" className="menuItem">
+                <span className="menuItemIcon">🚀</span>
+                我的项目
+              </a>
+              
+              <div className="menuGroup">
+                <div className="menuGroupTitle">后台管理</div>
+                <a href="ReviewQueue.html" className="menuItem active">
+                  <span className="menuItemIcon">✅</span>
+                  内容审核
+                </a>
+                <a href="ProjectManagement.html" className="menuItem">
+                  <span className="menuItemIcon">📋</span>
+                  项目管理
+                </a>
+                <a href="StudentManagement.html" className="menuItem">
+                  <span className="menuItemIcon">👥</span>
+                  学员管理
+                </a>
+                <a href="FinanceManagement.html" className="menuItem">
+                  <span className="menuItemIcon">💰</span>
+                  财务对账
+                </a>
+                <a href="DashboardManagement.html" className="menuItem">
+                  <span className="menuItemIcon">📊</span>
+                  榜单与数据
+                </a>
+              </div>
+            </nav>
+          </div>
+
+          {/* 主内容区 */}
+          <div className="mainContent">
+            <div className="reviewDetailPage">
+              <div className="pageHeader">
+                <Title level={2} style={{ margin: 0 }}>审核详情</Title>
+                <Space>
+                  <Button onClick={() => window.location.href = 'ReviewQueue.html'}>
+                    返回审核队列
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      const orderId = orderData.orderId || orderData.id;
+                      const projectId = orderData.projectId;
+                      window.location.href = `ProjectSpace.html?orderId=${orderId}&projectId=${projectId || ''}`;
+                    }}
+                  >
+                    查看协同空间
+                  </Button>
+                  {orderData.status === 'Submitted' && (
+                    <>
+                      <Button type="primary" danger onClick={() => setRejectModalVisible(true)}>
+                        退回修改
+                      </Button>
+                      <Button type="primary" onClick={() => setApproveModalVisible(true)}>
+                        审核通过
+                      </Button>
+                    </>
+                  )}
+                </Space>
+              </div>
+
+              {/* 订单基本信息 */}
+              <div className="contentCard">
+                <div className="cardHeader">订单信息</div>
+                <div className="cardBody">
+                  <Descriptions column={2} bordered>
+                    <Descriptions.Item label="订单号">{orderData.orderId || orderData.id}</Descriptions.Item>
+                    <Descriptions.Item label="项目名称">{orderData.projectName}</Descriptions.Item>
+                    <Descriptions.Item label="接单人">{orderData.taker}</Descriptions.Item>
+                    <Descriptions.Item label="当前版本">{orderData.version || 'V1'}</Descriptions.Item>
+                    <Descriptions.Item label="提交审核时间">{orderData.submitTime || '-'}</Descriptions.Item>
+                    <Descriptions.Item label="项目截止时间">{orderData.dueTime || '-'}</Descriptions.Item>
+                    <Descriptions.Item label="交付版本数">
+                      {orderData.deliveries ? orderData.deliveries.length : 0} 个
+                    </Descriptions.Item>
+                    <Descriptions.Item label="修改轮次">
+                      {orderData.revisions ? orderData.revisions.filter(r => r.type === 'revision').length : 0} 次
+                    </Descriptions.Item>
+                    <Descriptions.Item label="订单状态">
+                      <Tag color={orderData.status === 'Submitted' ? 'blue' : orderData.status === 'Approved' ? 'green' : 'orange'}>
+                        {orderData.status === 'Submitted' ? '待审核' : orderData.status === 'Approved' ? '已通过' : orderData.status}
+                      </Tag>
+                    </Descriptions.Item>
+                  </Descriptions>
+                </div>
+              </div>
+
+              {/* AI预审结果 */}
+              {orderData.aiReview && (
+                <div className="contentCard">
+                  <div className="cardHeader">AI预审结果（参考信息）</div>
+                  <div className="cardBody">
+                    <Alert
+                      message={
+                        <Space>
+                          <span>风险等级：</span>
+                          <Tag color={getRiskLevelColor(orderData.aiReview.riskLevel)}>
+                            {orderData.aiReview.riskLevel}
+                          </Tag>
+                          <span>预审得分：{orderData.aiReview.score}分</span>
+                        </Space>
+                      }
+                      description={
+                        <div style={{ marginTop: 8 }}>
+                          <Text strong>命中标签：</Text>
+                          <Space size="small" style={{ marginTop: 8 }}>
+                            {orderData.aiReview.hitTags.map((tag, idx) => (
+                              <Tag key={idx} color="blue">{tag}</Tag>
+                            ))}
+                          </Space>
+                        </div>
+                      }
+                      type={orderData.aiReview.riskLevel === '高风险' ? 'warning' : 'info'}
+                      showIcon
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* 交付版本 */}
+              <div className="contentCard">
+                <div className="cardHeader">交付版本</div>
+                <div className="cardBody">
+                  {orderData.deliveries && orderData.deliveries.length > 0 ? (
+                    <Timeline>
+                      {orderData.deliveries.map((delivery, idx) => {
+                        const statusColor = delivery.status === 'Approved' ? 'green' : 
+                                          delivery.status === 'NeedRevision' ? 'red' : 'blue';
+                        const statusText = delivery.status === 'Approved' ? '已通过' : 
+                                         delivery.status === 'NeedRevision' ? '需修改' : '待审核';
+                        return (
+                          <Timeline.Item key={delivery.id || idx} color={statusColor}>
+                            <div>
+                              <Space>
+                                <Text strong>{delivery.version || `V${idx + 1}`}</Text>
+                                <Tag color={statusColor}>{statusText}</Tag>
+                                <span style={{ color: '#8c8c8c' }}>
+                                  {delivery.uploadTime || delivery.time || '-'}
+                                </span>
+                              </Space>
+                              <div style={{ marginTop: 8 }}>
+                                <Text strong>文件名：</Text>
+                                <span style={{ color: '#666' }}>{delivery.fileName || '未命名文件'}</span>
+                                {delivery.fileSize && (
+                                  <span style={{ marginLeft: 16, color: '#8c8c8c', fontSize: 12 }}>
+                                    ({(delivery.fileSize / 1024 / 1024).toFixed(2)} MB)
+                                  </span>
+                                )}
+                              </div>
+                              {delivery.changeNote && (
+                                <div style={{ marginTop: 8, color: '#666', padding: 8, background: '#f5f5f5', borderRadius: 4 }}>
+                                  <Text strong>变更说明：</Text>
+                                  <div style={{ marginTop: 4 }}>{delivery.changeNote}</div>
+                                </div>
+                              )}
+                              <div style={{ marginTop: 8 }}>
+                                <Button 
+                                  type="link" 
+                                  size="small"
+                                  onClick={() => message.info('下载功能开发中')}
+                                >
+                                  下载文件
+                                </Button>
+                              </div>
+                            </div>
+                          </Timeline.Item>
+                        );
+                      })}
+                    </Timeline>
+                  ) : (
+                    <Empty description="暂无交付版本，学员尚未上传交付文件" />
+                  )}
+                </div>
+              </div>
+
+              {/* 历史退回与修改记录 */}
+              <div className="contentCard">
+                <div className="cardHeader">历史退回与修改记录</div>
+                <div className="cardBody">
+                  {orderData.revisions && orderData.revisions.length > 0 ? (
+                    <Timeline>
+                      {orderData.revisions.map((revision, idx) => {
+                        const isApproved = revision.type === 'approved';
+                        return (
+                          <Timeline.Item key={revision.id || idx} color={isApproved ? 'green' : 'red'}>
+                            <div>
+                              <Space>
+                                <Text strong>{revision.version || `V${idx + 1}`}</Text>
+                                <Tag color={isApproved ? 'green' : 'red'}>
+                                  {isApproved ? '审核通过' : '退回修改'}
+                                </Tag>
+                              </Space>
+                              {!isApproved && (
+                                <>
+                                  <div style={{ marginTop: 8 }}>
+                                    <Text strong>退回原因：</Text>
+                                    <span style={{ color: '#666', marginLeft: 8 }}>{revision.reason || '-'}</span>
+                                  </div>
+                                  <div style={{ marginTop: 8 }}>
+                                    <Text strong>修改点：</Text>
+                                    <div style={{ marginTop: 4, color: '#666', padding: 8, background: '#fff7e6', borderRadius: 4 }}>
+                                      {revision.content || revision.points || '-'}
+                                    </div>
+                                  </div>
+                                </>
+                              )}
+                              {isApproved && revision.content && (
+                                <div style={{ marginTop: 8, color: '#666', padding: 8, background: '#f6ffed', borderRadius: 4 }}>
+                                  {revision.content}
+                                </div>
+                              )}
+                              <div style={{ marginTop: 8, color: '#8c8c8c', fontSize: 12 }}>
+                                {revision.reviewTime || revision.time || '-'} | 审核人：{revision.reviewer || '审核员'}
+                              </div>
+                            </div>
+                          </Timeline.Item>
+                        );
+                      })}
+                    </Timeline>
+                  ) : (
+                    <Empty description="暂无退回记录" />
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 审核通过弹窗 */}
+          <Modal
+            title="审核通过"
+            open={approveModalVisible}
+            onOk={handleApprove}
+            onCancel={() => setApproveModalVisible(false)}
+            okText="确认通过"
+            cancelText="取消"
+          >
+            <Form form={form} layout="vertical">
+              <Form.Item
+                name="note"
+                label="备注（可选）"
+              >
+                <TextArea rows={4} placeholder="可填写审核备注信息" />
+              </Form.Item>
+            </Form>
+          </Modal>
+
+          {/* 退回修改弹窗 */}
+          <Modal
+            title="退回修改"
+            open={rejectModalVisible}
+            onOk={handleReject}
+            onCancel={() => setRejectModalVisible(false)}
+            okText="确认退回"
+            cancelText="取消"
+            width={600}
+          >
+            <Form form={form} layout="vertical">
+              <Form.Item
+                name="reason"
+                label="退回原因"
+                rules={[{ required: true, message: '请选择退回原因' }]}
+              >
+                <Select placeholder="请选择退回原因">
+                  <Option value="画面质量问题">画面质量问题</Option>
+                  <Option value="音频同步问题">音频同步问题</Option>
+                  <Option value="字幕规范问题">字幕规范问题</Option>
+                  <Option value="时长不符合要求">时长不符合要求</Option>
+                  <Option value="内容不符合要求">内容不符合要求</Option>
+                  <Option value="其他">其他</Option>
+                </Select>
+              </Form.Item>
+              <Form.Item
+                name="revisionPoints"
+                label="修改点"
+                rules={[{ required: true, message: '请填写修改点' }]}
+              >
+                <TextArea rows={6} placeholder="请详细说明需要修改的具体内容" />
+              </Form.Item>
+            </Form>
+          </Modal>
+        </div>
+      );
+    };
+
+    // 等待所有资源加载完成后再渲染
+    window.addEventListener('load', function() {
+      try {
+        ReactDOM.render(<ReviewDetail />, document.getElementById('root'));
+      } catch (error) {
+        console.error('渲染错误:', error);
+        document.getElementById('root').innerHTML = '<div style="padding: 20px; color: red;">页面加载失败，请检查浏览器控制台错误信息。</div>';
+      }
+    });
+  </script>
+</body>
+</html>
