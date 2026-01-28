@@ -276,7 +276,23 @@
       return urlParams.get(name);
     }
 
-    // 从 localStorage 读取或初始化订单空间数据
+    // 从 localStorage 读取或初始化项目空间数据（基于项目ID）
+    function getProjectSpaceData(projectId) {
+      const key = `projectSpace_${projectId}`;
+      const stored = localStorage.getItem(key);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+      return null;
+    }
+
+    // 保存项目空间数据到 localStorage（基于项目ID）
+    function saveProjectSpaceData(projectId, data) {
+      const key = `projectSpace_${projectId}`;
+      localStorage.setItem(key, JSON.stringify(data));
+    }
+
+    // 兼容旧版本：从 localStorage 读取或初始化订单空间数据（基于订单ID）
     function getOrderSpaceData(orderId) {
       const key = `orderSpace_${orderId}`;
       const stored = localStorage.getItem(key);
@@ -286,13 +302,64 @@
       return null;
     }
 
-    // 保存订单空间数据到 localStorage
+    // 兼容旧版本：保存订单空间数据到 localStorage（基于订单ID）
+    // 同时保存到项目空间（基于项目ID），实现多个订单共享
     function saveOrderSpaceData(orderId, data) {
       const key = `orderSpace_${orderId}`;
       localStorage.setItem(key, JSON.stringify(data));
+      // 同时保存到项目空间（基于项目ID），实现多个订单共享
+      if (data.projectId) {
+        saveProjectSpaceData(data.projectId, data);
+      }
     }
 
-    // 初始化订单空间数据
+    // 保存项目空间数据（优先使用此函数）
+    function saveSpaceData(data) {
+      if (data.projectId) {
+        saveProjectSpaceData(data.projectId, data);
+      }
+      // 如果有orderId，也保存到订单空间（兼容）
+      if (data.orderId) {
+        saveOrderSpaceData(data.orderId, data);
+      }
+    }
+
+    // 初始化项目空间数据（基于项目ID）
+    function initProjectSpaceData(projectId, projectInfo) {
+      const defaultData = {
+        projectId: projectId,
+        projectName: projectInfo.projectName || '未命名项目',
+        // 项目基础信息
+        category: projectInfo.category || '短剧',
+        projectTags: projectInfo.projectTags || [],
+        contentGenre: projectInfo.contentGenre || '',
+        difficulty: projectInfo.difficulty || '工厂',
+        participantTeam: projectInfo.participantTeam || '线上',
+        deliveryCycleDays: projectInfo.deliveryCycleDays || 7,
+        takeMode: projectInfo.takeMode || '抢单',
+        quotaTotal: projectInfo.quotaTotal || 1,
+        // 订单列表（多个订单共享一个项目空间）
+        orders: [],
+        // 项目空间通用数据
+        members: [
+          { id: '1', name: '当前用户', role: '学员', avatar: '👤' },
+          { id: '2', name: '李运营', role: '运营', avatar: '👨‍💼' },
+          { id: '3', name: '王审核', role: '审核', avatar: '👩‍💼' },
+        ],
+        materials: [
+          { id: '1', name: '原始素材_第01-05集.zip', size: 1073741824, type: 'zip' },
+          { id: '2', name: 'BGM音乐库.zip', size: 524288000, type: 'zip' },
+          { id: '3', name: '字幕模板.srt', size: 102400, type: 'srt' },
+        ],
+        deliveries: [], // 所有订单的交付版本
+        revisions: [], // 所有订单的修改意见
+        messages: [], // 项目空间内的沟通消息
+      };
+      saveProjectSpaceData(projectId, defaultData);
+      return defaultData;
+    }
+
+    // 初始化订单空间数据（兼容旧版本）
     function initOrderSpaceData(orderId, orderInfo) {
       // 从项目数据中获取基础信息（如果orderInfo中没有）
       let projectInfo = {};
@@ -354,13 +421,32 @@
     // 更新订单状态
     function updateOrderStatus(orderId, newStatus) {
       const orders = JSON.parse(localStorage.getItem('currentOrders') || '[]');
-      const orderIndex = orders.findIndex(o => o.orderId === orderId);
+      const orderIndex = orders.findIndex(o => o.orderId === orderId || o.id === orderId);
       if (orderIndex !== -1) {
         orders[orderIndex].status = newStatus;
         localStorage.setItem('currentOrders', JSON.stringify(orders));
+        
+        // 同时更新项目空间数据（基于项目ID）
+        const order = orders[orderIndex];
+        if (order.projectId) {
+          const projectSpaceData = getProjectSpaceData(order.projectId);
+          if (projectSpaceData) {
+            // 更新项目空间中该订单的状态
+            if (!projectSpaceData.orders) {
+              projectSpaceData.orders = [];
+            }
+            const orderInSpace = projectSpaceData.orders.find(o => o.orderId === orderId || o.id === orderId);
+            if (orderInSpace) {
+              orderInSpace.status = newStatus;
+            } else {
+              projectSpaceData.orders.push({ ...order, status: newStatus });
+            }
+            saveProjectSpaceData(order.projectId, projectSpaceData);
+          }
+        }
       }
       
-      // 同时更新空间数据
+      // 兼容旧版本：同时更新订单空间数据
       const spaceData = getOrderSpaceData(orderId);
       if (spaceData) {
         spaceData.status = newStatus;
@@ -383,26 +469,86 @@
       const projectId = getUrlParam('projectId');
 
       useEffect(() => {
-        if (!orderId) {
+        // 根据业务逻辑：一个项目ID对应一个项目空间，多个订单共享一个项目空间
+        // 优先使用projectId访问项目空间
+        if (!projectId && !orderId) {
           setLoading(false);
           return;
         }
 
-        // 从 localStorage 读取订单信息
-        const orders = JSON.parse(localStorage.getItem('currentOrders') || '[]');
-        const orderInfo = orders.find(o => o.orderId === orderId);
+        let spaceData = null;
+        let orderInfo = null;
 
-        if (!orderInfo) {
-          setLoading(false);
-          return;
+        // 优先基于projectId获取项目空间
+        if (projectId) {
+          spaceData = getProjectSpaceData(projectId);
+          
+          // 如果项目空间不存在，尝试从项目数据初始化
+          if (!spaceData) {
+            // 尝试从adminProjects或mockProjects获取项目信息
+            const adminProjects = JSON.parse(localStorage.getItem('adminProjects') || '[]');
+            const mockProjects = JSON.parse(localStorage.getItem('mockProjects') || '[]');
+            const projectInfo = adminProjects.find(p => p.id === projectId) || 
+                               mockProjects.find(p => p.id === projectId);
+            
+            if (projectInfo) {
+              spaceData = initProjectSpaceData(projectId, projectInfo);
+            } else {
+              // 如果找不到项目信息，但有orderId，使用订单信息初始化
+              if (orderId) {
+                const orders = JSON.parse(localStorage.getItem('currentOrders') || '[]');
+                orderInfo = orders.find(o => o.orderId === orderId || o.id === orderId);
+                if (orderInfo && orderInfo.projectId === projectId) {
+                  // 使用订单信息初始化项目空间
+                  const tempSpaceData = initOrderSpaceData(orderId, orderInfo);
+                  // 转换为项目空间格式并保存
+                  spaceData = {
+                    ...tempSpaceData,
+                    projectId: projectId,
+                    orders: [orderInfo],
+                  };
+                  saveProjectSpaceData(projectId, spaceData);
+                }
+              }
+            }
+          }
         }
 
-        // 读取或初始化空间数据
-        let spaceData = getOrderSpaceData(orderId);
+        // 如果没有projectId但有orderId，使用旧逻辑（向后兼容）
+        if (!spaceData && orderId) {
+          const orders = JSON.parse(localStorage.getItem('currentOrders') || '[]');
+          orderInfo = orders.find(o => o.orderId === orderId || o.id === orderId);
+
+          if (!orderInfo) {
+            setLoading(false);
+            return;
+          }
+
+          // 尝试从项目空间获取（如果订单的projectId对应的项目空间已存在）
+          if (orderInfo.projectId) {
+            spaceData = getProjectSpaceData(orderInfo.projectId);
+          }
+
+          // 如果项目空间不存在，使用订单空间数据（兼容旧版本）
+          if (!spaceData) {
+            spaceData = getOrderSpaceData(orderId);
+            if (!spaceData) {
+              spaceData = initOrderSpaceData(orderId, orderInfo);
+            }
+            // 将订单空间数据同步到项目空间
+            if (orderInfo.projectId && spaceData) {
+              saveProjectSpaceData(orderInfo.projectId, spaceData);
+            }
+          }
+        }
+
         if (!spaceData) {
-          spaceData = initOrderSpaceData(orderId, orderInfo);
-        } else {
-          // 确保所有必需的数组字段都存在，避免 undefined
+          setLoading(false);
+          return;
+        }
+
+        // 确保所有必需的数组字段都存在，避免 undefined
+        if (spaceData) {
           if (!Array.isArray(spaceData.deliveries)) spaceData.deliveries = [];
           if (!Array.isArray(spaceData.revisions)) spaceData.revisions = [];
           if (!Array.isArray(spaceData.members)) {
@@ -421,28 +567,57 @@
           }
           if (!Array.isArray(spaceData.messages)) spaceData.messages = [];
           if (!Array.isArray(spaceData.projectTags)) spaceData.projectTags = [];
+          if (!Array.isArray(spaceData.orders)) spaceData.orders = [];
           
-          // 同步订单状态和项目基础信息（如果订单信息中有）
-          spaceData.status = orderInfo.status || spaceData.status || 'InProgress';
-          if (orderInfo.category) spaceData.category = orderInfo.category;
-          if (orderInfo.projectTags) spaceData.projectTags = orderInfo.projectTags;
-          if (orderInfo.contentGenre) spaceData.contentGenre = orderInfo.contentGenre;
-          if (orderInfo.difficulty) spaceData.difficulty = orderInfo.difficulty;
-          if (orderInfo.participantTeam) spaceData.participantTeam = orderInfo.participantTeam;
-          if (orderInfo.deliveryCycleDays) spaceData.deliveryCycleDays = orderInfo.deliveryCycleDays;
-          if (orderInfo.takeMode) spaceData.takeMode = orderInfo.takeMode;
-          if (orderInfo.quotaTotal) spaceData.quotaTotal = orderInfo.quotaTotal;
+          // 如果有订单信息，同步订单状态和项目基础信息
+          if (orderInfo) {
+            spaceData.status = orderInfo.status || spaceData.status || 'InProgress';
+            if (orderInfo.category) spaceData.category = orderInfo.category;
+            if (orderInfo.projectTags) spaceData.projectTags = orderInfo.projectTags;
+            if (orderInfo.contentGenre) spaceData.contentGenre = orderInfo.contentGenre;
+            if (orderInfo.difficulty) spaceData.difficulty = orderInfo.difficulty;
+            if (orderInfo.participantTeam) spaceData.participantTeam = orderInfo.participantTeam;
+            if (orderInfo.deliveryCycleDays) spaceData.deliveryCycleDays = orderInfo.deliveryCycleDays;
+            if (orderInfo.takeMode) spaceData.takeMode = orderInfo.takeMode;
+            if (orderInfo.quotaTotal) spaceData.quotaTotal = orderInfo.quotaTotal;
+            
+            // 确保项目ID和名称存在
+            if (!spaceData.projectId) spaceData.projectId = orderInfo.projectId;
+            if (!spaceData.projectName) spaceData.projectName = orderInfo.projectName;
+            
+            // 将订单信息添加到项目空间的订单列表
+            if (orderId && spaceData.orders) {
+              const existingOrder = spaceData.orders.find(o => o.orderId === orderId || o.id === orderId);
+              if (!existingOrder) {
+                spaceData.orders.push(orderInfo);
+              }
+            }
+          }
           
-          // 确保项目ID和名称存在
-          if (!spaceData.projectId) spaceData.projectId = orderInfo.projectId;
-          if (!spaceData.projectName) spaceData.projectName = orderInfo.projectName;
+          // 确保项目ID存在
+          if (!spaceData.projectId && projectId) {
+            spaceData.projectId = projectId;
+          }
           
-          saveOrderSpaceData(orderId, spaceData);
+          // 使用项目ID保存项目空间（多个订单共享）
+          if (spaceData.projectId) {
+            saveProjectSpaceData(spaceData.projectId, spaceData);
+          }
+          // 兼容旧版本：也保存订单空间数据
+          if (orderId) {
+            saveOrderSpaceData(orderId, spaceData);
+          }
+        }
+
+        // 确保项目ID存在
+        if (spaceData && !spaceData.projectId && projectId) {
+          spaceData.projectId = projectId;
+          saveProjectSpaceData(projectId, spaceData);
         }
 
         setOrderData(spaceData);
         setLoading(false);
-      }, [orderId]);
+      }, [orderId, projectId]);
 
       const formatFileSize = (bytes) => {
         if (!bytes) return '-';
@@ -516,8 +691,10 @@
         };
 
         setOrderData(updatedData);
-        saveOrderSpaceData(orderId, updatedData);
-        updateOrderStatus(orderId, 'Submitted');
+        saveSpaceData(updatedData);
+        if (orderId) {
+          updateOrderStatus(orderId, 'Submitted');
+        }
         
         setUploadModalVisible(false);
         setChangeNote('');
@@ -581,7 +758,7 @@
         };
 
         setOrderData(updatedData);
-        saveOrderSpaceData(orderId, updatedData);
+        saveSpaceData(updatedData);
         setMessageContent('');
         setMessageImages([]);
         message.success('消息发送成功！');
@@ -638,8 +815,8 @@
         };
 
         setOrderData(updatedData);
-        saveOrderSpaceData(orderId, updatedData);
-        if (orderData.status !== 'Approved') {
+        saveSpaceData(updatedData);
+        if (orderData.status !== 'Approved' && orderId) {
           updateOrderStatus(orderId, 'NeedRevision');
         }
         revisionForm.resetFields();
@@ -681,8 +858,10 @@
             };
 
             setOrderData(updatedData);
-            saveOrderSpaceData(orderId, updatedData);
-            updateOrderStatus(orderId, 'Approved');
+            saveSpaceData(updatedData);
+            if (orderId) {
+              updateOrderStatus(orderId, 'Approved');
+            }
             message.success('审核通过！');
           },
         });
@@ -700,8 +879,10 @@
             };
 
             setOrderData(updatedData);
-            saveOrderSpaceData(orderId, updatedData);
-            updateOrderStatus(orderId, 'Accepted');
+            saveSpaceData(updatedData);
+            if (orderId) {
+              updateOrderStatus(orderId, 'Accepted');
+            }
             
             // 创建收益记录
             const earnings = JSON.parse(localStorage.getItem('earnings') || '[]');
@@ -737,7 +918,7 @@
                   <span className="menuItemIcon">📋</span>
                   接单大厅
                 </a>
-                <a href="ProjectHall.html?tab=leaderboard" className="menuItem">
+                <a href="Leaderboard.html" className="menuItem">
                   <span className="menuItemIcon">🏆</span>
                   天梯榜单
                 </a>
@@ -770,7 +951,7 @@
                   <span className="menuItemIcon">📋</span>
                   接单大厅
                 </a>
-                <a href="ProjectHall.html?tab=leaderboard" className="menuItem">
+                <a href="Leaderboard.html" className="menuItem">
                   <span className="menuItemIcon">🏆</span>
                   天梯榜单
                 </a>
@@ -820,7 +1001,7 @@
                 <div className="menuGroupTitle">后台管理</div>
                 <a href="ReviewQueue.html" className="menuItem">
                   <span className="menuItemIcon">✅</span>
-                  内容审核
+                  订单审核
                 </a>
                 <a href="ProjectManagement.html" className="menuItem">
                   <span className="menuItemIcon">📋</span>

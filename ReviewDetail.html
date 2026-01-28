@@ -100,6 +100,7 @@
 
     .reviewDetailPage {
       padding: 24px;
+      position: relative;
     }
 
     .pageHeader {
@@ -111,6 +112,15 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      margin-left: -24px;
+      margin-right: -24px;
+      padding-left: 24px;
+      padding-right: 24px;
+      border-radius: 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
     .contentCard {
@@ -498,7 +508,7 @@
                 <span className="menuItemIcon">📋</span>
                 接单大厅
               </a>
-              <a href="ProjectHall.html?tab=leaderboard" className="menuItem">
+              <a href="Leaderboard.html" className="menuItem">
                 <span className="menuItemIcon">🏆</span>
                 天梯榜单
               </a>
@@ -515,7 +525,7 @@
                 <div className="menuGroupTitle">后台管理</div>
                 <a href="ReviewQueue.html" className="menuItem active">
                   <span className="menuItemIcon">✅</span>
-                  内容审核
+                  订单审核
                 </a>
                 <a href="ProjectManagement.html" className="menuItem">
                   <span className="menuItemIcon">📋</span>

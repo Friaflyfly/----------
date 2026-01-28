@@ -347,6 +347,34 @@
         setApplicationModalVisible(true);
       };
 
+      const handleEnterProjectSpace = (project) => {
+        if (!project || !project.id) {
+          message.error('项目信息不完整');
+          return;
+        }
+        
+        // 根据业务逻辑：一个项目ID对应一个项目空间，多个订单共享一个项目空间
+        // 直接使用项目ID访问项目空间，不需要查找订单
+        const projectId = project.id;
+        
+        // 查找该项目下的订单（用于获取第一个订单ID，如果ProjectSpace需要orderId参数）
+        const orders = JSON.parse(localStorage.getItem('currentOrders') || '[]');
+        const projectOrders = orders.filter(order => 
+          order.projectId === project.id || order.projectId === project.projectId
+        );
+        
+        // 如果有订单，传递第一个订单ID（用于兼容现有实现）
+        // 如果没有订单，只传projectId（ProjectSpace需要支持这种情况）
+        if (projectOrders.length > 0) {
+          const firstOrder = projectOrders[0];
+          const orderId = firstOrder.orderId || firstOrder.id;
+          window.location.href = `ProjectSpace.html?orderId=${orderId}&projectId=${projectId}`;
+        } else {
+          // 没有订单时，只传projectId（需要ProjectSpace支持）
+          window.location.href = `ProjectSpace.html?projectId=${projectId}`;
+        }
+      };
+
       const loadApplications = (projectId) => {
         try {
           const allApplications = JSON.parse(localStorage.getItem('applications') || '[]');
@@ -573,6 +601,21 @@
           key: 'id',
           width: 120,
           fixed: 'left',
+          render: (id, record) => {
+            // 项目ID始终可点击，因为项目空间是基于项目ID的，不依赖订单
+            return (
+              <Button 
+                type="link" 
+                style={{ padding: 0, height: 'auto' }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEnterProjectSpace(record);
+                }}
+              >
+                {id}
+              </Button>
+            );
+          },
         },
         {
           title: '项目名称',
@@ -647,7 +690,7 @@
         {
           title: '操作',
           key: 'action',
-          width: 250,
+          width: 300,
           fixed: 'right',
           render: (_, record) => {
             const isArchived = record.status === 'Archived';
@@ -661,6 +704,13 @@
                   // 未归档状态：只显示编辑详情，以及其他操作按钮
                   <>
                     <Button size="small" onClick={() => handleEdit(record)}>编辑详情</Button>
+                    <Button 
+                      size="small" 
+                      type="link" 
+                      onClick={() => handleEnterProjectSpace(record)}
+                    >
+                      🚀 项目空间
+                    </Button>
                     {isApplicationMode && (
                       <Button size="small" type="link" onClick={() => handleViewApplications(record)}>
                         查看申请
@@ -710,7 +760,7 @@
                 <span className="menuItemIcon">📋</span>
                 接单大厅
               </a>
-              <a href="ProjectHall.html?tab=leaderboard" className="menuItem">
+              <a href="Leaderboard.html" className="menuItem">
                 <span className="menuItemIcon">🏆</span>
                 天梯榜单
               </a>
@@ -727,7 +777,7 @@
                 <div className="menuGroupTitle">后台管理</div>
                 <a href="ReviewQueue.html" className="menuItem">
                   <span className="menuItemIcon">✅</span>
-                  内容审核
+                  订单审核
                 </a>
                 <a href="ProjectManagement.html" className="menuItem active">
                   <span className="menuItemIcon">📋</span>

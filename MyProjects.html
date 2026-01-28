@@ -220,10 +220,22 @@
       };
 
       const goToSpace = (record) => {
-        const oid = record.orderId || record.id;
+        // 根据业务逻辑：一个项目ID对应一个项目空间，多个订单共享一个项目空间
         const pid = record.projectId;
-        if (oid) {
-          window.location.href = `ProjectSpace.html?orderId=${oid}&projectId=${pid || ''}`;
+        const oid = record.orderId || record.id;
+        
+        if (pid) {
+          // 优先使用项目ID访问项目空间
+          if (oid) {
+            // 如果有订单ID，同时传递（用于兼容）
+            window.location.href = `ProjectSpace.html?projectId=${pid}&orderId=${oid}`;
+          } else {
+            // 只有项目ID也可以访问项目空间
+            window.location.href = `ProjectSpace.html?projectId=${pid}`;
+          }
+        } else if (oid) {
+          // 兼容旧版本：如果没有项目ID，使用订单ID
+          window.location.href = `ProjectSpace.html?orderId=${oid}`;
         }
       };
 
@@ -271,7 +283,7 @@
           width: 120,
           render: (_, record) => (
             <Button type="primary" size="small" onClick={() => goToSpace(record)}>
-              进入协同空间
+              项目空间
             </Button>
           ),
         },
@@ -292,7 +304,7 @@
                 <span className="menuItemIcon">📋</span>
                 接单大厅
               </a>
-              <a href="ProjectHall.html?tab=leaderboard" className="menuItem">
+              <a href="Leaderboard.html" className="menuItem">
                 <span className="menuItemIcon">🏆</span>
                 天梯榜单
               </a>
@@ -308,7 +320,7 @@
                 <div className="menuGroupTitle">后台管理</div>
                 <a href="ReviewQueue.html" className="menuItem">
                   <span className="menuItemIcon">✅</span>
-                  内容审核
+                  订单审核
                 </a>
                 <a href="ProjectManagement.html" className="menuItem">
                   <span className="menuItemIcon">📋</span>
