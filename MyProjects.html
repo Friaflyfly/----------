@@ -173,6 +173,30 @@
           data = generateMockOrders();
           localStorage.setItem('currentOrders', JSON.stringify(data));
         }
+        
+        // 从财务账本中获取扣款信息，计算实付金额
+        const financeLedger = JSON.parse(localStorage.getItem('financeLedger') || '[]');
+        const ledgerMap = {};
+        financeLedger.forEach(item => {
+          ledgerMap[item.orderId] = item;
+        });
+        
+        // 为每个订单添加预估金额和实付金额
+        data = data.map(order => {
+          const orderId = order.orderId || order.id;
+          const ledgerItem = ledgerMap[orderId];
+          const estimatedAmount = order.amount || order.unitPrice || 0;
+          const deduction = ledgerItem ? (ledgerItem.deduction || 0) : 0;
+          const actualAmount = estimatedAmount - deduction;
+          
+          return {
+            ...order,
+            estimatedAmount: estimatedAmount,
+            actualAmount: actualAmount,
+            deduction: deduction,
+          };
+        });
+        
         setOrders(data);
         setLoading(false);
       };
@@ -191,6 +215,7 @@
           const takeTime = dayjs().subtract(10 - i * 2, 'day').format('YYYY-MM-DD HH:mm:ss');
           const dueTime = dayjs().add(5 + i, 'day').format('YYYY-MM-DD HH:mm:ss');
           const orderId = `ORD${String(i + 1).padStart(6, '0')}`;
+          const estimatedAmount = [500, 800, 600, 400, 300][i] * (10 + i * 2);
           return {
             orderId: orderId,
             id: orderId,
@@ -200,7 +225,10 @@
             takeTime: takeTime,
             dueTime: dueTime,
             status: status,
-            amount: [500, 800, 600, 400, 300][i] * (10 + i * 2),
+            amount: estimatedAmount,
+            estimatedAmount: estimatedAmount,
+            actualAmount: estimatedAmount, // 初始时实付金额等于预估金额
+            deduction: 0,
           };
         });
       };
@@ -275,6 +303,39 @@
           render: (status) => {
             const c = statusMap[status] || { color: 'default', text: status };
             return <Tag color={c.color}>{c.text}</Tag>;
+          },
+        },
+        {
+          title: '订单预估金额',
+          dataIndex: 'estimatedAmount',
+          key: 'estimatedAmount',
+          width: 150,
+          align: 'right',
+          render: (amount) => (
+            <span style={{ fontWeight: 500 }}>¥{amount ? amount.toLocaleString() : 0}</span>
+          ),
+        },
+        {
+          title: '订单实付金额',
+          dataIndex: 'actualAmount',
+          key: 'actualAmount',
+          width: 150,
+          align: 'right',
+          render: (amount, record) => {
+            const hasDeduction = record.deduction && record.deduction > 0;
+            return (
+              <span style={{ 
+                fontWeight: 500, 
+                color: hasDeduction ? '#ff4d4f' : '#52c41a' 
+              }}>
+                ¥{amount ? amount.toLocaleString() : 0}
+                {hasDeduction && (
+                  <span style={{ fontSize: 12, color: '#8c8c8c', marginLeft: 4 }}>
+                    (已扣¥{record.deduction.toLocaleString()})
+                  </span>
+                )}
+              </span>
+            );
           },
         },
         {
@@ -374,6 +435,7 @@
                   dataSource={filteredOrders}
                   rowKey={(r) => r.orderId || r.id}
                   loading={loading}
+                  scroll={{ x: 1200 }}
                   pagination={{
                     pageSize: 10,
                     showSizeChanger: true,
