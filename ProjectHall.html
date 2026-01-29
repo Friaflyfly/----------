@@ -602,7 +602,11 @@
           );
 
           if (existingApp) {
-            message.warning('您已经报名了，请勿重复操作');
+            if (existingApp.status === 'Rejected') {
+              message.warning('您的申请已被驳回，无法重新报名');
+            } else {
+              message.warning('您已经报名了，请勿重复操作');
+            }
             return;
           }
 
@@ -653,6 +657,106 @@
         if (diff === 0) return '今日截止';
         if (diff === 1) return '明日截止';
         return `${diff}天后截止`;
+      };
+
+      // 获取项目的申请状态
+      const getApplicationStatus = (project) => {
+        // 检查是否已接单
+        const orders = JSON.parse(localStorage.getItem('currentOrders') || '[]');
+        const existingOrder = orders.find(o => 
+          (o.projectId === project.id) && 
+          (o.taker === '当前用户' || o.taker === '学员A')
+        );
+        
+        if (existingOrder) {
+          return {
+            type: 'order',
+            status: '已接单',
+            orderId: existingOrder.orderId || existingOrder.id,
+          };
+        }
+
+        // 检查是否已申请
+        const applications = JSON.parse(localStorage.getItem('applications') || '[]');
+        const existingApp = applications.find(a => 
+          a.projectId === project.id && 
+          a.applicant === '当前用户'
+        );
+
+        if (existingApp) {
+          return {
+            type: 'application',
+            status: existingApp.status,
+            applicationId: existingApp.id,
+            rejectReason: existingApp.rejectReason,
+          };
+        }
+
+        return null;
+      };
+
+      // 获取按钮文本和状态
+      const getButtonConfig = (project) => {
+        const appStatus = getApplicationStatus(project);
+        const baseDisabled = isButtonDisabled(project);
+
+        if (appStatus) {
+          if (appStatus.type === 'order') {
+            // 已接单
+            return {
+              text: '已接单，前往空间',
+              disabled: false,
+              type: 'default',
+              onClick: () => {
+                window.location.href = `ProjectSpace.html?orderId=${appStatus.orderId}&projectId=${project.id}`;
+              },
+            };
+          } else if (appStatus.type === 'application') {
+            if (appStatus.status === 'Pending') {
+              // 待审核
+              return {
+                text: '报名状态：待审核',
+                disabled: true,
+                type: 'default',
+                onClick: () => {},
+              };
+            } else if (appStatus.status === 'Approved') {
+              // 已通过（应该已经有订单了，但以防万一）
+              return {
+                text: '报名状态：已通过',
+                disabled: false,
+                type: 'default',
+                onClick: () => {
+                  const orders = JSON.parse(localStorage.getItem('currentOrders') || '[]');
+                  const order = orders.find(o => 
+                    (o.projectId === project.id) && 
+                    (o.taker === '当前用户' || o.taker === '学员A')
+                  );
+                  if (order) {
+                    window.location.href = `ProjectSpace.html?orderId=${order.orderId || order.id}&projectId=${project.id}`;
+                  }
+                },
+              };
+            } else if (appStatus.status === 'Rejected') {
+              // 已驳回
+              return {
+                text: '报名状态：已驳回',
+                disabled: true,
+                type: 'default',
+                onClick: () => {},
+                rejectReason: appStatus.rejectReason,
+              };
+            }
+          }
+        }
+
+        // 默认状态
+        return {
+          text: project.takeMode === '抢单' ? '一键抢单' : '点击报名',
+          disabled: baseDisabled,
+          type: 'primary',
+          onClick: () => handleTakeOrder(project),
+        };
       };
 
       return (
@@ -803,6 +907,7 @@
                 const isDisabled = isButtonDisabled(project);
                 const disabledReason = getDisabledReason(project);
                 const remainingQuota = project.quotaTotal - project.quotaTaken;
+                const buttonConfig = getButtonConfig(project);
 
                 return (
                   <Col xs={24} sm={12} lg={8} xl={6} key={project.id}>
@@ -811,13 +916,13 @@
                       hoverable
                       actions={[
                         <Button
-                          type="primary"
+                          type={buttonConfig.type}
                           block
-                          disabled={isDisabled}
-                          onClick={() => handleTakeOrder(project)}
-                          title={isDisabled ? disabledReason : ''}
+                          disabled={buttonConfig.disabled}
+                          onClick={buttonConfig.onClick}
+                          title={buttonConfig.disabled ? (buttonConfig.rejectReason || disabledReason) : ''}
                         >
-                          {project.takeMode === '抢单' ? '一键抢单' : '点击报名'}
+                          {buttonConfig.text}
                         </Button>,
                       ]}
                     >
@@ -893,9 +998,15 @@
                         </div>
 
                         {/* 禁用原因提示 */}
-                        {isDisabled && (
+                        {isDisabled && !buttonConfig.rejectReason && (
                           <div className="disabledReason">
                             {disabledReason}
+                          </div>
+                        )}
+                        {/* 驳回原因提示 */}
+                        {buttonConfig.rejectReason && (
+                          <div className="disabledReason" style={{ backgroundColor: '#fff1f0', borderColor: '#ffccc7', color: '#cf1322' }}>
+                            驳回原因：{buttonConfig.rejectReason}
                           </div>
                         )}
                       </div>

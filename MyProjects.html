@@ -194,8 +194,37 @@
             estimatedAmount: estimatedAmount,
             actualAmount: actualAmount,
             deduction: deduction,
+            isOrder: true, // 标记为订单
           };
         });
+
+        // 读取被驳回的申请
+        const applications = JSON.parse(localStorage.getItem('applications') || '[]');
+        const rejectedApplications = applications
+          .filter(app => 
+            app.applicant === '当前用户' && 
+            app.status === 'Rejected'
+          )
+          .map(app => ({
+            id: app.id,
+            orderId: null, // 申请没有订单号
+            applicationId: app.id,
+            projectId: app.projectId,
+            projectName: app.projectName,
+            takeTime: app.applyTime,
+            dueTime: null,
+            status: 'Rejected',
+            amount: 0,
+            estimatedAmount: 0,
+            actualAmount: 0,
+            deduction: 0,
+            isOrder: false, // 标记为申请
+            rejectReason: app.rejectReason,
+            reviewTime: app.reviewTime,
+          }));
+
+        // 合并订单和被驳回的申请
+        data = [...data, ...rejectedApplications];
         
         setOrders(data);
         setLoading(false);
@@ -245,6 +274,7 @@
         'Approved': { color: 'green', text: '审核通过' },
         'Accepted': { color: 'success', text: '已验收' },
         'Closed': { color: 'default', text: '已关闭' },
+        'Rejected': { color: 'red', text: '已驳回' },
       };
 
       const goToSpace = (record) => {
@@ -269,11 +299,16 @@
 
       const columns = [
         {
-          title: '订单号',
+          title: '订单号/申请单号',
           dataIndex: 'orderId',
           key: 'orderId',
           width: 160,
-          render: (val, r) => val || r.id,
+          render: (val, r) => {
+            if (r.isOrder === false && r.applicationId) {
+              return r.applicationId || '-';
+            }
+            return val || r.id || '-';
+          },
         },
         {
           title: '项目名称',
@@ -299,10 +334,19 @@
           title: '状态',
           dataIndex: 'status',
           key: 'status',
-          width: 120,
-          render: (status) => {
+          width: 150,
+          render: (status, record) => {
             const c = statusMap[status] || { color: 'default', text: status };
-            return <Tag color={c.color}>{c.text}</Tag>;
+            return (
+              <div>
+                <Tag color={c.color}>{c.text}</Tag>
+                {status === 'Rejected' && record.rejectReason && (
+                  <div style={{ marginTop: 4, fontSize: 12, color: '#ff4d4f' }}>
+                    驳回原因：{record.rejectReason}
+                  </div>
+                )}
+              </div>
+            );
           },
         },
         {
@@ -342,11 +386,17 @@
           title: '操作',
           key: 'action',
           width: 120,
-          render: (_, record) => (
-            <Button type="primary" size="small" onClick={() => goToSpace(record)}>
-              项目空间
-            </Button>
-          ),
+          render: (_, record) => {
+            // 被驳回的申请不显示"进入空间"按钮
+            if (record.status === 'Rejected' && record.isOrder === false) {
+              return <span style={{ color: '#8c8c8c', fontSize: 12 }}>申请已驳回</span>;
+            }
+            return (
+              <Button type="primary" size="small" onClick={() => goToSpace(record)}>
+                项目空间
+              </Button>
+            );
+          },
         },
       ];
 
@@ -425,6 +475,7 @@
                     <Option value="Approved">审核通过</Option>
                     <Option value="Accepted">已验收</Option>
                     <Option value="Closed">已关闭</Option>
+                    <Option value="Rejected">已驳回</Option>
                   </Select>
                 </Space>
               </div>
