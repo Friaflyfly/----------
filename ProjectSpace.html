@@ -354,6 +354,7 @@
         requirementText: projectInfo.requirementText || '',
         requirementAttachments: projectInfo.requirementAttachments || [],
         deliveryRequirements: projectInfo.deliveryRequirements || {},
+        deliveryRequirementAttachments: projectInfo.deliveryRequirementAttachments || [],
         materialNote: projectInfo.materialNote || '',
         materialPackageFiles: projectInfo.materialPackageFiles || [],
         // 订单列表（多个订单共享一个项目空间）
@@ -502,8 +503,8 @@
             // 尝试从adminProjects或mockProjects获取项目信息
             const adminProjects = JSON.parse(localStorage.getItem('adminProjects') || '[]');
             const mockProjects = JSON.parse(localStorage.getItem('mockProjects') || '[]');
-            const projectInfo = adminProjects.find(p => p.id === projectId) || 
-                               mockProjects.find(p => p.id === projectId);
+            const projectInfo = adminProjects.find(p => p.id == projectId) || 
+                               mockProjects.find(p => p.id == projectId);
             
             if (projectInfo) {
               spaceData = initProjectSpaceData(projectId, projectInfo);
@@ -512,7 +513,7 @@
               if (orderId) {
                 const orders = JSON.parse(localStorage.getItem('currentOrders') || '[]');
                 orderInfo = orders.find(o => o.orderId === orderId || o.id === orderId);
-                if (orderInfo && orderInfo.projectId === projectId) {
+                if (orderInfo && orderInfo.projectId == projectId) {
                   // 使用订单信息初始化项目空间
                   const tempSpaceData = initOrderSpaceData(orderId, orderInfo);
                   // 转换为项目空间格式并保存
@@ -613,15 +614,17 @@
             spaceData.projectId = projectId;
           }
 
-          // 从 adminProjects 合并需求与素材（项目空间未存时用项目数据补全）
+          // 从 adminProjects 或 mockProjects 合并需求与素材（项目空间未存时用项目数据补全；支持 id 为数字或字符串）
           const pid = spaceData.projectId || projectId;
-          if (pid) {
+          if (pid != null && pid !== '') {
             const adminProjects = JSON.parse(localStorage.getItem('adminProjects') || '[]');
-            const project = adminProjects.find(p => p.id === pid);
+            const mockProjects = JSON.parse(localStorage.getItem('mockProjects') || '[]');
+            const project = adminProjects.find(p => p.id == pid) || mockProjects.find(p => p.id == pid);
             if (project) {
               if (project.requirementText != null) spaceData.requirementText = project.requirementText;
               if (project.requirementAttachments != null) spaceData.requirementAttachments = project.requirementAttachments;
               if (project.deliveryRequirements != null) spaceData.deliveryRequirements = project.deliveryRequirements;
+              if (project.deliveryRequirementAttachments != null) spaceData.deliveryRequirementAttachments = project.deliveryRequirementAttachments;
               if (project.materialNote != null) spaceData.materialNote = project.materialNote;
               if (project.materialPackageFiles != null) spaceData.materialPackageFiles = project.materialPackageFiles;
               if (project.materialPackageFiles && project.materialPackageFiles.length > 0) {
@@ -1197,6 +1200,22 @@
                             </div>
                           ))}
                         </div>
+                      ) : '-'}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="交付要求（附件）">
+                      {orderData.deliveryRequirementAttachments && orderData.deliveryRequirementAttachments.length > 0 ? (
+                        <Space direction="vertical">
+                          {orderData.deliveryRequirementAttachments.map((file, idx) => (
+                            <div key={file.uid || idx}>
+                              <Button type="link" onClick={() => message.info('下载功能开发中')}>
+                                📎 {file.name}
+                              </Button>
+                              <span style={{ marginLeft: 8, color: '#8c8c8c', fontSize: 12 }}>
+                                ({formatFileSize(file.size)})
+                              </span>
+                            </div>
+                          ))}
+                        </Space>
                       ) : '-'}
                     </Descriptions.Item>
                     <Descriptions.Item label="素材说明">

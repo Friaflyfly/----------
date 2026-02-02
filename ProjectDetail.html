@@ -229,6 +229,7 @@
             bitrate: '',
             subtitleRule: '',
           },
+          deliveryRequirementAttachments: project.deliveryRequirementAttachments || [],
           materialNote: project.materialNote ?? '',
           materialPackageFiles: project.materialPackageFiles || [],
         };
@@ -555,17 +556,35 @@
                         ) : '-'}
                       </Descriptions.Item>
                       <Descriptions.Item label="交付要求">
-                        {projectData.deliveryRequirements ? (
-                          <div style={{ padding: 12, background: '#fff7e6', borderRadius: 4 }}>
-                            {Object.entries(projectData.deliveryRequirements).map(([key, value]) => (
-                              <div key={key} style={{ marginBottom: 8 }}>
-                                <Text strong>{key === 'namingRule' ? '命名规范' : 
-                                              key === 'resolution' ? '分辨率' : 
-                                              key === 'bitrate' ? '码率' : 
-                                              key === 'subtitleRule' ? '字幕规范' : key}：</Text>
-                                <span style={{ marginLeft: 8 }}>{value}</span>
+                        {(projectData.deliveryRequirements && Object.keys(projectData.deliveryRequirements).length > 0) || (projectData.deliveryRequirementAttachments && projectData.deliveryRequirementAttachments.length > 0) ? (
+                          <div>
+                            {projectData.deliveryRequirements && Object.keys(projectData.deliveryRequirements).length > 0 && (
+                              <div style={{ padding: 12, background: '#fff7e6', borderRadius: 4, marginBottom: projectData.deliveryRequirementAttachments && projectData.deliveryRequirementAttachments.length > 0 ? 12 : 0 }}>
+                                {Object.entries(projectData.deliveryRequirements).map(([key, value]) => (
+                                  <div key={key} style={{ marginBottom: 8 }}>
+                                    <Text strong>{key === 'namingRule' ? '命名规范' : key === 'resolution' ? '分辨率' : key === 'bitrate' ? '码率' : key === 'subtitleRule' ? '字幕规范' : key}：</Text>
+                                    <span style={{ marginLeft: 8 }}>{value}</span>
+                                  </div>
+                                ))}
                               </div>
-                            ))}
+                            )}
+                            {projectData.deliveryRequirementAttachments && projectData.deliveryRequirementAttachments.length > 0 && (
+                              <div style={{ padding: 12, background: '#f5f5f5', borderRadius: 4 }}>
+                                <Text strong style={{ display: 'block', marginBottom: 8 }}>交付要求（附件）</Text>
+                                <Space direction="vertical">
+                                  {projectData.deliveryRequirementAttachments.map((file, idx) => (
+                                    <div key={file.uid || idx}>
+                                      <Button type="link" onClick={() => message.info('下载功能开发中')}>
+                                        📎 {file.name}
+                                      </Button>
+                                      <span style={{ marginLeft: 8, color: '#8c8c8c', fontSize: 12 }}>
+                                        ({formatFileSize(file.size)})
+                                      </span>
+                                    </div>
+                                  ))}
+                                </Space>
+                              </div>
+                            )}
                           </div>
                         ) : '-'}
                       </Descriptions.Item>

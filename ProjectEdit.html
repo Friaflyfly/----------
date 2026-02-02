@@ -233,6 +233,7 @@
               bitrate: '',
               subtitleRule: '',
             },
+            deliveryRequirementAttachments: project.deliveryRequirementAttachments || [],
           });
         } else {
           message.error('项目不存在');
@@ -269,6 +270,7 @@
                       publishTime: p.publishTime || dayjs().format('YYYY-MM-DD HH:mm:ss'),
                       requirementAttachments: normalizeAttachments(values.requirementAttachments),
                       materialPackageFiles: normalizeAttachments(values.materialPackageFiles),
+                      deliveryRequirementAttachments: normalizeAttachments(values.deliveryRequirementAttachments),
                     }
                   : p
               );
@@ -307,6 +309,7 @@
                 deliveryRequirements: values.deliveryRequirements || {},
                 requirementAttachments: normalizeAttachments(values.requirementAttachments),
                 materialPackageFiles: normalizeAttachments(values.materialPackageFiles),
+                deliveryRequirementAttachments: normalizeAttachments(values.deliveryRequirementAttachments),
                 status: values.status || 'Draft',
                 publishTime: null,
                 orderStats: {
@@ -425,6 +428,7 @@
                     quotaTotal: 5,
                     requirementAttachments: [],
                     materialPackageFiles: [],
+                    deliveryRequirementAttachments: [],
                   }}
                 >
                   <Tabs defaultActiveKey="basic">
@@ -781,6 +785,22 @@
                         </Form.Item>
                         <Form.Item name={['deliveryRequirements', 'subtitleRule']} noStyle style={{ marginTop: 16 }}>
                           <Input placeholder="字幕规范（例：SRT格式，UTF-8编码）" />
+                        </Form.Item>
+                        <Form.Item
+                          name="deliveryRequirementAttachments"
+                          label="交付要求（附件）"
+                          style={{ marginTop: 16 }}
+                          valuePropName="fileList"
+                          getValueFromEvent={(e) => (e && e.fileList) || []}
+                        >
+                          <Upload
+                            maxCount={10}
+                            beforeUpload={() => false}
+                            accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.zip,.rar"
+                            listType="text"
+                          >
+                            <Button type="default">上传交付要求附件</Button>
+                          </Upload>
                         </Form.Item>
                       </Form.Item>
                     </TabPane>
