@@ -224,7 +224,9 @@
             applyReviewRule: project.applyReviewRule || '运营审核',
             candidates: project.candidates || [],
             requirementText: project.requirementText || '',
+            requirementAttachments: project.requirementAttachments || [],
             materialNote: project.materialNote || '',
+            materialPackageFiles: project.materialPackageFiles || [],
             deliveryRequirements: project.deliveryRequirements || {
               namingRule: '',
               resolution: '',
@@ -247,6 +249,14 @@
           try {
             const projects = JSON.parse(localStorage.getItem('adminProjects') || '[]');
             
+            const normalizeAttachments = (list) =>
+              (list || []).map((f) => ({
+                uid: f.uid,
+                name: f.name,
+                status: f.status || 'done',
+                size: f.size,
+              }));
+
             if (isEditMode && projectId) {
               // 编辑模式
               const updatedProjects = projects.map(p => 
@@ -257,6 +267,8 @@
                       dueTime: values.dueTime ? values.dueTime.format('YYYY-MM-DD HH:mm:ss') : p.dueTime,
                       productionStartTime: values.productionStartTime ? values.productionStartTime.format('YYYY-MM-DD HH:mm:ss') : p.productionStartTime,
                       publishTime: p.publishTime || dayjs().format('YYYY-MM-DD HH:mm:ss'),
+                      requirementAttachments: normalizeAttachments(values.requirementAttachments),
+                      materialPackageFiles: normalizeAttachments(values.materialPackageFiles),
                     }
                   : p
               );
@@ -293,8 +305,8 @@
                 requirementText: values.requirementText || '',
                 materialNote: values.materialNote || '',
                 deliveryRequirements: values.deliveryRequirements || {},
-                requirementAttachments: [],
-                materialPackageFiles: [],
+                requirementAttachments: normalizeAttachments(values.requirementAttachments),
+                materialPackageFiles: normalizeAttachments(values.materialPackageFiles),
                 status: values.status || 'Draft',
                 publishTime: null,
                 orderStats: {
@@ -411,6 +423,8 @@
                     applyReviewRule: '运营审核',
                     deliveryCycleDays: 7,
                     quotaTotal: 5,
+                    requirementAttachments: [],
+                    materialPackageFiles: [],
                   }}
                 >
                   <Tabs defaultActiveKey="basic">
@@ -716,11 +730,43 @@
                       </Form.Item>
 
                       <Form.Item
+                        name="requirementAttachments"
+                        label="项目需求（附件）"
+                        valuePropName="fileList"
+                        getValueFromEvent={(e) => (e && e.fileList) || []}
+                      >
+                        <Upload
+                          maxCount={10}
+                          beforeUpload={() => false}
+                          accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.zip,.rar,.png,.jpg,.jpeg"
+                          listType="text"
+                        >
+                          <Button type="default">上传附件</Button>
+                        </Upload>
+                      </Form.Item>
+
+                      <Form.Item
                         name="materialNote"
                         label="素材说明"
                         rules={[{ max: 2000, message: '素材说明不能超过2000字' }]}
                       >
-                        <TextArea rows={4} placeholder="请输入素材包内容与使用说明" />
+                        <TextArea rows={4} placeholder="请输入素材包内容与使用说明（对素材包内容与使用说明的补充）" />
+                      </Form.Item>
+
+                      <Form.Item
+                        name="materialPackageFiles"
+                        label="素材包"
+                        valuePropName="fileList"
+                        getValueFromEvent={(e) => (e && e.fileList) || []}
+                      >
+                        <Upload
+                          maxCount={20}
+                          beforeUpload={() => false}
+                          accept=".zip,.rar,.7z,.mp4,.mov,.mp3,.wav,.srt,.ass,.pdf,.doc,.docx"
+                          listType="text"
+                        >
+                          <Button type="default">上传素材包</Button>
+                        </Upload>
                       </Form.Item>
 
                       <Form.Item label="交付要求">

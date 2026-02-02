@@ -326,6 +326,18 @@
 
     // 初始化项目空间数据（基于项目ID）
     function initProjectSpaceData(projectId, projectInfo) {
+      const materialsFromProject = (projectInfo.materialPackageFiles && projectInfo.materialPackageFiles.length > 0)
+        ? projectInfo.materialPackageFiles.map((f, i) => ({
+            id: f.uid || String(i + 1),
+            name: f.name,
+            size: f.size,
+            type: (f.name && f.name.split('.').pop()) || 'file',
+          }))
+        : [
+            { id: '1', name: '原始素材_第01-05集.zip', size: 1073741824, type: 'zip' },
+            { id: '2', name: 'BGM音乐库.zip', size: 524288000, type: 'zip' },
+            { id: '3', name: '字幕模板.srt', size: 102400, type: 'srt' },
+          ];
       const defaultData = {
         projectId: projectId,
         projectName: projectInfo.projectName || '未命名项目',
@@ -338,6 +350,12 @@
         deliveryCycleDays: projectInfo.deliveryCycleDays || 7,
         takeMode: projectInfo.takeMode || '抢单',
         quotaTotal: projectInfo.quotaTotal || 1,
+        // 需求与素材（来自项目）
+        requirementText: projectInfo.requirementText || '',
+        requirementAttachments: projectInfo.requirementAttachments || [],
+        deliveryRequirements: projectInfo.deliveryRequirements || {},
+        materialNote: projectInfo.materialNote || '',
+        materialPackageFiles: projectInfo.materialPackageFiles || [],
         // 订单列表（多个订单共享一个项目空间）
         orders: [],
         // 项目空间通用数据
@@ -346,11 +364,7 @@
           { id: '2', name: '李运营', role: '运营', avatar: '👨‍💼' },
           { id: '3', name: '王审核', role: '审核', avatar: '👩‍💼' },
         ],
-        materials: [
-          { id: '1', name: '原始素材_第01-05集.zip', size: 1073741824, type: 'zip' },
-          { id: '2', name: 'BGM音乐库.zip', size: 524288000, type: 'zip' },
-          { id: '3', name: '字幕模板.srt', size: 102400, type: 'srt' },
-        ],
+        materials: materialsFromProject,
         deliveries: [], // 所有订单的交付版本
         revisions: [], // 所有订单的修改意见
         messages: [], // 项目空间内的沟通消息
@@ -597,6 +611,28 @@
           // 确保项目ID存在
           if (!spaceData.projectId && projectId) {
             spaceData.projectId = projectId;
+          }
+
+          // 从 adminProjects 合并需求与素材（项目空间未存时用项目数据补全）
+          const pid = spaceData.projectId || projectId;
+          if (pid) {
+            const adminProjects = JSON.parse(localStorage.getItem('adminProjects') || '[]');
+            const project = adminProjects.find(p => p.id === pid);
+            if (project) {
+              if (project.requirementText != null) spaceData.requirementText = project.requirementText;
+              if (project.requirementAttachments != null) spaceData.requirementAttachments = project.requirementAttachments;
+              if (project.deliveryRequirements != null) spaceData.deliveryRequirements = project.deliveryRequirements;
+              if (project.materialNote != null) spaceData.materialNote = project.materialNote;
+              if (project.materialPackageFiles != null) spaceData.materialPackageFiles = project.materialPackageFiles;
+              if (project.materialPackageFiles && project.materialPackageFiles.length > 0) {
+                spaceData.materials = project.materialPackageFiles.map((f, i) => ({
+                  id: f.uid || String(i + 1),
+                  name: f.name,
+                  size: f.size,
+                  type: (f.name && f.name.split('.').pop()) || 'file',
+                }));
+              }
+            }
           }
           
           // 使用项目ID保存项目空间（多个订单共享）
@@ -1128,23 +1164,76 @@
                   </Descriptions>
                 </TabPane>
 
-                <TabPane tab="📦 素材" key="materials">
-                  <List
-                    dataSource={orderData.materials}
-                    renderItem={(item) => (
-                      <List.Item>
-                        <List.Item.Meta
-                          avatar={<span style={{ fontSize: 24 }}>📦</span>}
-                          title={<a href="#" download>{item.name}</a>}
-                          description={`大小: ${formatFileSize(item.size)} | 类型: ${item.type || '未知'}`}
-                        />
-                        <Button type="primary" href="#" download>
-                          下载
-                        </Button>
-                      </List.Item>
-                    )}
-                    style={{ marginTop: 16 }}
-                  />
+                <TabPane tab="📋 需求与素材" key="requirements">
+                  <Descriptions column={1} bordered style={{ marginTop: 16 }}>
+                    <Descriptions.Item label="项目需求（文本）">
+                      <div style={{ whiteSpace: 'pre-wrap', maxHeight: 300, overflow: 'auto', padding: 12, background: '#f5f5f5', borderRadius: 4 }}>
+                        {orderData.requirementText || '-'}
+                      </div>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="项目需求（附件）">
+                      {orderData.requirementAttachments && orderData.requirementAttachments.length > 0 ? (
+                        <Space direction="vertical">
+                          {orderData.requirementAttachments.map((file, idx) => (
+                            <div key={file.uid || idx}>
+                              <Button type="link" onClick={() => message.info('下载功能开发中')}>
+                                📎 {file.name}
+                              </Button>
+                              <span style={{ marginLeft: 8, color: '#8c8c8c', fontSize: 12 }}>
+                                ({formatFileSize(file.size)})
+                              </span>
+                            </div>
+                          ))}
+                        </Space>
+                      ) : '-'}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="交付要求">
+                      {orderData.deliveryRequirements && Object.keys(orderData.deliveryRequirements).length > 0 ? (
+                        <div style={{ padding: 12, background: '#fff7e6', borderRadius: 4 }}>
+                          {Object.entries(orderData.deliveryRequirements).map(([key, value]) => (
+                            <div key={key} style={{ marginBottom: 8 }}>
+                              <Text strong>{key === 'namingRule' ? '命名规范' : key === 'resolution' ? '分辨率' : key === 'bitrate' ? '码率' : key === 'subtitleRule' ? '字幕规范' : key}：</Text>
+                              <span style={{ marginLeft: 8 }}>{value || '-'}</span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : '-'}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="素材说明">
+                      <div style={{ whiteSpace: 'pre-wrap', maxHeight: 200, overflow: 'auto', padding: 12, background: '#f5f5f5', borderRadius: 4 }}>
+                        {orderData.materialNote || '-'}
+                      </div>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="素材包">
+                      {orderData.materialPackageFiles && orderData.materialPackageFiles.length > 0 ? (
+                        <Space direction="vertical">
+                          {orderData.materialPackageFiles.map((file, idx) => (
+                            <div key={file.uid || idx}>
+                              <Button type="link" onClick={() => message.info('下载功能开发中')}>
+                                📦 {file.name}
+                              </Button>
+                              <span style={{ marginLeft: 8, color: '#8c8c8c', fontSize: 12 }}>
+                                ({formatFileSize(file.size)})
+                              </span>
+                            </div>
+                          ))}
+                        </Space>
+                      ) : (orderData.materials && orderData.materials.length > 0 ? (
+                        <Space direction="vertical">
+                          {orderData.materials.map((file, idx) => (
+                            <div key={file.id || idx}>
+                              <Button type="link" onClick={() => message.info('下载功能开发中')}>
+                                📦 {file.name}
+                              </Button>
+                              <span style={{ marginLeft: 8, color: '#8c8c8c', fontSize: 12 }}>
+                                ({formatFileSize(file.size)})
+                              </span>
+                            </div>
+                          ))}
+                        </Space>
+                      ) : '-')}
+                    </Descriptions.Item>
+                  </Descriptions>
                 </TabPane>
 
                 <TabPane tab="📤 交付与修改" key="deliveries">

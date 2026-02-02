@@ -222,21 +222,15 @@
           candidates: project.candidates || [],
           // 需求与素材
           requirementText: project.requirementText || '项目需求描述：\n1. 需要高质量的剪辑效果\n2. 符合平台规范\n3. 按时交付',
-          requirementAttachments: project.requirementAttachments || [
-            { id: '1', name: '脚本大纲.docx', size: 102400 },
-            { id: '2', name: '分镜参考.pdf', size: 2048000 },
-          ],
+          requirementAttachments: project.requirementAttachments || [],
           deliveryRequirements: project.deliveryRequirements || {
-            namingRule: '项目名_集数_版本号.mp4',
-            resolution: '1920x1080',
-            bitrate: '5000kbps',
-            subtitleRule: 'SRT格式，UTF-8编码',
+            namingRule: '',
+            resolution: '',
+            bitrate: '',
+            subtitleRule: '',
           },
-          materialNote: project.materialNote || '素材包包含原始视频、BGM、字幕模板等',
-          materialPackageFiles: project.materialPackageFiles || [
-            { id: '1', name: '原始素材_第01-05集.zip', size: 1073741824 },
-            { id: '2', name: 'BGM音乐库.zip', size: 524288000 },
-          ],
+          materialNote: project.materialNote ?? '',
+          materialPackageFiles: project.materialPackageFiles || [],
         };
 
         setProjectData(fullProject);
