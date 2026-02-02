@@ -203,6 +203,7 @@
           form.setFieldsValue({
             projectName: project.projectName,
             projectTags: project.projectTags || [],
+            projectStage: project.projectStage || '精剪中',
             contentGenre: project.contentGenre || '霸总',
             category: project.category,
             difficulty: project.difficulty,
@@ -287,6 +288,7 @@
                 category: values.category,
                 difficulty: values.difficulty,
                 participantTeam: values.participantTeam,
+                projectStage: values.projectStage || '精剪中',
                 budgetAmount: values.budgetAmount,
                 expenseAmount: values.expenseAmount || 0,
                 projectNote: values.projectNote || '',
@@ -422,6 +424,7 @@
                   layout="vertical"
                   initialValues={{
                     status: 'Draft',
+                    projectStage: '精剪中',
                     takeMode: '抢单',
                     applyReviewRule: '运营审核',
                     deliveryCycleDays: 7,
@@ -504,6 +507,21 @@
                           <Option value="实训">实训</Option>
                           <Option value="线下">线下</Option>
                           <Option value="线上">线上</Option>
+                        </Select>
+                      </Form.Item>
+
+                      <Form.Item
+                        name="projectStage"
+                        label="项目状态"
+                        rules={[{ required: true, message: '请选择项目状态' }]}
+                      >
+                        <Select placeholder="请选择项目状态（阶段）">
+                          <Option value="精剪中">精剪中</Option>
+                          <Option value="内部一审">内部一审</Option>
+                          <Option value="内部二审">内部二审</Option>
+                          <Option value="导演审">导演审</Option>
+                          <Option value="监制审">监制审</Option>
+                          <Option value="审核完成">审核完成</Option>
                         </Select>
                       </Form.Item>
                     </TabPane>

@@ -163,6 +163,10 @@
       const [freezeModalVisible, setFreezeModalVisible] = useState(false);
       const [freezeForm] = Form.useForm();
       const [currentStudent, setCurrentStudent] = useState(null);
+      const [studentModalVisible, setStudentModalVisible] = useState(false);
+      const [studentModalMode, setStudentModalMode] = useState('add'); // 'add' | 'edit'
+      const [editingStudent, setEditingStudent] = useState(null);
+      const [studentForm] = Form.useForm();
 
       useEffect(() => {
         loadData();
@@ -192,10 +196,17 @@
 
       const generateMockTalent = () => {
         const statuses = ['Active', 'Training', 'Paused', 'Frozen', 'Exited'];
+        const genders = ['男', '女'];
+        const classes = ['剪辑一班', '剪辑二班', '调色班', '特效班', '综合班'];
+        const takerRoles = ['学员', '剪辑师', '调色师', '特效师'];
         return Array.from({ length: 20 }, (_, i) => ({
           id: `student_${String(i + 1).padStart(6, '0')}`,
           nickname: `学员${i + 1}`,
           username: `user${i + 1}`,
+          phone: `138${String(10000000 + i).slice(-8)}`,
+          gender: genders[i % 2],
+          className: classes[i % classes.length],
+          takerRole: takerRoles[i % takerRoles.length],
           status: statuses[Math.floor(Math.random() * statuses.length)],
           skills: ['剪辑', '调色', '特效'].slice(0, Math.floor(Math.random() * 3) + 1),
           level: Math.floor(Math.random() * 5) + 1,
@@ -211,9 +222,9 @@
 
       const generateMockPending = () => {
         return [
-          { id: 'pending_1', nickname: '张三', username: 'zhangsan', applyTime: dayjs().subtract(2, 'day').format('YYYY-MM-DD HH:mm:ss'), portfolio: 'portfolio1.zip' },
-          { id: 'pending_2', nickname: '李四', username: 'lisi', applyTime: dayjs().subtract(1, 'day').format('YYYY-MM-DD HH:mm:ss'), portfolio: 'portfolio2.zip' },
-          { id: 'pending_3', nickname: '王五', username: 'wangwu', applyTime: dayjs().subtract(3, 'hour').format('YYYY-MM-DD HH:mm:ss') },
+          { id: 'pending_1', nickname: '张三', username: 'zhangsan', phone: '13800138001', gender: '男', className: '剪辑一班', takerRole: '剪辑师', applyTime: dayjs().subtract(2, 'day').format('YYYY-MM-DD HH:mm:ss'), portfolio: 'portfolio1.zip' },
+          { id: 'pending_2', nickname: '李四', username: 'lisi', phone: '13800138002', gender: '女', className: '调色班', takerRole: '调色师', applyTime: dayjs().subtract(1, 'day').format('YYYY-MM-DD HH:mm:ss'), portfolio: 'portfolio2.zip' },
+          { id: 'pending_3', nickname: '王五', username: 'wangwu', phone: '13800138003', gender: '男', className: '特效班', takerRole: '特效师', applyTime: dayjs().subtract(3, 'hour').format('YYYY-MM-DD HH:mm:ss') },
         ];
       };
 
@@ -225,6 +236,10 @@
         const newTalent = {
           ...student,
           id: `student_${Date.now()}`,
+          phone: student.phone || '-',
+          gender: student.gender || '-',
+          className: student.className || '-',
+          takerRole: student.takerRole || '剪辑师',
           status: 'Training',
           skills: [],
           level: 1,
@@ -287,6 +302,71 @@
         message.info(`查看${student.nickname}的接单详情功能开发中`);
       };
 
+      const handleOpenAdd = () => {
+        setEditingStudent(null);
+        setStudentModalMode('add');
+        studentForm.resetFields();
+        studentForm.setFieldsValue({ takerRole: '剪辑师', gender: '男' });
+        setStudentModalVisible(true);
+      };
+
+      const handleOpenEdit = (record) => {
+        setEditingStudent(record);
+        setStudentModalMode('edit');
+        studentForm.setFieldsValue({
+          nickname: record.nickname,
+          username: record.username,
+          phone: record.phone || '',
+          gender: record.gender || '男',
+          className: record.className || '',
+          takerRole: record.takerRole || '剪辑师',
+          status: record.status,
+        });
+        setStudentModalVisible(true);
+      };
+
+      const handleStudentSubmit = () => {
+        studentForm.validateFields().then((values) => {
+          if (studentModalMode === 'add') {
+            const newId = `student_${String(Date.now()).slice(-6)}`;
+            const newStudent = {
+              id: newId,
+              nickname: values.nickname,
+              username: values.username,
+              phone: values.phone || '',
+              gender: values.gender,
+              className: values.className || '',
+              takerRole: values.takerRole || '剪辑师',
+              status: 'Training',
+              skills: [],
+              level: 1,
+              concurrencyUsed: 0,
+              concurrencyLimit: 5,
+              totalOrders: 0,
+              onTimeRate: '0.00',
+              passRate: '0.00',
+              revisionRounds: '0.0',
+              freezeReason: null,
+            };
+            const updated = [...talentList, newStudent];
+            setTalentList(updated);
+            localStorage.setItem('talentPool', JSON.stringify(updated));
+            message.success('新增学员成功');
+          } else {
+            const updated = talentList.map((s) =>
+              s.id === editingStudent.id
+                ? { ...s, nickname: values.nickname, username: values.username, phone: values.phone, gender: values.gender, className: values.className, takerRole: values.takerRole || '剪辑师', status: values.status }
+                : s
+            );
+            setTalentList(updated);
+            localStorage.setItem('talentPool', JSON.stringify(updated));
+            message.success('保存成功');
+          }
+          setStudentModalVisible(false);
+          studentForm.resetFields();
+        }).catch(() => {});
+      };
+
       const getStatusTag = (status) => {
         const statusMap = {
           'Active': { color: 'green', text: '可接单' },
@@ -302,6 +382,10 @@
       const talentColumns = [
         { title: '学员ID', dataIndex: 'id', key: 'id', width: 150 },
         { title: '昵称', dataIndex: 'nickname', key: 'nickname', width: 120 },
+        { title: '手机号', dataIndex: 'phone', key: 'phone', width: 130, render: (v) => v || '-' },
+        { title: '性别', dataIndex: 'gender', key: 'gender', width: 80, render: (v) => v || '-' },
+        { title: '班级', dataIndex: 'className', key: 'className', width: 100, render: (v) => v || '-' },
+        { title: '接单角色', dataIndex: 'takerRole', key: 'takerRole', width: 100, render: (v) => v || '-' },
         { title: '状态', dataIndex: 'status', key: 'status', width: 100, render: getStatusTag },
         { title: '技能标签', dataIndex: 'skills', key: 'skills', width: 150, render: (skills) => (
           <Space size="small">{skills.map((s, i) => <Tag key={i}>{s}</Tag>)}</Space>
@@ -318,7 +402,7 @@
         { title: '冻结原因', dataIndex: 'freezeReason', key: 'freezeReason', width: 150, render: (reason) => reason || '-' },
         { title: '操作', key: 'action', width: 200, render: (_, record) => (
           <Space size="small">
-            <Button size="small" onClick={() => message.info('编辑功能开发中')}>编辑</Button>
+            <Button size="small" onClick={() => handleOpenEdit(record)}>编辑</Button>
             {record.status === 'Active' && (
               <>
                 <Button size="small" onClick={() => handleStatusChange(record, 'Paused')}>暂停</Button>
@@ -339,6 +423,10 @@
         { title: '申请时间', dataIndex: 'applyTime', key: 'applyTime', width: 180 },
         { title: '昵称', dataIndex: 'nickname', key: 'nickname', width: 120 },
         { title: '用户名', dataIndex: 'username', key: 'username', width: 120 },
+        { title: '手机号', dataIndex: 'phone', key: 'phone', width: 130, render: (v) => v || '-' },
+        { title: '性别', dataIndex: 'gender', key: 'gender', width: 80, render: (v) => v || '-' },
+        { title: '班级', dataIndex: 'className', key: 'className', width: 100, render: (v) => v || '-' },
+        { title: '接单角色', dataIndex: 'takerRole', key: 'takerRole', width: 100, render: (v) => v || '-' },
         { title: '作品集', dataIndex: 'portfolio', key: 'portfolio', width: 150, render: (portfolio) => 
           portfolio ? <a href="#" onClick={(e) => { e.preventDefault(); message.info('下载作品集'); }}>下载</a> : <span style={{ color: '#8c8c8c' }}>未上传</span>
         },
@@ -430,7 +518,7 @@
             <div className="studentPage">
               <div className="pageHeader">
                 <Title level={2} style={{ margin: 0 }}>学员管理</Title>
-                <Button type="primary" onClick={() => message.info('新增学员功能开发中')}>新增学员</Button>
+                <Button type="primary" onClick={handleOpenAdd}>新增学员</Button>
               </div>
 
               <div className="contentCard">
@@ -458,6 +546,57 @@
               </div>
             </div>
           </div>
+
+          {/* 新增/编辑学员弹窗 */}
+          <Modal
+            title={studentModalMode === 'add' ? '新增学员' : '编辑学员'}
+            open={studentModalVisible}
+            onOk={handleStudentSubmit}
+            onCancel={() => { setStudentModalVisible(false); studentForm.resetFields(); setEditingStudent(null); }}
+            okText={studentModalMode === 'add' ? '确定新增' : '保存'}
+            cancelText="取消"
+            width={520}
+          >
+            <Form form={studentForm} layout="vertical" style={{ marginTop: 16 }}>
+              <Form.Item name="nickname" label="昵称" rules={[{ required: true, message: '请输入昵称' }]}>
+                <Input placeholder="请输入昵称" />
+              </Form.Item>
+              <Form.Item name="username" label="用户名" rules={[{ required: true, message: '请输入用户名' }]}>
+                <Input placeholder="请输入用户名" />
+              </Form.Item>
+              <Form.Item name="phone" label="手机号">
+                <Input placeholder="请输入手机号" />
+              </Form.Item>
+              <Form.Item name="gender" label="性别">
+                <Select placeholder="请选择性别">
+                  <Option value="男">男</Option>
+                  <Option value="女">女</Option>
+                </Select>
+              </Form.Item>
+              <Form.Item name="className" label="班级">
+                <Input placeholder="如：剪辑一班" />
+              </Form.Item>
+              <Form.Item name="takerRole" label="接单角色">
+                <Select placeholder="请选择接单角色">
+                  <Option value="学员">学员</Option>
+                  <Option value="剪辑师">剪辑师</Option>
+                  <Option value="调色师">调色师</Option>
+                  <Option value="特效师">特效师</Option>
+                </Select>
+              </Form.Item>
+              {studentModalMode === 'edit' && (
+                <Form.Item name="status" label="状态">
+                  <Select placeholder="请选择状态">
+                    <Option value="Active">可接单</Option>
+                    <Option value="Training">在训</Option>
+                    <Option value="Paused">暂停</Option>
+                    <Option value="Frozen">冻结</Option>
+                    <Option value="Exited">退出</Option>
+                  </Select>
+                </Form.Item>
+              )}
+            </Form>
+          </Modal>
 
           {/* 冻结弹窗 */}
           <Modal

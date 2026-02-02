@@ -168,6 +168,7 @@
       const [loading, setLoading] = useState(false);
       const [filters, setFilters] = useState({
         status: '',
+        projectStage: '',
         category: '',
         takeMode: '',
         difficulty: '',
@@ -291,6 +292,7 @@
       const filteredProjects = useMemo(() => {
         return projects.filter(project => {
           if (filters.status && project.status !== filters.status) return false;
+          if (filters.projectStage && (project.projectStage || '精剪中') !== filters.projectStage) return false;
           if (filters.category && project.category !== filters.category) return false;
           if (filters.takeMode && project.takeMode !== filters.takeMode) return false;
           if (filters.difficulty && project.difficulty !== filters.difficulty) return false;
@@ -435,6 +437,7 @@
             projectId: currentProject.id,
             projectName: currentProject.projectName,
             taker: approvingApp.applicant,
+            takerRole: approvingApp.takerRole || '剪辑师',
             takeTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
             dueTime: currentProject.dueTime,
             status: 'InProgress',
@@ -663,6 +666,34 @@
           render: getStatusTag,
         },
         {
+          title: '项目状态',
+          dataIndex: 'projectStage',
+          key: 'projectStage',
+          width: 120,
+          render: (val, record) => (
+            <Select
+              value={val || '精剪中'}
+              size="small"
+              style={{ width: '100%', minWidth: 100 }}
+              onChange={(v) => {
+                const projects = JSON.parse(localStorage.getItem('adminProjects') || '[]');
+                const next = projects.map(p => p.id === record.id ? { ...p, projectStage: v } : p);
+                localStorage.setItem('adminProjects', JSON.stringify(next));
+                setProjects(next);
+                message.success('项目状态已更新');
+              }}
+              options={[
+                { value: '精剪中', label: '精剪中' },
+                { value: '内部一审', label: '内部一审' },
+                { value: '内部二审', label: '内部二审' },
+                { value: '导演审', label: '导演审' },
+                { value: '监制审', label: '监制审' },
+                { value: '审核完成', label: '审核完成' },
+              ]}
+            />
+          ),
+        },
+        {
           title: '负责人',
           dataIndex: 'coordinator',
           key: 'coordinator',
@@ -826,6 +857,22 @@
                     <Option value="ClosedForTaking">已满/已截止</Option>
                     <Option value="Closed">已关闭</Option>
                     <Option value="Archived">已归档</Option>
+                  </Select>
+
+                  <span>项目状态：</span>
+                  <Select
+                    style={{ width: 120 }}
+                    placeholder="全部"
+                    allowClear
+                    value={filters.projectStage}
+                    onChange={(value) => setFilters({ ...filters, projectStage: value || '' })}
+                  >
+                    <Option value="精剪中">精剪中</Option>
+                    <Option value="内部一审">内部一审</Option>
+                    <Option value="内部二审">内部二审</Option>
+                    <Option value="导演审">导演审</Option>
+                    <Option value="监制审">监制审</Option>
+                    <Option value="审核完成">审核完成</Option>
                   </Select>
 
                   <span>分类：</span>

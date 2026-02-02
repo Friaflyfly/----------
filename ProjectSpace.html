@@ -264,7 +264,7 @@
 
   <script type="text/babel">
     const { useState, useEffect } = React;
-    const { Card, Tag, Button, Tabs, Descriptions, Space, Typography, List, Avatar, Upload, Timeline, Input, message, Modal, Select, Form } = antd;
+    const { Card, Tag, Button, Tabs, Descriptions, Space, Typography, List, Avatar, Upload, Timeline, Input, InputNumber, message, Modal, Select, Form, Alert, Table } = antd;
     const { TabPane } = Tabs;
     const { Title, Text } = Typography;
     const { TextArea } = Input;
@@ -344,6 +344,7 @@
         // 项目基础信息
         category: projectInfo.category || '短剧',
         projectTags: projectInfo.projectTags || [],
+        projectStage: projectInfo.projectStage || '精剪中',
         contentGenre: projectInfo.contentGenre || '',
         difficulty: projectInfo.difficulty || '工厂',
         participantTeam: projectInfo.participantTeam || '线上',
@@ -386,6 +387,7 @@
           projectInfo = {
             category: project.category,
             projectTags: project.projectTags || [],
+            projectStage: project.projectStage,
             contentGenre: project.contentGenre,
             difficulty: project.difficulty,
             participantTeam: project.participantTeam,
@@ -400,7 +402,10 @@
         orderId: orderId,
         projectId: orderInfo.projectId,
         projectName: orderInfo.projectName,
+        taker: orderInfo.taker || '当前用户',
+        takerRole: orderInfo.takerRole || '剪辑师',
         // 项目基础信息
+        projectStage: projectInfo.projectStage || '精剪中',
         category: projectInfo.category || orderInfo.category || '短剧',
         projectTags: projectInfo.projectTags || orderInfo.projectTags || [],
         contentGenre: projectInfo.contentGenre || orderInfo.contentGenre || '',
@@ -475,11 +480,16 @@
       const [loading, setLoading] = useState(true);
       const [uploadModalVisible, setUploadModalVisible] = useState(false);
       const [changeNote, setChangeNote] = useState('');
+      const [episodeNumber, setEpisodeNumber] = useState(1);
       const [messageContent, setMessageContent] = useState('');
       const [revisionForm] = Form.useForm();
       const [revisionModalVisible, setRevisionModalVisible] = useState(false);
       const [selectedVersion, setSelectedVersion] = useState('');
       const [messageImages, setMessageImages] = useState([]);
+      const [amountAdjustModalVisible, setAmountAdjustModalVisible] = useState(false);
+      const [amountAdjustEditingRecord, setAmountAdjustEditingRecord] = useState(null);
+      const [amountAdjustEditingValue, setAmountAdjustEditingValue] = useState(0);
+      const [amountAdjustReason, setAmountAdjustReason] = useState('');
       const orderId = getUrlParam('orderId');
       const projectId = getUrlParam('projectId');
 
@@ -565,7 +575,22 @@
         // 确保所有必需的数组字段都存在，避免 undefined
         if (spaceData) {
           if (!Array.isArray(spaceData.deliveries)) spaceData.deliveries = [];
+          const isOldMock = spaceData.deliveries.length === 3 && spaceData.deliveries.every(d => d.id && String(d.id).startsWith('delivery_mock_'));
+          if (spaceData.deliveries.length === 0 || isOldMock) {
+            const pn = spaceData.projectName || '未命名项目';
+            spaceData.deliveries = [
+              { id: 'delivery_mock_1', version: 'V1-1', episodeNumber: 1, episodeVersion: 1, fileName: `${pn}_V1-1.zip`, uploadTime: dayjs().subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: '当前用户', changeNote: '第1集初剪完成，已按分镜完成剪辑与调色', status: 'Approved', fileSize: 268435456 },
+              { id: 'delivery_mock_2', version: 'V2-1', episodeNumber: 2, episodeVersion: 1, fileName: `${pn}_V2-1.zip`, uploadTime: dayjs().subtract(4, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: '当前用户', changeNote: '第2集第一版提交，请审核', status: 'NeedRevision', fileSize: 314572800 },
+              { id: 'delivery_mock_3', version: 'V2-2', episodeNumber: 2, episodeVersion: 2, fileName: `${pn}_V2-2.zip`, uploadTime: dayjs().subtract(2, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: '当前用户', changeNote: '第2集按修改意见调整后重新提交（片头字幕已延长至3秒）', status: 'Submitted', fileSize: 318767104 },
+              { id: 'delivery_mock_4', version: 'V3-1', episodeNumber: 3, episodeVersion: 1, fileName: `${pn}_V3-1.zip`, uploadTime: dayjs().subtract(1, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: '当前用户', changeNote: '第3集初剪完成，待审核', status: 'Submitted', fileSize: 293601280 },
+            ];
+          }
           if (!Array.isArray(spaceData.revisions)) spaceData.revisions = [];
+          if (spaceData.revisions.length === 0 && spaceData.deliveries.some(d => d.version === 'V2-1')) {
+            spaceData.revisions = [
+              { id: 'rev_mock_1', version: 'V2-1', type: 'revision', reason: '片头字幕时长偏短', content: '片头字幕需延长至 3 秒，与样片一致；片尾署名顺序请按合同调整', reviewer: '王审核', reviewTime: dayjs().subtract(3, 'day').format('YYYY-MM-DD HH:mm:ss') },
+            ];
+          }
           if (!Array.isArray(spaceData.members)) {
             spaceData.members = [
               { id: '1', name: '当前用户', role: '学员', avatar: '👤' },
@@ -583,10 +608,14 @@
           if (!Array.isArray(spaceData.messages)) spaceData.messages = [];
           if (!Array.isArray(spaceData.projectTags)) spaceData.projectTags = [];
           if (!Array.isArray(spaceData.orders)) spaceData.orders = [];
+          if (spaceData.amountAdjust == null) spaceData.amountAdjust = 0;
           
           // 如果有订单信息，同步订单状态和项目基础信息
           if (orderInfo) {
             spaceData.status = orderInfo.status || spaceData.status || 'InProgress';
+            if (orderInfo.taker != null) spaceData.taker = orderInfo.taker;
+            if (orderInfo.takerRole != null) spaceData.takerRole = orderInfo.takerRole;
+            if (orderId) spaceData.orderId = orderId;
             if (orderInfo.category) spaceData.category = orderInfo.category;
             if (orderInfo.projectTags) spaceData.projectTags = orderInfo.projectTags;
             if (orderInfo.contentGenre) spaceData.contentGenre = orderInfo.contentGenre;
@@ -595,6 +624,8 @@
             if (orderInfo.deliveryCycleDays) spaceData.deliveryCycleDays = orderInfo.deliveryCycleDays;
             if (orderInfo.takeMode) spaceData.takeMode = orderInfo.takeMode;
             if (orderInfo.quotaTotal) spaceData.quotaTotal = orderInfo.quotaTotal;
+            if (orderInfo.unitPrice != null) spaceData.unitPrice = orderInfo.unitPrice;
+            if (orderInfo.episodeCount != null) spaceData.episodeCount = orderInfo.episodeCount;
             
             // 确保项目ID和名称存在
             if (!spaceData.projectId) spaceData.projectId = orderInfo.projectId;
@@ -621,6 +652,7 @@
             const mockProjects = JSON.parse(localStorage.getItem('mockProjects') || '[]');
             const project = adminProjects.find(p => p.id == pid) || mockProjects.find(p => p.id == pid);
             if (project) {
+              if (project.projectStage != null) spaceData.projectStage = project.projectStage;
               if (project.requirementText != null) spaceData.requirementText = project.requirementText;
               if (project.requirementAttachments != null) spaceData.requirementAttachments = project.requirementAttachments;
               if (project.deliveryRequirements != null) spaceData.deliveryRequirements = project.deliveryRequirements;
@@ -704,18 +736,29 @@
         return false; // 阻止自动上传
       };
 
-      // 确认上传交付文件
+      // 确认上传交付文件（版本号：V{集数}-{该集版次}）
       const handleConfirmUpload = () => {
+        const ep = Number(episodeNumber) || 1;
+        if (ep < 1) {
+          message.warning('请填写正确的集数');
+          return;
+        }
         if (!changeNote.trim()) {
           message.warning('请输入变更说明');
           return;
         }
 
-        const nextVersion = `V${orderData.deliveries.length + 1}`;
+        const deliveries = orderData.deliveries || [];
+        const sameEpisodeDeliveries = deliveries.filter((d) => Number(d.episodeNumber) === ep);
+        const episodeVersion = sameEpisodeDeliveries.length + 1;
+        const version = `V${ep}-${episodeVersion}`;
+
         const newDelivery = {
           id: `delivery_${Date.now()}`,
-          version: nextVersion,
-          fileName: `${orderData.projectName}_${nextVersion}.zip`,
+          version,
+          episodeNumber: ep,
+          episodeVersion,
+          fileName: `${orderData.projectName}_${version}.zip`,
           uploadTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
           uploader: '当前用户',
           changeNote: changeNote,
@@ -737,6 +780,7 @@
         
         setUploadModalVisible(false);
         setChangeNote('');
+        setEpisodeNumber(1);
         message.success('交付文件上传成功！');
       };
 
@@ -908,24 +952,32 @@
 
       // 申请验收
       const handleAccept = () => {
+        if (!orderData) return;
         Modal.confirm({
           title: '确认验收',
           content: '确定要申请验收吗？验收后将计入收益。',
           onOk: () => {
-            const updatedData = {
-              ...orderData,
-              status: 'Accepted',
-            };
-
+            let updatedData = { ...orderData, status: 'Accepted' };
+            if (orderId && orderData.orders && orderData.orders.length > 0) {
+              updatedData = {
+                ...updatedData,
+                orders: orderData.orders.map(o => (o.orderId === orderId || o.id === orderId) ? { ...o, status: 'Accepted' } : o),
+              };
+            }
             setOrderData(updatedData);
             saveSpaceData(updatedData);
             if (orderId) {
               updateOrderStatus(orderId, 'Accepted');
             }
             
-            // 创建收益记录
+            // 创建收益记录（含差额）：按当前订单 orderId 取该订单金额
             const earnings = JSON.parse(localStorage.getItem('earnings') || '[]');
-            const totalAmount = orderData.unitPrice * orderData.episodeCount;
+            const currentOrder = orderId && orderData.orders && orderData.orders.length > 0
+              ? orderData.orders.find(o => o.orderId === orderId || o.id === orderId)
+              : null;
+            const base = currentOrder ? (currentOrder.unitPrice * currentOrder.episodeCount) : (orderData.unitPrice * orderData.episodeCount);
+            const adjust = Number(currentOrder ? currentOrder.amountAdjust : orderData.amountAdjust) || 0;
+            const totalAmount = base + adjust;
             earnings.push({
               orderId: orderId,
               projectName: orderData.projectName,
@@ -940,6 +992,64 @@
           },
         });
       };
+
+      // 管理员保存某订单的差额（必填原因留痕）
+      const handleSaveAmountAdjust = (record, newAdjust, reason) => {
+        if (!orderData) return;
+        const trimmed = (reason || '').trim();
+        if (!trimmed) {
+          message.error('请填写差额原因');
+          return;
+        }
+        const num = Number(newAdjust) || 0;
+        const now = dayjs().format('YYYY-MM-DD HH:mm:ss');
+        const orders = orderData.orders && orderData.orders.length > 0
+          ? orderData.orders.map(o => (o.orderId === record.orderId || o.id === record.orderId)
+              ? { ...o, amountAdjust: num, amountAdjustReason: trimmed, amountAdjustTime: now, amountAdjustBy: '管理员' }
+              : { ...o, amountAdjust: o.amountAdjust ?? 0 })
+          : null;
+        const updatedData = orders
+          ? { ...orderData, orders }
+          : { ...orderData, amountAdjust: num, amountAdjustReason: trimmed, amountAdjustTime: now, amountAdjustBy: '管理员' };
+        setOrderData(updatedData);
+        saveSpaceData(updatedData);
+        setAmountAdjustModalVisible(false);
+        setAmountAdjustReason('');
+        setAmountAdjustEditingRecord(null);
+        message.success('差额已保存');
+      };
+
+      // 表格数据源：多订单用 orders，否则用当前空间顶层字段 + URL 的 orderId 拼至少一行
+      const reviewTableDataSource = (() => {
+        if (!orderData) return [];
+        if (orderData.orders && orderData.orders.length > 0) {
+          return orderData.orders.map(o => ({ ...o, amountAdjust: o.amountAdjust ?? 0 }));
+        }
+        // 有项目空间但无 orders 列表时，用空间顶层和 URL 参数拼一行，保证始终有数据可看
+        return [{
+          orderId: orderData.orderId || orderId,
+          id: orderData.orderId || orderId,
+          taker: orderData.taker ?? '当前用户',
+          takerRole: orderData.takerRole ?? '剪辑师',
+          episodeCount: orderData.episodeCount,
+          status: orderData.status,
+          unitPrice: orderData.unitPrice,
+          amountAdjust: orderData.amountAdjust ?? 0,
+          amountAdjustReason: orderData.amountAdjustReason,
+        }];
+      })();
+
+      // 当前用户是否为学员（接单人）：学员不允许看订单管理 Tab
+      const isTakerView = orderData && (
+        orderData.taker === '当前用户' ||
+        (orderData.orders && orderData.orders.some(o => o.taker === '当前用户'))
+      );
+
+      useEffect(() => {
+        if (orderData && activeTab === 'review' && isTakerView) {
+          setActiveTab('overview');
+        }
+      }, [orderData, activeTab, isTakerView]);
 
       if (loading) {
         return (
@@ -1119,6 +1229,9 @@
                     <Descriptions.Item label="参与团队">
                       {orderData.participantTeam || '线上'}
                     </Descriptions.Item>
+                    <Descriptions.Item label="项目状态">
+                      <Tag color="blue">{orderData.projectStage || '精剪中'}</Tag>
+                    </Descriptions.Item>
                     <Descriptions.Item label="交付周期">
                       {orderData.deliveryCycleDays || 7}天
                     </Descriptions.Item>
@@ -1269,22 +1382,26 @@
                           .filter(r => r.version === delivery.version)
                           .sort((a, b) => dayjs(a.reviewTime).valueOf() - dayjs(b.reviewTime).valueOf());
                         
+                        const versionTitle = delivery.episodeNumber != null && delivery.version
+                          ? `第 ${delivery.episodeNumber} 集 · ${delivery.version}`
+                          : (delivery.version || delivery.fileName);
                         return (
                           <div key={delivery.id} className={`versionCard ${delivery.status === 'Approved' ? 'current' : ''}`} style={{ marginBottom: 24 }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                               <Space>
                                 <Tag color="blue">{delivery.version}</Tag>
-                                <span style={{ fontWeight: 500 }}>{delivery.fileName}</span>
+                                <span style={{ fontWeight: 500 }}>{versionTitle}</span>
                                 <span className={`statusTag ${getStatusClass(delivery.status)}`}>
                                   {getStatusText(delivery.status)}
                                 </span>
                               </Space>
                               <Space>
-                                <Button type="link" href="#" download>下载</Button>
+                                <Button type="link" href="#" download title="下载本版本">下载</Button>
                                 <Button 
                                   type="link" 
                                   onClick={() => handleOpenRevisionModal(delivery.version)}
                                   style={{ color: '#1890ff' }}
+                                  title={`针对 ${delivery.version} 添加修改意见`}
                                 >
                                   💬 添加修改意见
                                 </Button>
@@ -1492,45 +1609,121 @@
                   </div>
                 </TabPane>
 
-                <TabPane tab="✅ 审核与验收" key="review">
+                {!isTakerView && (
+                <TabPane tab="📋 订单管理" key="review">
                   <div style={{ marginTop: 16 }}>
-                    {orderData.status === 'Approved' ? (
-                      <div>
-                        <Card>
-                          <Alert
-                            message="审核已通过"
-                            description="订单已通过审核，可以申请验收"
-                            type="success"
-                            showIcon
-                            style={{ marginBottom: 16 }}
-                          />
-                          <Button type="primary" size="large" onClick={handleAccept}>
-                            申请验收
-                          </Button>
-                        </Card>
-                      </div>
+                    <Card title="项目订单" style={{ marginBottom: 16 }}>
+                      {reviewTableDataSource.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '24px', color: '#8c8c8c' }}>暂无订单数据</div>
+                      ) : (
+                        <Table
+                          dataSource={reviewTableDataSource}
+                          rowKey={(r) => r.orderId || r.id || String(reviewTableDataSource.indexOf(r))}
+                          pagination={{ pageSize: 10, showTotal: (total) => `共 ${total} 条订单` }}
+                          size="small"
+                          scroll={{ x: 1000 }}
+                          columns={[
+                            { title: '订单号', dataIndex: 'orderId', key: 'orderId', width: 160, render: (v) => v || '-' },
+                            { title: '接单用户', dataIndex: 'taker', key: 'taker', width: 120, render: (v) => v || '-' },
+                            { title: '接单角色', dataIndex: 'takerRole', key: 'takerRole', width: 100, render: (v) => v || '-' },
+                            { title: '集数', dataIndex: 'episodeCount', key: 'episodeCount', width: 80, render: (v) => v != null ? `${v} 集` : '-' },
+                            { title: '交付情况', key: 'deliveries', width: 100, render: () => (orderData.deliveries && orderData.deliveries.length > 0) ? `共 ${orderData.deliveries.length} 个版本` : '-' },
+                            { title: '审核状态', dataIndex: 'status', key: 'status', width: 100, render: (s) => s ? <span className={`statusTag ${getStatusClass(s)}`}>{getStatusText(s)}</span> : '-' },
+                            { title: '订单金额', key: 'baseAmount', width: 140, render: (_, r) => (r.unitPrice != null && r.episodeCount != null) ? `¥${(r.unitPrice * r.episodeCount).toFixed(2)}` : '-' },
+                            { title: '差额', key: 'amountAdjust', width: 180, render: (_, record) => (
+                              <Space size="small">
+                                <InputNumber
+                                  min={-999999}
+                                  max={999999}
+                                  step={0.01}
+                                  value={record.amountAdjust ?? 0}
+                                  onChange={(v) => {
+                                    if (orderData.orders && orderData.orders.length > 0) {
+                                      const next = orderData.orders.map(o => (o.orderId === record.orderId || o.id === record.orderId) ? { ...o, amountAdjust: v ?? 0 } : o);
+                                      setOrderData({ ...orderData, orders: next });
+                                    } else {
+                                      setOrderData({ ...orderData, amountAdjust: v ?? 0 });
+                                    }
+                                  }}
+                                  style={{ width: 120 }}
+                                />
+                                <Button type="primary" size="small" onClick={() => { setAmountAdjustEditingRecord(record); setAmountAdjustEditingValue(record.amountAdjust ?? 0); setAmountAdjustReason(''); setAmountAdjustModalVisible(true); }}>保存</Button>
+                              </Space>
+                            )},
+                            { title: '合计金额', key: 'total', width: 120, render: (_, r) => {
+                              const base = (r.unitPrice != null && r.episodeCount != null) ? r.unitPrice * r.episodeCount : 0;
+                              const adj = Number(r.amountAdjust) || 0;
+                              return base || adj ? `¥${(base + adj).toFixed(2)}` : '-';
+                            }},
+                            { title: '差额原因', dataIndex: 'amountAdjustReason', key: 'amountAdjustReason', width: 160, ellipsis: true, render: (v) => v || '-' },
+                          ]}
+                        />
+                      )}
+                      <Text type="secondary" style={{ display: 'block', marginTop: 12 }}>差额：正数为加款，负数为扣款。修改后点击该行「保存」须填写原因（留痕）后生效。</Text>
+                    </Card>
+
+                    {orderId && (orderData.status === 'Approved' ? (
+                      <Card>
+                        <Alert message="当前订单已通过审核，可申请验收" type="success" showIcon style={{ marginBottom: 16 }} />
+                        <Button type="primary" size="large" onClick={handleAccept}>申请验收</Button>
+                      </Card>
                     ) : orderData.status === 'Accepted' ? (
                       <Card>
-                        <Alert
-                          message="已验收"
-                          description="订单已完成验收，收益已入账"
-                          type="success"
-                          showIcon
-                        />
+                        <Alert message="当前订单已验收，收益已入账" type="success" showIcon />
                       </Card>
                     ) : (
-                      <div style={{ textAlign: 'center', padding: '40px', color: '#8c8c8c' }}>
-                        {orderData.status === 'Submitted' ? '订单已提交，等待审核' : '订单尚未通过审核'}
+                      <div style={{ textAlign: 'center', padding: '24px', color: '#8c8c8c' }}>
+                        {orderData.status === 'Submitted' ? '当前订单已提交，等待审核' : orderData.status === 'NeedRevision' ? '当前订单已退回修改' : '当前订单尚未通过审核'}
                       </div>
-                    )}
+                    ))}
                   </div>
                 </TabPane>
+                )}
               </Tabs>
             </Card>
             </div>
           </div>
 
           {/* 上传文件对话框 */}
+          {/* 差额保存弹窗：必填原因 */}
+          <Modal
+            title="保存差额"
+            open={amountAdjustModalVisible}
+            onOk={() => amountAdjustEditingRecord && handleSaveAmountAdjust(amountAdjustEditingRecord, amountAdjustEditingValue, amountAdjustReason)}
+            onCancel={() => {
+              setAmountAdjustModalVisible(false);
+              setAmountAdjustReason('');
+              setAmountAdjustEditingRecord(null);
+            }}
+            okText="确认保存"
+            cancelText="取消"
+          >
+            <div style={{ marginBottom: 16 }}>
+              <Text strong>订单号：</Text>
+              <span>{amountAdjustEditingRecord?.orderId || '-'}</span>
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <Text strong style={{ display: 'block', marginBottom: 8 }}>差额（元）</Text>
+              <InputNumber
+                min={-999999}
+                max={999999}
+                step={0.01}
+                value={amountAdjustEditingValue}
+                onChange={(v) => setAmountAdjustEditingValue(v ?? 0)}
+                style={{ width: '100%' }}
+              />
+            </div>
+            <div>
+              <Text strong style={{ display: 'block', marginBottom: 8 }}>原因（必填）</Text>
+              <TextArea
+                rows={4}
+                placeholder="请填写差额原因，用于留痕与对账"
+                value={amountAdjustReason}
+                onChange={(e) => setAmountAdjustReason(e.target.value)}
+              />
+            </div>
+          </Modal>
+
           <Modal
             title="上传交付文件"
             open={uploadModalVisible}
@@ -1538,6 +1731,7 @@
             onCancel={() => {
               setUploadModalVisible(false);
               setChangeNote('');
+              setEpisodeNumber(1);
             }}
           >
             <div style={{ marginBottom: 16 }}>
@@ -1547,6 +1741,25 @@
               >
                 <Button>选择文件</Button>
               </Upload>
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <Text strong style={{ display: 'block', marginBottom: 8 }}>第几集</Text>
+              <InputNumber
+                min={1}
+                max={orderData?.episodeCount || 999}
+                value={episodeNumber}
+                onChange={(v) => setEpisodeNumber(v ?? 1)}
+                placeholder="填写本附件对应的集数"
+                style={{ width: '100%' }}
+              />
+              {orderData?.episodeCount != null && (
+                <Text type="secondary" style={{ fontSize: 12, marginTop: 4 }}>本订单共 {orderData.episodeCount} 集</Text>
+              )}
+            </div>
+            <div style={{ marginBottom: 16, padding: '12px', background: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 4 }}>
+              <Text strong>本次将为：</Text>
+              <Text>第 {episodeNumber || 1} 集 第 {(orderData?.deliveries || []).filter((d) => Number(d.episodeNumber) === Number(episodeNumber || 1)).length + 1} 版</Text>
+              <Text type="secondary" style={{ marginLeft: 8 }}>（版本号：V{episodeNumber || 1}-{(orderData?.deliveries || []).filter((d) => Number(d.episodeNumber) === Number(episodeNumber || 1)).length + 1}）</Text>
             </div>
             <div>
               <Text strong>变更说明：</Text>

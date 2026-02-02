@@ -573,6 +573,7 @@
             projectId: project.id,
             projectName: project.projectName,
             taker: '当前用户',
+            takerRole: '剪辑师',
             status: 'InProgress',
             takeTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
             dueTime: dayjs(project.dueTime).format('YYYY-MM-DD HH:mm:ss'),
@@ -615,6 +616,7 @@
             projectId: project.id,
             projectName: project.projectName,
             applicant: '当前用户',
+            takerRole: '剪辑师',
             applyTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
             status: 'Pending',
           };

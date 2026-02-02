@@ -245,6 +245,7 @@
           category: '短剧',
           difficulty: '精品',
           participantTeam: '线上',
+          projectStage: '精剪中',
           takeMode: '抢单',
           coordinator: '张三',
           status: 'Published',
@@ -422,6 +423,9 @@
                       </Descriptions.Item>
                       <Descriptions.Item label="参与团队">{projectData.participantTeam}</Descriptions.Item>
                       <Descriptions.Item label="项目状态">
+                        <Tag color="blue">{projectData.projectStage || '精剪中'}</Tag>
+                      </Descriptions.Item>
+                      <Descriptions.Item label="发布状态">
                         <Tag color={
                           projectData.status === 'Published' ? 'green' :
                           projectData.status === 'Draft' ? 'default' :
