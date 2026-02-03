@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>订单审核 - 天合短剧剪辑接单平台</title>
+  <title>任务审核 - 天合短剧剪辑接单平台</title>
   
   <!-- Ant Design CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
@@ -169,7 +169,6 @@
       const [reviewList, setReviewList] = useState([]);
       const [loading, setLoading] = useState(false);
       const [filters, setFilters] = useState({
-        riskLevel: '',
         search: '',
       });
 
@@ -216,6 +215,8 @@
               submitTime: dayjs().subtract(2, 'hour').format('YYYY-MM-DD HH:mm:ss'),
               version: 'V1',
               amount: 10000,
+              episodeNumber: 1,
+              isFinalized: false,
             },
             {
               id: 'ORD000002',
@@ -229,6 +230,8 @@
               submitTime: dayjs().subtract(4, 'hour').format('YYYY-MM-DD HH:mm:ss'),
               version: 'V1',
               amount: 8000,
+              episodeNumber: 2,
+              isFinalized: true,
             },
             {
               id: 'ORD000003',
@@ -242,6 +245,8 @@
               submitTime: dayjs().subtract(6, 'hour').format('YYYY-MM-DD HH:mm:ss'),
               version: 'V2',
               amount: 12000,
+              episodeNumber: 3,
+              isFinalized: false,
             },
             {
               id: 'ORD000004',
@@ -255,6 +260,8 @@
               submitTime: dayjs().subtract(1, 'hour').format('YYYY-MM-DD HH:mm:ss'),
               version: 'V1',
               amount: 6000,
+              episodeNumber: 1,
+              isFinalized: false,
             },
           ];
 
@@ -269,24 +276,24 @@
             const spaceKey = `orderSpace_${order.orderId}`;
             const existingSpace = localStorage.getItem(spaceKey);
             if (!existingSpace) {
+              const pn = order.projectName;
+              const taker = order.taker || '学员';
+              const baseTime = dayjs(order.submitTime || undefined);
               const spaceData = {
                 orderId: order.orderId,
                 projectId: order.projectId,
-                projectName: order.projectName,
+                projectName: pn,
                 status: 'Submitted',
                 deliveries: [
-                  {
-                    id: `delivery_${Date.now()}_${order.orderId}`,
-                    version: order.version,
-                    fileName: `${order.projectName}_${order.version}.zip`,
-                    uploadTime: order.submitTime,
-                    uploader: order.taker,
-                    changeNote: '首次提交交付文件',
-                    status: 'Submitted',
-                    fileSize: Math.floor(Math.random() * 500000000) + 100000000,
-                  },
+                  { id: `delivery_1_${order.orderId}`, version: 'V1-1', episodeNumber: 1, episodeVersion: 1, fileName: `${pn}_V1-1.zip`, uploadTime: baseTime.subtract(5, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: taker, changeNote: '第1集初剪完成', status: 'Approved', fileSize: 268435456 },
+                  { id: `delivery_2_${order.orderId}`, version: 'V1-2', episodeNumber: 1, episodeVersion: 2, fileName: `${pn}_V1-2.zip`, uploadTime: baseTime.subtract(4, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: taker, changeNote: '第1集精修版', status: 'Approved', fileSize: 272629760 },
+                  { id: `delivery_3_${order.orderId}`, version: 'V2-1', episodeNumber: 2, episodeVersion: 1, fileName: `${pn}_V2-1.zip`, uploadTime: baseTime.subtract(3, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: taker, changeNote: '第2集第一版', status: 'NeedRevision', fileSize: 314572800 },
+                  { id: `delivery_4_${order.orderId}`, version: 'V2-2', episodeNumber: 2, episodeVersion: 2, fileName: `${pn}_V2-2.zip`, uploadTime: baseTime.subtract(1, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: taker, changeNote: '第2集按意见修改后重交', status: 'Submitted', fileSize: 318767104 },
+                  { id: `delivery_5_${order.orderId}`, version: 'V3-1', episodeNumber: 3, episodeVersion: 1, fileName: `${pn}_V3-1.zip`, uploadTime: baseTime.format('YYYY-MM-DD HH:mm:ss'), uploader: taker, changeNote: '第3集初剪，待审核', status: 'Submitted', fileSize: 293601280 },
                 ],
-                revisions: [],
+                revisions: [
+                  { id: `rev_1_${order.orderId}`, version: 'V2-1', type: 'revision', reason: '片头字幕偏短', content: '片头字幕延长至3秒', reviewer: '王审核', reviewTime: baseTime.subtract(2, 'day').format('YYYY-MM-DD HH:mm:ss') },
+                ],
                 messages: [],
               };
               localStorage.setItem(spaceKey, JSON.stringify(spaceData));
@@ -304,11 +311,6 @@
           const dueTime = dayjs(order.dueTime || submitTime.add(3, 'day'));
           const waitHours = dayjs().diff(submitTime, 'hour');
           
-          const riskLevels = ['低风险', '中风险', '高风险'];
-          const riskLevel = riskLevels[Math.floor(Math.random() * riskLevels.length)];
-          const tags = ['画面质量', '音频同步', '字幕规范', '时长符合', '内容合规'];
-          const hitTags = tags.slice(0, Math.floor(Math.random() * 3) + 1);
-
           // 确保 orderId 字段正确（支持 orderId 和 id 两种）
           const orderId = order.orderId || order.id || `ORD${String(index + 1).padStart(6, '0')}`;
           
@@ -318,11 +320,11 @@
             projectName: order.projectName || '测试项目',
             taker: order.taker || '学员A',
             version: `V${order.version || 1}`,
+            episodeNumber: order.episodeNumber != null ? order.episodeNumber : (Math.floor(Math.random() * 20) + 1),
+            isFinalized: order.isFinalized === true,
             submitTime: submitTime.format('YYYY-MM-DD HH:mm:ss'),
             waitHours: waitHours,
             dueTime: dueTime.format('YYYY-MM-DD HH:mm:ss'),
-            riskLevel: riskLevel,
-            hitTags: hitTags,
             order: order,
           };
         });
@@ -331,12 +333,10 @@
       // 过滤和排序数据
       const filteredAndSortedData = useMemo(() => {
         let filtered = reviewList.filter(item => {
-          if (filters.riskLevel && item.riskLevel !== filters.riskLevel) return false;
           if (filters.search) {
             const searchLower = filters.search.toLowerCase();
-            if (!item.orderId.toLowerCase().includes(searchLower) &&
-                !item.projectName.toLowerCase().includes(searchLower) &&
-                !item.taker.toLowerCase().includes(searchLower)) {
+            if (!(item.projectName || '').toLowerCase().includes(searchLower) &&
+                !(item.taker || '').toLowerCase().includes(searchLower)) {
               return false;
             }
           }
@@ -368,15 +368,6 @@
         window.location.href = `ReviewDetail.html?orderId=${record.orderId}`;
       };
 
-      const getRiskLevelColor = (level) => {
-        const colorMap = {
-          '低风险': 'green',
-          '中风险': 'orange',
-          '高风险': 'red',
-        };
-        return colorMap[level] || 'default';
-      };
-
       const formatWaitTime = (hours) => {
         if (hours < 1) return '刚刚';
         if (hours < 24) return `${hours}小时`;
@@ -384,13 +375,6 @@
       };
 
       const columns = [
-        {
-          title: '订单号',
-          dataIndex: 'orderId',
-          key: 'orderId',
-          width: 150,
-          fixed: 'left',
-        },
         {
           title: '项目名',
           dataIndex: 'projectName',
@@ -403,6 +387,20 @@
           dataIndex: 'taker',
           key: 'taker',
           width: 120,
+        },
+        {
+          title: '第几集',
+          dataIndex: 'episodeNumber',
+          key: 'episodeNumber',
+          width: 90,
+          render: (v) => v != null ? `第 ${v} 集` : '-',
+        },
+        {
+          title: '是否定稿',
+          dataIndex: 'isFinalized',
+          key: 'isFinalized',
+          width: 90,
+          render: (v) => v ? <Tag color="green">是</Tag> : <Tag>否</Tag>,
         },
         {
           title: '版本号',
@@ -443,28 +441,6 @@
               </span>
             );
           },
-        },
-        {
-          title: 'AI预审风险等级',
-          dataIndex: 'riskLevel',
-          key: 'riskLevel',
-          width: 140,
-          render: (level) => (
-            <Tag color={getRiskLevelColor(level)}>{level}</Tag>
-          ),
-        },
-        {
-          title: '命中标签',
-          dataIndex: 'hitTags',
-          key: 'hitTags',
-          width: 200,
-          render: (tags) => (
-            <Space size="small" wrap>
-              {tags && tags.map((tag, idx) => (
-                <Tag key={idx} color="blue">{tag}</Tag>
-              ))}
-            </Space>
-          ),
         },
         {
           title: '操作',
@@ -512,7 +488,7 @@
                 <div className="menuGroupTitle">后台管理</div>
                 <a href="ReviewQueue.html" className="menuItem active">
                   <span className="menuItemIcon">✅</span>
-                  订单审核
+                  任务审核
                 </a>
                 <a href="ProjectManagement.html" className="menuItem">
                   <span className="menuItemIcon">📋</span>
@@ -538,27 +514,14 @@
           <div className="mainContent">
             <div className="reviewPage">
               <div className="pageHeader">
-                <Title level={2} style={{ margin: 0 }}>订单审核</Title>
+                <Title level={2} style={{ margin: 0 }}>任务审核</Title>
               </div>
 
               {/* 筛选区 */}
               <div className="filterCard">
                 <Space size="middle" wrap>
-                  <span>AI预审风险等级：</span>
-                  <Select
-                    style={{ width: 150 }}
-                    placeholder="全部"
-                    allowClear
-                    value={filters.riskLevel}
-                    onChange={(value) => setFilters({ ...filters, riskLevel: value || '' })}
-                  >
-                    <Option value="低风险">低风险</Option>
-                    <Option value="中风险">中风险</Option>
-                    <Option value="高风险">高风险</Option>
-                  </Select>
-
                   <Search
-                    placeholder="搜索订单号/项目名/接单人"
+                    placeholder="搜索项目名/接单人"
                     style={{ width: 300 }}
                     allowClear
                     value={filters.search}

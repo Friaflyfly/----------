@@ -283,22 +283,33 @@
 
         // 从协同空间读取交付版本和修改记录
         const spaceData = getOrderSpaceData(orderId);
-        const deliveries = spaceData?.deliveries || [];
+        let deliveries = spaceData?.deliveries || [];
+        if (deliveries.length === 0) {
+          const pn = order.projectName || '测试项目';
+          const taker = order.taker || '学员A';
+          const baseTime = dayjs(order.submitTime || undefined);
+          deliveries = [
+            { id: 'mock_d1', version: 'V1-1', episodeNumber: 1, episodeVersion: 1, fileName: `${pn}_V1-1.zip`, uploadTime: baseTime.subtract(5, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: taker, changeNote: '第1集初剪完成', status: 'Approved', fileSize: 268435456 },
+            { id: 'mock_d2', version: 'V1-2', episodeNumber: 1, episodeVersion: 2, fileName: `${pn}_V1-2.zip`, uploadTime: baseTime.subtract(4, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: taker, changeNote: '第1集精修版', status: 'Approved', fileSize: 272629760 },
+            { id: 'mock_d3', version: 'V2-1', episodeNumber: 2, episodeVersion: 1, fileName: `${pn}_V2-1.zip`, uploadTime: baseTime.subtract(3, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: taker, changeNote: '第2集第一版', status: 'NeedRevision', fileSize: 314572800 },
+            { id: 'mock_d4', version: 'V2-2', episodeNumber: 2, episodeVersion: 2, fileName: `${pn}_V2-2.zip`, uploadTime: baseTime.subtract(1, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: taker, changeNote: '第2集按意见修改后重交', status: 'Submitted', fileSize: 318767104 },
+            { id: 'mock_d5', version: 'V3-1', episodeNumber: 3, episodeVersion: 1, fileName: `${pn}_V3-1.zip`, uploadTime: baseTime.format('YYYY-MM-DD HH:mm:ss'), uploader: taker, changeNote: '第3集初剪，待审核', status: 'Submitted', fileSize: 293601280 },
+          ];
+        }
         const revisions = spaceData?.revisions || [];
 
         // 获取最新交付版本的提交时间
         const latestDelivery = deliveries.length > 0 ? deliveries[deliveries.length - 1] : null;
         const submitTime = latestDelivery?.uploadTime || order.submitTime || dayjs().format('YYYY-MM-DD HH:mm:ss');
 
-        // 生成审核相关数据
+        // 生成审核相关数据（第几集、是否定稿可从订单或最新交付取）
+        const episodeNumber = order.episodeNumber != null ? order.episodeNumber : (latestDelivery?.episodeNumber != null ? latestDelivery.episodeNumber : 1);
+        const isFinalized = order.isFinalized === true || (latestDelivery && latestDelivery.isFinalized === true);
         const reviewData = {
           ...order,
-          orderId: orderId, // 确保有 orderId 字段
-          aiReview: {
-            riskLevel: ['低风险', '中风险', '高风险'][Math.floor(Math.random() * 3)],
-            hitTags: ['画面质量', '音频同步', '字幕规范', '时长符合', '内容合规'].slice(0, Math.floor(Math.random() * 3) + 1),
-            score: Math.floor(Math.random() * 30) + 70,
-          },
+          orderId: orderId, // 确保有 orderId 字段（内部跳转用）
+          episodeNumber,
+          isFinalized,
           deliveries: deliveries,
           revisions: revisions,
           submitTime: submitTime,
@@ -483,15 +494,7 @@
         );
       }
 
-      const getRiskLevelColor = (level) => {
-        const colorMap = {
-          '低风险': 'green',
-          '中风险': 'orange',
-          '高风险': 'red',
-        };
-        return colorMap[level] || 'default';
-      };
-
+      
       return (
         <div className="appLayout">
           {/* 左侧导航栏 */}
@@ -525,7 +528,7 @@
                 <div className="menuGroupTitle">后台管理</div>
                 <a href="ReviewQueue.html" className="menuItem active">
                   <span className="menuItemIcon">✅</span>
-                  订单审核
+                  任务审核
                 </a>
                 <a href="ProjectManagement.html" className="menuItem">
                   <span className="menuItemIcon">📋</span>
@@ -583,9 +586,10 @@
                 <div className="cardHeader">订单信息</div>
                 <div className="cardBody">
                   <Descriptions column={2} bordered>
-                    <Descriptions.Item label="订单号">{orderData.orderId || orderData.id}</Descriptions.Item>
                     <Descriptions.Item label="项目名称">{orderData.projectName}</Descriptions.Item>
                     <Descriptions.Item label="接单人">{orderData.taker}</Descriptions.Item>
+                    <Descriptions.Item label="第几集">{orderData.episodeNumber != null ? `第 ${orderData.episodeNumber} 集` : '-'}</Descriptions.Item>
+                    <Descriptions.Item label="是否定稿">{orderData.isFinalized ? <Tag color="green">是</Tag> : <Tag>否</Tag>}</Descriptions.Item>
                     <Descriptions.Item label="当前版本">{orderData.version || 'V1'}</Descriptions.Item>
                     <Descriptions.Item label="提交审核时间">{orderData.submitTime || '-'}</Descriptions.Item>
                     <Descriptions.Item label="项目截止时间">{orderData.dueTime || '-'}</Descriptions.Item>
@@ -604,88 +608,82 @@
                 </div>
               </div>
 
-              {/* AI预审结果 */}
-              {orderData.aiReview && (
-                <div className="contentCard">
-                  <div className="cardHeader">AI预审结果（参考信息）</div>
-                  <div className="cardBody">
-                    <Alert
-                      message={
-                        <Space>
-                          <span>风险等级：</span>
-                          <Tag color={getRiskLevelColor(orderData.aiReview.riskLevel)}>
-                            {orderData.aiReview.riskLevel}
-                          </Tag>
-                          <span>预审得分：{orderData.aiReview.score}分</span>
-                        </Space>
-                      }
-                      description={
-                        <div style={{ marginTop: 8 }}>
-                          <Text strong>命中标签：</Text>
-                          <Space size="small" style={{ marginTop: 8 }}>
-                            {orderData.aiReview.hitTags.map((tag, idx) => (
-                              <Tag key={idx} color="blue">{tag}</Tag>
-                            ))}
-                          </Space>
-                        </div>
-                      }
-                      type={orderData.aiReview.riskLevel === '高风险' ? 'warning' : 'info'}
-                      showIcon
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* 交付版本 */}
+              {/* 交付版本：按集分组，同一集的不同版本一起展示 */}
               <div className="contentCard">
-                <div className="cardHeader">交付版本</div>
+                <div className="cardHeader">交付版本（按集展示，同集多版本一起审核）</div>
                 <div className="cardBody">
                   {orderData.deliveries && orderData.deliveries.length > 0 ? (
-                    <Timeline>
-                      {orderData.deliveries.map((delivery, idx) => {
-                        const statusColor = delivery.status === 'Approved' ? 'green' : 
-                                          delivery.status === 'NeedRevision' ? 'red' : 'blue';
-                        const statusText = delivery.status === 'Approved' ? '已通过' : 
-                                         delivery.status === 'NeedRevision' ? '需修改' : '待审核';
+                    (() => {
+                      const deliveries = orderData.deliveries;
+                      const getEpisode = (d) => {
+                        if (d.episodeNumber != null) return Number(d.episodeNumber);
+                        const m = (d.version || '').match(/^V?(\d+)[-_]/);
+                        return m ? parseInt(m[1], 10) : 0;
+                      };
+                      const byEpisode = {};
+                      deliveries.forEach(d => {
+                        const ep = getEpisode(d);
+                        if (!byEpisode[ep]) byEpisode[ep] = [];
+                        byEpisode[ep].push(d);
+                      });
+                      const episodeNumbers = Object.keys(byEpisode).map(Number).sort((a, b) => a - b);
+                      return episodeNumbers.map(ep => {
+                        const list = byEpisode[ep];
+                        const epLabel = ep === 0 ? '未分集' : `第 ${ep} 集`;
                         return (
-                          <Timeline.Item key={delivery.id || idx} color={statusColor}>
-                            <div>
-                              <Space>
-                                <Text strong>{delivery.version || `V${idx + 1}`}</Text>
-                                <Tag color={statusColor}>{statusText}</Tag>
-                                <span style={{ color: '#8c8c8c' }}>
-                                  {delivery.uploadTime || delivery.time || '-'}
-                                </span>
-                              </Space>
-                              <div style={{ marginTop: 8 }}>
-                                <Text strong>文件名：</Text>
-                                <span style={{ color: '#666' }}>{delivery.fileName || '未命名文件'}</span>
-                                {delivery.fileSize && (
-                                  <span style={{ marginLeft: 16, color: '#8c8c8c', fontSize: 12 }}>
-                                    ({(delivery.fileSize / 1024 / 1024).toFixed(2)} MB)
-                                  </span>
-                                )}
-                              </div>
-                              {delivery.changeNote && (
-                                <div style={{ marginTop: 8, color: '#666', padding: 8, background: '#f5f5f5', borderRadius: 4 }}>
-                                  <Text strong>变更说明：</Text>
-                                  <div style={{ marginTop: 4 }}>{delivery.changeNote}</div>
-                                </div>
-                              )}
-                              <div style={{ marginTop: 8 }}>
-                                <Button 
-                                  type="link" 
-                                  size="small"
-                                  onClick={() => message.info('下载功能开发中')}
-                                >
-                                  下载文件
-                                </Button>
-                              </div>
+                          <div key={ep} style={{ marginBottom: 24 }}>
+                            <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 12, paddingBottom: 8, borderBottom: '2px solid #1890ff', color: '#1890ff' }}>
+                              {epLabel}（共 {list.length} 个版本）
                             </div>
-                          </Timeline.Item>
+                            <Timeline>
+                              {list.map((delivery, idx) => {
+                                const statusColor = delivery.status === 'Approved' ? 'green' : 
+                                                  delivery.status === 'NeedRevision' ? 'red' : 'blue';
+                                const statusText = delivery.status === 'Approved' ? '已通过' : 
+                                                 delivery.status === 'NeedRevision' ? '需修改' : '待审核';
+                                return (
+                                  <Timeline.Item key={delivery.id || idx} color={statusColor}>
+                                    <div>
+                                      <Space>
+                                        <Text strong>{delivery.version || `V${idx + 1}`}</Text>
+                                        <Tag color={statusColor}>{statusText}</Tag>
+                                        <span style={{ color: '#8c8c8c' }}>
+                                          {delivery.uploadTime || delivery.time || '-'}
+                                        </span>
+                                      </Space>
+                                      <div style={{ marginTop: 8 }}>
+                                        <Text strong>文件名：</Text>
+                                        <span style={{ color: '#666' }}>{delivery.fileName || '未命名文件'}</span>
+                                        {delivery.fileSize && (
+                                          <span style={{ marginLeft: 16, color: '#8c8c8c', fontSize: 12 }}>
+                                            ({(delivery.fileSize / 1024 / 1024).toFixed(2)} MB)
+                                          </span>
+                                        )}
+                                      </div>
+                                      {delivery.changeNote && (
+                                        <div style={{ marginTop: 8, color: '#666', padding: 8, background: '#f5f5f5', borderRadius: 4 }}>
+                                          <Text strong>变更说明：</Text>
+                                          <div style={{ marginTop: 4 }}>{delivery.changeNote}</div>
+                                        </div>
+                                      )}
+                                      <div style={{ marginTop: 8 }}>
+                                        <Button 
+                                          type="link" 
+                                          size="small"
+                                          onClick={() => message.info('下载功能开发中')}
+                                        >
+                                          下载文件
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </Timeline.Item>
+                                );
+                              })}
+                            </Timeline>
+                          </div>
                         );
-                      })}
-                    </Timeline>
+                      });
+                    })()
                   ) : (
                     <Empty description="暂无交付版本，学员尚未上传交付文件" />
                   )}
