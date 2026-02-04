@@ -168,6 +168,8 @@
       const [loading, setLoading] = useState(false);
       const [filters, setFilters] = useState({
         status: '',
+        city: '',
+        projectStatusL1: '',
         projectStage: '',
         category: '',
         takeMode: '',
@@ -254,6 +256,9 @@
         const teams = ['实训', '线下', '线上'];
         const takeModes = ['抢单', '报名'];
         const coordinators = ['张三', '李四', '王五'];
+        const cities = ['长沙', '西安'];
+        const statusL1Options = ['在制中', '已交付', '待进'];
+        const projectStages = ['精剪中', '内部一审', '内部二审', '导演审', '监制审', '平台审', '审核完成'];
         const statuses = ['Draft', 'Published', 'ClosedForTaking', 'Closed', 'Archived'];
 
         return Array.from({ length: 15 }, (_, i) => {
@@ -266,6 +271,9 @@
             id: `proj_${String(i + 1).padStart(6, '0')}`,
             projectName: `${category}项目${i + 1}`,
             category: category,
+            city: cities[i % cities.length],
+            projectStatusL1: statusL1Options[i % statusL1Options.length],
+            projectStage: projectStages[i % projectStages.length],
             difficulty: difficulties[i % difficulties.length],
             participantTeam: teams[i % teams.length],
             takeMode: takeModes[i % takeModes.length],
@@ -292,6 +300,8 @@
       const filteredProjects = useMemo(() => {
         return projects.filter(project => {
           if (filters.status && project.status !== filters.status) return false;
+          if (filters.city && (project.city || '') !== filters.city) return false;
+          if (filters.projectStatusL1 && (project.projectStatusL1 || '') !== filters.projectStatusL1) return false;
           if (filters.projectStage && (project.projectStage || '精剪中') !== filters.projectStage) return false;
           if (filters.category && project.category !== filters.category) return false;
           if (filters.takeMode && project.takeMode !== filters.takeMode) return false;
@@ -634,6 +644,20 @@
           width: 100,
         },
         {
+          title: '城市',
+          dataIndex: 'city',
+          key: 'city',
+          width: 80,
+          render: (v) => v || '-',
+        },
+        {
+          title: '项目状况',
+          dataIndex: 'projectStatusL1',
+          key: 'projectStatusL1',
+          width: 90,
+          render: (v) => v || '-',
+        },
+        {
           title: '单价',
           dataIndex: 'unitPrice',
           key: 'unitPrice',
@@ -666,7 +690,7 @@
           render: getStatusTag,
         },
         {
-          title: '项目状态',
+          title: '项目状态(二级)',
           dataIndex: 'projectStage',
           key: 'projectStage',
           width: 120,
@@ -688,6 +712,7 @@
                 { value: '内部二审', label: '内部二审' },
                 { value: '导演审', label: '导演审' },
                 { value: '监制审', label: '监制审' },
+                { value: '平台审', label: '平台审' },
                 { value: '审核完成', label: '审核完成' },
               ]}
             />
@@ -826,6 +851,10 @@
                   <span className="menuItemIcon">📊</span>
                   榜单与数据
                 </a>
+                <a href="DataBoard.html" className="menuItem">
+                  <span className="menuItemIcon">📈</span>
+                  数据看板
+                </a>
               </div>
             </nav>
           </div>
@@ -859,7 +888,32 @@
                     <Option value="Archived">已归档</Option>
                   </Select>
 
-                  <span>项目状态：</span>
+                  <span>城市：</span>
+                  <Select
+                    style={{ width: 100 }}
+                    placeholder="全部"
+                    allowClear
+                    value={filters.city}
+                    onChange={(value) => setFilters({ ...filters, city: value || '' })}
+                  >
+                    <Option value="长沙">长沙</Option>
+                    <Option value="西安">西安</Option>
+                  </Select>
+
+                  <span>项目状况：</span>
+                  <Select
+                    style={{ width: 100 }}
+                    placeholder="全部"
+                    allowClear
+                    value={filters.projectStatusL1}
+                    onChange={(value) => setFilters({ ...filters, projectStatusL1: value || '' })}
+                  >
+                    <Option value="在制中">在制中</Option>
+                    <Option value="已交付">已交付</Option>
+                    <Option value="待进">待进</Option>
+                  </Select>
+
+                  <span>项目状态(二级)：</span>
                   <Select
                     style={{ width: 120 }}
                     placeholder="全部"
@@ -872,6 +926,7 @@
                     <Option value="内部二审">内部二审</Option>
                     <Option value="导演审">导演审</Option>
                     <Option value="监制审">监制审</Option>
+                    <Option value="平台审">平台审</Option>
                     <Option value="审核完成">审核完成</Option>
                   </Select>
 

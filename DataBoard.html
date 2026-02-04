@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数据看板 - 天合短剧剪辑接单平台</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js"></script>
+  <script src="https://unpkg.com/@antv/g2@5/dist/g2.min.js"></script>
+  <style>
+    body { margin: 0; padding: 0; }
+    .appLayout { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 200px; background: #fff; box-shadow: 2px 0 8px rgba(0,0,0,0.06);
+      position: fixed; left: 0; top: 0; bottom: 0; overflow-y: auto; z-index: 100;
+    }
+    .sidebarHeader { padding: 20px 16px; border-bottom: 1px solid #f0f0f0; }
+    .logo { font-size: 18px; font-weight: 600; color: #1890ff; text-decoration: none; display: block; }
+    .menu { padding: 16px 0; }
+    .menuItem {
+      display: block; padding: 12px 24px; color: #262626; text-decoration: none; font-size: 14px;
+      border-left: 3px solid transparent; transition: all 0.3s;
+    }
+    .menuItem:hover { background: #f0f0f0; color: #1890ff; }
+    .menuItem.active { background: #e6f7ff; color: #1890ff; border-left-color: #1890ff; font-weight: 500; }
+    .menuItemIcon { margin-right: 8px; font-size: 16px; }
+    .menuGroup { margin-top: 16px; padding-top: 16px; border-top: 1px solid #f0f0f0; }
+    .menuGroupTitle { padding: 8px 24px; font-size: 12px; color: #8c8c8c; font-weight: 600; }
+    .mainContent { flex: 1; margin-left: 200px; min-height: 100vh; background: #f5f5f5; }
+    .boardPage { padding: 24px; }
+    .pageHeader { background: #fff; padding: 16px 24px; border-radius: 8px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .kpiRow { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+    .kpiCard {
+      flex: 1; min-width: 200px; background: #fff; padding: 24px; border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .kpiTitle { font-size: 14px; color: #8c8c8c; margin-bottom: 8px; }
+    .kpiValue { font-size: 28px; font-weight: 600; color: #262626; }
+    .chartCard { background: #fff; padding: 24px; border-radius: 8px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .chartTitle { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #262626; }
+    .chartWrap { width: 100%; height: 320px; }
+    .sectionTitle { font-size: 18px; font-weight: 600; margin: 24px 0 16px; color: #262626; }
+    .kanbanRow { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px; min-height: 200px; }
+    .kanbanCol { flex: 0 0 260px; background: #fafafa; border-radius: 8px; border: 1px solid #f0f0f0; display: flex; flex-direction: column; }
+    .kanbanColHead { padding: 12px 16px; font-weight: 600; font-size: 14px; color: #262626; border-bottom: 1px solid #f0f0f0; }
+    .kanbanColBody { padding: 8px; flex: 1; overflow-y: auto; }
+    .projectCard {
+      background: #fff; border-radius: 6px; padding: 12px; margin-bottom: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      border-left: 3px solid #1890ff;
+    }
+    .projectCard a { color: #262626; text-decoration: none; display: block; }
+    .projectCard a:hover { color: #1890ff; }
+    .projectCardName { font-weight: 500; margin-bottom: 4px; }
+    .projectCardMeta { font-size: 12px; color: #8c8c8c; }
+    .progressGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .progressCard {
+      background: #fff; border-radius: 8px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border-top: 3px solid #1890ff;
+    }
+    .progressCardName { font-weight: 600; margin-bottom: 8px; font-size: 15px; }
+    .progressCardLink { color: #1890ff; text-decoration: none; }
+    .progressCardLink:hover { text-decoration: underline; }
+    .progressCardBar { height: 8px; background: #f0f0f0; border-radius: 4px; overflow: hidden; margin: 8px 0; }
+    .progressCardBarFill { height: 100%; background: #52c41a; border-radius: 4px; }
+    .progressCardMeta { font-size: 13px; color: #8c8c8c; }
+    .timelineTable { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .timelineTable th, .timelineTable td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+    .timelineTable th { background: #fafafa; font-weight: 600; color: #262626; }
+    .timelineTable a { color: #1890ff; text-decoration: none; }
+    .timelineTable a:hover { text-decoration: underline; }
+    .timelineWrap { width: 100%; height: 360px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.js"></script>
+  <script>
+    (function() {
+      var antd = typeof antd !== 'undefined' ? antd : {};
+      var Typography = antd.Typography || {};
+      var Title = Typography.Title || 'div';
+
+      function getUrlParam(key) {
+        const m = new RegExp('([?&])' + key + '=([^&]*)').exec(window.location.search);
+        return m ? decodeURIComponent(m[2]) : null;
+      }
+
+      // 聚合看板数据：项目来自 adminProjects + mockProjects；总计划集数 = 各订单 episodeCount 之和；待进集数 = 总计划集数 − 已交付集数
+      function aggregateBoardData() {
+        try {
+        const adminProjects = JSON.parse(localStorage.getItem('adminProjects') || '[]');
+        const mockProjects = JSON.parse(localStorage.getItem('mockProjects') || '[]');
+        const projectIdSet = new Set();
+        const projects = [];
+        adminProjects.forEach(p => { if (!projectIdSet.has(p.id)) { projectIdSet.add(p.id); projects.push(p); } });
+        mockProjects.forEach(p => { if (!projectIdSet.has(p.id)) { projectIdSet.add(p.id); projects.push(p); } });
+
+        // 看板展示用假数据：当项目较少或状态单一时补全「短剧项目情况」各列样式
+        var statusCityCombos = [
+          { projectStatusL1: '在制中', city: '长沙' }, { projectStatusL1: '在制中', city: '西安' },
+          { projectStatusL1: '已交付', city: '长沙' }, { projectStatusL1: '已交付', city: '西安' },
+          { projectStatusL1: '待进', city: '长沙' }, { projectStatusL1: '待进', city: '西安' },
+        ];
+        var stages = ['精剪中', '内部一审', '内部二审', '导演审', '监制审', '平台审', '审核完成'];
+        var fakeNames = ['霸道总裁逆袭记', '重生之都市仙尊', '闪婚后被宠上天', '神医王妃', '穿越之锦绣田园', '甜妻来袭', '萌宝助攻', '影后她只想搞事业'];
+        var existingKeys = {};
+        projects.forEach(function(p) {
+          var k = (p.projectStatusL1 || '在制中') + ' (' + (p.city || '长沙') + ')';
+          existingKeys[k] = true;
+        });
+        statusCityCombos.forEach(function(combo, idx) {
+          var key = combo.projectStatusL1 + ' (' + combo.city + ')';
+          if (existingKeys[key]) return;
+          var baseId = 'MOCK_BOARD_' + key.replace(/\s|\(|\)/g, '_') + '_';
+          for (var i = 0; i < 2; i++) {
+            var id = baseId + (idx * 2 + i);
+            if (projectIdSet.has(id)) continue;
+            projectIdSet.add(id);
+            projects.push({
+              id: id,
+              projectName: fakeNames[(idx * 2 + i) % fakeNames.length] + '（示例）',
+              city: combo.city,
+              projectStatusL1: combo.projectStatusL1,
+              projectStage: stages[(idx * 2 + i) % stages.length],
+              episodeCount: 12 + (idx + i) * 2,
+            });
+          }
+          existingKeys[key] = true;
+        });
+
+        const currentOrders = JSON.parse(localStorage.getItem('currentOrders') || '[]');
+        const projectMap = {};
+        projects.forEach(p => { projectMap[p.id] = projectMap[String(p.id)] = p; });
+
+        // 总计划集数 = 各订单 episodeCount 之和
+        const totalPlanEpisodes = currentOrders.reduce((sum, o) => sum + (Number(o.episodeCount) || 0), 0);
+
+        let deliveredEpisodes = 0;
+        const byStatusCity = {};
+        const episodeByStatus = { '待进': 0, '已交付': 0, '在制中': 0 };
+
+        const projectsList = [];
+        const stageOrder = ['精剪中', '内部一审', '内部二审', '导演审', '监制审', '平台审', '审核完成'];
+
+        projects.forEach(p => {
+          const city = p.city || '长沙';
+          const l1 = p.projectStatusL1 || '在制中';
+          const stage = p.projectStage || '精剪中';
+          const key = l1 + ' (' + city + ')';
+          byStatusCity[key] = (byStatusCity[key] || 0) + 1;
+
+          let projectEpisodes = 0;
+          currentOrders.forEach(o => {
+            if (o.projectId === p.id || o.projectId == p.id) {
+              projectEpisodes += Number(o.episodeCount) || 0;
+            }
+          });
+          if (projectEpisodes === 0) projectEpisodes = Number(p.episodeCount) || 0;
+
+          if (l1 === '已交付') {
+            deliveredEpisodes += projectEpisodes;
+            episodeByStatus['已交付'] += projectEpisodes;
+          } else if (l1 === '在制中') {
+            episodeByStatus['在制中'] += projectEpisodes;
+          } else {
+            episodeByStatus['待进'] += projectEpisodes;
+          }
+
+          projectsList.push({
+            id: p.id,
+            projectName: p.projectName || p.id,
+            city: city,
+            projectStatusL1: l1,
+            projectStage: stage,
+            planEpisodes: projectEpisodes,
+            deliveredEpisodes: l1 === '已交付' ? projectEpisodes : 0,
+          });
+        });
+
+        // 待进集数口径：总计划集数 − 已交付集数
+        const pendingEpisodesKpi = totalPlanEpisodes - deliveredEpisodes;
+        const statusCityKeys = Object.keys(byStatusCity).sort();
+        const stageKeys = stageOrder.filter(s => projectsList.some(p => p.projectStage === s));
+
+        // 短剧进审时间：订单接单→截止时间线（用于表格与甘特图），依赖 dayjs 时安全降级
+        const timelineData = [];
+        var hasDayjs = typeof dayjs !== 'undefined' && typeof dayjs().isValid === 'function';
+        currentOrders.forEach(function(o) {
+          var startMs, endMs, takeStr, dueStr;
+          if (hasDayjs) {
+            var take = (o.takeTime && dayjs(o.takeTime).isValid()) ? dayjs(o.takeTime) : dayjs();
+            var due = (o.dueTime && dayjs(o.dueTime).isValid()) ? dayjs(o.dueTime) : dayjs().add(7, 'day');
+            startMs = take.valueOf();
+            endMs = due.valueOf();
+            takeStr = o.takeTime || take.format('YYYY-MM-DD HH:mm');
+            dueStr = o.dueTime || due.format('YYYY-MM-DD HH:mm');
+          } else {
+            startMs = Date.now();
+            endMs = startMs + 86400000 * 7;
+            takeStr = o.takeTime || '';
+            dueStr = o.dueTime || '';
+          }
+          if (endMs < startMs) endMs = startMs + 86400000 * 7;
+          timelineData.push({
+            orderId: o.orderId || o.id,
+            projectId: o.projectId,
+            projectName: o.projectName || '项目',
+            taker: o.taker || '-',
+            takeTime: takeStr,
+            dueTime: dueStr,
+            status: o.status || 'InProgress',
+            startMs: startMs,
+            endMs: endMs,
+            label: (o.projectName || o.orderId || o.id) + ' · ' + (o.orderId || o.id),
+          });
+        });
+        timelineData.sort(function(a, b) { return a.startMs - b.startMs; });
+
+        return {
+          totalCount: projects.length,
+          totalPlanEpisodes,
+          pendingEpisodes: pendingEpisodesKpi,
+          deliveredEpisodes,
+          episodeByStatus,
+          pieData: Object.entries(byStatusCity).map(function(e) { return { name: e[0], value: e[1] }; }),
+          barData: [
+            { status: '待进', episodes: episodeByStatus['待进'] },
+            { status: '已交付', episodes: episodeByStatus['已交付'] },
+            { status: '在制中', episodes: episodeByStatus['在制中'] },
+          ],
+          projectsList: projectsList,
+          statusCityKeys: statusCityKeys,
+          stageKeys: stageKeys,
+          stageOrder: stageOrder,
+          timelineData: timelineData,
+        };
+        } catch (err) {
+          return {
+            totalCount: 0,
+            totalPlanEpisodes: 0,
+            pendingEpisodes: 0,
+            deliveredEpisodes: 0,
+            episodeByStatus: { '待进': 0, '已交付': 0, '在制中': 0 },
+            pieData: [],
+            barData: [{ status: '待进', episodes: 0 }, { status: '已交付', episodes: 0 }, { status: '在制中', episodes: 0 }],
+            projectsList: [],
+            statusCityKeys: [],
+            stageKeys: [],
+            stageOrder: ['精剪中', '内部一审', '内部二审', '导演审', '监制审', '平台审', '审核完成'],
+            timelineData: [],
+          };
+        }
+      }
+
+      const DataBoard = () => {
+        const [mounted, setMounted] = React.useState(false);
+        const data = React.useMemo(aggregateBoardData, []);
+
+        React.useEffect(() => {
+          setMounted(true);
+        }, []);
+
+        React.useEffect(() => {
+          if (!mounted || typeof G2 === 'undefined') return;
+
+          const pieContainer = document.getElementById('chart-pie');
+          const barContainer = document.getElementById('chart-bar');
+          const timelineContainer = document.getElementById('chart-timeline');
+          if (!pieContainer || !barContainer) return;
+
+          pieContainer.innerHTML = '';
+          barContainer.innerHTML = '';
+          if (timelineContainer) timelineContainer.innerHTML = '';
+
+          const { Chart } = G2;
+          const pieData = data.pieData.length ? data.pieData : [
+            { name: '在制中 (长沙)', value: 21 },
+            { name: '在制中 (西安)', value: 2 },
+            { name: '已交付 (西安)', value: 3 },
+            { name: '待进 (长沙)', value: 21 },
+            { name: '待进 (西安)', value: 1 },
+          ];
+
+          const pieChart = new Chart({
+            container: pieContainer,
+            width: pieContainer.offsetWidth,
+            height: 320,
+          });
+          pieChart.options({
+            data: pieData,
+            coordinate: { type: 'theta', outerRadius: 0.8 },
+            scale: { value: { type: 'linear', min: 0 } },
+            legend: { color: { position: 'bottom', layout: { justifyContent: 'center' } } },
+            children: [
+              { type: 'interval', transform: [{ type: 'stackY' }], encode: { y: 'value', color: 'name' } },
+            ],
+          });
+          pieChart.render();
+
+          const barData = data.barData.every(d => d.episodes === 0)
+            ? [{ status: '待进', episodes: 1760 }, { status: '已交付', episodes: 240 }, { status: '在制中', episodes: 1821 }]
+            : data.barData;
+
+          const barChart = new Chart({
+            container: barContainer,
+            width: barContainer.offsetWidth,
+            height: 320,
+          });
+          barChart.options({
+            data: barData,
+            axis: { y: { title: '集数', labelFormatter: (v) => v }, x: { title: false } },
+            scale: { episodes: { type: 'linear', min: 0 } },
+            children: [
+              { type: 'interval', encode: { x: 'status', y: 'episodes', color: 'status' } },
+            ],
+          });
+          barChart.render();
+
+          var timelineChart = null;
+          if (timelineContainer && data.timelineData && data.timelineData.length > 0) {
+            var minMs = Math.min.apply(null, data.timelineData.map(function(d) { return d.startMs; }));
+            var maxMs = Math.max.apply(null, data.timelineData.map(function(d) { return d.endMs; }));
+            if (maxMs <= minMs) maxMs = minMs + 86400000 * 7;
+            var ganttData = data.timelineData.map(function(d) {
+              return { label: d.label.length > 24 ? d.label.slice(0, 22) + '…' : d.label, start: d.startMs, end: d.endMs };
+            });
+            try {
+              timelineChart = new Chart({
+                container: timelineContainer,
+                width: timelineContainer.offsetWidth,
+                height: 360,
+              });
+              timelineChart.options({
+                data: ganttData,
+                coordinate: { transform: [{ type: 'transpose' }] },
+                scale: {
+                  start: { type: 'linear', domain: [minMs, maxMs], tickCount: 5 },
+                  end: { type: 'linear', domain: [minMs, maxMs] },
+                  label: { type: 'band', padding: 0.3 },
+                },
+                axis: {
+                  x: { title: false },
+                  y: {
+                    title: '时间',
+                    labelFormatter: function(v) {
+                      if (typeof dayjs !== 'undefined') return dayjs(Number(v)).format('MM-DD');
+                      return new Date(Number(v)).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
+                    },
+                  },
+                },
+                legend: false,
+                children: [
+                  { type: 'interval', encode: { x: 'label', y: ['start', 'end'], color: 'label' } },
+                ],
+              });
+              timelineChart.render();
+            } catch (e) { if (timelineChart) timelineChart.destroy(); }
+          }
+
+          return () => {
+            pieChart.destroy();
+            barChart.destroy();
+            if (timelineChart) timelineChart.destroy();
+          };
+        }, [mounted, data.pieData.length, data.barData, data.timelineData]);
+
+        const Title = Typography.Title;
+        return React.createElement('div', { className: 'appLayout' },
+          React.createElement('div', { className: 'sidebar' },
+            React.createElement('div', { className: 'sidebarHeader' },
+              React.createElement('a', { href: 'Home.html', className: 'logo' }, '🎬 天合短剧平台')
+            ),
+            React.createElement('nav', { className: 'menu' },
+              React.createElement('a', { href: 'Home.html', className: 'menuItem' }, React.createElement('span', { className: 'menuItemIcon' }, '🏠'), '首页'),
+              React.createElement('a', { href: 'ProjectHall.html', className: 'menuItem' }, React.createElement('span', { className: 'menuItemIcon' }, '📋'), '接单大厅'),
+              React.createElement('a', { href: 'Leaderboard.html', className: 'menuItem' }, React.createElement('span', { className: 'menuItemIcon' }, '🏆'), '天梯榜单'),
+              React.createElement('a', { href: 'Account.html', className: 'menuItem' }, React.createElement('span', { className: 'menuItemIcon' }, '💰'), '账户与收益'),
+              React.createElement('a', { href: 'MyProjects.html', className: 'menuItem' }, React.createElement('span', { className: 'menuItemIcon' }, '🚀'), '我的项目'),
+              React.createElement('div', { className: 'menuGroup' },
+                React.createElement('div', { className: 'menuGroupTitle' }, '后台管理'),
+                React.createElement('a', { href: 'ReviewQueue.html', className: 'menuItem' }, React.createElement('span', { className: 'menuItemIcon' }, '✅'), '任务审核'),
+                React.createElement('a', { href: 'ProjectManagement.html', className: 'menuItem' }, React.createElement('span', { className: 'menuItemIcon' }, '📋'), '项目管理'),
+                React.createElement('a', { href: 'StudentManagement.html', className: 'menuItem' }, React.createElement('span', { className: 'menuItemIcon' }, '👥'), '学员管理'),
+                React.createElement('a', { href: 'FinanceManagement.html', className: 'menuItem' }, React.createElement('span', { className: 'menuItemIcon' }, '💰'), '财务对账'),
+                React.createElement('a', { href: 'DashboardManagement.html', className: 'menuItem' }, React.createElement('span', { className: 'menuItemIcon' }, '📊'), '榜单与数据'),
+                React.createElement('a', { href: 'DataBoard.html', className: 'menuItem active' }, React.createElement('span', { className: 'menuItemIcon' }, '📈'), '数据看板')
+              )
+            )
+          ),
+          React.createElement('div', { className: 'mainContent' },
+            React.createElement('div', { className: 'boardPage' },
+              React.createElement('div', { className: 'pageHeader' },
+                React.createElement('div', { style: { margin: 0, fontSize: 24, fontWeight: 600 } }, '2026短剧整体概览')
+              ),
+              React.createElement('div', { className: 'kpiRow' },
+                React.createElement('div', { className: 'kpiCard' },
+                  React.createElement('div', { className: 'kpiTitle' }, '2026年短剧总数量'),
+                  React.createElement('div', { className: 'kpiValue' }, String(Number(data.totalCount) || 0))
+                ),
+                React.createElement('div', { className: 'kpiCard' },
+                  React.createElement('div', { className: 'kpiTitle' }, '2026短剧总制作集数'),
+                  React.createElement('div', { className: 'kpiValue' }, String((data.totalPlanEpisodes || 2061).toLocaleString()))
+                ),
+                React.createElement('div', { className: 'kpiCard' },
+                  React.createElement('div', { className: 'kpiTitle' }, '待进集数'),
+                  React.createElement('div', { className: 'kpiValue' }, String((data.pendingEpisodes >= 0 ? data.pendingEpisodes : 1760).toLocaleString()))
+                )
+              ),
+              React.createElement('div', { style: { display: 'flex', gap: 16, flexWrap: 'wrap' } },
+                React.createElement('div', { className: 'chartCard', style: { flex: '1 1 400px' } },
+                  React.createElement('div', { className: 'chartTitle' }, '短剧整体情况（单位：部）'),
+                  React.createElement('div', { id: 'chart-pie', className: 'chartWrap' })
+                ),
+                React.createElement('div', { className: 'chartCard', style: { flex: '1 1 400px' } },
+                  React.createElement('div', { className: 'chartTitle' }, '短剧进度集数分布'),
+                  React.createElement('div', { id: 'chart-bar', className: 'chartWrap' })
+                )
+              ),
+              React.createElement('div', { className: 'sectionTitle' }, '短剧项目情况（按状况+城市）'),
+              React.createElement('div', { className: 'kanbanRow' },
+                (data.statusCityKeys || []).map(function(colKey) {
+                  var list = (data.projectsList || []).filter(function(p) { return (p.projectStatusL1 + ' (' + p.city + ')') === colKey; });
+                  return React.createElement('div', { key: colKey, className: 'kanbanCol' },
+                    React.createElement('div', { className: 'kanbanColHead' }, String(colKey), ' (', list.length, ')'),
+                    React.createElement('div', { className: 'kanbanColBody' },
+                      list.map(function(p) {
+                        return React.createElement('div', { key: p.id, className: 'projectCard' },
+                          React.createElement('a', { href: 'ProjectDetail.html?projectId=' + encodeURIComponent(p.id) },
+                            React.createElement('div', { className: 'projectCardName' }, String(p.projectName || p.id || '')),
+                            React.createElement('div', { className: 'projectCardMeta' }, String(p.id || ''), ' · ', String(p.planEpisodes != null ? p.planEpisodes : ''), '集')
+                          )
+                        );
+                      })
+                    )
+                  );
+                })
+              ),
+              React.createElement('div', { className: 'sectionTitle' }, '项目完成进度（按阶段）'),
+              React.createElement('div', { className: 'kanbanRow' },
+                (data.stageKeys || []).map(function(stageKey) {
+                  var list = (data.projectsList || []).filter(function(p) { return p.projectStage === stageKey; });
+                  return React.createElement('div', { key: stageKey, className: 'kanbanCol' },
+                    React.createElement('div', { className: 'kanbanColHead' }, String(stageKey), ' (', list.length, ')'),
+                    React.createElement('div', { className: 'kanbanColBody' },
+                      list.map(function(p) {
+                        return React.createElement('div', { key: p.id, className: 'projectCard' },
+                          React.createElement('a', { href: 'ProjectDetail.html?projectId=' + encodeURIComponent(p.id) },
+                            React.createElement('div', { className: 'projectCardName' }, String(p.projectName || p.id || '')),
+                            React.createElement('div', { className: 'projectCardMeta' }, String(p.id || ''), ' · ', String(p.planEpisodes != null ? p.planEpisodes : ''), '集')
+                          )
+                        );
+                      })
+                    )
+                  );
+                })
+              ),
+              React.createElement('div', { className: 'sectionTitle' }, '短剧进审时间'),
+              React.createElement('div', { className: 'chartCard', style: { marginBottom: 16 } },
+                React.createElement('div', { className: 'chartTitle' }, '订单接单与截止时间'),
+                React.createElement('table', { className: 'timelineTable' },
+                  React.createElement('thead', null,
+                    React.createElement('tr', null,
+                      React.createElement('th', null, '订单号'),
+                      React.createElement('th', null, '项目'),
+                      React.createElement('th', null, '接单人'),
+                      React.createElement('th', null, '接单时间'),
+                      React.createElement('th', null, '截止时间'),
+                      React.createElement('th', null, '状态')
+                    )
+                  ),
+                  React.createElement('tbody', null,
+                    (data.timelineData && data.timelineData.length > 0)
+                      ? data.timelineData.map(function(row) {
+                          return React.createElement('tr', { key: row.orderId },
+                            React.createElement('td', null,
+                              React.createElement('a', { href: 'ProjectSpace.html?orderId=' + encodeURIComponent(row.orderId) + '&projectId=' + encodeURIComponent(row.projectId || '') }, String(row.orderId || ''))
+                            ),
+                            React.createElement('td', null, String(row.projectName || '')),
+                            React.createElement('td', null, String(row.taker || '')),
+                            React.createElement('td', null, String(row.takeTime || '')),
+                            React.createElement('td', null, String(row.dueTime || '')),
+                            React.createElement('td', null, row.status === 'InProgress' ? '进行中' : row.status === 'Submitted' ? '已提交' : row.status === 'Approved' ? '已通过' : row.status === 'Accepted' ? '已验收' : String(row.status || '-'))
+                          );
+                        })
+                      : React.createElement('tr', null, React.createElement('td', { colSpan: 6, style: { textAlign: 'center', color: '#8c8c8c', padding: 24 } }, '暂无订单数据'))
+                  )
+                ),
+                (data.timelineData && data.timelineData.length > 0)
+                  ? React.createElement('div', { className: 'chartTitle', style: { marginTop: 24 } }, '时间分布（接单 → 截止）')
+                  : null,
+                (data.timelineData && data.timelineData.length > 0)
+                  ? React.createElement('div', { id: 'chart-timeline', className: 'timelineWrap' })
+                  : null
+              ),
+              React.createElement('div', { className: 'sectionTitle' }, '短剧具体完成进度'),
+              React.createElement('div', { className: 'progressGrid' },
+                (data.projectsList && data.projectsList.length > 0)
+                  ? data.projectsList.map(function(p) {
+                      var pct = p.planEpisodes ? Math.round(100 * p.deliveredEpisodes / p.planEpisodes) : 0;
+                      return React.createElement('div', { key: p.id, className: 'progressCard' },
+                        React.createElement('a', { className: 'progressCardLink', href: 'ProjectDetail.html?projectId=' + encodeURIComponent(p.id) }, String(p.projectName || p.id || '')),
+                        React.createElement('div', { className: 'progressCardMeta' }, String(p.projectStage || ''), ' · ', String(p.city || '')),
+                        React.createElement('div', { className: 'progressCardBar' },
+                          React.createElement('div', { className: 'progressCardBarFill', style: { width: pct + '%' } })
+                        ),
+                        React.createElement('div', { className: 'progressCardMeta' }, '已交付 ', String(p.deliveredEpisodes != null ? p.deliveredEpisodes : ''), ' / ', String(p.planEpisodes != null ? p.planEpisodes : ''), ' 集')
+                      );
+                    })
+                  : React.createElement('div', { style: { gridColumn: '1 / -1', padding: 24, textAlign: 'center', color: '#8c8c8c' } }, '暂无项目数据')
+              )
+            )
+          )
+        );
+      };
+
+      function doRender() {
+        if (typeof React === 'undefined' || typeof ReactDOM === 'undefined') {
+          setTimeout(doRender, 100);
+          return;
+        }
+        var root = document.getElementById('root');
+        if (root) ReactDOM.render(React.createElement(DataBoard), root);
+      }
+      if (document.readyState === 'loading') window.addEventListener('load', doRender);
+      else doRender();
+    })();
+  </script>
+</body>
+</html>

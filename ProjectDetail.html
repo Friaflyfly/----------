@@ -243,6 +243,8 @@
           id: projectId,
           projectName: `测试项目${projectId.slice(-1)}`,
           category: '短剧',
+          city: '长沙',
+          projectStatusL1: '在制中',
           difficulty: '精品',
           participantTeam: '线上',
           projectStage: '精剪中',
@@ -379,6 +381,10 @@
                   <span className="menuItemIcon">📊</span>
                   榜单与数据
                 </a>
+                <a href="DataBoard.html" className="menuItem">
+                  <span className="menuItemIcon">📈</span>
+                  数据看板
+                </a>
               </div>
             </nav>
           </div>
@@ -422,7 +428,13 @@
                         </Tag>
                       </Descriptions.Item>
                       <Descriptions.Item label="参与团队">{projectData.participantTeam}</Descriptions.Item>
-                      <Descriptions.Item label="项目状态">
+                      <Descriptions.Item label="城市">{projectData.city || '-'}</Descriptions.Item>
+                      <Descriptions.Item label="项目状况（一级）">
+                        <Tag color={projectData.projectStatusL1 === '已交付' ? 'green' : projectData.projectStatusL1 === '待进' ? 'blue' : 'orange'}>
+                          {projectData.projectStatusL1 || '-'}
+                        </Tag>
+                      </Descriptions.Item>
+                      <Descriptions.Item label="项目状态（二级）">
                         <Tag color="blue">{projectData.projectStage || '精剪中'}</Tag>
                       </Descriptions.Item>
                       <Descriptions.Item label="发布状态">

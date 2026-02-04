@@ -203,6 +203,8 @@
           form.setFieldsValue({
             projectName: project.projectName,
             projectTags: project.projectTags || [],
+            city: project.city || '长沙',
+            projectStatusL1: project.projectStatusL1 || '在制中',
             projectStage: project.projectStage || '精剪中',
             contentGenre: project.contentGenre || '霸总',
             category: project.category,
@@ -284,6 +286,8 @@
                 id: newProjectId,
                 projectName: values.projectName,
                 projectTags: values.projectTags || [],
+                city: values.city || '长沙',
+                projectStatusL1: values.projectStatusL1 || '在制中',
                 contentGenre: values.contentGenre,
                 category: values.category,
                 difficulty: values.difficulty,
@@ -397,6 +401,10 @@
                   <span className="menuItemIcon">📊</span>
                   榜单与数据
                 </a>
+                <a href="DataBoard.html" className="menuItem">
+                  <span className="menuItemIcon">📈</span>
+                  数据看板
+                </a>
               </div>
             </nav>
           </div>
@@ -424,6 +432,8 @@
                   layout="vertical"
                   initialValues={{
                     status: 'Draft',
+                    city: '长沙',
+                    projectStatusL1: '在制中',
                     projectStage: '精剪中',
                     takeMode: '抢单',
                     applyReviewRule: '运营审核',
@@ -511,16 +521,40 @@
                       </Form.Item>
 
                       <Form.Item
+                        name="city"
+                        label="城市"
+                        rules={[{ required: true, message: '请选择城市' }]}
+                      >
+                        <Select placeholder="请选择城市">
+                          <Option value="长沙">长沙</Option>
+                          <Option value="西安">西安</Option>
+                        </Select>
+                      </Form.Item>
+
+                      <Form.Item
+                        name="projectStatusL1"
+                        label="项目状况（一级）"
+                        rules={[{ required: true, message: '请选择项目状况' }]}
+                      >
+                        <Select placeholder="请选择项目状况">
+                          <Option value="在制中">在制中</Option>
+                          <Option value="已交付">已交付</Option>
+                          <Option value="待进">待进</Option>
+                        </Select>
+                      </Form.Item>
+
+                      <Form.Item
                         name="projectStage"
-                        label="项目状态"
+                        label="项目状态（二级）"
                         rules={[{ required: true, message: '请选择项目状态' }]}
                       >
-                        <Select placeholder="请选择项目状态（阶段）">
+                        <Select placeholder="请选择项目状态（当前阶段）">
                           <Option value="精剪中">精剪中</Option>
                           <Option value="内部一审">内部一审</Option>
                           <Option value="内部二审">内部二审</Option>
                           <Option value="导演审">导演审</Option>
                           <Option value="监制审">监制审</Option>
+                          <Option value="平台审">平台审</Option>
                           <Option value="审核完成">审核完成</Option>
                         </Select>
                       </Form.Item>

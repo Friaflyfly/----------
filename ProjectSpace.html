@@ -670,6 +670,8 @@
             const project = adminProjects.find(p => p.id == pid) || mockProjects.find(p => p.id == pid);
             if (project) {
               if (project.coordinator != null) spaceData.coordinator = project.coordinator;
+              if (project.city != null) spaceData.city = project.city;
+              if (project.projectStatusL1 != null) spaceData.projectStatusL1 = project.projectStatusL1;
               if (project.projectStage != null) spaceData.projectStage = project.projectStage;
               if (project.requirementText != null) spaceData.requirementText = project.requirementText;
               if (project.requirementAttachments != null) spaceData.requirementAttachments = project.requirementAttachments;
@@ -1263,6 +1265,10 @@
                 <a href="DashboardManagement.html" className="menuItem">
                   <span className="menuItemIcon">📊</span>
                   榜单与数据
+                </a>
+                <a href="DataBoard.html" className="menuItem">
+                  <span className="menuItemIcon">📈</span>
+                  数据看板
                 </a>
               </div>
             </nav>
