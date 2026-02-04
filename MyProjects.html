@@ -198,16 +198,31 @@
           };
         });
 
-        // 读取被驳回的申请
+        // 读取报名申请：待审核（Pending）与已驳回（Rejected），便于查看「已报名但未通过」情况
         const applications = JSON.parse(localStorage.getItem('applications') || '[]');
-        const rejectedApplications = applications
-          .filter(app => 
-            app.applicant === '当前用户' && 
-            app.status === 'Rejected'
-          )
+        const pendingApplications = applications
+          .filter(app => app.applicant === '当前用户' && app.status === 'Pending')
           .map(app => ({
             id: app.id,
-            orderId: null, // 申请没有订单号
+            orderId: null,
+            applicationId: app.id,
+            projectId: app.projectId,
+            projectName: app.projectName,
+            takeTime: app.applyTime,
+            dueTime: null,
+            status: 'Pending',
+            amount: 0,
+            estimatedAmount: 0,
+            actualAmount: 0,
+            deduction: 0,
+            isOrder: false,
+            applyTime: app.applyTime,
+          }));
+        const rejectedApplications = applications
+          .filter(app => app.applicant === '当前用户' && app.status === 'Rejected')
+          .map(app => ({
+            id: app.id,
+            orderId: null,
             applicationId: app.id,
             projectId: app.projectId,
             projectName: app.projectName,
@@ -218,14 +233,23 @@
             estimatedAmount: 0,
             actualAmount: 0,
             deduction: 0,
-            isOrder: false, // 标记为申请
+            isOrder: false,
             rejectReason: app.rejectReason,
             reviewTime: app.reviewTime,
           }));
 
-        // 合并订单和被驳回的申请
-        data = [...data, ...rejectedApplications];
-        
+        // 合并订单 + 待审核报名 + 已驳回报名
+        data = [...data, ...pendingApplications, ...rejectedApplications];
+
+        // 若没有任何报名记录，注入示例行便于查看「已报名未通过」的展示样式（仅展示用）
+        if (pendingApplications.length === 0 && rejectedApplications.length === 0) {
+          var demoApplyTime = dayjs().subtract(1, 'day').format('YYYY-MM-DD HH:mm:ss');
+          data = data.concat([
+            { id: 'DEMO_PENDING', orderId: null, applicationId: 'APPLY_DEMO_001', projectId: 'demo_p', projectName: '示例项目（报名待审核）', takeTime: demoApplyTime, dueTime: null, status: 'Pending', amount: 0, estimatedAmount: 0, actualAmount: 0, deduction: 0, isOrder: false, applyTime: demoApplyTime },
+            { id: 'DEMO_REJECTED', orderId: null, applicationId: 'APPLY_DEMO_002', projectId: 'demo_p2', projectName: '示例项目（报名已驳回）', takeTime: dayjs().subtract(2, 'day').format('YYYY-MM-DD HH:mm:ss'), dueTime: null, status: 'Rejected', amount: 0, estimatedAmount: 0, actualAmount: 0, deduction: 0, isOrder: false, rejectReason: '示例：不符合本期项目要求', reviewTime: dayjs().subtract(1, 'day').format('YYYY-MM-DD HH:mm:ss') },
+          ]);
+        }
+
         setOrders(data);
         setLoading(false);
       };
@@ -274,7 +298,8 @@
         'Approved': { color: 'green', text: '审核通过' },
         'Accepted': { color: 'success', text: '已验收' },
         'Closed': { color: 'default', text: '已关闭' },
-        'Rejected': { color: 'red', text: '已驳回' },
+        'Pending': { color: 'orange', text: '报名待审核' },
+        'Rejected': { color: 'red', text: '报名已驳回' },
       };
 
       const goToSpace = (record) => {
@@ -299,6 +324,17 @@
 
       const columns = [
         {
+          title: '类型',
+          key: 'sourceType',
+          width: 100,
+          render: (_, r) => {
+            if (r.isOrder === false) {
+              return r.status === 'Pending' ? <Tag color="orange">报名待审核</Tag> : <Tag color="red">报名已驳回</Tag>;
+            }
+            return <Tag color="blue">订单</Tag>;
+          },
+        },
+        {
           title: '订单号/申请单号',
           dataIndex: 'orderId',
           key: 'orderId',
@@ -317,11 +353,17 @@
           ellipsis: true,
         },
         {
-          title: '接单时间',
+          title: '接单/申请时间',
           dataIndex: 'takeTime',
           key: 'takeTime',
           width: 180,
-          render: (t) => (t ? dayjs(t).format('YYYY-MM-DD HH:mm:ss') : '-'),
+          render: (t, record) => {
+            if (!t) return '-';
+            const formatted = dayjs(t).format('YYYY-MM-DD HH:mm:ss');
+            return record.isOrder === false ? (
+              <span title="报名申请时间">{formatted}</span>
+            ) : formatted;
+          },
         },
         {
           title: '截止时间',
@@ -387,7 +429,11 @@
           key: 'action',
           width: 120,
           render: (_, record) => {
-            // 被驳回的申请不显示"进入空间"按钮
+            // 报名待审核：仅展示状态，不可进入空间
+            if (record.status === 'Pending' && record.isOrder === false) {
+              return <span style={{ color: '#fa8c16', fontSize: 12 }}>等待运营审核</span>;
+            }
+            // 报名已驳回：仅展示状态
             if (record.status === 'Rejected' && record.isOrder === false) {
               return <span style={{ color: '#8c8c8c', fontSize: 12 }}>申请已驳回</span>;
             }
@@ -479,7 +525,8 @@
                     <Option value="Approved">审核通过</Option>
                     <Option value="Accepted">已验收</Option>
                     <Option value="Closed">已关闭</Option>
-                    <Option value="Rejected">已驳回</Option>
+                    <Option value="Pending">报名待审核</Option>
+                    <Option value="Rejected">报名已驳回</Option>
                   </Select>
                 </Space>
               </div>
