@@ -209,7 +209,6 @@
         dateRange: null,
       });
       const [adjustModalVisible, setAdjustModalVisible] = useState(false);
-      const [adjustForm] = Form.useForm();
       const [currentRecord, setCurrentRecord] = useState(null);
       const [orderDetailVisible, setOrderDetailVisible] = useState(false);
       const [currentProjectOrders, setCurrentProjectOrders] = useState([]);
@@ -357,47 +356,63 @@
         };
       }, [filteredLedger]);
 
+      const [orderDeductions, setOrderDeductions] = useState({});
+      const [adjustReason, setAdjustReason] = useState('');
+
       const handleAdjust = (record) => {
         setCurrentRecord(record);
-        adjustForm.setFieldsValue({ deduction: record.totalDeduction || 0, reason: '' });
+        const init = {};
+        (record.orders || []).forEach(o => {
+          init[o.orderId || o.id] = o.deduction || 0;
+        });
+        setOrderDeductions(init);
+        setAdjustReason('');
         setAdjustModalVisible(true);
       };
 
+      const handleOrderDeductionChange = (orderId, value) => {
+        setOrderDeductions(prev => ({ ...prev, [orderId]: value || 0 }));
+      };
+
       const handleAdjustSubmit = () => {
-        adjustForm.validateFields().then(values => {
-          // 更新项目级别的扣款
-          const updatedLedger = ledger.map(item => {
-            if (item.id === currentRecord.id) {
-              const newTotalDeduction = values.deduction;
-              // 更新项目下所有订单的扣款（平均分配或按比例）
-              const updatedOrders = item.orders.map(order => ({
-                ...order,
-                deduction: Math.round((newTotalDeduction / item.totalAmount) * order.amount),
-              }));
-              
-              return {
-                ...item,
-                totalDeduction: newTotalDeduction,
-                orders: updatedOrders,
-                adjustReason: values.reason,
-                adjustTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-              };
-            }
-            return item;
-          });
-          
-          // 同步更新订单级别的账本数据
-          const allOrders = [];
-          updatedLedger.forEach(project => {
-            allOrders.push(...project.orders);
-          });
-          localStorage.setItem('financeLedger', JSON.stringify(allOrders));
-          
-          setLedger(updatedLedger);
-          setAdjustModalVisible(false);
-          adjustForm.resetFields();
-          message.success('扣款调整已保存');
+        if (!adjustReason.trim()) {
+          message.warning('请填写扣款原因');
+          return;
+        }
+        if (!currentRecord) return;
+        const orders = currentRecord.orders || [];
+        const updatedOrders = orders.map(order => {
+          const oid = order.orderId || order.id;
+          const deduction = Number(orderDeductions[oid]) || 0;
+          if (deduction > (order.amount || 0)) {
+            message.warning(`订单 ${oid} 扣款不能大于订单金额`);
+            return null;
+          }
+          return { ...order, deduction, adjustReason, adjustTime: dayjs().format('YYYY-MM-DD HH:mm:ss') };
+        }).filter(Boolean);
+        if (updatedOrders.length !== orders.length) return;
+
+        const newTotalDeduction = updatedOrders.reduce((s, o) => s + (o.deduction || 0), 0);
+        const updatedLedger = ledger.map(item => {
+          if (item.id === currentRecord.id) {
+            return {
+              ...item,
+              totalDeduction: newTotalDeduction,
+              orders: updatedOrders,
+            };
+          }
+          return item;
         });
+
+        const allOrders = [];
+        updatedLedger.forEach(project => allOrders.push(...project.orders));
+        localStorage.setItem('financeLedger', JSON.stringify(allOrders));
+
+        setLedger(updatedLedger);
+        setAdjustModalVisible(false);
+        setOrderDeductions({});
+        setAdjustReason('');
+        message.success('扣款调整已保存');
       };
 
       const handleSettleStatusChange = (record, newStatus) => {
@@ -495,6 +510,14 @@
           width: 120,
           align: 'right',
           render: (amount) => <span style={{ fontWeight: 500, color: '#52c41a' }}>¥{amount ? amount.toLocaleString() : 0}</span>,
+        },
+        {
+          title: '扣款',
+          dataIndex: 'deduction',
+          key: 'deduction',
+          width: 110,
+          align: 'right',
+          render: (d) => (d && d > 0) ? <span style={{ color: '#ff4d4f', fontWeight: 500 }}>-¥{(d || 0).toLocaleString()}</span> : '-',
         },
       ];
 
@@ -726,32 +749,55 @@
             </div>
           </div>
 
-          {/* 扣款调整弹窗 */}
+          {/* 扣款调整弹窗：按单笔订单扣款 */}
           <Modal
-            title="扣款调整"
+            title={`扣款调整 - ${currentRecord?.projectName || ''}`}
             open={adjustModalVisible}
             onOk={handleAdjustSubmit}
-            onCancel={() => { setAdjustModalVisible(false); adjustForm.resetFields(); }}
-            okText="确认"
+            onCancel={() => { setAdjustModalVisible(false); setOrderDeductions({}); setAdjustReason(''); }}
+            okText="确认保存"
             cancelText="取消"
-            width={600}
+            width={700}
           >
-            <Form form={adjustForm} layout="vertical">
-              <Form.Item
-                name="deduction"
-                label="扣款金额"
-                rules={[{ required: true, message: '请输入扣款金额' }]}
-              >
-                <InputNumber min={0} style={{ width: '100%' }} placeholder="请输入扣款金额" />
-              </Form.Item>
-              <Form.Item
-                name="reason"
-                label="扣款原因"
-                rules={[{ required: true, message: '请填写扣款原因' }]}
-              >
-                <TextArea rows={4} placeholder="请填写扣款原因" />
-              </Form.Item>
-            </Form>
+            <div style={{ marginBottom: 16, fontSize: 13, color: '#8c8c8c' }}>
+              针对项目下的每笔订单分别录入扣款金额，扣款将影响该订单的实付金额及学员收益。
+            </div>
+            <Table
+              size="small"
+              dataSource={currentRecord?.orders || []}
+              rowKey={(r) => r.orderId || r.id}
+              pagination={false}
+              columns={[
+                { title: '订单号', dataIndex: 'orderId', key: 'orderId', width: 140, render: (v, r) => v || r.id || '-' },
+                { title: '接单人', dataIndex: 'taker', key: 'taker', width: 100 },
+                { title: '订单金额', dataIndex: 'amount', key: 'amount', width: 110, align: 'right', render: (a) => `¥${(a || 0).toLocaleString()}` },
+                {
+                  title: '扣款金额',
+                  key: 'deduction',
+                  width: 140,
+                  align: 'right',
+                  render: (_, order) => (
+                    <InputNumber
+                      min={0}
+                      max={order.amount || 0}
+                      value={orderDeductions[order.orderId || order.id] ?? order.deduction ?? 0}
+                      onChange={(v) => handleOrderDeductionChange(order.orderId || order.id, v)}
+                      style={{ width: '100%' }}
+                      placeholder="0"
+                    />
+                  ),
+                },
+              ]}
+            />
+            <div style={{ marginTop: 16 }}>
+              <div style={{ marginBottom: 6, fontWeight: 500 }}>扣款原因（必填）</div>
+              <TextArea
+                rows={3}
+                value={adjustReason}
+                onChange={(e) => setAdjustReason(e.target.value)}
+                placeholder="请填写扣款原因，将记录到本次调整的每笔订单"
+              />
+            </div>
           </Modal>
 
           {/* 订单详情抽屉 */}
