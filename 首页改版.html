@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>骋风天合 - AI影视内容生产与IP运营一体化服务商</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0f1115',
+                        darkCard: '#1a1d24',
+                        primary: '#00f2ff',
+                        secondary: '#8a2be2',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 自定义渐变文字与背景特效 */
+        .text-gradient {
+            background: linear-gradient(to right, #00f2ff, #8a2be2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-bg {
+            background-image: radial-gradient(circle at top center, rgba(138, 43, 226, 0.15), transparent 50%),
+                              radial-gradient(circle at bottom right, rgba(0, 242, 255, 0.1), transparent 40%);
+        }
+        .glass-card {
+            background: rgba(26, 29, 36, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-darkBg text-gray-300 font-sans antialiased overflow-x-hidden">
+
+    <nav class="fixed w-full z-50 bg-darkBg/80 backdrop-blur-md border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0 font-bold text-2xl text-white tracking-wider">
+                    骋风天合
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#" class="text-white hover:text-primary transition">首页</a>
+                        <a href="#business" class="hover:text-primary transition">核心业务</a>
+                        <a href="#solutions" class="hover:text-primary transition">解决方案</a>
+                        <a href="#cases" class="hover:text-primary transition">案例作品</a>
+                        <a href="#about" class="hover:text-primary transition">关于我们</a>
+                    </div>
+                </div>
+                <div>
+                    <a href="#" class="bg-gradient-to-r from-primary to-secondary text-white px-5 py-2 rounded-full font-medium hover:opacity-90 transition shadow-lg shadow-primary/30">
+                        联系我们
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 hero-bg overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <h1 class="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl mb-6">
+                <span class="block">AI影视内容生产与IP运营</span>
+                <span class="block text-gradient mt-2">一体化服务商</span>
+            </h1>
+            <p class="mt-3 max-w-3xl mx-auto text-base text-gray-400 sm:text-lg md:text-xl mb-10">
+                围绕剪辑接单、AIGC创作、虚拟偶像三大核心业务板块，构建从内容生产、项目协同到 IP 孵化与商业化运营的完整闭环。持续推动内容生产向智能化、工业化、规模化演进。
+            </p>
+            <div class="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
+                <div class="rounded-md shadow">
+                    <a href="#" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full text-white bg-gradient-to-r from-primary to-secondary hover:opacity-90 md:py-4 md:text-lg md:px-10 transition">
+                        预约演示
+                    </a>
+                </div>
+                <div class="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
+                    <a href="#cases" class="w-full flex items-center justify-center px-8 py-3 border border-gray-600 text-base font-medium rounded-full text-gray-300 bg-transparent hover:bg-gray-800 md:py-4 md:text-lg md:px-10 transition">
+                        查看案例
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="business" class="py-20 bg-darkBg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-extrabold text-white sm:text-4xl">三大核心业务板块</h2>
+                <p class="mt-4 text-xl text-gray-400">承接需求、驱动创作、放大内容价值。</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="glass-card rounded-2xl p-8 hover:-translate-y-2 transition duration-300">
+                    <div class="h-12 w-12 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center mb-6 text-2xl">🎬</div>
+                    <h3 class="text-2xl font-bold text-white mb-2">剪辑接单平台</h3>
+                    <p class="text-primary text-sm mb-4 font-medium">让需求、创作、交付在线协同。</p>
+                    <p class="text-gray-400 mb-8 text-sm leading-relaxed">面向内容制作与交付场景，提供从需求承接、任务分发、过程协同到交付管理的一体化支持，帮助团队降低沟通成本、提升履约效率。</p>
+                    <a href="#" class="text-white border-b border-white pb-1 hover:text-primary hover:border-primary transition">查看详情 →</a>
+                </div>
+                <div class="glass-card rounded-2xl p-8 hover:-translate-y-2 transition duration-300 relative overflow-hidden border-primary/30">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl"></div>
+                    <div class="h-12 w-12 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center mb-6 text-2xl">✨</div>
+                    <h3 class="text-2xl font-bold text-white mb-2">AIGC 创作平台</h3>
+                    <p class="text-secondary text-sm mb-4 font-medium">让内容生产更快、更稳、更可复制。</p>
+                    <p class="text-gray-400 mb-8 text-sm leading-relaxed">依托 AIGC 全流程制作能力，覆盖剧本智能生成、角色与场景构建、动态影像合成等环节，支撑短剧、广告等多类型生产。</p>
+                    <a href="#" class="text-white border-b border-white pb-1 hover:text-secondary hover:border-secondary transition">预约演示 →</a>
+                </div>
+                <div class="glass-card rounded-2xl p-8 hover:-translate-y-2 transition duration-300">
+                    <div class="h-12 w-12 rounded-lg bg-pink-500/20 text-pink-400 flex items-center justify-center mb-6 text-2xl">🧝‍♀️</div>
+                    <h3 class="text-2xl font-bold text-white mb-2">虚拟偶像与 IP 运营</h3>
+                    <p class="text-pink-400 text-sm mb-4 font-medium">让内容从一次生产走向持续运营。</p>
+                    <p class="text-gray-400 mb-8 text-sm leading-relaxed">围绕虚拟人设打造、内容矩阵生产、IP运营与品牌合作，帮助客户构建可持续传播、可商业化变现的数字内容资产。</p>
+                    <a href="#" class="text-white border-b border-white pb-1 hover:text-pink-400 hover:border-pink-400 transition">洽谈合作 →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 bg-darkCard border-y border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl font-extrabold text-white mb-4">不是三块分散业务，而是一条完整协同链路</h2>
+            <p class="text-gray-400 mb-12">从需求进入，到内容生产，再到 IP 放大与商业转化，形成一体化闭环。</p>
+            
+            <div class="flex flex-col md:flex-row justify-center items-center space-y-8 md:space-y-0 md:space-x-4">
+                <div class="bg-darkBg p-6 rounded-xl w-full md:w-1/3 border border-gray-800 z-10">
+                    <h4 class="text-xl font-bold text-white mb-2">01 需求进入</h4>
+                    <p class="text-sm text-gray-400">通过剪辑接单平台完成需求承接、任务分发与项目协同。</p>
+                </div>
+                <div class="hidden md:block w-12 border-t-2 border-dashed border-primary"></div>
+                <div class="bg-darkBg p-6 rounded-xl w-full md:w-1/3 border border-primary/50 shadow-[0_0_15px_rgba(0,242,255,0.2)] z-10 transform scale-105">
+                    <h4 class="text-xl font-bold text-white mb-2 text-primary">02 智能生产</h4>
+                    <p class="text-sm text-gray-400">通过 AIGC 创作平台完成脚本生成、视觉生成、视频制作与内容迭代。</p>
+                </div>
+                <div class="hidden md:block w-12 border-t-2 border-dashed border-secondary"></div>
+                <div class="bg-darkBg p-6 rounded-xl w-full md:w-1/3 border border-gray-800 z-10">
+                    <h4 class="text-xl font-bold text-white mb-2">03 价值放大</h4>
+                    <p class="text-sm text-gray-400">通过虚拟偶像与 IP 化运营，延展为持续传播资产与品牌合作。</p>
+                </div>
+            </div>
+            <p class="mt-12 text-lg text-white font-medium bg-gray-800/50 inline-block px-6 py-3 rounded-full">
+                💡 形成“接单协同 → 智能创作 → IP运营”的业务闭环
+            </p>
+        </div>
+    </section>
+
+    <section id="solutions" class="py-24 bg-darkBg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-extrabold text-white sm:text-4xl">面向多场景的内容解决方案</h2>
+                <p class="mt-4 text-xl text-gray-400 max-w-3xl mx-auto">从短剧、宣传片到综艺衍生与 IP 运营，提供可落地、可复制、可规模化的内容生产方案。</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-darkCard p-8 rounded-2xl border border-gray-800 hover:border-primary/50 transition duration-300 group">
+                    <div class="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center mb-6 group-hover:bg-blue-500/20 transition">
+                        <span class="text-blue-400 text-xl">📱</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">AI短剧 / AI漫剧</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">覆盖实拍 + AI 融合、AI渲染成片、AI场景与特效合成，提升短剧内容的生产效率与视觉表现。</p>
+                </div>
+                <div class="bg-darkCard p-8 rounded-2xl border border-gray-800 hover:border-secondary/50 transition duration-300 group">
+                    <div class="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center mb-6 group-hover:bg-purple-500/20 transition">
+                        <span class="text-purple-400 text-xl">🏢</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">企业宣传片</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">服务企业品牌展示、招商推介、峰会活动、城市宣传等场景，兼顾专业质感与智能化提效。</p>
+                </div>
+                <div class="bg-darkCard p-8 rounded-2xl border border-gray-800 hover:border-pink-500/50 transition duration-300 group">
+                    <div class="w-12 h-12 rounded-full bg-pink-500/10 flex items-center justify-center mb-6 group-hover:bg-pink-500/20 transition">
+                        <span class="text-pink-400 text-xl">💡</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">品牌广告内容</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">面向品牌营销与商业传播场景，支持更高频、更灵活、更具创意的广告内容生产。</p>
+                </div>
+                <div class="bg-darkCard p-8 rounded-2xl border border-gray-800 hover:border-primary/50 transition duration-300 group">
+                    <div class="w-12 h-12 rounded-full bg-cyan-500/10 flex items-center justify-center mb-6 group-hover:bg-cyan-500/20 transition">
+                        <span class="text-cyan-400 text-xl">🎬</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">综艺衍生内容</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">围绕综艺 IP 进行衍生短片、中插内容与创意二创，放大节目传播势能。</p>
+                </div>
+                <div class="bg-darkCard p-8 rounded-2xl border border-gray-800 hover:border-secondary/50 transition duration-300 group">
+                    <div class="w-12 h-12 rounded-full bg-indigo-500/10 flex items-center justify-center mb-6 group-hover:bg-indigo-500/20 transition">
+                        <span class="text-indigo-400 text-xl">🪐</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">虚拟偶像与IP运营</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">围绕虚拟角色进行设定、内容规划、矩阵分发与品牌合作，延长内容生命周期。</p>
+                </div>
+                <div class="bg-darkCard p-8 rounded-2xl border border-gray-800 hover:border-pink-500/50 transition duration-300 group">
+                    <div class="w-12 h-12 rounded-full bg-rose-500/10 flex items-center justify-center mb-6 group-hover:bg-rose-500/20 transition">
+                        <span class="text-rose-400 text-xl">🎓</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">创作者培训与就业</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">依托项目实训与平台能力，打通人才培养、技能实战与接单成长路径。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="cases" class="py-24 bg-[#0a0c10] border-t border-gray-800 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+                <div>
+                    <h2 class="text-3xl font-extrabold text-white sm:text-4xl mb-4">代表案例</h2>
+                    <p class="text-xl text-gray-400">用作品说明能力，用结果建立信任。</p>
+                </div>
+                <div class="mt-6 md:mt-0 flex flex-wrap gap-2">
+                    <button class="px-4 py-1.5 rounded-full bg-primary/20 text-primary border border-primary/30 text-sm hover:bg-primary hover:text-darkBg transition">全部</button>
+                    <button class="px-4 py-1.5 rounded-full bg-darkCard text-gray-300 border border-gray-700 text-sm hover:text-white transition">AI短剧</button>
+                    <button class="px-4 py-1.5 rounded-full bg-darkCard text-gray-300 border border-gray-700 text-sm hover:text-white transition">海报视觉</button>
+                    <button class="px-4 py-1.5 rounded-full bg-darkCard text-gray-300 border border-gray-700 text-sm hover:text-white transition">综艺衍生</button>
+                    <button class="px-4 py-1.5 rounded-full bg-darkCard text-gray-300 border border-gray-700 text-sm hover:text-white transition">企业宣传</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-[200px]">
+                <div class="relative group rounded-xl overflow-hidden sm:col-span-2 lg:col-span-2 row-span-2 cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop" alt="AI短剧" class="w-full h-full object-cover transition duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100">
+                    <div class="absolute inset-0 bg-gradient-to-t from-darkBg via-darkBg/20 to-transparent opacity-80"></div>
+                    <div class="absolute bottom-0 left-0 p-6">
+                        <span class="px-2 py-1 bg-primary/80 text-darkBg text-xs font-bold rounded mb-2 inline-block">AI短剧特效合成</span>
+                        <h3 class="text-2xl font-bold text-white mb-1">《赛博黎明》- 纯AIGC剧集</h3>
+                        <p class="text-gray-300 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">利用 AIGC 完成 80% 场景渲染与动态合成。</p>
+                    </div>
+                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div class="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/50">
+                            <svg class="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative group rounded-xl overflow-hidden cursor-pointer row-span-1">
+                    <img src="https://images.unsplash.com/photo-1557672172-298e090bd0f1?q=80&w=600&auto=format&fit=crop" alt="海报视觉" class="w-full h-full object-cover transition duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100">
+                    <div class="absolute inset-0 bg-gradient-to-t from-darkBg to-transparent opacity-90"></div>
+                    <div class="absolute bottom-0 left-0 p-4">
+                        <span class="px-2 py-1 bg-secondary/80 text-white text-xs font-bold rounded mb-2 inline-block">海报视觉</span>
+                        <h3 class="text-lg font-bold text-white">S级综艺主视觉海报</h3>
+                    </div>
+                </div>
+                <div class="relative group rounded-xl overflow-hidden cursor-pointer row-span-1">
+                    <img src="https://images.unsplash.com/photo-1540317580384-e5d43867caa6?q=80&w=600&auto=format&fit=crop" alt="虚拟偶像" class="w-full h-full object-cover transition duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100">
+                    <div class="absolute inset-0 bg-gradient-to-t from-darkBg to-transparent opacity-90"></div>
+                    <div class="absolute bottom-0 left-0 p-4">
+                        <span class="px-2 py-1 bg-pink-500/80 text-white text-xs font-bold rounded mb-2 inline-block">艺人 MV</span>
+                        <h3 class="text-lg font-bold text-white">虚拟偶像星元出场短片</h3>
+                    </div>
+                </div>
+                <div class="relative group rounded-xl overflow-hidden sm:col-span-2 cursor-pointer row-span-1">
+                    <img src="https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?q=80&w=800&auto=format&fit=crop" alt="企业宣传" class="w-full h-full object-cover transition duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100">
+                    <div class="absolute inset-0 bg-gradient-to-t from-darkBg via-transparent to-transparent opacity-90"></div>
+                    <div class="absolute bottom-0 left-0 p-5">
+                        <span class="px-2 py-1 bg-cyan-500/80 text-white text-xs font-bold rounded mb-2 inline-block">企业宣传短片</span>
+                        <h3 class="text-xl font-bold text-white">某新能源科技品牌TVC</h3>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-10">
+                <a href="#" class="inline-flex items-center text-gray-400 hover:text-white transition">
+                    查看更多案例 <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-darkBg relative">
+        <div class="absolute top-1/2 left-0 w-64 h-64 bg-primary/10 rounded-full blur-[100px] -translate-y-1/2"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-extrabold text-white sm:text-4xl">为什么选择我们</h2>
+                <div class="w-16 h-1 bg-gradient-to-r from-primary to-secondary mx-auto mt-6 rounded-full"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="flex items-start p-6 bg-darkCard rounded-2xl border border-gray-800 hover:border-primary/40 transition">
+                    <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center border border-white/5">
+                        <span class="text-2xl text-primary">⚙️</span>
+                    </div>
+                    <div class="ml-6">
+                        <h3 class="text-xl font-bold text-white mb-2">影视工业能力 × AIGC技术融合</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">不是单纯工具叠加，而是把高端影视制作经验与生成式能力结合，形成真正可交付、可复用、可放大的内容生产体系。</p>
+                    </div>
+                </div>
+                <div class="flex items-start p-6 bg-darkCard rounded-2xl border border-gray-800 hover:border-secondary/40 transition">
+                    <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center border border-white/5">
+                        <span class="text-2xl text-secondary">🔄</span>
+                    </div>
+                    <div class="ml-6">
+                        <h3 class="text-xl font-bold text-white mb-2">全流程内容生产能力</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">覆盖剧本智能生成、角色与场景构建、动态影像合成等关键环节，支撑从创意到成片的完整链路。</p>
+                    </div>
+                </div>
+                <div class="flex items-start p-6 bg-darkCard rounded-2xl border border-gray-800 hover:border-primary/40 transition">
+                    <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center border border-white/5">
+                        <span class="text-2xl text-cyan-400">🚀</span>
+                    </div>
+                    <div class="ml-6">
+                        <h3 class="text-xl font-bold text-white mb-2">内容提效与规模化交付</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">在保证艺术水准的前提下，实现效率提升与成本优化，适合面向多行业、多项目、多内容类型进行规模化生产。</p>
+                    </div>
+                </div>
+                <div class="flex items-start p-6 bg-darkCard rounded-2xl border border-gray-800 hover:border-pink-500/40 transition">
+                    <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500/20 to-rose-500/20 flex items-center justify-center border border-white/5">
+                        <span class="text-2xl text-pink-400">💎</span>
+                    </div>
+                    <div class="ml-6">
+                        <h3 class="text-xl font-bold text-white mb-2">IP运营与商业化延展能力</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">不仅能生产内容，也能围绕内容进一步开展 IP 孵化、资源联动与商业价值转化，放大资产效益。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-[#0d0f13] border-y border-gray-800">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <span class="text-secondary font-semibold tracking-wider uppercase text-sm mb-4 block">Talent & Ecosystem</span>
+            <h2 class="text-3xl font-extrabold text-white sm:text-4xl mb-4">不止做内容，也培养下一代内容创作者</h2>
+            <p class="text-xl text-primary mb-8 font-medium">把项目能力、工具能力与商业化能力打通。</p>
+            
+            <div class="glass-card p-10 rounded-3xl relative overflow-hidden border border-gray-700/50 shadow-2xl">
+                <div class="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent"></div>
+                <p class="relative z-10 text-gray-300 text-lg leading-loose mb-8 max-w-3xl mx-auto">
+                    围绕真实项目场景，构建<span class="text-white font-bold px-2 py-1 bg-gray-800 rounded mx-1">编导思维</span> + <span class="text-white font-bold px-2 py-1 bg-gray-800 rounded mx-1">AI工具流</span> + <span class="text-white font-bold px-2 py-1 bg-gray-800 rounded mx-1">数据运营</span>的复合型能力培养体系，帮助创作者掌握从创意到交付的完整链路，并逐步实现从接单创作者到内容创业者的成长跃迁。
+                </p>
+                <a href="#" class="relative z-10 inline-flex items-center px-8 py-3 border border-secondary text-base font-medium rounded-full text-white bg-secondary/10 hover:bg-secondary hover:text-white transition duration-300">
+                    了解培养体系
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-darkBg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-extrabold text-white sm:text-4xl">灵活合作，覆盖全周期需求</h2>
+                <p class="mt-4 text-gray-400">无论是单次项目交付，还是长期深度绑定，我们都能提供匹配的合作方案。</p>
+            </div>
+            
+            <div class="flex flex-wrap justify-center gap-4 md:gap-6">
+                <div class="bg-darkCard px-6 py-4 rounded-xl border border-gray-800 hover:border-primary transition w-full md:w-[calc(33.333%-1rem)] text-center group">
+                    <h4 class="text-white font-bold text-lg mb-2 group-hover:text-primary transition">项目制合作</h4>
+                    <p class="text-gray-500 text-sm">面向单次内容生产需求<br>快速组建交付方案</p>
+                </div>
+                <div class="bg-darkCard px-6 py-4 rounded-xl border border-gray-800 hover:border-secondary transition w-full md:w-[calc(33.333%-1rem)] text-center group">
+                    <h4 class="text-white font-bold text-lg mb-2 group-hover:text-secondary transition">品牌定制合作</h4>
+                    <p class="text-gray-500 text-sm">围绕品牌传播目标<br>定制内容创意与执行</p>
+                </div>
+                <div class="bg-darkCard px-6 py-4 rounded-xl border border-gray-800 hover:border-pink-500 transition w-full md:w-[calc(33.333%-1rem)] text-center group">
+                    <h4 class="text-white font-bold text-lg mb-2 group-hover:text-pink-400 transition">联合出品 / 运营</h4>
+                    <p class="text-gray-500 text-sm">适合 IP 项目、长期内容栏目<br>或持续性运营需求</p>
+                </div>
+                <div class="bg-darkCard px-6 py-4 rounded-xl border border-gray-800 hover:border-cyan-500 transition w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1rem)] text-center group">
+                    <h4 class="text-white font-bold text-lg mb-2 group-hover:text-cyan-400 transition">虚拟偶像合作</h4>
+                    <p class="text-gray-500 text-sm">围绕角色打造、矩阵运营<br>与品牌联动展开</p>
+                </div>
+                <div class="bg-darkCard px-6 py-4 rounded-xl border border-gray-800 hover:border-blue-500 transition w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1rem)] text-center group">
+                    <h4 class="text-white font-bold text-lg mb-2 group-hover:text-blue-400 transition">创作者生态合作</h4>
+                    <p class="text-gray-500 text-sm">围绕培训、孵化、接单<br>共创进行合作拓展</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="py-24 bg-darkCard border-t border-gray-800 relative overflow-hidden">
+        <div class="absolute right-0 bottom-0 w-1/2 h-full opacity-10 pointer-events-none">
+            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#00f2ff" d="M44.7,-76.4C58.8,-69.2,71.8,-59.1,81.3,-46.3C90.8,-33.5,96.7,-18.1,95.5,-3.1C94.3,11.9,86,26.5,76.5,39.6C67,52.7,56.3,64.3,43.3,73.1C30.3,81.9,15.1,87.9,0.3,87.4C-14.5,86.9,-29.1,79.9,-41.8,70.8C-54.5,61.7,-65.4,50.5,-73.4,37.3C-81.4,24.1,-86.6,8.9,-85.4,-5.8C-84.2,-20.5,-76.6,-34.7,-66.6,-46.2C-56.6,-57.7,-44.2,-66.5,-30.9,-73.5C-17.6,-80.5,-3.4,-85.7,11.1,-85.1C25.6,-84.5,40.1,-78.1,44.7,-76.4Z" transform="translate(100 100) scale(1.1)" />
+            </svg>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="md:w-2/3">
+                <h2 class="text-3xl font-extrabold text-white sm:text-4xl mb-6">关于骋风天合</h2>
+                <p class="text-lg text-gray-300 leading-relaxed mb-8">
+                    骋风天合致力于构建<strong class="text-white">“AI+影视”</strong>融合发展的新质生产力体系，集高端影视制作、AIGC智能内容生产、AIGC人才教育与孵化、IP生态运营于一体，持续推动内容生产从传统制作向智能化、工业化、规模化演进。
+                </p>
+                <div class="flex flex-wrap gap-3">
+                    <span class="px-4 py-2 rounded border border-gray-700 bg-black/50 text-gray-300 text-sm flex items-center shadow-inner"><span class="w-2 h-2 rounded-full bg-primary mr-2"></span>影视工业化能力</span>
+                    <span class="px-4 py-2 rounded border border-gray-700 bg-black/50 text-gray-300 text-sm flex items-center shadow-inner"><span class="w-2 h-2 rounded-full bg-secondary mr-2"></span>AIGC全流程制作</span>
+                    <span class="px-4 py-2 rounded border border-gray-700 bg-black/50 text-gray-300 text-sm flex items-center shadow-inner"><span class="w-2 h-2 rounded-full bg-pink-500 mr-2"></span>IP生态运营</span>
+                    <span class="px-4 py-2 rounded border border-gray-700 bg-black/50 text-gray-300 text-sm flex items-center shadow-inner"><span class="w-2 h-2 rounded-full bg-cyan-500 mr-2"></span>人才教育与孵化</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="relative py-24 bg-darkBg text-center overflow-hidden">
+        <div class="absolute inset-0 hero-bg opacity-50"></div>
+        <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-extrabold text-white mb-6">让内容生产更高效，让IP价值更可持续</h2>
+            <p class="text-xl text-gray-400 mb-10">无论你需要项目承接、AIGC创作，还是虚拟偶像 / IP 化运营，我们都可以提供完整的业务支持与合作方案。</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="#" class="px-8 py-4 border border-transparent text-lg font-medium rounded-full text-white bg-gradient-to-r from-primary to-secondary hover:scale-105 transition transform">获取方案</a>
+                <a href="#" class="px-8 py-4 border border-gray-600 text-lg font-medium rounded-full text-white bg-darkCard hover:bg-gray-800 transition">联系我们</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-black py-8 text-center border-t border-gray-900">
+        <p class="text-gray-600 text-sm">© 2024 骋风天合. 保留所有权利.</p>
+    </footer>
+
+</body>
+</html>

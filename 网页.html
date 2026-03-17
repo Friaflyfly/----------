@@ -1,0 +1,395 @@
+import React from "react";
+import { motion } from "framer-motion";
+import {
+  Film,
+  GraduationCap,
+  Briefcase,
+  Sparkles,
+  Layers,
+  Workflow,
+  ShieldCheck,
+  BarChart3,
+  ArrowRight,
+  CheckCircle2,
+  FolderKanban,
+  Users,
+  Clapperboard,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+
+const fadeUp = {
+  initial: { opacity: 0, y: 24 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, amount: 0.2 },
+  transition: { duration: 0.5 },
+};
+
+const features = [
+  {
+    icon: Workflow,
+    title: "全流程协同",
+    desc: "覆盖项目发布、接单、协作、审核、交付、对账等核心环节，推动内容生产流程在线化与标准化。",
+  },
+  {
+    icon: GraduationCap,
+    title: "培训到实训",
+    desc: "打通天合剪辑培训学校与真实项目场景，让学员在平台中完成从学习到实战的自然衔接。",
+  },
+  {
+    icon: Briefcase,
+    title: "接单到就业",
+    desc: "通过平台接单、作品沉淀、项目协作与过程评价，形成更可落地的就业转化路径。",
+  },
+  {
+    icon: Sparkles,
+    title: "AI持续赋能",
+    desc: "在协同底座成熟后，逐步接入AIGC创作工具与多模态能力，实现人机协同生产。",
+  },
+];
+
+const architecture = [
+  {
+    title: "底层资产平台",
+    desc: "统一管理素材、脚本、成片、工程文件，以及提示词、参数、素材包等过程资产。",
+    bullets: ["数字资产沉淀", "版本追溯", "权限控制", "审计留痕"],
+    icon: Layers,
+  },
+  {
+    title: "中间双平台",
+    desc: "一期先建设接单分发与交付平台，二期逐步建设AIGC创作工具平台。",
+    bullets: ["项目大厅", "项目协同", "审核验收", "创作工具"],
+    icon: FolderKanban,
+  },
+  {
+    title: "顶层能力开放",
+    desc: "在数据、治理和规则成熟后，逐步探索更高阶的内容与能力开放。",
+    bullets: ["阶段性推进", "治理先行", "稳步扩展", "能力复用"],
+    icon: ShieldCheck,
+  },
+];
+
+const flow = [
+  { title: "培训学习", subtitle: "课程训练与基础能力培养", icon: GraduationCap },
+  { title: "平台实训", subtitle: "进入真实项目场景参与协作", icon: Users },
+  { title: "接单交付", subtitle: "完成内容生产、审核与验收", icon: Clapperboard },
+  { title: "就业转化", subtitle: "沉淀作品经验，提升岗位适配", icon: Briefcase },
+];
+
+const modules = [
+  "项目大厅 / 榜单",
+  "项目详情与接单",
+  "项目协同空间",
+  "素材下载与成品上传",
+  "审核与验收",
+  "收益看板与账本管理",
+  "后台运营管理",
+  "AIGC能力接入（规划中）",
+];
+
+const metrics = [
+  { label: "业务定位", value: "内容生产平台" },
+  { label: "核心特色", value: "培训-实训-就业一体化" },
+  { label: "建设阶段", value: "一期闭环建设中" },
+  { label: "未来方向", value: "AI协同创作升级" },
+];
+
+export default function TianheContentPlatformWebsite() {
+  return (
+    <div className="min-h-screen bg-white text-slate-900">
+      <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-sm">
+              <Film className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="text-sm font-medium text-slate-500">Tianhe</div>
+              <div className="text-base font-semibold">天合内容生产平台</div>
+            </div>
+          </div>
+          <nav className="hidden items-center gap-6 text-sm text-slate-600 md:flex">
+            <a href="#overview" className="transition hover:text-slate-900">项目概述</a>
+            <a href="#value" className="transition hover:text-slate-900">核心价值</a>
+            <a href="#architecture" className="transition hover:text-slate-900">平台架构</a>
+            <a href="#roadmap" className="transition hover:text-slate-900">建设路径</a>
+          </nav>
+          <Button className="rounded-2xl">申请演示</Button>
+        </div>
+      </header>
+
+      <main>
+        <section className="relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-slate-100" />
+          <div className="relative mx-auto grid max-w-7xl gap-10 px-6 py-16 lg:grid-cols-[1.1fr_0.9fr] lg:px-8 lg:py-24">
+            <motion.div {...fadeUp}>
+              <Badge className="mb-5 rounded-full px-4 py-1.5 text-sm">数字内容生产 × 人才转化 × AI赋能</Badge>
+              <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-slate-950 md:text-5xl lg:text-6xl">
+                面向数字内容产业的
+                <span className="block">一体化协同平台</span>
+              </h1>
+              <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
+                天合内容生产平台聚焦短剧剪辑与数字内容生产场景，打通培训、实训、接单、交付与就业转化，推动内容生产从人工分散管理走向在线化、标准化、可追溯协同。
+              </p>
+              <div className="mt-8 flex flex-wrap gap-4">
+                <Button size="lg" className="rounded-2xl px-6">
+                  预约现场演示
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+                <Button size="lg" variant="outline" className="rounded-2xl px-6">
+                  查看平台架构
+                </Button>
+              </div>
+              <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                {metrics.map((item) => (
+                  <Card key={item.label} className="rounded-2xl border-slate-200 shadow-sm">
+                    <CardContent className="p-5">
+                      <div className="text-sm text-slate-500">{item.label}</div>
+                      <div className="mt-2 text-base font-semibold text-slate-900">{item.value}</div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </motion.div>
+
+            <motion.div {...fadeUp} className="lg:pl-8">
+              <Card className="overflow-hidden rounded-[28px] border-slate-200 shadow-xl shadow-slate-200/60">
+                <div className="border-b border-slate-200 bg-slate-50 px-6 py-4">
+                  <div className="flex items-center gap-2 text-sm text-slate-500">
+                    <div className="h-2.5 w-2.5 rounded-full bg-slate-300" />
+                    <div className="h-2.5 w-2.5 rounded-full bg-slate-300" />
+                    <div className="h-2.5 w-2.5 rounded-full bg-slate-300" />
+                    <span className="ml-2">平台展示示意</span>
+                  </div>
+                </div>
+                <CardContent className="space-y-5 p-6">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="rounded-2xl border border-slate-200 p-4">
+                      <div className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-700">
+                        <FolderKanban className="h-4 w-4" />
+                        项目大厅
+                      </div>
+                      <div className="space-y-2">
+                        <div className="rounded-xl bg-slate-100 p-3 text-sm text-slate-600">抢单 / 报名 / 项目标签</div>
+                        <div className="rounded-xl bg-slate-100 p-3 text-sm text-slate-600">预算 / 周期 / 集数 / 难度</div>
+                      </div>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 p-4">
+                      <div className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-700">
+                        <BarChart3 className="h-4 w-4" />
+                        经营看板
+                      </div>
+                      <div className="space-y-2">
+                        <div className="rounded-xl bg-slate-100 p-3 text-sm text-slate-600">项目进度可视</div>
+                        <div className="rounded-xl bg-slate-100 p-3 text-sm text-slate-600">收益与账本管理</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="rounded-3xl bg-slate-900 p-5 text-white">
+                    <div className="flex items-center gap-2 text-sm text-slate-300">
+                      <Sparkles className="h-4 w-4" />
+                      二期规划能力
+                    </div>
+                    <div className="mt-3 text-xl font-semibold">AIGC创作协同平台</div>
+                    <div className="mt-2 text-sm leading-7 text-slate-300">
+                      接入多模态模型，沉淀提示词、参数与过程资产，逐步实现人机协同生产。
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+        </section>
+
+        <section id="overview" className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+          <motion.div {...fadeUp} className="max-w-3xl">
+            <Badge variant="outline" className="rounded-full px-4 py-1.5">项目概述</Badge>
+            <h2 className="mt-4 text-3xl font-semibold tracking-tight">不是单点工具，而是内容生产与人才转化的综合平台</h2>
+            <p className="mt-4 text-lg leading-8 text-slate-600">
+              平台以数字内容生产场景为核心，围绕项目发布、接单、协同、审核、交付、对账等环节，建设可管理、可协同、可沉淀的平台能力；同时结合天合剪辑培训学校，形成从培训学习到平台实训、从真实接单到就业转化的闭环路径。
+            </p>
+          </motion.div>
+
+          <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4" id="value">
+            {features.map((feature) => {
+              const Icon = feature.icon;
+              return (
+                <motion.div key={feature.title} {...fadeUp}>
+                  <Card className="h-full rounded-[24px] border-slate-200 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+                    <CardHeader>
+                      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-white">
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <CardTitle className="text-xl">{feature.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="leading-7 text-slate-600">{feature.desc}</p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="bg-slate-50 py-16">
+          <div className="mx-auto max-w-7xl px-6 lg:px-8">
+            <motion.div {...fadeUp} className="max-w-3xl">
+              <Badge variant="outline" className="rounded-full px-4 py-1.5">特色模式</Badge>
+              <h2 className="mt-4 text-3xl font-semibold tracking-tight">培训 - 实训 - 接单 - 就业，一条路径贯通</h2>
+              <p className="mt-4 text-lg leading-8 text-slate-600">
+                依托天合剪辑培训学校与平台协同能力，将课程学习、项目实践、作品沉淀与就业承接打通，提升人才培养的实战性与岗位适配度。
+              </p>
+            </motion.div>
+
+            <div className="mt-10 grid gap-4 md:grid-cols-4">
+              {flow.map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <motion.div key={item.title} {...fadeUp} transition={{ duration: 0.5, delay: index * 0.06 }}>
+                    <Card className="relative h-full rounded-[24px] border-slate-200 shadow-sm">
+                      <CardContent className="p-6">
+                        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+                          <Icon className="h-5 w-5 text-slate-900" />
+                        </div>
+                        <div className="text-sm text-slate-400">0{index + 1}</div>
+                        <div className="mt-1 text-xl font-semibold">{item.title}</div>
+                        <p className="mt-2 leading-7 text-slate-600">{item.subtitle}</p>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section id="architecture" className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+          <motion.div {...fadeUp} className="max-w-3xl">
+            <Badge variant="outline" className="rounded-full px-4 py-1.5">平台架构</Badge>
+            <h2 className="mt-4 text-3xl font-semibold tracking-tight">三层架构支撑分阶段建设</h2>
+            <p className="mt-4 text-lg leading-8 text-slate-600">
+              以资产沉淀为基础，以业务闭环为抓手，以能力开放为长期方向，先做闭环，再做扩展，逐步形成面向数字内容生产的长期平台能力。
+            </p>
+          </motion.div>
+
+          <div className="mt-10 grid gap-6 lg:grid-cols-3">
+            {architecture.map((item) => {
+              const Icon = item.icon;
+              return (
+                <motion.div key={item.title} {...fadeUp}>
+                  <Card className="h-full rounded-[28px] border-slate-200 shadow-sm">
+                    <CardHeader>
+                      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-white">
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <CardTitle className="text-2xl">{item.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="leading-7 text-slate-600">{item.desc}</p>
+                      <div className="mt-5 flex flex-wrap gap-2">
+                        {item.bullets.map((bullet) => (
+                          <Badge key={bullet} variant="secondary" className="rounded-full px-3 py-1">
+                            {bullet}
+                          </Badge>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="bg-slate-950 py-16 text-white">
+          <div className="mx-auto max-w-7xl px-6 lg:px-8">
+            <motion.div {...fadeUp} className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+              <div>
+                <Badge className="rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-white">一期建设重点</Badge>
+                <h2 className="mt-4 text-3xl font-semibold tracking-tight">先跑通业务闭环，再逐步叠加AI能力</h2>
+                <p className="mt-4 text-lg leading-8 text-slate-300">
+                  当前阶段优先建设项目协同、审核验收、收益管理与后台运营能力，不急于做大而全，先把流程、数据和治理能力沉淀扎实。
+                </p>
+              </div>
+              <Card className="rounded-[28px] border-white/10 bg-white/5 text-white shadow-none backdrop-blur">
+                <CardContent className="grid gap-3 p-6 sm:grid-cols-2">
+                  {modules.map((module) => (
+                    <div key={module} className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">
+                      <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" />
+                      <span className="text-sm leading-6 text-slate-200">{module}</span>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+        </section>
+
+        <section id="roadmap" className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+          <motion.div {...fadeUp} className="max-w-3xl">
+            <Badge variant="outline" className="rounded-full px-4 py-1.5">建设路径</Badge>
+            <h2 className="mt-4 text-3xl font-semibold tracking-tight">分阶段推进，稳步升级</h2>
+          </motion.div>
+
+          <div className="mt-10 grid gap-6 lg:grid-cols-3">
+            {[
+              {
+                phase: "一期",
+                title: "业务闭环建设",
+                desc: "聚焦接单、交付、审核、对账等核心流程，先在可控场景中跑通业务与数据闭环。",
+              },
+              {
+                phase: "二期",
+                title: "AIGC创作协同",
+                desc: "接入多模态模型与创作工具，沉淀提示词、参数、素材包等过程资产。",
+              },
+              {
+                phase: "三期",
+                title: "能力拓展与开放",
+                desc: "在治理、数据和规则成熟基础上，逐步扩展更高阶的平台协同与能力开放。",
+              },
+            ].map((item, index) => (
+              <motion.div key={item.phase} {...fadeUp} transition={{ duration: 0.5, delay: index * 0.06 }}>
+                <Card className="h-full rounded-[28px] border-slate-200 shadow-sm">
+                  <CardContent className="p-6">
+                    <div className="text-sm font-medium text-slate-500">{item.phase}</div>
+                    <div className="mt-2 text-2xl font-semibold">{item.title}</div>
+                    <p className="mt-3 leading-7 text-slate-600">{item.desc}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        <section className="px-6 pb-20 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <motion.div
+              {...fadeUp}
+              className="overflow-hidden rounded-[32px] bg-gradient-to-br from-slate-900 to-slate-700 px-8 py-10 text-white shadow-xl"
+            >
+              <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+                <div>
+                  <h2 className="text-3xl font-semibold tracking-tight">欢迎了解天合内容生产平台</h2>
+                  <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-200">
+                    以内容生产平台为底座，以培训学校为人才入口，以真实项目为实训载体，以平台接单为就业通道，构建数字内容生产与人才转化的一体化体系。
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-4">
+                  <Button size="lg" variant="secondary" className="rounded-2xl px-6 text-slate-900">
+                    联系我们
+                  </Button>
+                  <Button size="lg" variant="outline" className="rounded-2xl border-white/30 bg-transparent px-6 text-white hover:bg-white/10">
+                    查看演示
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}

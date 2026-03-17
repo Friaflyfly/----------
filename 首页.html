@@ -1,0 +1,507 @@
+import React from "react";
+import { motion } from "framer-motion";
+import {
+  Film,
+  Sparkles,
+  Cpu,
+  GraduationCap,
+  Clapperboard,
+  Rocket,
+  Building2,
+  BadgeCheck,
+  PlayCircle,
+  ArrowRight,
+  Globe,
+  Layers3,
+  Wand2,
+  Users,
+} from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+
+const stats = [
+  { value: "300%", label: "内容生产效率提升" },
+  { value: "60%", label: "综合制作成本降低" },
+  { value: "4大", label: "核心生态能力模块" },
+  { value: "全流程", label: "AIGC内容制作覆盖" },
+];
+
+const pillars = [
+  {
+    icon: Cpu,
+    title: "技术底座自主可控",
+    desc: "以高性能算力集群、垂类模型训练能力与场景化应用优化体系为核心，打通从底层算力到内容应用的全栈能力。",
+  },
+  {
+    icon: Film,
+    title: "AI+影视全流程生产",
+    desc: "覆盖剧本智能生成、角色与场景构建、动态影像合成、特效制作、宣传物料产出等关键环节。",
+  },
+  {
+    icon: GraduationCap,
+    title: "人才教育与孵化体系",
+    desc: "围绕编导思维、AI工具流与数据运营能力，培养兼具创意与技术的下一代内容创作者。",
+  },
+  {
+    icon: Rocket,
+    title: "内容变现与生态运营",
+    desc: "贯通创作、孵化、分发与商业变现链路，形成可复制、可规模化的内容产业生态。",
+  },
+];
+
+const capabilities = [
+  {
+    title: "算力底座",
+    subtitle: "高性能资源支撑 AI 内容工业化生产",
+    points: ["高性能算力集群", "垂类模型训练与优化", "内容生成任务调度"],
+  },
+  {
+    title: "智能创作工具",
+    subtitle: "让剧本、镜头、特效与成片生产更高效",
+    points: ["剧本智能生成", "角色/场景精准构建", "动态影像与特效合成"],
+  },
+  {
+    title: "人才孵化体系",
+    subtitle: "构建 AI 时代的影视人才供给能力",
+    points: ["项目实战教学", "创作方法论沉淀", "创作者成长体系"],
+  },
+  {
+    title: "商业变现通路",
+    subtitle: "形成从内容生产到市场转化的闭环",
+    points: ["平台分发与传播", "IP 孵化与运营", "品牌与产业合作"],
+  },
+];
+
+const works = [
+  {
+    category: "AI剧集",
+    title: "《坐标》",
+    desc: "国内首部无真人出镜、无实景拍摄、无动捕的纯 AIGC 剧集，探索历史叙事与 AI 影像表达的新边界。",
+  },
+  {
+    category: "综艺衍生短片",
+    title: "中餐厅 AI 江湖大片",
+    desc: "面向头部综艺 IP 的衍生内容创作，以 AI 方式提升内容延展速度与视觉新鲜感。",
+  },
+  {
+    category: "创意短片",
+    title: "《无二心》/《子弹情书》",
+    desc: "以更低制作门槛完成高概念视觉表达，验证 AI 在创意短片制作中的商业效率。",
+  },
+  {
+    category: "企业宣传片",
+    title: "品牌定制宣传内容",
+    desc: "服务酒业、烟草、互联网峰会、城市品牌等多个场景，实现高质高效的视频内容交付。",
+  },
+  {
+    category: "AI漫剧",
+    title: "漫画与动态影像融合",
+    desc: "围绕 AI 漫剧、虚拟场景与特效表达，打造更适合年轻用户传播的内容形式。",
+  },
+  {
+    category: "MV / 片头 / 中插",
+    title: "多类型工业化制作",
+    desc: "覆盖艺人 MV、节目片头、综艺中插短片等多元业务，验证影视工业经验与 AI 工具链协同能力。",
+  },
+];
+
+const scenarios = [
+  {
+    icon: Building2,
+    title: "文旅宣传",
+    desc: "用 AI 提升城市名片、景区推广与文化内容传播效率。",
+  },
+  {
+    icon: Sparkles,
+    title: "品牌营销",
+    desc: "面向品牌广告、商业短片与活动传播，快速生产更具话题性的视觉内容。",
+  },
+  {
+    icon: Clapperboard,
+    title: "影视内容创新",
+    desc: "从短剧、漫剧到综艺衍生内容，探索新叙事和新制作模式。",
+  },
+  {
+    icon: Users,
+    title: "人才培养与就业",
+    desc: "将项目实践与教学结合，形成创作训练、接单成长与产业输送能力。",
+  },
+];
+
+const timeline = [
+  {
+    step: "01",
+    title: "AI剧本孵化",
+    desc: "基于题材方向与商业场景，完成创意提炼、内容设定与前期策划。",
+  },
+  {
+    step: "02",
+    title: "智能生产制作",
+    desc: "通过 AI 工具链完成角色、场景、镜头、特效与视觉包装的高效生成。",
+  },
+  {
+    step: "03",
+    title: "精品成片交付",
+    desc: "融合影视工业经验与审美标准，确保输出内容具备传播与商业价值。",
+  },
+  {
+    step: "04",
+    title: "分发与生态运营",
+    desc: "通过平台分发、IP 联动与商业合作，完成内容价值的持续放大。",
+  },
+];
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0 },
+};
+
+export default function ChengfengTianheWebsite() {
+  return (
+    <div className="min-h-screen bg-slate-950 text-white">
+      <section className="relative overflow-hidden border-b border-white/10">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.18),transparent_30%),radial-gradient(circle_at_top_right,rgba(168,85,247,0.18),transparent_28%),radial-gradient(circle_at_bottom,rgba(16,185,129,0.12),transparent_35%)]" />
+        <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:40px_40px]" />
+
+        <div className="relative mx-auto max-w-7xl px-6 py-20 md:px-8 md:py-28">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            transition={{ duration: 0.5 }}
+            className="max-w-4xl"
+          >
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-1.5 text-sm text-cyan-100">
+              <BadgeCheck className="h-4 w-4" />
+              AI+影视融合发展的新质生产力平台
+            </div>
+            <h1 className="max-w-5xl text-4xl font-semibold leading-tight md:text-6xl md:leading-[1.1]">
+              骋风天合
+              <span className="block bg-gradient-to-r from-cyan-300 via-blue-300 to-violet-300 bg-clip-text text-transparent">
+                用 AI 重构影视内容生产与产业生态
+              </span>
+            </h1>
+            <p className="mt-6 max-w-3xl text-base leading-8 text-slate-300 md:text-lg">
+              集高端影视制作、AIGC 智能内容生产、AIGC 人才教育与孵化、IP 生态运营于一体，
+              以“算力底座—智能创作工具—人才孵化体系—商业变现通路”构建完整产业能力闭环。
+            </p>
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Button className="rounded-2xl px-6 py-6 text-base">
+                查看合作方向
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                className="rounded-2xl border-white/20 bg-white/5 px-6 py-6 text-base text-white hover:bg-white/10"
+              >
+                <PlayCircle className="mr-2 h-4 w-4" />
+                浏览代表作品
+              </Button>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="mt-12 grid gap-4 md:mt-16 md:grid-cols-4"
+          >
+            {stats.map((item) => (
+              <Card key={item.label} className="rounded-3xl border-white/10 bg-white/5 backdrop-blur">
+                <CardContent className="p-6">
+                  <div className="text-3xl font-semibold text-white">{item.value}</div>
+                  <div className="mt-2 text-sm leading-6 text-slate-300">{item.label}</div>
+                </CardContent>
+              </Card>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 py-18 md:px-8 md:py-24">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={fadeUp}
+          transition={{ duration: 0.5 }}
+          className="mb-10 flex flex-col gap-4 md:mb-14 md:flex-row md:items-end md:justify-between"
+        >
+          <div>
+            <p className="text-sm uppercase tracking-[0.2em] text-cyan-300">About</p>
+            <h2 className="mt-3 text-3xl font-semibold md:text-4xl">公司定位</h2>
+          </div>
+          <p className="max-w-3xl text-sm leading-7 text-slate-300 md:text-base">
+            骋风天合致力于打造面向未来的 AI 内容工业平台，不只是做单点工具，而是构建一套从创意、制作、人才到商业化的持续增长系统。
+          </p>
+        </motion.div>
+
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          {pillars.map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <motion.div
+                key={item.title}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.15 }}
+                variants={fadeUp}
+                transition={{ duration: 0.45, delay: index * 0.08 }}
+              >
+                <Card className="h-full rounded-3xl border-white/10 bg-slate-900/70">
+                  <CardContent className="p-6">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-300">
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <h3 className="mt-5 text-xl font-medium">{item.title}</h3>
+                    <p className="mt-3 text-sm leading-7 text-slate-300">{item.desc}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="border-y border-white/10 bg-white/5">
+        <div className="mx-auto max-w-7xl px-6 py-18 md:px-8 md:py-24">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={fadeUp}
+            transition={{ duration: 0.5 }}
+            className="mb-12"
+          >
+            <p className="text-sm uppercase tracking-[0.2em] text-violet-300">Ecosystem</p>
+            <h2 className="mt-3 text-3xl font-semibold md:text-4xl">四大能力模块</h2>
+          </motion.div>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            {capabilities.map((item, index) => (
+              <motion.div
+                key={item.title}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                variants={fadeUp}
+                transition={{ duration: 0.45, delay: index * 0.08 }}
+              >
+                <Card className="rounded-3xl border-white/10 bg-slate-950/70">
+                  <CardContent className="p-7">
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <h3 className="text-2xl font-medium">{item.title}</h3>
+                        <p className="mt-2 text-sm text-slate-400">{item.subtitle}</p>
+                      </div>
+                      <Layers3 className="h-8 w-8 text-violet-300" />
+                    </div>
+                    <div className="mt-6 space-y-3">
+                      {item.points.map((point) => (
+                        <div
+                          key={point}
+                          className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200"
+                        >
+                          {point}
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 py-18 md:px-8 md:py-24">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={fadeUp}
+          transition={{ duration: 0.5 }}
+          className="mb-12 flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
+        >
+          <div>
+            <p className="text-sm uppercase tracking-[0.2em] text-cyan-300">Works</p>
+            <h2 className="mt-3 text-3xl font-semibold md:text-4xl">代表作品与案例方向</h2>
+          </div>
+          <p className="max-w-3xl text-sm leading-7 text-slate-300 md:text-base">
+            官网此处建议后续替换为真实海报、剧照、视频封面与案例数据；当前先保留为结构化展示位，便于后续交付开发。
+          </p>
+        </motion.div>
+
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {works.map((item, index) => (
+            <motion.div
+              key={item.title}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              variants={fadeUp}
+              transition={{ duration: 0.45, delay: index * 0.06 }}
+            >
+              <Card className="overflow-hidden rounded-3xl border-white/10 bg-slate-900/70">
+                <div className="flex aspect-[16/10] items-center justify-center bg-[linear-gradient(135deg,rgba(34,211,238,0.12),rgba(99,102,241,0.14),rgba(236,72,153,0.12))]">
+                  <div className="flex flex-col items-center text-slate-200">
+                    <PlayCircle className="h-10 w-10" />
+                    <span className="mt-3 text-sm">案例封面 / 视频占位</span>
+                  </div>
+                </div>
+                <CardContent className="p-6">
+                  <div className="text-sm text-cyan-300">{item.category}</div>
+                  <h3 className="mt-2 text-xl font-medium">{item.title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-slate-300">{item.desc}</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-y border-white/10 bg-gradient-to-b from-slate-900 to-slate-950">
+        <div className="mx-auto max-w-7xl px-6 py-18 md:px-8 md:py-24">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={fadeUp}
+            transition={{ duration: 0.5 }}
+            className="mb-12"
+          >
+            <p className="text-sm uppercase tracking-[0.2em] text-violet-300">Process</p>
+            <h2 className="mt-3 text-3xl font-semibold md:text-4xl">从创意到商业化的全链路路径</h2>
+          </motion.div>
+
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+            {timeline.map((item, index) => (
+              <motion.div
+                key={item.step}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                variants={fadeUp}
+                transition={{ duration: 0.45, delay: index * 0.08 }}
+              >
+                <Card className="h-full rounded-3xl border-white/10 bg-white/5">
+                  <CardContent className="p-6">
+                    <div className="text-sm tracking-[0.25em] text-cyan-300">STEP {item.step}</div>
+                    <h3 className="mt-4 text-2xl font-medium">{item.title}</h3>
+                    <p className="mt-3 text-sm leading-7 text-slate-300">{item.desc}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 py-18 md:px-8 md:py-24">
+        <div className="grid gap-8 xl:grid-cols-[1.15fr_0.85fr]">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={fadeUp}
+            transition={{ duration: 0.5 }}
+          >
+            <p className="text-sm uppercase tracking-[0.2em] text-cyan-300">Scenarios</p>
+            <h2 className="mt-3 text-3xl font-semibold md:text-4xl">应用场景</h2>
+            <div className="mt-8 grid gap-5 md:grid-cols-2">
+              {scenarios.map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <Card key={item.title} className="rounded-3xl border-white/10 bg-slate-900/70">
+                    <CardContent className="p-6">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-violet-400/10 text-violet-300">
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <h3 className="mt-4 text-xl font-medium">{item.title}</h3>
+                      <p className="mt-3 text-sm leading-7 text-slate-300">{item.desc}</p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={fadeUp}
+            transition={{ duration: 0.55 }}
+          >
+            <Card className="h-full rounded-[32px] border-white/10 bg-[linear-gradient(180deg,rgba(34,211,238,0.08),rgba(255,255,255,0.02))]">
+              <CardContent className="p-8">
+                <div className="flex items-center gap-3 text-cyan-300">
+                  <Wand2 className="h-5 w-5" />
+                  <span className="text-sm uppercase tracking-[0.2em]">Why Us</span>
+                </div>
+                <h3 className="mt-5 text-3xl font-semibold leading-tight">
+                  影视工业能力 × 生成式 AI 技术 × 产业生态整合
+                </h3>
+                <div className="mt-8 space-y-4">
+                  {[
+                    "核心团队具备一线影视内容制作与大型平台项目经验",
+                    "拥有 AI 内容生产平台与方法论沉淀，适合规模化复制",
+                    "具备教学、孵化、分发、合作等多元生态连接能力",
+                    "可面向文旅、品牌、综艺、短剧、宣传片等多类场景快速落地",
+                  ].map((item) => (
+                    <div
+                      key={item}
+                      className="rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-4 text-sm leading-7 text-slate-200"
+                    >
+                      {item}
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-8 rounded-3xl border border-cyan-300/20 bg-cyan-400/10 p-5">
+                  <div className="flex items-center gap-3 text-cyan-100">
+                    <Globe className="h-5 w-5" />
+                    <span className="font-medium">未来方向</span>
+                  </div>
+                  <p className="mt-3 text-sm leading-7 text-slate-200">
+                    持续深化“AI剧本孵化—精品制作—全国分发—生态运营”全链路建设，推动中国原创故事以更智能、更工业化、更国际化的方式走向市场。
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="border-t border-white/10 bg-white/5">
+        <div className="mx-auto max-w-7xl px-6 py-18 md:px-8 md:py-20">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={fadeUp}
+            transition={{ duration: 0.5 }}
+            className="rounded-[36px] border border-white/10 bg-[linear-gradient(135deg,rgba(34,211,238,0.14),rgba(59,130,246,0.12),rgba(168,85,247,0.12))] p-8 md:p-12"
+          >
+            <div className="max-w-4xl">
+              <p className="text-sm uppercase tracking-[0.2em] text-cyan-100">Contact / Cooperation</p>
+              <h2 className="mt-4 text-3xl font-semibold md:text-5xl">让 AI 内容生产真正走向产业化与规模化</h2>
+              <p className="mt-5 max-w-3xl text-sm leading-7 text-slate-100 md:text-base">
+                建议此区域后续接入：商务合作入口、作品集下载、宣传片播放、课程咨询与人才合作表单，形成官网对外转化闭环。
+              </p>
+              <div className="mt-8 flex flex-wrap gap-4">
+                <Button className="rounded-2xl px-6 py-6 text-base">立即咨询合作</Button>
+                <Button
+                  variant="outline"
+                  className="rounded-2xl border-white/20 bg-white/10 px-6 py-6 text-base text-white hover:bg-white/15"
+                >
+                  下载公司介绍
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    </div>
+  );
+}
