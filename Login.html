@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录 - 天合短剧剪辑接单平台</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.css">
+  <style>
+    body { margin: 0; padding: 0; }
+    .loginPage {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+    }
+    .loginHeader { text-align: center; margin-bottom: 32px; }
+    .loginLogo { font-size: 28px; font-weight: 700; color: #fff; text-decoration: none; display: block; margin-bottom: 6px; }
+    .loginSub { color: rgba(255,255,255,.8); font-size: 14px; }
+    .loginCard {
+      background: #fff; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,.18);
+      padding: 36px 40px 28px; width: 100%; max-width: 420px;
+    }
+    .loginTitle { font-size: 22px; font-weight: 700; color: #262626; margin-bottom: 24px; text-align: center; }
+    .loginFooter { text-align: center; margin-top: 20px; display: flex; justify-content: center; gap: 24px; }
+    .loginFooter a { color: rgba(255,255,255,.85); text-decoration: underline; font-size: 14px; }
+    .codeBtn { height: 40px; }
+    .forgotRow { display: flex; justify-content: flex-end; margin-top: -8px; margin-bottom: 16px; }
+    .forgotRow a { font-size: 13px; color: #667eea; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useRef, useEffect } = React;
+    const { Form, Input, Button, Tabs, message, Modal } = antd;
+
+    const Login = () => {
+      const [loginMode, setLoginMode] = useState('code');
+      const [form] = Form.useForm();
+      const [submitting, setSubmitting] = useState(false);
+      const [countdown, setCountdown] = useState(0);
+      const timerRef = useRef(null);
+
+      // 忘记密码弹窗
+      const [resetVisible, setResetVisible] = useState(false);
+      const [resetForm] = Form.useForm();
+      const [resetCountdown, setResetCountdown] = useState(0);
+      const resetTimerRef = useRef(null);
+
+      useEffect(() => { return () => { clearInterval(timerRef.current); clearInterval(resetTimerRef.current); }; }, []);
+
+      const startCountdown = (setter, ref) => {
+        setter(60);
+        clearInterval(ref.current);
+        ref.current = setInterval(() => {
+          setter(prev => {
+            if (prev <= 1) { clearInterval(ref.current); return 0; }
+            return prev - 1;
+          });
+        }, 1000);
+      };
+
+      const handleSendCode = () => {
+        const phone = form.getFieldValue('phone');
+        if (!phone || !/^1\d{10}$/.test(phone)) {
+          message.warning('请输入正确的手机号');
+          return;
+        }
+        startCountdown(setCountdown, timerRef);
+        message.success('验证码已发送（测试验证码：123456）');
+      };
+
+      const findUser = (phone) => {
+        const talent = JSON.parse(localStorage.getItem('talentPool') || '[]');
+        return talent.find(t => t.phone === phone);
+      };
+
+      const findPassword = (phone) => {
+        const pending = JSON.parse(localStorage.getItem('pendingStudents') || '[]');
+        const reg = pending.find(p => p.phone === phone);
+        return reg ? reg.password : null;
+      };
+
+      const doLogin = (user) => {
+        if (user.status === 'Paused') {
+          message.error('账号已暂停，请联系运营');
+          return;
+        }
+        if (user.status === 'Frozen') {
+          message.error('账号已冻结，请联系运营');
+          return;
+        }
+        if (user.status === 'Exited') {
+          message.error('账号已退出，无法登录');
+          return;
+        }
+        localStorage.setItem('currentUser', JSON.stringify({
+          id: user.id,
+          phone: user.phone,
+          nickname: user.nickname,
+          takerRole: user.takerRole,
+          status: user.status,
+          loginTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+        }));
+        message.success('登录成功，即将跳转...');
+        setTimeout(() => { window.location.href = 'Home.html'; }, 1200);
+      };
+
+      const handleLogin = () => {
+        form.validateFields().then(values => {
+          setSubmitting(true);
+          const user = findUser(values.phone);
+
+          if (!user) {
+            message.error('该手机号未注册或未通过审核，请先注册入驻');
+            setSubmitting(false);
+            return;
+          }
+
+          if (loginMode === 'code') {
+            if (values.code !== '123456') {
+              message.error('验证码错误（测试验证码：123456）');
+              setSubmitting(false);
+              return;
+            }
+            doLogin(user);
+          } else {
+            const savedPwd = findPassword(values.phone);
+            if (!savedPwd) {
+              message.error('未找到密码记录，请使用验证码登录');
+              setSubmitting(false);
+              return;
+            }
+            if (values.password !== savedPwd) {
+              message.error('密码错误');
+              setSubmitting(false);
+              return;
+            }
+            doLogin(user);
+          }
+          setSubmitting(false);
+        }).catch(() => {});
+      };
+
+      // 忘记密码
+      const handleResetSendCode = () => {
+        const phone = resetForm.getFieldValue('phone');
+        if (!phone || !/^1\d{10}$/.test(phone)) {
+          message.warning('请输入正确的手机号');
+          return;
+        }
+        startCountdown(setResetCountdown, resetTimerRef);
+        message.success('验证码已发送（测试验证码：123456）');
+      };
+
+      const handleResetSubmit = () => {
+        resetForm.validateFields().then(values => {
+          if (values.code !== '123456') {
+            message.error('验证码错误（测试验证码：123456）');
+            return;
+          }
+          const pending = JSON.parse(localStorage.getItem('pendingStudents') || '[]');
+          const idx = pending.findIndex(p => p.phone === values.phone);
+          if (idx === -1) {
+            message.error('该手机号未注册');
+            return;
+          }
+          pending[idx].password = values.newPassword;
+          localStorage.setItem('pendingStudents', JSON.stringify(pending));
+          message.success('密码已重置，请重新登录');
+          setResetVisible(false);
+          resetForm.resetFields();
+        }).catch(() => {});
+      };
+
+      const tabItems = [
+        { key: 'code', label: '验证码登录' },
+        { key: 'password', label: '密码登录' },
+      ];
+
+      return (
+        <div className="loginPage">
+          <div className="loginHeader">
+            <a href="Home.html" className="loginLogo">🎬 天合短剧剪辑接单平台</a>
+            <div className="loginSub">专业的短剧剪辑接单平台</div>
+          </div>
+
+          <div className="loginCard">
+            <div className="loginTitle">登录</div>
+
+            <Tabs
+              activeKey={loginMode}
+              onChange={(k) => { setLoginMode(k); form.resetFields(['code', 'password']); }}
+              centered
+              items={tabItems}
+            />
+
+            <Form form={form} layout="vertical" style={{ marginTop: 8 }}>
+              <Form.Item name="phone" label="手机号" rules={[{ required: true, message: '请输入手机号' }, { pattern: /^1\d{10}$/, message: '请输入正确的手机号' }]}>
+                <Input placeholder="请输入手机号" maxLength={11} size="large" />
+              </Form.Item>
+
+              {loginMode === 'code' && (
+                <Form.Item name="code" label="验证码" rules={[{ required: true, message: '请输入验证码' }, { len: 6, message: '验证码为6位' }]}>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <Input placeholder="6位验证码" maxLength={6} size="large" style={{ flex: 1 }} />
+                    <Button
+                      className="codeBtn"
+                      size="large"
+                      disabled={countdown > 0}
+                      onClick={handleSendCode}
+                      style={{ width: 130, flexShrink: 0 }}
+                    >
+                      {countdown > 0 ? `${countdown}s 后重发` : '获取验证码'}
+                    </Button>
+                  </div>
+                </Form.Item>
+              )}
+
+              {loginMode === 'password' && (
+                <>
+                  <Form.Item name="password" label="密码" rules={[{ required: true, message: '请输入密码' }]}>
+                    <Input.Password placeholder="请输入密码" size="large" />
+                  </Form.Item>
+                  <div className="forgotRow">
+                    <a href="#" onClick={(e) => { e.preventDefault(); setResetVisible(true); resetForm.resetFields(); }}>忘记密码？</a>
+                  </div>
+                </>
+              )}
+
+              <Button
+                type="primary"
+                block
+                size="large"
+                loading={submitting}
+                onClick={handleLogin}
+                style={{ height: 46, fontWeight: 600, fontSize: 16, borderRadius: 8, background: '#667eea', marginTop: 8 }}
+              >
+                登录
+              </Button>
+            </Form>
+
+            <div style={{ textAlign: 'center', marginTop: 20 }}>
+              <span style={{ color: '#8c8c8c', fontSize: 14 }}>还没有账号？</span>
+              <a href="Register.html" style={{ color: '#667eea', fontWeight: 600, fontSize: 14, marginLeft: 6 }}>立即注册</a>
+            </div>
+          </div>
+
+          <div className="loginFooter">
+            <a href="Home.html">← 返回首页</a>
+          </div>
+
+          {/* 忘记密码弹窗 */}
+          <Modal
+            title="重置密码"
+            open={resetVisible}
+            onCancel={() => { setResetVisible(false); resetForm.resetFields(); }}
+            footer={null}
+            width={420}
+          >
+            <Form form={resetForm} layout="vertical" style={{ marginTop: 16 }}>
+              <Form.Item name="phone" label="手机号" rules={[{ required: true, message: '请输入手机号' }, { pattern: /^1\d{10}$/, message: '请输入正确的手机号' }]}>
+                <Input placeholder="注册时使用的手机号" maxLength={11} />
+              </Form.Item>
+              <Form.Item name="code" label="验证码" rules={[{ required: true, message: '请输入验证码' }, { len: 6, message: '验证码为6位' }]}>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <Input placeholder="6位验证码" maxLength={6} style={{ flex: 1 }} />
+                  <Button
+                    disabled={resetCountdown > 0}
+                    onClick={handleResetSendCode}
+                    style={{ width: 130, flexShrink: 0 }}
+                  >
+                    {resetCountdown > 0 ? `${resetCountdown}s 后重发` : '获取验证码'}
+                  </Button>
+                </div>
+              </Form.Item>
+              <Form.Item name="newPassword" label="新密码" rules={[{ required: true, message: '请输入新密码' }, { min: 6, message: '至少6位' }]}>
+                <Input.Password placeholder="至少6位" />
+              </Form.Item>
+              <Form.Item name="confirmPassword" label="确认新密码" dependencies={['newPassword']}
+                rules={[{ required: true, message: '请确认新密码' }, ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value || getFieldValue('newPassword') === value) return Promise.resolve();
+                    return Promise.reject(new Error('两次密码不一致'));
+                  },
+                })]}>
+                <Input.Password placeholder="再次输入新密码" />
+              </Form.Item>
+              <Button type="primary" block size="large" onClick={handleResetSubmit}
+                style={{ height: 42, fontWeight: 600, borderRadius: 8, background: '#667eea' }}>
+                重置密码
+              </Button>
+            </Form>
+          </Modal>
+        </div>
+      );
+    };
+
+    function renderApp() {
+      if (typeof React === 'undefined' || typeof ReactDOM === 'undefined') {
+        setTimeout(renderApp, 100);
+        return;
+      }
+      try {
+        ReactDOM.render(<Login />, document.getElementById('root'));
+      } catch (e) {
+        console.error('渲染错误:', e);
+        document.getElementById('root').innerHTML = '<div style="padding:20px;color:red;">页面加载失败</div>';
+      }
+    }
+    if (document.readyState === 'loading') window.addEventListener('load', renderApp);
+    else renderApp();
+  </script>
+</body>
+</html>
