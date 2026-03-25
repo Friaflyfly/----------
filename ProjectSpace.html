@@ -509,7 +509,7 @@
       const [amountAdjustEditingValue, setAmountAdjustEditingValue] = useState(0);
       const [amountAdjustReason, setAmountAdjustReason] = useState('');
       const [deliveryEpisodeFilter, setDeliveryEpisodeFilter] = useState(null); // null=全部, 1-20=该集
-      const [deliveryStageFilter, setDeliveryStageFilter] = useState(null); // null=全部阶段
+      const [deliveryStageFilter, setDeliveryStageFilter] = useState(null); // 初始null，首次渲染时设为当前阶段
       const [addMemberModalVisible, setAddMemberModalVisible] = useState(false);
       const [newMemberName, setNewMemberName] = useState('');
       const [newMemberRole, setNewMemberRole] = useState('学员');
@@ -1517,28 +1517,21 @@
                       const currentStage = orderData.projectStage || '精剪中';
                       const currentIdx = STAGES.indexOf(currentStage);
                       const allDel = orderData.deliveries || [];
+                      const effectiveStageFilter = deliveryStageFilter || currentStage;
                       return (
                         <div>
                           <div style={{ fontSize: 14, color: '#595959', marginBottom: 8, fontWeight: 600 }}>项目阶段进度</div>
                           <div className="stageProgress">
-                            <div
-                              className={`stageNode${deliveryStageFilter === null ? ' selected' : ''}`}
-                              onClick={() => setDeliveryStageFilter(null)}
-                              style={{ minWidth: 52 }}
-                            >
-                              <div className="stageDot" style={deliveryStageFilter === null ? { background: '#fff', borderColor: '#fff' } : { background: '#1890ff', borderColor: '#1890ff' }}></div>
-                              <div className="stageLabel" style={deliveryStageFilter === null ? { color: '#fff' } : {}}>全部</div>
-                            </div>
                             {STAGES.map((st, idx) => {
                               var stageDeliveries = allDel.filter(d => (d.stage || '精剪中') === st);
                               var isDone = idx < currentIdx;
                               var isActive = idx === currentIdx;
-                              var isSelected = deliveryStageFilter === st;
+                              var isSelected = effectiveStageFilter === st;
                               var cls = 'stageNode' + (isDone ? ' done' : '') + (isActive ? ' active' : '') + (isSelected ? ' selected' : '');
                               return (
                                 <React.Fragment key={st}>
-                                  <span className="stageArrow">→</span>
-                                  <div className={cls} onClick={() => setDeliveryStageFilter(st)}>
+                                  {idx > 0 && <span className="stageArrow">→</span>}
+                                  <div className={cls} onClick={() => { if (!isSelected) setDeliveryStageFilter(st); }}>
                                     <div className="stageDot"></div>
                                     <div className="stageLabel">{st}</div>
                                   </div>
@@ -1600,9 +1593,8 @@
                     </div>
                     {(() => {
                       const allDeliveries = orderData.deliveries || [];
-                      var filteredByStage = deliveryStageFilter == null
-                        ? allDeliveries
-                        : allDeliveries.filter((d) => (d.stage || '精剪中') === deliveryStageFilter);
+                      var activeStageFilter = deliveryStageFilter || (orderData.projectStage || '精剪中');
+                      var filteredByStage = allDeliveries.filter((d) => (d.stage || '精剪中') === activeStageFilter);
                       const deliveriesToShow = deliveryEpisodeFilter == null
                         ? filteredByStage
                         : filteredByStage.filter((d) => Number(d.episodeNumber) === deliveryEpisodeFilter);
