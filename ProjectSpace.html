@@ -167,6 +167,21 @@
       border: 1px solid #b7eb8f;
     }
 
+    .stageProgress { display: flex; align-items: center; background: #fff; border: 1px solid #f0f0f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; overflow-x: auto; gap: 0; }
+    .stageNode { display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 6px 10px; border-radius: 6px; min-width: 72px; transition: all .2s; position: relative; }
+    .stageNode:hover { background: #f0f5ff; }
+    .stageNode.active { background: #e6f7ff; }
+    .stageNode.selected { background: #1890ff; }
+    .stageNode.selected .stageDot { background: #fff; border-color: #fff; }
+    .stageNode.selected .stageLabel { color: #fff; }
+    .stageNode.selected .stageCount { color: rgba(255,255,255,.85); }
+    .stageDot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid #d9d9d9; background: #fff; margin-bottom: 4px; transition: all .2s; }
+    .stageNode.done .stageDot { background: #52c41a; border-color: #52c41a; }
+    .stageNode.active .stageDot { background: #1890ff; border-color: #1890ff; box-shadow: 0 0 0 3px rgba(24,144,255,.2); }
+    .stageLabel { font-size: 11px; font-weight: 600; color: #595959; white-space: nowrap; }
+    .stageCount { font-size: 10px; color: #8c8c8c; margin-top: 1px; }
+    .stageArrow { color: #d9d9d9; font-size: 14px; margin: 0 2px; flex-shrink: 0; }
+    .inheritTag { display: inline-block; background: #f0f0f0; color: #8c8c8c; border-radius: 3px; padding: 1px 6px; font-size: 10px; margin-left: 6px; }
     .versionCard {
       border: 1px solid #f0f0f0;
       border-radius: 8px;
@@ -494,6 +509,7 @@
       const [amountAdjustEditingValue, setAmountAdjustEditingValue] = useState(0);
       const [amountAdjustReason, setAmountAdjustReason] = useState('');
       const [deliveryEpisodeFilter, setDeliveryEpisodeFilter] = useState(null); // null=全部, 1-20=该集
+      const [deliveryStageFilter, setDeliveryStageFilter] = useState(null); // null=全部阶段
       const [addMemberModalVisible, setAddMemberModalVisible] = useState(false);
       const [newMemberName, setNewMemberName] = useState('');
       const [newMemberRole, setNewMemberRole] = useState('学员');
@@ -587,14 +603,31 @@
           if (spaceData.deliveries.length === 0 || isOldMock) {
             const pn = spaceData.projectName || '未命名项目';
             spaceData.deliveries = [
-              { id: 'delivery_mock_1', version: 'V1-1', episodeNumber: 1, episodeVersion: 1, fileName: `${pn}_V1-1.zip`, uploadTime: dayjs().subtract(6, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: '当前用户', changeNote: '第1集初剪完成，已按分镜完成剪辑与调色', status: 'Approved', fileSize: 268435456, isFinalized: true },
-              { id: 'delivery_mock_1b', version: 'V1-2', episodeNumber: 1, episodeVersion: 2, fileName: `${pn}_V1-2.zip`, uploadTime: dayjs().subtract(5, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: '当前用户', changeNote: '第1集精修版，补镜头与调色', status: 'Approved', fileSize: 272629760, isFinalized: true },
-              { id: 'delivery_mock_2', version: 'V2-1', episodeNumber: 2, episodeVersion: 1, fileName: `${pn}_V2-1.zip`, uploadTime: dayjs().subtract(4, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: '当前用户', changeNote: '第2集第一版提交，请审核', status: 'NeedRevision', fileSize: 314572800, isFinalized: false },
-              { id: 'delivery_mock_3', version: 'V2-2', episodeNumber: 2, episodeVersion: 2, fileName: `${pn}_V2-2.zip`, uploadTime: dayjs().subtract(2, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: '当前用户', changeNote: '第2集按修改意见调整后重新提交（片头字幕已延长至3秒）', status: 'Submitted', fileSize: 318767104, isFinalized: false },
-              { id: 'delivery_mock_4', version: 'V3-1', episodeNumber: 3, episodeVersion: 1, fileName: `${pn}_V3-1.zip`, uploadTime: dayjs().subtract(1, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: '当前用户', changeNote: '第3集初剪完成，待审核', status: 'Submitted', fileSize: 293601280, isFinalized: false },
+              { id: 'delivery_mock_1', version: 'V1-1', episodeNumber: 1, episodeVersion: 1, fileName: `${pn}_V1-1.zip`, uploadTime: dayjs().subtract(12, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: '当前用户', changeNote: '第1集初剪完成，已按分镜完成剪辑与调色', status: 'Approved', fileSize: 268435456, isFinalized: true, stage: '精剪中', inherited: false },
+              { id: 'delivery_mock_1b', version: 'V1-2', episodeNumber: 1, episodeVersion: 2, fileName: `${pn}_V1-2.zip`, uploadTime: dayjs().subtract(11, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: '当前用户', changeNote: '第1集精修版，补镜头与调色', status: 'Approved', fileSize: 272629760, isFinalized: true, stage: '精剪中', inherited: false },
+              { id: 'delivery_mock_2', version: 'V2-1', episodeNumber: 2, episodeVersion: 1, fileName: `${pn}_V2-1.zip`, uploadTime: dayjs().subtract(10, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: '当前用户', changeNote: '第2集第一版提交', status: 'Approved', fileSize: 314572800, isFinalized: true, stage: '精剪中', inherited: false },
+              { id: 'delivery_mock_3', version: 'V3-1', episodeNumber: 3, episodeVersion: 1, fileName: `${pn}_V3-1.zip`, uploadTime: dayjs().subtract(9, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: '当前用户', changeNote: '第3集初剪完成', status: 'Approved', fileSize: 293601280, isFinalized: true, stage: '精剪中', inherited: false },
+              // 内部一审阶段：第1集有修改重传，第2、3集继承
+              { id: 'delivery_mock_4', version: 'V1-1', episodeNumber: 1, episodeVersion: 1, fileName: `${pn}_V1-1_一审.zip`, uploadTime: dayjs().subtract(7, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: '当前用户', changeNote: '一审修改：调整片头节奏', status: 'Approved', fileSize: 275000000, isFinalized: true, stage: '内部一审', inherited: false },
+              { id: 'delivery_mock_5', version: 'V2-1', episodeNumber: 2, episodeVersion: 1, fileName: `${pn}_V2-1.zip`, uploadTime: dayjs().subtract(7, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: '系统继承', changeNote: '阶段切换继承自「精剪中」', status: 'Approved', fileSize: 314572800, isFinalized: true, stage: '内部一审', inherited: true, inheritedFrom: 'delivery_mock_2' },
+              { id: 'delivery_mock_6', version: 'V3-1', episodeNumber: 3, episodeVersion: 1, fileName: `${pn}_V3-1.zip`, uploadTime: dayjs().subtract(7, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: '系统继承', changeNote: '阶段切换继承自「精剪中」', status: 'Approved', fileSize: 293601280, isFinalized: true, stage: '内部一审', inherited: true, inheritedFrom: 'delivery_mock_3' },
+              // 内部二审阶段：第2集有修改，第1、3集继承
+              { id: 'delivery_mock_7', version: 'V1-1', episodeNumber: 1, episodeVersion: 1, fileName: `${pn}_V1-1_一审.zip`, uploadTime: dayjs().subtract(3, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: '系统继承', changeNote: '阶段切换继承自「内部一审」', status: 'Approved', fileSize: 275000000, isFinalized: false, stage: '内部二审', inherited: true, inheritedFrom: 'delivery_mock_4' },
+              { id: 'delivery_mock_8', version: 'V2-1', episodeNumber: 2, episodeVersion: 1, fileName: `${pn}_V2-1_二审.zip`, uploadTime: dayjs().subtract(2, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: '当前用户', changeNote: '二审修改：补充字幕和特效', status: 'Submitted', fileSize: 320000000, isFinalized: false, stage: '内部二审', inherited: false },
+              { id: 'delivery_mock_9', version: 'V3-1', episodeNumber: 3, episodeVersion: 1, fileName: `${pn}_V3-1.zip`, uploadTime: dayjs().subtract(3, 'day').format('YYYY-MM-DD HH:mm:ss'), uploader: '系统继承', changeNote: '阶段切换继承自「内部一审」', status: 'Approved', fileSize: 293601280, isFinalized: false, stage: '内部二审', inherited: true, inheritedFrom: 'delivery_mock_6' },
             ];
+            if (!spaceData.stageHistory) {
+              spaceData.stageHistory = [
+                { from: '精剪中', to: '内部一审', time: dayjs().subtract(7, 'day').format('YYYY-MM-DD HH:mm:ss'), operator: '李运营' },
+                { from: '内部一审', to: '内部二审', time: dayjs().subtract(3, 'day').format('YYYY-MM-DD HH:mm:ss'), operator: '李运营' },
+              ];
+            }
           }
-          spaceData.deliveries.forEach(d => { if (d.isFinalized === undefined) d.isFinalized = false; });
+          spaceData.deliveries.forEach(d => {
+            if (d.isFinalized === undefined) d.isFinalized = false;
+            if (!d.stage) d.stage = spaceData.projectStage || '精剪中';
+            if (d.inherited === undefined) d.inherited = false;
+          });
           if (!Array.isArray(spaceData.revisions)) spaceData.revisions = [];
           if (spaceData.revisions.length === 0 && spaceData.deliveries.some(d => d.version === 'V2-1')) {
             spaceData.revisions = [
@@ -773,6 +806,7 @@
         const episodeVersion = sameEpisodeDeliveries.length + 1;
         const version = `V${ep}-${episodeVersion}`;
 
+        const currentStage = orderData.projectStage || '精剪中';
         const newDelivery = {
           id: `delivery_${Date.now()}`,
           version,
@@ -783,8 +817,10 @@
           uploader: '当前用户',
           changeNote: changeNote,
           status: 'Submitted',
-          fileSize: Math.floor(Math.random() * 1000000000) + 100000000, // 模拟文件大小
+          fileSize: Math.floor(Math.random() * 1000000000) + 100000000,
           isFinalized: false,
+          stage: currentStage,
+          inherited: false,
         };
 
         const updatedData = {
@@ -1475,8 +1511,47 @@
 
                 <TabPane tab="📤 交付与修改" key="deliveries">
                   <div style={{ marginTop: 16 }}>
+                    {/* 项目阶段进度条 */}
+                    {(() => {
+                      const STAGES = ['精剪中', '内部一审', '内部二审', '导演审', '监制审', '平台审', '审核完成'];
+                      const currentStage = orderData.projectStage || '精剪中';
+                      const currentIdx = STAGES.indexOf(currentStage);
+                      const allDel = orderData.deliveries || [];
+                      return (
+                        <div>
+                          <div style={{ fontSize: 14, color: '#595959', marginBottom: 8, fontWeight: 600 }}>项目阶段进度</div>
+                          <div className="stageProgress">
+                            <div
+                              className={`stageNode${deliveryStageFilter === null ? ' selected' : ''}`}
+                              onClick={() => setDeliveryStageFilter(null)}
+                              style={{ minWidth: 52 }}
+                            >
+                              <div className="stageDot" style={deliveryStageFilter === null ? { background: '#fff', borderColor: '#fff' } : { background: '#1890ff', borderColor: '#1890ff' }}></div>
+                              <div className="stageLabel" style={deliveryStageFilter === null ? { color: '#fff' } : {}}>全部</div>
+                            </div>
+                            {STAGES.map((st, idx) => {
+                              var stageDeliveries = allDel.filter(d => (d.stage || '精剪中') === st);
+                              var isDone = idx < currentIdx;
+                              var isActive = idx === currentIdx;
+                              var isSelected = deliveryStageFilter === st;
+                              var cls = 'stageNode' + (isDone ? ' done' : '') + (isActive ? ' active' : '') + (isSelected ? ' selected' : '');
+                              return (
+                                <React.Fragment key={st}>
+                                  <span className="stageArrow">→</span>
+                                  <div className={cls} onClick={() => setDeliveryStageFilter(st)}>
+                                    <div className="stageDot"></div>
+                                    <div className="stageLabel">{st}</div>
+                                  </div>
+                                </React.Fragment>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })()}
+
                     {/* 1-20 集独立筛选框 */}
-                    <div style={{ marginBottom: 16 }}>
+                    <div style={{ marginBottom: 16, marginTop: 16 }}>
                       <div style={{ fontSize: 14, color: '#595959', marginBottom: 8 }}>按集数筛选（点击方框仅展示该集版本）</div>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
                         <div
@@ -1525,9 +1600,12 @@
                     </div>
                     {(() => {
                       const allDeliveries = orderData.deliveries || [];
-                      const deliveriesToShow = deliveryEpisodeFilter == null
+                      var filteredByStage = deliveryStageFilter == null
                         ? allDeliveries
-                        : allDeliveries.filter((d) => Number(d.episodeNumber) === deliveryEpisodeFilter);
+                        : allDeliveries.filter((d) => (d.stage || '精剪中') === deliveryStageFilter);
+                      const deliveriesToShow = deliveryEpisodeFilter == null
+                        ? filteredByStage
+                        : filteredByStage.filter((d) => Number(d.episodeNumber) === deliveryEpisodeFilter);
                       return (!deliveriesToShow.length) ? (
                         <div className="uploadArea">
                           <div style={{ fontSize: 48, marginBottom: 16 }}>📤</div>
@@ -1548,12 +1626,14 @@
                         return (
                           <div key={delivery.id} className={`versionCard ${delivery.status === 'Approved' ? 'current' : ''}`} style={{ marginBottom: 24 }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                              <Space>
+                              <Space wrap>
                                 <Tag color="blue">{delivery.version}</Tag>
                                 <span style={{ fontWeight: 500 }}>{versionTitle}</span>
                                 <span className={`statusTag ${getStatusClass(delivery.status)}`}>
                                   {getStatusText(delivery.status)}
                                 </span>
+                                {delivery.stage && <Tag color="geekblue" style={{ fontSize: 11 }}>{delivery.stage}</Tag>}
+                                {delivery.inherited && <span className="inheritTag">🔗 继承</span>}
                               </Space>
                               <Space>
                                 <Button type="link" href="#" download title="下载本版本">下载</Button>

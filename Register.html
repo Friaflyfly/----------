@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>注册入驻 - 天合短剧剪辑接单平台</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.css">
+  <style>
+    body { margin: 0; padding: 0; }
+    .registerPage {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 24px;
+    }
+    .regHeader {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .regLogo {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      text-decoration: none;
+      display: block;
+      margin-bottom: 8px;
+    }
+    .regSub { color: rgba(255,255,255,.8); font-size: 15px; }
+    .regCard {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.18);
+      padding: 36px 40px 28px;
+      width: 100%;
+      max-width: 560px;
+    }
+    .regTitle { font-size: 22px; font-weight: 700; color: #262626; margin-bottom: 4px; }
+    .regDesc { font-size: 13px; color: #8c8c8c; margin-bottom: 24px; }
+    .roleSwitch { display: flex; gap: 12px; margin-bottom: 24px; }
+    .roleBtn {
+      flex: 1;
+      border: 2px solid #d9d9d9;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+      background: #fff;
+    }
+    .roleBtn:hover { border-color: #667eea; }
+    .roleBtn.active { border-color: #667eea; background: #f0f2ff; }
+    .roleBtnIcon { font-size: 28px; margin-bottom: 6px; }
+    .roleBtnName { font-size: 15px; font-weight: 600; color: #262626; }
+    .roleBtnDesc { font-size: 12px; color: #8c8c8c; margin-top: 2px; }
+    .regFooter { text-align: center; margin-top: 20px; }
+    .regFooter a { color: rgba(255,255,255,.85); text-decoration: underline; font-size: 14px; }
+    .tipText { font-size: 12px; color: #8c8c8c; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState } = React;
+    const { Form, Input, Select, Button, Checkbox, message, Upload } = antd;
+    const { Option } = Select;
+    const { TextArea } = Input;
+
+    const Register = () => {
+      const [form] = Form.useForm();
+      const [userType, setUserType] = useState('student');
+      const [submitting, setSubmitting] = useState(false);
+      const [fileList, setFileList] = useState([]);
+
+      const handleSubmit = () => {
+        form.validateFields().then(values => {
+          if (!values.agreeTerm) {
+            message.warning('请先阅读并同意入驻协议');
+            return;
+          }
+          setSubmitting(true);
+
+          const pending = JSON.parse(localStorage.getItem('pendingStudents') || '[]');
+          const exists = pending.some(
+            p => p.phone === values.phone
+          );
+          if (exists) {
+            message.warning('该手机号已提交过申请，请勿重复注册');
+            setSubmitting(false);
+            return;
+          }
+
+          const record = {
+            id: 'REG_' + String(Date.now()),
+            userType: userType,
+            nickname: values.nickname,
+            username: values.phone,
+            phone: values.phone,
+            gender: values.gender,
+            className: userType === 'student' ? (values.className || '') : '',
+            takerRole: values.takerRole,
+            introduction: values.introduction || '',
+            portfolio: fileList.length > 0 ? fileList[0].name : '',
+            applyTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+            status: 'Pending',
+          };
+          pending.push(record);
+          localStorage.setItem('pendingStudents', JSON.stringify(pending));
+
+          message.success('注册申请已提交，请等待运营审核！');
+          setSubmitting(false);
+          form.resetFields();
+          setFileList([]);
+          setTimeout(() => { window.location.href = 'Home.html'; }, 1500);
+        }).catch(() => {});
+      };
+
+      const uploadProps = {
+        beforeUpload: (file) => {
+          setFileList([file]);
+          return false;
+        },
+        fileList,
+        onRemove: () => { setFileList([]); },
+        maxCount: 1,
+      };
+
+      return (
+        <div className="registerPage">
+          <div className="regHeader">
+            <a href="Home.html" className="regLogo">🎬 天合短剧剪辑接单平台</a>
+            <div className="regSub">注册入驻，开始接单赚收益</div>
+          </div>
+
+          <div className="regCard">
+            <div className="regTitle">注册入驻</div>
+            <div className="regDesc">填写以下信息提交申请，运营审核通过后即可开始接单</div>
+
+            {/* 身份选择 */}
+            <div style={{ marginBottom: 4, fontWeight: 600, fontSize: 14 }}>选择身份</div>
+            <div className="roleSwitch">
+              <div className={`roleBtn${userType === 'student' ? ' active' : ''}`} onClick={() => { setUserType('student'); form.resetFields(['className']); }}>
+                <div className="roleBtnIcon">🎓</div>
+                <div className="roleBtnName">学员</div>
+                <div className="roleBtnDesc">在校/培训学员，班级必填</div>
+              </div>
+              <div className={`roleBtn${userType === 'normal' ? ' active' : ''}`} onClick={() => { setUserType('normal'); form.resetFields(['className']); }}>
+                <div className="roleBtnIcon">👤</div>
+                <div className="roleBtnName">普通用户</div>
+                <div className="roleBtnDesc">专业剪辑师，须提交作品集</div>
+              </div>
+            </div>
+
+            <Form form={form} layout="vertical" requiredMark={true} initialValues={{ gender: '男', takerRole: '剪辑师', agreeTerm: false }}>
+
+              <Form.Item name="nickname" label="昵称" rules={[{ required: true, message: '请输入昵称' }]}>
+                <Input placeholder="展示名称，如：张三" maxLength={20} />
+              </Form.Item>
+
+              <div style={{ display: 'flex', gap: 12 }}>
+                <Form.Item name="phone" label="手机号（登录账号）" style={{ flex: 1 }} rules={[{ required: true, message: '请输入手机号' }, { pattern: /^1\d{10}$/, message: '请输入正确的手机号' }]}>
+                  <Input placeholder="11位手机号，用于登录" maxLength={11} />
+                </Form.Item>
+                <Form.Item name="gender" label="性别" style={{ width: 120 }} rules={[{ required: true }]}>
+                  <Select>
+                    <Option value="男">男</Option>
+                    <Option value="女">女</Option>
+                  </Select>
+                </Form.Item>
+              </div>
+
+              <div style={{ display: 'flex', gap: 12 }}>
+                <Form.Item name="password" label="密码" style={{ flex: 1 }} rules={[{ required: true, message: '请输入密码' }, { min: 6, message: '至少6位' }]}>
+                  <Input.Password placeholder="至少6位" />
+                </Form.Item>
+                <Form.Item name="confirmPassword" label="确认密码" style={{ flex: 1 }} dependencies={['password']}
+                  rules={[{ required: true, message: '请确认密码' }, ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue('password') === value) return Promise.resolve();
+                      return Promise.reject(new Error('两次密码不一致'));
+                    },
+                  })]}>
+                  <Input.Password placeholder="再次输入密码" />
+                </Form.Item>
+              </div>
+
+              {/* 学员必填班级 */}
+              {userType === 'student' && (
+                <Form.Item name="className" label="班级" rules={[{ required: true, message: '学员必须选择班级' }]}>
+                  <Select placeholder="请选择所在班级">
+                    <Option value="剪辑一班">剪辑一班</Option>
+                    <Option value="剪辑二班">剪辑二班</Option>
+                    <Option value="调色班">调色班</Option>
+                    <Option value="特效班">特效班</Option>
+                    <Option value="综合班">综合班</Option>
+                  </Select>
+                </Form.Item>
+              )}
+
+              <Form.Item name="takerRole" label="接单角色意向" rules={[{ required: true, message: '请选择接单角色' }]}>
+                <Select placeholder="请选择接单角色">
+                  <Option value="剪辑师">剪辑师</Option>
+                  <Option value="调色师">调色师</Option>
+                  <Option value="特效师">特效师</Option>
+                </Select>
+              </Form.Item>
+
+              {userType === 'normal' && (
+                <Form.Item name="introduction" label="自我介绍" rules={[{ required: true, message: '普通用户必须填写自我介绍' }]}>
+                  <TextArea rows={3} placeholder="介绍你的剪辑经验、擅长领域等" maxLength={500} showCount />
+                </Form.Item>
+              )}
+
+              {/* 作品集：普通用户必传，学员选传 */}
+              <Form.Item
+                label={userType === 'normal' ? '作品集附件（必传）' : '作品集附件（选填）'}
+                required={userType === 'normal'}
+                extra={<span className="tipText">{userType === 'normal' ? '普通用户须上传作品集供审核参考，支持 zip/rar/mp4，≤200MB' : '可上传作品集加速审核，支持 zip/rar/mp4，≤200MB'}</span>}
+              >
+                <Upload {...uploadProps}>
+                  <Button>{fileList.length > 0 ? '重新选择' : '选择文件'}</Button>
+                </Upload>
+                {userType === 'normal' && fileList.length === 0 && (
+                  <div style={{ color: '#ff4d4f', fontSize: 12, marginTop: 4 }}>普通用户必须上传作品集</div>
+                )}
+              </Form.Item>
+
+              <Form.Item name="agreeTerm" valuePropName="checked" rules={[{ validator: (_, v) => v ? Promise.resolve() : Promise.reject('请同意协议') }]}>
+                <Checkbox>我已阅读并同意 <a href="#" onClick={(e) => { e.preventDefault(); message.info('入驻协议内容'); }}>《平台入驻协议》</a></Checkbox>
+              </Form.Item>
+
+              <Button type="primary" block size="large" loading={submitting} onClick={handleSubmit}
+                disabled={userType === 'normal' && fileList.length === 0}
+                style={{ height: 44, fontWeight: 600, fontSize: 16, borderRadius: 8, background: '#667eea' }}>
+                提交注册申请
+              </Button>
+            </Form>
+          </div>
+
+          <div className="regFooter">
+            <a href="Home.html">← 返回首页</a>
+          </div>
+        </div>
+      );
+    };
+
+    function renderApp() {
+      if (typeof React === 'undefined' || typeof ReactDOM === 'undefined') {
+        setTimeout(renderApp, 100);
+        return;
+      }
+      try {
+        ReactDOM.render(<Register />, document.getElementById('root'));
+      } catch (e) {
+        console.error('渲染错误:', e);
+        document.getElementById('root').innerHTML = '<div style="padding:20px;color:red;">页面加载失败</div>';
+      }
+    }
+    if (document.readyState === 'loading') window.addEventListener('load', renderApp);
+    else renderApp();
+  </script>
+</body>
+</html>

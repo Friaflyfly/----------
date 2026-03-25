@@ -700,11 +700,69 @@
               size="small"
               style={{ width: '100%', minWidth: 100 }}
               onChange={(v) => {
+                const oldStage = record.projectStage || '精剪中';
+                if (v === oldStage) return;
                 const projects = JSON.parse(localStorage.getItem('adminProjects') || '[]');
                 const next = projects.map(p => p.id === record.id ? { ...p, projectStage: v } : p);
                 localStorage.setItem('adminProjects', JSON.stringify(next));
                 setProjects(next);
-                message.success('项目状态已更新');
+
+                // 同步更新项目空间的 projectStage 并生成继承版本
+                const spaceKey = `projectSpace_${record.id}`;
+                const spaceRaw = localStorage.getItem(spaceKey);
+                if (spaceRaw) {
+                  try {
+                    const space = JSON.parse(spaceRaw);
+                    space.projectStage = v;
+                    if (!Array.isArray(space.stageHistory)) space.stageHistory = [];
+                    space.stageHistory.push({ from: oldStage, to: v, time: dayjs().format('YYYY-MM-DD HH:mm:ss'), operator: '当前运营' });
+
+                    const deliveries = Array.isArray(space.deliveries) ? space.deliveries : [];
+                    // 找出上一阶段每集的最新版本
+                    const latestByEpisode = {};
+                    deliveries.forEach(d => {
+                      var dStage = d.stage || oldStage;
+                      if (dStage === oldStage) {
+                        var ep = Number(d.episodeNumber);
+                        if (!latestByEpisode[ep] || dayjs(d.uploadTime).isAfter(dayjs(latestByEpisode[ep].uploadTime))) {
+                          latestByEpisode[ep] = d;
+                        }
+                      }
+                    });
+                    // 为每集生成继承版本（如果新阶段下该集还没有版本）
+                    var newDeliveries = [];
+                    Object.keys(latestByEpisode).forEach(epStr => {
+                      var ep = Number(epStr);
+                      var hasNewStage = deliveries.some(d => d.stage === v && Number(d.episodeNumber) === ep);
+                      if (!hasNewStage) {
+                        var src = latestByEpisode[ep];
+                        var sameEpInNewStage = deliveries.filter(d => d.stage === v && Number(d.episodeNumber) === ep);
+                        var newEpVer = sameEpInNewStage.length + 1;
+                        newDeliveries.push({
+                          id: 'inherit_' + Date.now() + '_' + ep,
+                          version: 'V' + ep + '-' + newEpVer,
+                          episodeNumber: ep,
+                          episodeVersion: newEpVer,
+                          fileName: src.fileName,
+                          uploadTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+                          uploader: '系统继承',
+                          changeNote: '阶段切换继承自「' + oldStage + '」',
+                          status: src.status === 'Approved' ? 'Approved' : 'Submitted',
+                          fileSize: src.fileSize,
+                          isFinalized: false,
+                          stage: v,
+                          inherited: true,
+                          inheritedFrom: src.id,
+                        });
+                      }
+                    });
+                    // 补全旧 deliveries 的 stage
+                    deliveries.forEach(d => { if (!d.stage) d.stage = oldStage; });
+                    space.deliveries = deliveries.concat(newDeliveries);
+                    localStorage.setItem(spaceKey, JSON.stringify(space));
+                  } catch(e) {}
+                }
+                message.success('项目阶段已切换为「' + v + '」，继承版本已生成');
               }}
               options={[
                 { value: '精剪中', label: '精剪中' },

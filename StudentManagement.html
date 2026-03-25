@@ -148,7 +148,7 @@
 
   <script type="text/babel">
     const { useState, useEffect, useMemo } = React;
-    const { Card, Table, Button, Tag, Space, Select, Input, Tabs, Typography, Modal, Form, message, Popconfirm } = antd;
+    const { Card, Table, Button, Tag, Space, Select, Input, Tabs, Typography, Modal, Form, message, Popconfirm, Drawer, Descriptions } = antd;
     const { Title } = Typography;
     const { Option } = Select;
     const { TabPane } = Tabs;
@@ -167,6 +167,11 @@
       const [studentModalMode, setStudentModalMode] = useState('add'); // 'add' | 'edit'
       const [editingStudent, setEditingStudent] = useState(null);
       const [studentForm] = Form.useForm();
+      const [detailDrawerVisible, setDetailDrawerVisible] = useState(false);
+      const [detailRecord, setDetailRecord] = useState(null);
+      const [rejectModalVisible, setRejectModalVisible] = useState(false);
+      const [rejectingRecord, setRejectingRecord] = useState(null);
+      const [rejectReason, setRejectReason] = useState('');
 
       useEffect(() => {
         loadData();
@@ -257,10 +262,12 @@
       };
 
       const handleReject = (student, reason) => {
-        const updatedPending = pendingList.filter(s => s.id !== student.id);
-        setPendingList(updatedPending);
+        const updatedPending = pendingList.map(s =>
+          s.id === student.id ? { ...s, status: 'Rejected', rejectReason: reason, reviewTime: dayjs().format('YYYY-MM-DD HH:mm:ss') } : s
+        );
+        setPendingList(updatedPending.filter(s => s.status === 'Pending'));
         localStorage.setItem('pendingStudents', JSON.stringify(updatedPending));
-        message.success('已驳回');
+        message.success('已驳回，原因已记录');
       };
 
       const handleFreeze = () => {
@@ -315,7 +322,6 @@
         setStudentModalMode('edit');
         studentForm.setFieldsValue({
           nickname: record.nickname,
-          username: record.username,
           phone: record.phone || '',
           gender: record.gender || '男',
           className: record.className || '',
@@ -332,7 +338,7 @@
             const newStudent = {
               id: newId,
               nickname: values.nickname,
-              username: values.username,
+              username: values.phone || '',
               phone: values.phone || '',
               gender: values.gender,
               className: values.className || '',
@@ -355,7 +361,7 @@
           } else {
             const updated = talentList.map((s) =>
               s.id === editingStudent.id
-                ? { ...s, nickname: values.nickname, username: values.username, phone: values.phone, gender: values.gender, className: values.className, takerRole: values.takerRole || '剪辑师', status: values.status }
+                ? { ...s, nickname: values.nickname, username: values.phone || s.username, phone: values.phone, gender: values.gender, className: values.className, takerRole: values.takerRole || '剪辑师', status: values.status }
                 : s
             );
             setTalentList(updated);
@@ -420,40 +426,26 @@
       ];
 
       const pendingColumns = [
-        { title: '申请时间', dataIndex: 'applyTime', key: 'applyTime', width: 180 },
-        { title: '昵称', dataIndex: 'nickname', key: 'nickname', width: 120 },
-        { title: '用户名', dataIndex: 'username', key: 'username', width: 120 },
+        { title: '申请时间', dataIndex: 'applyTime', key: 'applyTime', width: 170 },
+        {
+          title: '身份类型', dataIndex: 'userType', key: 'userType', width: 100,
+          render: (v) => v === 'normal' ? <Tag color="purple">普通用户</Tag> : <Tag color="blue">学员</Tag>,
+        },
+        { title: '昵称', dataIndex: 'nickname', key: 'nickname', width: 110 },
         { title: '手机号', dataIndex: 'phone', key: 'phone', width: 130, render: (v) => v || '-' },
-        { title: '性别', dataIndex: 'gender', key: 'gender', width: 80, render: (v) => v || '-' },
+        { title: '性别', dataIndex: 'gender', key: 'gender', width: 70, render: (v) => v || '-' },
         { title: '班级', dataIndex: 'className', key: 'className', width: 100, render: (v) => v || '-' },
         { title: '接单角色', dataIndex: 'takerRole', key: 'takerRole', width: 100, render: (v) => v || '-' },
-        { title: '作品集', dataIndex: 'portfolio', key: 'portfolio', width: 150, render: (portfolio) => 
-          portfolio ? <a href="#" onClick={(e) => { e.preventDefault(); message.info('下载作品集'); }}>下载</a> : <span style={{ color: '#8c8c8c' }}>未上传</span>
+        { title: '作品集', dataIndex: 'portfolio', key: 'portfolio', width: 100, render: (portfolio) =>
+          portfolio ? <a href="#" onClick={(e) => { e.preventDefault(); message.info('下载: ' + portfolio); }}>下载</a> : <span style={{ color: '#8c8c8c' }}>未上传</span>
         },
-        { title: '操作', key: 'action', width: 200, render: (_, record) => (
+        { title: '操作', key: 'action', width: 240, fixed: 'right', render: (_, record) => (
           <Space>
-            <Popconfirm title="确定通过？" onConfirm={() => handleApprove(record)}>
+            <Button size="small" onClick={() => { setDetailRecord(record); setDetailDrawerVisible(true); }}>详情</Button>
+            <Popconfirm title="确定通过该用户入驻？" onConfirm={() => handleApprove(record)}>
               <Button type="primary" size="small">通过</Button>
             </Popconfirm>
-            <Popconfirm 
-              title="确定驳回？" 
-              onConfirm={() => {
-                Modal.confirm({
-                  title: '驳回原因',
-                  content: <Input placeholder="请输入驳回原因" id="rejectReason" />,
-                  onOk: () => {
-                    const reason = document.getElementById('rejectReason').value;
-                    if (!reason) {
-                      message.error('请填写驳回原因');
-                      return Promise.reject();
-                    }
-                    handleReject(record, reason);
-                  },
-                });
-              }}
-            >
-              <Button danger size="small">驳回</Button>
-            </Popconfirm>
+            <Button danger size="small" onClick={() => { setRejectingRecord(record); setRejectReason(''); setRejectModalVisible(true); }}>驳回</Button>
           </Space>
         )},
       ];
@@ -565,9 +557,6 @@
               <Form.Item name="nickname" label="昵称" rules={[{ required: true, message: '请输入昵称' }]}>
                 <Input placeholder="请输入昵称" />
               </Form.Item>
-              <Form.Item name="username" label="用户名" rules={[{ required: true, message: '请输入用户名' }]}>
-                <Input placeholder="请输入用户名" />
-              </Form.Item>
               <Form.Item name="phone" label="手机号">
                 <Input placeholder="请输入手机号" />
               </Form.Item>
@@ -620,6 +609,81 @@
                 <TextArea rows={4} placeholder="请填写冻结原因" />
               </Form.Item>
             </Form>
+          </Modal>
+
+          {/* 审核详情抽屉 */}
+          <Drawer
+            title="入驻申请详情"
+            placement="right"
+            width={520}
+            onClose={() => setDetailDrawerVisible(false)}
+            open={detailDrawerVisible}
+            extra={
+              detailRecord && (
+                <Space>
+                  <Popconfirm title="确定通过？" onConfirm={() => { handleApprove(detailRecord); setDetailDrawerVisible(false); }}>
+                    <Button type="primary" size="small">通过</Button>
+                  </Popconfirm>
+                  <Button danger size="small" onClick={() => { setRejectingRecord(detailRecord); setRejectReason(''); setRejectModalVisible(true); setDetailDrawerVisible(false); }}>驳回</Button>
+                </Space>
+              )
+            }
+          >
+            {detailRecord && (
+              <Descriptions column={2} bordered size="small" labelStyle={{ width: 100, fontWeight: 600 }}>
+                <Descriptions.Item label="身份类型" span={2}>
+                  {detailRecord.userType === 'normal' ? <Tag color="purple">普通用户</Tag> : <Tag color="blue">学员</Tag>}
+                </Descriptions.Item>
+                <Descriptions.Item label="昵称">{detailRecord.nickname}</Descriptions.Item>
+                <Descriptions.Item label="手机号">{detailRecord.phone || '-'}</Descriptions.Item>
+                <Descriptions.Item label="性别">{detailRecord.gender || '-'}</Descriptions.Item>
+                <Descriptions.Item label="班级">{detailRecord.className || '-'}</Descriptions.Item>
+                <Descriptions.Item label="接单角色">{detailRecord.takerRole || '-'}</Descriptions.Item>
+                <Descriptions.Item label="申请时间" span={2}>{detailRecord.applyTime}</Descriptions.Item>
+                <Descriptions.Item label="自我介绍" span={2}>
+                  <div style={{ whiteSpace: 'pre-wrap', maxHeight: 200, overflow: 'auto' }}>
+                    {detailRecord.introduction || '未填写'}
+                  </div>
+                </Descriptions.Item>
+                <Descriptions.Item label="作品集" span={2}>
+                  {detailRecord.portfolio
+                    ? <a href="#" onClick={(e) => { e.preventDefault(); message.info('下载: ' + detailRecord.portfolio); }}>{detailRecord.portfolio}</a>
+                    : <span style={{ color: '#8c8c8c' }}>未上传</span>}
+                </Descriptions.Item>
+              </Descriptions>
+            )}
+          </Drawer>
+
+          {/* 驳回原因弹窗 */}
+          <Modal
+            title="驳回入驻申请"
+            open={rejectModalVisible}
+            onOk={() => {
+              if (!rejectReason.trim()) {
+                message.warning('请填写驳回原因');
+                return;
+              }
+              handleReject(rejectingRecord, rejectReason.trim());
+              setRejectModalVisible(false);
+              setRejectingRecord(null);
+              setRejectReason('');
+            }}
+            onCancel={() => { setRejectModalVisible(false); setRejectReason(''); }}
+            okText="确认驳回"
+            okButtonProps={{ danger: true }}
+            cancelText="取消"
+          >
+            {rejectingRecord && (
+              <div style={{ marginBottom: 12, color: '#8c8c8c', fontSize: 13 }}>
+                驳回 <b style={{ color: '#262626' }}>{rejectingRecord.nickname}</b>（{rejectingRecord.phone}）的入驻申请
+              </div>
+            )}
+            <TextArea
+              rows={4}
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              placeholder="请填写驳回原因，将展示给申请人（必填）"
+            />
           </Modal>
         </div>
       );

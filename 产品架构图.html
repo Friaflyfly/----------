@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>剪辑接单平台 · 产品架构图</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:#f0f2f7;color:#1a1f36;min-height:100vh;padding:36px 40px}
+.wrap{max-width:1340px;margin:0 auto}
+
+/* ── HEADER ── */
+.header{background:linear-gradient(135deg,#0a1942 0%,#0d2b6e 45%,#1a52a8 100%);border-radius:14px;padding:32px 40px 28px;color:#fff;margin-bottom:20px;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;background:rgba(255,255,255,.04);border-radius:50%}
+.header::after{content:'';position:absolute;bottom:-40px;left:160px;width:360px;height:140px;background:rgba(255,255,255,.03);border-radius:50%}
+.header-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;position:relative;z-index:1}
+.prod-title{font-size:26px;font-weight:800;letter-spacing:.5px;margin-bottom:7px}
+.prod-sub{font-size:13.5px;opacity:.75;max-width:620px;line-height:1.7}
+.header-meta{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex-shrink:0}
+.badge{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:4px 14px;font-size:11.5px;color:rgba(255,255,255,.88)}
+.badge-stage{background:rgba(255,193,7,.18);border-color:rgba(255,193,7,.38);color:#ffd54f;font-weight:700}
+.roles{display:flex;gap:10px;flex-wrap:wrap;position:relative;z-index:1}
+.role-chip{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:4px 12px;font-size:12px;color:rgba(255,255,255,.82)}
+
+/* ── LEGEND + FLOW ── */
+.card{background:#fff;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.06);padding:18px 24px;margin-bottom:18px}
+.legend-row{display:flex;gap:24px;flex-wrap:wrap;align-items:center}
+.legend-item{display:flex;align-items:center;gap:7px;font-size:12.5px;color:#555}
+.leg-dot{width:13px;height:13px;border-radius:3px;flex-shrink:0}
+.sec-label{font-size:12px;font-weight:700;color:#5a6a8a;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.sec-label::before{content:'';display:inline-block;width:3px;height:14px;background:#1a52a8;border-radius:2px}
+.flow-steps{display:flex;align-items:center;overflow-x:auto;padding:2px 0;gap:0}
+.flow-step{display:flex;flex-direction:column;align-items:center;flex:1;min-width:108px}
+.flow-box{background:linear-gradient(135deg,#e8f0fe,#d2e3fc);border:1.5px solid #93b8f8;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:700;color:#1a52a8;text-align:center;white-space:nowrap;width:100%}
+.flow-arrow{font-size:20px;color:#1a52a8;padding:0 6px;flex-shrink:0;opacity:.7}
+
+/* ── ARCH DIAGRAM ── */
+.arch{background:#fff;border-radius:12px;box-shadow:0 2px 14px rgba(0,0,0,.07);overflow:hidden;margin-bottom:18px}
+.arch-layer{display:flex;border-bottom:1px solid #f0f2f7}
+.arch-layer:last-child{border-bottom:none}
+.layer-label{width:96px;min-width:96px;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:22px 10px;text-align:center;font-size:12px;font-weight:800;letter-spacing:.5px;line-height:1.55;gap:5px}
+.layer-label span{font-size:10px;font-weight:500;opacity:.7;letter-spacing:.2px}
+.lyr-touch .layer-label{background:#e6f4ea;color:#1e6e34;border-right:3px solid #34a853}
+.lyr-biz   .layer-label{background:#e8f0fe;color:#1a52a8;border-right:3px solid #1967d2}
+.lyr-plat  .layer-label{background:#fce4ec;color:#ad1457;border-right:3px solid #d81b60}
+.lyr-ext   .layer-label{background:#f3e5f5;color:#6a1b9a;border-right:3px solid #8e24aa}
+.layer-body{flex:1;padding:16px 18px;display:flex;flex-wrap:wrap;gap:10px;align-content:flex-start}
+
+/* ── MODULE CARD ── */
+.mod{border:1.5px solid #e0e8f4;border-radius:8px;padding:10px 13px;min-width:108px;display:flex;flex-direction:column;gap:5px;transition:box-shadow .18s,border-color .18s;background:#f8faff}
+.mod:hover{box-shadow:0 4px 14px rgba(26,82,168,.13);border-color:#93b8f8}
+.mod.cur{background:#e8f0fe;border-color:#93b8f8}
+.mod.reu{background:#e6f4ea;border-color:#a8d5b3}
+.mod.ext{background:#f3e5f5;border-color:#ce93d8}
+.mod.skp{background:#fafafa;border-color:#e0e0e0;opacity:.55}
+.mod-name{font-size:13px;font-weight:700;color:#1a1f36}
+.mod-desc{font-size:11px;color:#7a8aaa;line-height:1.45}
+.tag{display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.4px;width:fit-content;margin-bottom:1px}
+.t-cur{background:#1967d2;color:#fff}
+.t-reu{background:#34a853;color:#fff}
+.t-ext{background:#8e24aa;color:#fff}
+.t-skp{background:#bdbdbd;color:#fff}
+
+/* ── BOTTOM GRID ── */
+.bottom-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:18px}
+.info-card{background:#fff;border-radius:10px;padding:20px 22px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.info-card h3{font-size:13px;font-weight:700;margin-bottom:13px;display:flex;align-items:center;gap:7px}
+.h3-green{color:#1e6e34}.h3-red{color:#b71c1c}.h3-orange{color:#e65100}
+.ico{width:23px;height:23px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.ico-g{background:#e6f4ea}.ico-r{background:#ffebee}.ico-o{background:#fff8e1}
+.chk-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+.chk-list li{font-size:12.5px;color:#444;display:flex;align-items:flex-start;gap:7px;line-height:1.55}
+.chk-list li::before{flex-shrink:0;margin-top:1px;font-weight:700}
+.chk-list.g li::before{content:'✓';color:#34a853}
+.chk-list.r li{color:#c62828}.chk-list.r li::before{content:'✗';color:#e53935}
+.chk-list.o li::before{content:'?';color:#f57c00}
+
+/* ── CONSTRAINTS ── */
+.constraint-card{background:#fffde7;border:1.5px solid #ffe082;border-radius:10px;padding:18px 22px;margin-bottom:18px}
+.constraint-title{font-size:13px;font-weight:700;color:#e65100;margin-bottom:12px}
+.constraint-list{display:flex;flex-wrap:wrap;gap:12px}
+.constraint-item{font-size:12.5px;color:#555;display:flex;align-items:flex-start;gap:6px;flex:1;min-width:220px;line-height:1.55}
+.c-num{color:#f57c00;font-weight:700;flex-shrink:0}
+
+/* ── FOOTER ── */
+.footer{text-align:center;font-size:11px;color:#bbb;padding-top:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ════ HEADER ════ -->
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="prod-title">剪辑接单平台 · 产品架构图</div>
+      <div class="prod-sub">面向内容制作场景，连接项目发布方与剪辑执行方，提供从项目发布、接单、协作、交付到收益结算的闭环平台</div>
+    </div>
+    <div class="header-meta">
+      <span class="badge badge-stage">🚧 一期方案设计</span>
+      <span class="badge">适用：内部团队 · 研发团队 · 管理层</span>
+    </div>
+  </div>
+  <div class="roles">
+    <span class="role-chip">👤 平台运营</span>
+    <span class="role-chip">✂️ 学员 / 剪辑师</span>
+    <span class="role-chip">🔍 审核人员</span>
+    <span class="role-chip">🏢 甲方客户</span>
+    <span class="role-chip">💰 财务人员</span>
+  </div>
+</div>
+
+<!-- ════ LEGEND ════ -->
+<div class="card" style="padding:14px 24px;margin-bottom:18px">
+  <div class="legend-row">
+    <div class="legend-item"><div class="leg-dot" style="background:#1967d2"></div><b>本期</b>&nbsp;·&nbsp;一期实现</div>
+    <div class="legend-item"><div class="leg-dot" style="background:#34a853"></div><b>复用</b>&nbsp;·&nbsp;依赖已有能力</div>
+    <div class="legend-item"><div class="leg-dot" style="background:#8e24aa"></div><b>外部</b>&nbsp;·&nbsp;第三方系统</div>
+    <div class="legend-item"><div class="leg-dot" style="background:#bdbdbd"></div><b>后期</b>&nbsp;·&nbsp;本期不实现</div>
+  </div>
+</div>
+
+<!-- ════ CORE FLOW ════ -->
+<div class="card" style="margin-bottom:18px">
+  <div class="sec-label">核心业务链路</div>
+  <div class="flow-steps">
+    <div class="flow-step"><div class="flow-box">运营发布项目</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box">学员浏览 / 接单</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box">自动创建协作空间</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box">上传成片交付</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box">人工审核 / 验收</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box">收益入账 / 结算</div></div>
+  </div>
+</div>
+
+<!-- ════ ARCHITECTURE ════ -->
+<div class="sec-label">产品架构图（四层）</div>
+<div class="arch">
+
+  <!-- 用户触点层 -->
+  <div class="arch-layer lyr-touch">
+    <div class="layer-label">用户触点层<span>User Layer</span></div>
+    <div class="layer-body">
+      <div class="mod cur">
+        <span class="tag t-cur">本期</span>
+        <div class="mod-name">学员端 Web</div>
+        <div class="mod-desc">浏览项目 / 接单 / 交付</div>
+      </div>
+      <div class="mod cur">
+        <span class="tag t-cur">本期</span>
+        <div class="mod-name">运营后台 Web</div>
+        <div class="mod-desc">项目管理 / 学员 / 财务</div>
+      </div>
+      <div class="mod cur">
+        <span class="tag t-cur">本期</span>
+        <div class="mod-name">审核人员端</div>
+        <div class="mod-desc">审核队列 / 人工审核</div>
+      </div>
+      <div class="mod skp">
+        <span class="tag t-skp">后期</span>
+        <div class="mod-name">甲方客户端</div>
+        <div class="mod-desc">项目查看 / 验收确认</div>
+      </div>
+      <div class="mod skp">
+        <span class="tag t-skp">后期</span>
+        <div class="mod-name">移动端 H5</div>
+        <div class="mod-desc">轻量访问 / 通知接收</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 业务应用层 -->
+  <div class="arch-layer lyr-biz">
+    <div class="layer-label">业务应用层<span>Application Layer</span></div>
+    <div class="layer-body">
+      <div class="mod cur">
+        <span class="tag t-cur">本期</span>
+        <div class="mod-name">项目大厅</div>
+        <div class="mod-desc">分类浏览 / 筛选排序</div>
+      </div>
+      <div class="mod cur">
+        <span class="tag t-cur">本期</span>
+        <div class="mod-name">项目详情</div>
+        <div class="mod-desc">需求 / 单价 / 集数 / 截止</div>
+      </div>
+      <div class="mod cur">
+        <span class="tag t-cur">本期</span>
+        <div class="mod-name">抢单 / 报名</div>
+        <div class="mod-desc">一键接单 / 报名审核</div>
+      </div>
+      <div class="mod cur">
+        <span class="tag t-cur">本期</span>
+        <div class="mod-name">订单管理</div>
+        <div class="mod-desc">状态流转 / 我的项目</div>
+      </div>
+      <div class="mod cur">
+        <span class="tag t-cur">本期</span>
+        <div class="mod-name">协作空间</div>
+        <div class="mod-desc">素材 / 交付 / 沟通 / 版本</div>
+      </div>
+      <div class="mod cur">
+        <span class="tag t-cur">本期</span>
+        <div class="mod-name">成品上传</div>
+        <div class="mod-desc">多版本 / 变更说明留痕</div>
+      </div>
+      <div class="mod cur">
+        <span class="tag t-cur">本期</span>
+        <div class="mod-name">审核 / 验收</div>
+        <div class="mod-desc">人工审核 / 退回意见</div>
+      </div>
+      <div class="mod cur">
+        <span class="tag t-cur">本期</span>
+        <div class="mod-name">账户收益</div>
+        <div class="mod-desc">收益展示 / 明细 / 结算状态</div>
+      </div>
+      <div class="mod cur">
+        <span class="tag t-cur">本期</span>
+        <div class="mod-name">后台管理</div>
+        <div class="mod-desc">项目 / 学员 / 财务对账</div>
+      </div>
+      <div class="mod cur">
+        <span class="tag t-cur">本期</span>
+        <div class="mod-name">天梯榜单</div>
+        <div class="mod-desc">接单量 / 收益 / 活跃度</div>
+      </div>
+      <div class="mod skp">
+        <span class="tag t-skp">后期</span>
+        <div class="mod-name">智能推荐</div>
+        <div class="mod-desc">个性化项目匹配</div>
+      </div>
+      <div class="mod skp">
+        <span class="tag t-skp">后期</span>
+        <div class="mod-name">自动提现</div>
+        <div class="mod-desc">在线支付 / 自动分账</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 平台支撑层 -->
+  <div class="arch-layer lyr-plat">
+    <div class="layer-label">平台支撑层<span>Platform Layer</span></div>
+    <div class="layer-body">
+      <div class="mod reu">
+        <span class="tag t-reu">复用</span>
+        <div class="mod-name">用户中心</div>
+        <div class="mod-desc">账号 / 认证 / 登录</div>
+      </div>
+      <div class="mod reu">
+        <span class="tag t-reu">复用</span>
+        <div class="mod-name">权限中心</div>
+        <div class="mod-desc">RBAC / 角色 / 资源访问</div>
+      </div>
+      <div class="mod reu">
+        <span class="tag t-reu">复用</span>
+        <div class="mod-name">消息通知</div>
+        <div class="mod-desc">站内通知 / 事件推送</div>
+      </div>
+      <div class="mod cur">
+        <span class="tag t-cur">本期</span>
+        <div class="mod-name">文件中心</div>
+        <div class="mod-desc">上传 / 下载 / 版本管理</div>
+      </div>
+      <div class="mod cur">
+        <span class="tag t-cur">本期</span>
+        <div class="mod-name">审核中心</div>
+        <div class="mod-desc">审核队列 / 结论同步 / 留痕</div>
+      </div>
+      <div class="mod cur">
+        <span class="tag t-cur">本期</span>
+        <div class="mod-name">数据统计</div>
+        <div class="mod-desc">数据看板 / 榜单 / 报表</div>
+      </div>
+      <div class="mod skp">
+        <span class="tag t-skp">后期</span>
+        <div class="mod-name">AI 审核引擎</div>
+        <div class="mod-desc">内容自动预审</div>
+      </div>
+      <div class="mod skp">
+        <span class="tag t-skp">后期</span>
+        <div class="mod-name">开放 API</div>
+        <div class="mod-desc">对外能力开放</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 外部系统/基础能力层 -->
+  <div class="arch-layer lyr-ext">
+    <div class="layer-label">外部系统<br>基础能力层<span>Infra / External</span></div>
+    <div class="layer-body">
+      <div class="mod reu">
+        <span class="tag t-reu">复用</span>
+        <div class="mod-name">对象存储 OSS</div>
+        <div class="mod-desc">素材 / 成品文件存储</div>
+      </div>
+      <div class="mod reu">
+        <span class="tag t-reu">复用</span>
+        <div class="mod-name">短信服务</div>
+        <div class="mod-desc">验证码 / 通知短信</div>
+      </div>
+      <div class="mod ext">
+        <span class="tag t-ext">外部</span>
+        <div class="mod-name">财务系统</div>
+        <div class="mod-desc">线下对账 / 结算依据</div>
+      </div>
+      <div class="mod skp">
+        <span class="tag t-skp">后期</span>
+        <div class="mod-name">支付系统</div>
+        <div class="mod-desc">在线支付 / 自动分账</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════ BOTTOM THREE COLUMNS ════ -->
+<div class="bottom-grid">
+
+  <div class="info-card">
+    <h3 class="h3-green"><span class="ico ico-g">✅</span>本期范围</h3>
+    <ul class="chk-list g">
+      <li>项目展示与分类浏览</li>
+      <li>抢单 / 报名接单完整流程</li>
+      <li>订单自动生成与状态管理</li>
+      <li>协作空间（素材 / 交付 / 沟通）</li>
+      <li>文件上传下载（多版本留痕）</li>
+      <li>人工审核与修改意见退回</li>
+      <li>账户收益展示（非自动提现）</li>
+      <li>后台管理（项目 / 学员 / 财务）</li>
+      <li>天梯榜单（多维排行）</li>
+    </ul>
+  </div>
+
+  <div class="info-card">
+    <h3 class="h3-red"><span class="ico ico-r">🚫</span>本期不做</h3>
+    <ul class="chk-list r">
+      <li>在线支付 / 自动提现</li>
+      <li>自动分账系统</li>
+      <li>智能推荐引擎</li>
+      <li>AI 自动审核</li>
+      <li>开放 API 对外接入</li>
+      <li>移动端独立 App</li>
+      <li>甲方独立账号 / 客户端</li>
+    </ul>
+  </div>
+
+  <div class="info-card">
+    <h3 class="h3-orange"><span class="ico ico-o">❓</span>待确认问题</h3>
+    <ul class="chk-list o">
+      <li>收益结算是否需要与财务系统直连？</li>
+      <li>验收操作由运营还是甲方触发？</li>
+      <li>学员并发上限由谁配置？</li>
+      <li>大文件是否需要断点续传支持？</li>
+      <li>榜单数据刷新频率如何定义？</li>
+      <li>甲方一期是否需要独立账号体系？</li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- ════ CONSTRAINTS ════ -->
+<div class="constraint-card">
+  <div class="constraint-title">⚠️ 特殊约束与一期决策</div>
+  <div class="constraint-list">
+    <div class="constraint-item"><span class="c-num">①</span>一期不做线上支付，收益先展示不做自动提现，线下由财务打款后在平台标记结算</div>
+    <div class="constraint-item"><span class="c-num">②</span>审核先人工处理，不依赖 AI 自动审核，退回意见必填确保留痕可追溯</div>
+    <div class="constraint-item"><span class="c-num">③</span>账号体系、短信、对象存储均复用已有能力，不新建基础设施</div>
+    <div class="constraint-item"><span class="c-num">④</span>文件强鉴权，仅协作空间成员可访问素材与成品，防止越权访问</div>
+  </div>
+</div>
+
+<div class="footer">剪辑接单平台 · 产品架构图 V1.0 · 一期 MVP 方案设计</div>
+
+</div>
+</body>
+</html>
