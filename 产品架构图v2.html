@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>骋风天合内容生产平台 · 产品架构图 V2</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:#e8ecf4;color:#1a2238;min-height:100vh;padding:32px 28px 40px}
+.wrap{max-width:1440px;margin:0 auto}
+
+/* header */
+.header{
+  background:linear-gradient(125deg,#0c1a3a 0%,#132b5c 42%,#1e4a8c 100%);
+  border-radius:14px;padding:28px 36px 26px;color:#fff;margin-bottom:18px;
+  position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(12,26,58,.35)
+}
+.header::before{content:'';position:absolute;inset:-20% 55% auto -10%;height:120%;background:radial-gradient(ellipse,rgba(255,255,255,.06),transparent 70%)}
+.prod-title{font-size:24px;font-weight:800;letter-spacing:.5px;margin-bottom:8px}
+.prod-sub{font-size:13px;opacity:.82;max-width:780px;line-height:1.75}
+.badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;position:relative;z-index:1}
+.badge{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:5px 14px;font-size:11.5px}
+
+/* relationship strip */
+.rel-strip{
+  background:#fff;border-radius:12px;padding:16px 22px;margin-bottom:16px;
+  box-shadow:0 2px 12px rgba(0,0,0,.06);border:1px solid #e2e8f0
+}
+.rel-strip-title{font-size:11px;font-weight:800;letter-spacing:2px;color:#64748b;text-transform:uppercase;margin-bottom:12px}
+.rel-flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:10px;justify-content:space-between}
+.rel-item{
+  flex:1;min-width:200px;background:linear-gradient(180deg,#f8fafc,#f1f5f9);
+  border:1px solid #cbd5e1;border-radius:10px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start
+}
+.rel-ico{
+  width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;background:#fff;border:1px solid #e2e8f0
+}
+/* 仅标题行块级；正文内 <strong> 保持行内，避免标点孤行 */
+.rel-hd{display:block;font-size:12.5px;color:#0f172a;margin-bottom:4px;font-weight:700}
+.rel-body{font-size:11.5px;color:#475569;line-height:1.5;display:block}
+.rel-body strong{font-weight:700;color:#0f172a}
+
+/* arch container */
+.sec-label{
+  font-size:12px;font-weight:800;color:#475569;letter-spacing:1.5px;margin:22px 0 10px;
+  display:flex;align-items:center;gap:8px
+}
+.sec-label::before{content:'';width:4px;height:16px;border-radius:2px;background:linear-gradient(180deg,#2563eb,#1d4ed8)}
+
+.arch-block{background:#fff;border-radius:12px;overflow:hidden;margin-bottom:14px;box-shadow:0 2px 14px rgba(15,23,42,.07);border:1px solid #e2e8f0}
+
+.layer-head{
+  display:flex;align-items:center;gap:14px;padding:14px 20px;color:#fff;font-weight:800;font-size:14px;letter-spacing:.3px
+}
+.layer-head small{font-weight:600;opacity:.75;font-size:11px;margin-left:6px;letter-spacing:0}
+.lyr1 .layer-head{background:linear-gradient(90deg,#1e40af,#3b82f6)}
+.lyr2 .layer-head{background:linear-gradient(90deg,#0f766e,#14b8a6)}
+.lyr3 .layer-head{background:linear-gradient(90deg,#4c1d95,#7c3aed)}
+
+.layer-body{padding:16px 18px 18px}
+
+/* layer 1 grid */
+.biz-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+@media(max-width:1200px){.biz-grid{grid-template-columns:repeat(2,1fr)}.biz-grid .biz-card:first-child{grid-column:span 2}}
+@media(max-width:640px){.biz-grid{grid-template-columns:1fr}.biz-grid .biz-card:first-child{grid-column:span 1}}
+
+.biz-card{
+  border:1px solid #bfdbfe;background:linear-gradient(180deg,#eff6ff,#fff);
+  border-radius:10px;padding:12px 12px 10px;min-height:100%
+}
+.biz-card h4{font-size:13px;font-weight:800;color:#1e3a8a;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #dbeafe}
+.biz-card ul{list-style:none;font-size:11px;color:#334155;line-height:1.55}
+.biz-card li{padding-left:11px;position:relative;margin-bottom:4px}
+.biz-card li::before{content:'·';position:absolute;left:0;color:#3b82f6;font-weight:bold}
+
+.platform-banner{
+  margin-top:4px;padding:10px 14px;background:#1e40af;color:#fff;border-radius:8px;font-size:12px;font-weight:800;text-align:center;letter-spacing:1px
+}
+
+/* connectors between layers */
+.connector{
+  display:flex;align-items:center;justify-content:center;gap:16px;padding:10px 16px;margin:-2px 0 0;
+  background:linear-gradient(180deg,#f1f5f9,#e2e8f0);border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;font-size:12px;color:#334155
+}
+.connector svg{flex-shrink:0;opacity:.85}
+.connector b{color:#0f172a}
+
+/* layer 2 two columns */
+.dual{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:900px){.dual{grid-template-columns:1fr}}
+
+.dual-col{border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;background:#f8fafc}
+.dual-head{padding:11px 14px;font-weight:800;font-size:13px;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.dual-head span{font-size:10px;font-weight:600;opacity:.88}
+.col-left .dual-head{background:linear-gradient(90deg,#0d9488,#14b8a6)}
+.col-right .dual-head{background:linear-gradient(90deg,#6d28d9,#8b5cf6)}
+.dual-body{padding:12px 14px 14px}
+
+.subsec{margin-bottom:12px}
+.subsec:last-child{margin-bottom:0}
+.subsec h5{font-size:12px;font-weight:800;color:#0f766e;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.col-right .subsec h5{color:#5b21b6}
+.subsec h5::before{content:'';width:3px;height:12px;border-radius:2px;background:currentColor;opacity:.7}
+.subsec ul{list-style:none;font-size:11px;color:#475569;line-height:1.55}
+.subsec li{padding-left:11px;position:relative;margin-bottom:3px}
+.subsec li::before{content:'·';position:absolute;left:0;color:#94a3b8;font-weight:bold}
+
+.module-list .subsec h5::before{display:none}
+.module-list .subsec h5{padding:6px 10px;background:#ede9fe;color:#5b21b6;border-radius:6px;margin-bottom:6px}
+.col-left .module-list .subsec h5{background:#ccfbf1;color:#0f766e}
+
+.collab-bar{
+  margin-top:12px;padding:10px 14px;background:linear-gradient(90deg,#fef3c7,#fde68a);
+  border:1px solid #fbbf24;border-radius:8px;font-size:11.5px;color:#78350f;text-align:center;font-weight:700
+}
+
+/* layer 3 */
+.foundation-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media(max-width:1100px){.foundation-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.foundation-grid{grid-template-columns:1fr}}
+
+.fd-card{
+  border:1px solid #c4b5fd;background:linear-gradient(180deg,#f5f3ff,#fff);
+  border-radius:10px;padding:11px 12px
+}
+.fd-card h4{font-size:12.5px;font-weight:800;color:#5b21b6;margin-bottom:6px}
+.fd-card ul{list-style:none;font-size:10.5px;color:#4c1d95;line-height:1.5;opacity:.92}
+.fd-card li{padding-left:10px;position:relative;margin-bottom:3px}
+.fd-card li::before{content:'·';position:absolute;left:0;color:#8b5cf6;font-weight:bold}
+
+.fd-banner{margin-bottom:10px;padding:9px 12px;background:#5b21b6;color:#fff;border-radius:8px;font-size:12px;font-weight:800;text-align:center}
+
+/* bottom legend */
+.foot-note{
+  background:#fff;border:1px dashed #cbd5e1;border-radius:10px;padding:14px 18px;margin-top:8px;
+  font-size:11.5px;color:#475569;line-height:1.65
+}
+.foot-note strong{color:#1e293b}
+
+.footer{text-align:center;font-size:11px;color:#94a3b8;padding-top:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="header">
+  <div class="prod-title">骋风天合内容生产平台 · 产品架构图</div>
+  <p class="prod-sub">平台型架构视图：业务交易驱动生产履约，接单分发与 AIGC 工具协同产出，数字资产统一沉淀并反向赋能交易、创作与交付归档。适用于管理层汇报与跨团队对齐。</p>
+  <div class="badge-row">
+    <span class="badge">三层：业务交易层 · 生产履约层 · 资产底座层</span>
+    <span class="badge">双平台协同：接单分发与交付 ⟷ AIGC 创作工具</span>
+    <span class="badge">统一资产：入库 · 组织 · 版本 · 检索 · 权限</span>
+  </div>
+</header>
+
+<!-- 关键关系一览 -->
+<div class="rel-strip">
+  <div class="rel-strip-title">模块关系总览</div>
+  <div class="rel-flow">
+    <div class="rel-item">
+      <div class="rel-ico">↓</div>
+      <div>
+        <strong class="rel-hd">交易 → 履约</strong>
+        <span class="rel-body">内容交易平台向接单分发与交付平台<strong>下发项目与订单</strong>，驱动生产任务落地。</span>
+      </div>
+    </div>
+    <div class="rel-item">
+      <div class="rel-ico">⇄</div>
+      <div>
+        <strong class="rel-hd">双平台协同</strong>
+        <span class="rel-body">接单分发与交付平台与 AIGC 创作工具平台<strong>协同完成内容生产、审核与交付</strong>。</span>
+      </div>
+    </div>
+    <div class="rel-item">
+      <div class="rel-ico">↓</div>
+      <div>
+        <strong class="rel-hd">创作 → 资产</strong>
+        <span class="rel-body">AIGC 产出的图片、视频、成片等<strong>沉淀至数字资产管理</strong>。</span>
+      </div>
+    </div>
+    <div class="rel-item">
+      <div class="rel-ico">↑</div>
+      <div>
+        <strong class="rel-hd">资产反哺</strong>
+        <span class="rel-body">数字资产<strong>支撑交易展示、创作引用与交付归档</strong>，形成闭环。</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sec-label">第一层 · 业务交易层</div>
+<div class="arch-block lyr1">
+  <div class="layer-head">业务交易层 <small>Business &amp; Transaction</small></div>
+  <div class="layer-body">
+    <div class="platform-banner">内容交易平台</div>
+    <div class="biz-grid" style="margin-top:12px">
+      <div class="biz-card">
+        <h4>需求中心</h4>
+        <ul>
+          <li>内容需求发布</li>
+          <li>项目立项与需求录入</li>
+          <li>项目分类与标签定义</li>
+          <li>需求 / 素材 / 交付要求配置</li>
+        </ul>
+      </div>
+      <div class="biz-card">
+        <h4>交易撮合中心</h4>
+        <ul>
+          <li>项目发布与下架</li>
+          <li>接单模式（抢单 / 报名）</li>
+          <li>名额与截止时间管理</li>
+          <li>项目展示与详情</li>
+          <li>供需匹配与推荐</li>
+        </ul>
+      </div>
+      <div class="biz-card">
+        <h4>订单交易中心</h4>
+        <ul>
+          <li>项目转订单</li>
+          <li>报名审核转订单</li>
+          <li>交易状态流转</li>
+          <li>项目 / 订单台账</li>
+        </ul>
+      </div>
+      <div class="biz-card">
+        <h4>客户协同中心</h4>
+        <ul>
+          <li>需求沟通</li>
+          <li>验收反馈</li>
+          <li>版本确认</li>
+          <li>项目结果查看</li>
+        </ul>
+      </div>
+      <div class="biz-card">
+        <h4>经营运营中心</h4>
+        <ul>
+          <li>项目经营看板</li>
+          <li>平台供需数据</li>
+          <li>转化与履约效率分析</li>
+          <li>榜单 / 激励 / 运营策略配置</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="connector">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+  <span><b>下发</b>：项目与订单进入生产履约 · 接单分发与交付平台承接履约</span>
+</div>
+
+<div class="sec-label">第二层 · 生产履约层</div>
+<div class="arch-block lyr2">
+  <div class="layer-head">生产履约层 <small>Production &amp; Fulfillment</small></div>
+  <div class="layer-body">
+    <div class="dual">
+      <div class="dual-col col-left">
+        <div class="dual-head">接单分发与交付平台 <span>Order · Delivery</span></div>
+        <div class="dual-body">
+          <div class="subsec">
+            <h5>学员端</h5>
+            <ul>
+              <li>接单大厅、榜单、项目详情</li>
+              <li>接单管理、项目协同空间</li>
+              <li>账户与收益</li>
+            </ul>
+          </div>
+          <div class="subsec">
+            <h5>管理端</h5>
+            <ul>
+              <li>项目管理、学员管理、审核管理</li>
+              <li>财务对账、榜单与数据</li>
+              <li>权限与审计</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="dual-col col-right">
+        <div class="dual-head">AIGC 创作工具平台 <span>Creation · Review</span></div>
+        <div class="dual-body module-list">
+          <div class="subsec">
+            <h5>登录与基础入口</h5>
+          </div>
+          <div class="subsec">
+            <h5>项目首页</h5>
+            <ul>
+              <li>项目列表、项目配置、分镜配置、提示词配置</li>
+            </ul>
+          </div>
+          <div class="subsec">
+            <h5>AI 创作页</h5>
+            <ul>
+              <li>项目 / 集数切换、素材库、文件管理、评论模式</li>
+              <li>提交审核、分区状态切换、导演批注、画布卡片</li>
+              <li>素材配置弹窗、参考图选择、提示词库引用、模型参数配置</li>
+            </ul>
+          </div>
+          <div class="subsec">
+            <h5>团队协作审核页</h5>
+            <ul>
+              <li>审核状态矩阵、通过与驳回、撤回提交</li>
+              <li>进入画布、上传成片、导出整集</li>
+            </ul>
+          </div>
+          <div class="subsec">
+            <h5>提示词管理 · 数据中心 · 用户管理</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="collab-bar">接单分发与交付平台 ⟷ AIGC 创作工具平台：任务协同、进度与审核结论互通，共同完成生产与交付</div>
+  </div>
+</div>
+
+<div class="connector">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><path d="M12 19V5M19 12l-7-7-7 7"/></svg>
+  <span>成片与素材<strong>沉淀</strong>至资产底座；资产能力<strong>向上</strong>支撑交易展示、创作引用与归档验收</span>
+</div>
+
+<div class="sec-label">第三层 · 资产底座层</div>
+<div class="arch-block lyr3">
+  <div class="layer-head">资产底座层 <small>Digital Asset Foundation</small></div>
+  <div class="layer-body">
+    <div class="fd-banner">数字资产管理</div>
+    <div class="foundation-grid">
+      <div class="fd-card">
+        <h4>资产入库</h4>
+        <ul>
+          <li>原始素材、参考图、生成图</li>
+          <li>视频、成片、提示词模板</li>
+        </ul>
+      </div>
+      <div class="fd-card">
+        <h4>资产组织</h4>
+        <ul>
+          <li>分类、标签</li>
+          <li>项目 / 集数 / 分镜关联</li>
+          <li>元数据管理、命名规范</li>
+        </ul>
+      </div>
+      <div class="fd-card">
+        <h4>版本管理</h4>
+        <ul>
+          <li>版本号、历史版本、主版本标记</li>
+          <li>删除 / 覆盖留痕</li>
+        </ul>
+      </div>
+      <div class="fd-card">
+        <h4>资产检索与复用</h4>
+        <ul>
+          <li>素材检索、参考素材复用</li>
+          <li>已确认素材复用、跨项目调用</li>
+        </ul>
+      </div>
+      <div class="fd-card">
+        <h4>资产流转</h4>
+        <ul>
+          <li>素材下载、交付导出、成片归档</li>
+          <li>订单 / 审核 / 验收联动</li>
+        </ul>
+      </div>
+      <div class="fd-card">
+        <h4>权限与版权</h4>
+        <ul>
+          <li>访问权限、空间隔离</li>
+          <li>版权声明、审计日志</li>
+        </ul>
+      </div>
+      <div class="fd-card" style="grid-column:span 2">
+        <h4>存储与预览</h4>
+        <ul>
+          <li>文件预览、缩略图、转码压缩、下载导出</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="foot-note">
+  <strong>关系小结：</strong>业务交易层完成需求与订单闭环；生产履约层由「接单分发与交付」与「AIGC 创作工具」双平台并列承担执行与创作；资产底座层统一承载全链路数字资产，并向交易侧（展示与台账）、创作侧（引用与复用）、交付侧（导出与归档）提供一致能力。
+</div>
+
+<div class="footer">骋风天合内容生产平台 · 产品架构图 V2 · 平台型架构（非页面流程）</div>
+
+</div>
+</body>
+</html>

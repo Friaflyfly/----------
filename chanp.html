@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>骋风天合内容生产平台 - 产品架构图</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f9;
+            --layer-1-color: #1e3a8a; /* 深蓝色 - 业务交易层 */
+            --layer-2-color: #0d9488; /* 蓝绿色 - 生产履约层 */
+            --layer-3-color: #4f46e5; /* 靛蓝色 - 资产底座层 */
+            --accent-color: #f59e0b; /* 琥珀色 - 贯穿能力 */
+            --text-main: #334155;
+            --box-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: var(--layer-1-color);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .architecture-container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* 层级通用样式 */
+        .layer {
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .layer-title {
+            font-weight: bold;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        /* 第一层：业务交易层 */
+        .layer-business {
+            background-color: #e0f2fe;
+            border: 2px solid var(--layer-1-color);
+        }
+        .layer-business .layer-title { background-color: var(--layer-1-color); }
+
+        /* 第二层：生产履约层 */
+        .layer-production {
+            background-color: #f0fdfa;
+            border: 2px solid var(--layer-2-color);
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .layer-production .layer-title { background-color: var(--layer-2-color); width: 100%; }
+
+        /* 第三层：资产底座层 */
+        .layer-assets {
+            background-color: #eef2ff;
+            border: 2px solid var(--layer-3-color);
+        }
+        .layer-assets .layer-title { background-color: var(--layer-3-color); }
+
+        /* 通用能力虚线框 */
+        .layer-common {
+            border: 2px dashed var(--accent-color);
+            background-color: #fffbeb;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 10px;
+        }
+
+        /* 模块样式 */
+        .platform-box {
+            background: var(--box-bg);
+            border-radius: 8px;
+            padding: 15px;
+            flex: 1;
+            min-width: 250px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .platform-name {
+            font-weight: 800;
+            color: var(--text-main);
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            text-align: center;
+        }
+
+        .module-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .module {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 8px;
+            font-size: 0.85rem;
+        }
+
+        .module strong {
+            display: block;
+            color: #1e293b;
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+        }
+
+        .module ul {
+            margin: 0;
+            padding-left: 15px;
+            color: #64748b;
+            list-style-type: square;
+        }
+
+        /* 连接箭头模拟 */
+        .arrow-v {
+            text-align: center;
+            font-size: 24px;
+            color: #94a3b8;
+            margin: -10px 0;
+        }
+
+        .common-grid {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-weight: bold;
+            color: #b45309;
+        }
+
+        @media (max-width: 768px) {
+            .layer-production { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>骋风天合内容生产平台</h1>
+    <p class="subtitle">交易 — 生产 — 交付 — 资产沉淀 全链路闭环架构</p>
+
+    <div class="architecture-container">
+        
+        <div class="layer layer-business">
+            <span class="layer-title">顶层：业务交易层</span>
+            <div class="platform-box">
+                <div class="platform-name">内容交易平台 (面向需求/经营)</div>
+                <div class="module-group">
+                    <div class="module"><strong>需求中心</strong><ul><li>立项/录入</li><li>配置要求</li></ul></div>
+                    <div class="module"><strong>交易撮合</strong><ul><li>接单模式</li><li>供需匹配</li></ul></div>
+                    <div class="module"><strong>订单交易</strong><ul><li>状态流转</li><li>交易台账</li></ul></div>
+                    <div class="module"><strong>客户协同</strong><ul><li>验收反馈</li><li>版本确认</li></ul></div>
+                    <div class="module"><strong>经营运营</strong><ul><li>经营看板</li><li>策略配置</li></ul></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="arrow-v">↓ 下发项目与订单</div>
+
+        <div class="layer layer-production">
+            <span class="layer-title">中层：生产履约层</span>
+            
+            <div class="platform-box">
+                <div class="platform-name">接单分发与交付平台 (面向履约)</div>
+                <div class="module-group">
+                    <div class="module"><strong>学员端</strong><ul><li>接单大厅</li><li>收益账本</li></ul></div>
+                    <div class="module"><strong>管理端</strong><ul><li>人才库</li><li>审核管理</li></ul></div>
+                    <div class="module"><strong>财务对账</strong><ul><li>结算标记</li><li>报表导出</li></ul></div>
+                    <div class="module"><strong>协同空间</strong><ul><li>多轮修改</li><li>图文沟通</li></ul></div>
+                </div>
+            </div>
+
+            <div class="platform-box">
+                <div class="platform-name">AIGC 创作工具平台 (面向生产)</div>
+                <div class="module-group">
+                    <div class="module"><strong>创作画布</strong><ul><li>AI生图/视频</li><li>分镜配置</li></ul></div>
+                    <div class="module"><strong>协作审核</strong><ul><li>导演批注</li><li>状态矩阵</li></ul></div>
+                    <div class="module"><strong>提示词库</strong><ul><li>模板管理</li><li>后缀绑定</li></ul></div>
+                    <div class="module"><strong>数据中心</strong><ul><li>AI使用统计</li><li>成本分析</li></ul></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="arrow-v">↓ 沉淀资产 / 向上支撑</div>
+
+        <div class="layer layer-assets">
+            <span class="layer-title">底层：资产底座层</span>
+            <div class="platform-box">
+                <div class="platform-name">数字资产管理 (DAM)</div>
+                <div class="module-group">
+                    <div class="module"><strong>资产入库</strong><ul><li>原始/生成素材</li><li>成片归档</li></ul></div>
+                    <div class="module"><strong>组织检索</strong><ul><li>标签体系</li><li>跨项目复用</li></ul></div>
+                    <div class="module"><strong>版本管理</strong><ul><li>历史留存</li><li>确认版标记</li></ul></div>
+                    <div class="module"><strong>存储预览</strong><ul><li>转码压缩</li><li>版权审计</li></ul></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layer-common">
+            <div class="common-grid">
+                <span>🛡️ 权限与角色 (RBAC)</span>
+                <span>📝 审计日志</span>
+                <span>🔔 消息通知</span>
+                <span>📊 数据中心</span>
+                <span>🔍 AI/人像审核</span>
+                <span>☁️ 存储与转码</span>
+            </div>
+        </div>
+
+    </div>
+
+    <p style="margin-top: 30px; color: #94a3b8; font-size: 0.9rem;">© 2026 骋风天合内容生产平台架构方案</p>
+
+</body>
+</html>

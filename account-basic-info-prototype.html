@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>账户基础信息页 - 平台风格版</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #262626; }
+    .app { display: flex; min-height: 100vh; }
+    .sidebar { width: 200px; background: #fff; box-shadow: 2px 0 8px rgba(0,0,0,.06); position: fixed; top: 0; left: 0; bottom: 0; }
+    .logo { display: block; padding: 20px 16px; border-bottom: 1px solid #f0f0f0; color: #1890ff; font-weight: 600; text-decoration: none; }
+    .menu a { display: block; padding: 12px 24px; color: #262626; text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
+    .menu a:hover { background: #f0f0f0; color: #1890ff; }
+    .menu a.active { background: #e6f7ff; color: #1890ff; border-left-color: #1890ff; font-weight: 500; }
+    .main { margin-left: 200px; flex: 1; padding: 24px; }
+    .card { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+    .head { padding: 16px 20px; margin-bottom: 12px; }
+    .title { margin: 0; font-size: 24px; }
+    .sub { margin: 8px 0 0; font-size: 14px; color: #8c8c8c; }
+    .freeze { display: none; margin-bottom: 16px; background: #fff7e6; border: 1px solid #ffd591; color: #d46b08; border-radius: 8px; padding: 12px 16px; font-size: 14px; }
+    .layout { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .content { padding: 20px 24px; }
+    .content h2 { margin: 0 0 6px; font-size: 18px; }
+    .tip { margin: 0 0 16px; color: #8c8c8c; font-size: 13px; }
+    .profile { display: grid; grid-template-columns: 140px 1fr; gap: 18px; border-bottom: 1px solid #f0f0f0; padding-bottom: 18px; margin-bottom: 18px; }
+    .avatar { width: 96px; height: 96px; border-radius: 50%; border: 1px solid #d9d9d9; display: block; margin: 0 auto 10px; }
+    .btns { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    .btn { height: 32px; border: 1px solid #d9d9d9; background: #fff; border-radius: 6px; padding: 0 12px; font-size: 13px; color: #595959; cursor: pointer; }
+    .btn:hover { border-color: #91d5ff; color: #1890ff; }
+    .btn.primary { background: #1890ff; border-color: #1890ff; color: #fff; }
+    .btn.primary:hover { background: #40a9ff; border-color: #40a9ff; color: #fff; }
+    .btn.danger { color: #ff4d4f; border-color: #ffccc7; }
+    .btn:disabled { color: #bfbfbf; border-color: #f0f0f0; background: #fafafa; cursor: not-allowed; }
+    .avatar-tip { margin-top: 8px; color: #8c8c8c; font-size: 12px; text-align: center; }
+    .form { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px 16px; }
+    .field.full { grid-column: 1 / -1; }
+    label { display: block; margin-bottom: 6px; font-size: 14px; color: #595959; }
+    input[type=text], textarea, select { width: 100%; border: 1px solid #d9d9d9; border-radius: 6px; padding: 6px 11px; font-size: 14px; outline: none; }
+    input[type=text] { height: 36px; }
+    textarea { min-height: 90px; resize: vertical; }
+    input[type=text]:focus, textarea:focus, select:focus { border-color: #40a9ff; box-shadow: 0 0 0 2px rgba(24,144,255,.15); }
+    .inline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .tag { background: #fafafa; border: 1px solid #f0f0f0; border-radius: 4px; padding: 5px 10px; font-size: 13px; }
+    .error { min-height: 18px; margin-top: 4px; color: #ff4d4f; font-size: 12px; }
+    .counter { margin-left: auto; color: #8c8c8c; font-size: 12px; }
+    .actions { display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid #f0f0f0; margin-top: 18px; padding-top: 16px; }
+    .side-card { padding: 18px 20px; }
+    .side-card h3 { margin: 0 0 6px; font-size: 16px; }
+    .side-card p { margin: 0 0 14px; font-size: 13px; color: #8c8c8c; }
+    .kv { display: flex; justify-content: space-between; font-size: 13px; margin: 8px 0; color: #595959; }
+    .divider { height: 1px; background: #f0f0f0; margin: 12px 0; }
+    .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 99; }
+    .modal { width: 100%; max-width: 460px; background: #fff; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,.18); padding: 18px 20px; }
+    .modal h3 { margin: 0 0 8px; font-size: 18px; }
+    .modal p { margin: 0 0 14px; font-size: 13px; color: #8c8c8c; line-height: 1.6; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+    .toasts { position: fixed; top: 16px; right: 16px; width: min(90vw, 340px); display: grid; gap: 8px; z-index: 120; }
+    .toast { background: #fff; border: 1px solid #d9d9d9; border-radius: 6px; padding: 10px 12px; font-size: 13px; box-shadow: 0 3px 10px rgba(0,0,0,.08); }
+    .toast.ok { border-color: #b7eb8f; background: #f6ffed; color: #389e0d; }
+    .toast.err { border-color: #ffccc7; background: #fff2f0; color: #cf1322; }
+    .toast.warn { border-color: #ffe58f; background: #fffbe6; color: #d48806; }
+    @media (max-width: 960px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 16px; }
+      .layout { grid-template-columns: 1fr; }
+      .profile { grid-template-columns: 1fr; }
+      .form { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a href="Home.html" class="logo">🎬 天合接单平台</a>
+      <nav class="menu">
+        <a href="ProjectHall.html">接单大厅</a>
+        <a href="MyProjects.html">我的项目</a>
+        <a href="account-basic-info-prototype.html" class="active">账户基础信息</a>
+        <a href="enterprise-verification-prototype.html">企业认证</a>
+        <a href="account-security-prototype.html">账号安全</a>
+      </nav>
+    </aside>
+    <main class="main">
+      <section class="card head">
+        <h1 class="title">账户基础信息页</h1>
+        <p class="sub">维护个人资料并完成绑定信息二次验证。</p>
+      </section>
+      <div class="freeze" id="freezeBanner"></div>
+      <div class="layout">
+        <section class="card content">
+          <h2>基础资料</h2>
+          <p class="tip">昵称前端敏感词拦截；手机号/邮箱变更需验证码二次验证。</p>
+          <div class="profile">
+            <div>
+              <img id="avatarPreview" class="avatar" src="https://api.dicebear.com/9.x/lorelei/svg?seed=account" alt="用户头像">
+              <div class="btns">
+                <button class="btn" id="uploadAvatarBtn">上传头像</button>
+                <button class="btn danger" id="resetAvatarBtn">恢复默认</button>
+              </div>
+              <div class="avatar-tip">支持 JPG/PNG/WEBP，最大 5MB，上传前自动压缩。</div>
+              <input id="avatarInput" type="file" accept=".jpg,.jpeg,.png,.webp" hidden>
+            </div>
+            <div class="form">
+              <div class="field">
+                <label for="nickname">昵称（必填）</label>
+                <input id="nickname" type="text" maxlength="20" placeholder="请输入昵称">
+                <div class="error" id="nicknameError"></div>
+              </div>
+              <div class="field">
+                <label>账号类型</label>
+                <span id="accountTypeText" class="tag">企业账号</span>
+                <div class="error" style="color:#8c8c8c;">账号类型由入驻主体决定，不可在此页面修改。</div>
+              </div>
+              <div class="field">
+                <label>企业信息</label>
+                <span id="enterpriseNameText" class="tag">骋风天合影视文化传媒有限公司</span>
+                <div class="error" style="color:#8c8c8c;">企业名称取自企业认证信息，仅支持在企业认证页面变更。</div>
+              </div>
+              <div class="field">
+                <label>绑定手机号</label>
+                <div class="inline"><span id="phoneMasked" class="tag">138****1234</span><button class="btn" id="changePhoneBtn">更换手机号</button></div>
+              </div>
+              <div class="field">
+                <label>绑定邮箱</label>
+                <div class="inline"><span id="emailMasked" class="tag">a***@mail.com</span><button class="btn" id="changeEmailBtn">更换邮箱</button></div>
+              </div>
+              <div class="field full">
+                <label for="signature">个性签名</label>
+                <textarea id="signature" maxlength="80" placeholder="写点什么介绍你自己（0-80字）"></textarea>
+                <div class="inline"><div id="signatureError" class="error"></div><span class="counter"><span id="signCount">0</span>/80</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="actions"><button class="btn" id="cancelBtn">取消</button><button class="btn primary" id="saveBtn">保存</button></div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <div id="verifyModalMask" class="modal-mask">
+    <div class="modal">
+      <h3 id="verifyTitle">更换绑定信息</h3>
+      <p id="verifyDesc">请先输入新的绑定信息并完成验证码二次验证。</p>
+      <label for="newValue">新值</label>
+      <input id="newValue" type="text" placeholder="">
+      <label for="verifyCode" style="margin-top: 10px;">验证码</label>
+      <div class="inline"><input id="verifyCode" type="text" placeholder="请输入验证码"><button class="btn" id="sendCodeBtn">发送验证码</button></div>
+      <div id="verifyError" class="error"></div>
+      <div class="modal-actions"><button class="btn" id="verifyCancelBtn">取消</button><button class="btn primary" id="verifyConfirmBtn">确认变更</button></div>
+    </div>
+  </div>
+
+  <div id="toastWrap" class="toasts"></div>
+
+  <script>
+    const state = { unsavedChanges: false, isFrozen: false, freezeReasonCode: "", freezeReasonParams: {}, sensitiveWordsVersion: "2026.04.22", sensitiveWords: ["垃圾", "违法", "诈骗", "恶意词"], sendCodeCooldown: 0, verifyType: "phone" };
+    const config = {
+      freezeReasonTemplates: {
+        RISK_SUSPICIOUS_LOGIN: "账号当前处于冻结状态：检测到异常登录（{city}），暂无法修改资料或切换身份。",
+        RISK_COMPLAINT_HIGH: "账号当前处于冻结状态：近期投诉率超阈值（{ratio}%），暂无法修改资料或切换身份。",
+        RISK_KYC_EXPIRED: "账号当前处于冻结状态：实名认证已过期（到期日 {date}），暂无法修改资料或切换身份。",
+        DEFAULT: "账号当前处于冻结状态：{reasonText}，暂无法修改资料或切换身份。"
+      }
+    };
+    const $ = (id) => document.getElementById(id);
+    const nicknameEl = $("nickname"), signatureEl = $("signature"), nicknameErrorEl = $("nicknameError"), signatureErrorEl = $("signatureError"), signCountEl = $("signCount"), saveBtn = $("saveBtn"), freezeBannerEl = $("freezeBanner"), accountTypeText = $("accountTypeText"), avatarInput = $("avatarInput"), avatarPreview = $("avatarPreview"), verifyModalMask = $("verifyModalMask"), verifyTitle = $("verifyTitle"), verifyDesc = $("verifyDesc"), newValueInput = $("newValue"), verifyCodeInput = $("verifyCode"), verifyError = $("verifyError"), sendCodeBtn = $("sendCodeBtn");
+    const toast = (msg, kind = "ok") => { const n = document.createElement("div"); n.className = `toast ${kind}`; n.textContent = msg; $("toastWrap").appendChild(n); setTimeout(() => n.remove(), 2600); };
+    const maskPhone = (v) => `${v.slice(0,3)}****${v.slice(-4)}`;
+    const maskEmail = (v) => { const [n,d] = v.split("@"); return (!n || !d) ? v : `${n.slice(0,1)}***@${d}`; };
+    const validateNickname = () => { const v = nicknameEl.value.trim(); nicknameEl.value = v; if (!v) return "请输入昵称"; if (v.length < 2 || v.length > 20) return "昵称长度需为2-20字符"; if (!/^[\u4e00-\u9fa5a-zA-Z0-9_]+$/.test(v)) return "仅支持中英文、数字、下划线"; if (state.sensitiveWords.some((w) => v.includes(w))) return "昵称包含敏感词，请修改后再提交"; return ""; };
+    const validateSignature = () => signatureEl.value.length > 80 ? "个性签名最多80字" : "";
+    const renderErrors = () => { nicknameErrorEl.textContent = validateNickname(); signatureErrorEl.textContent = validateSignature(); signCountEl.textContent = String(signatureEl.value.length); };
+    const renderFreeze = () => {
+      if (!state.isFrozen || !state.freezeReasonCode) { freezeBannerEl.style.display = "none"; return; }
+      const tpl = config.freezeReasonTemplates[state.freezeReasonCode] || config.freezeReasonTemplates.DEFAULT;
+      const p = state.freezeReasonParams;
+      freezeBannerEl.textContent = tpl.replace("{city}", p.city || "未知地区").replace("{ratio}", p.ratio || "--").replace("{date}", p.date || "--").replace("{reasonText}", p.reasonText || state.freezeReasonCode);
+      freezeBannerEl.style.display = "block";
+    };
+    const setDisabled = () => {
+      const lock = state.isFrozen;
+      [nicknameEl, signatureEl, $("uploadAvatarBtn"), $("resetAvatarBtn"), $("changePhoneBtn"), $("changeEmailBtn"), saveBtn].forEach((el) => el.disabled = lock);
+    };
+    const closeVerify = () => verifyModalMask.style.display = "none";
+    const openVerify = (type) => {
+      if (state.isFrozen) return toast("账号冻结中，无法变更绑定信息", "err");
+      state.verifyType = type; verifyTitle.textContent = type === "phone" ? "更换绑定手机号" : "更换绑定邮箱"; verifyDesc.textContent = "请先输入新的绑定信息并完成验证码二次验证。"; newValueInput.value = ""; verifyCodeInput.value = ""; verifyError.textContent = ""; newValueInput.placeholder = type === "phone" ? "请输入新手机号" : "请输入新邮箱"; verifyModalMask.style.display = "flex";
+    };
+    const compressImage = async (file, maxWidth = 1080, quality = 0.82) => {
+      const bmp = await createImageBitmap(file); const ratio = Math.min(1, maxWidth / bmp.width); const w = Math.round(bmp.width * ratio), h = Math.round(bmp.height * ratio); const c = document.createElement("canvas"); c.width = w; c.height = h; c.getContext("2d").drawImage(bmp, 0, 0, w, h); return new Promise((res) => c.toBlob((b) => res(b), "image/jpeg", quality));
+    };
+
+    nicknameEl.addEventListener("input", () => { state.unsavedChanges = true; renderErrors(); });
+    nicknameEl.addEventListener("blur", renderErrors);
+    signatureEl.addEventListener("input", () => { state.unsavedChanges = true; renderErrors(); });
+    $("uploadAvatarBtn").addEventListener("click", () => avatarInput.click());
+    $("resetAvatarBtn").addEventListener("click", () => { avatarPreview.src = "https://api.dicebear.com/9.x/lorelei/svg?seed=account"; state.unsavedChanges = true; toast("头像已恢复默认", "warn"); });
+    avatarInput.addEventListener("change", async (e) => {
+      const f = e.target.files[0]; if (!f) return;
+      if (!/image\/(jpeg|png|webp)/.test(f.type)) return toast("仅支持 JPG/PNG/WEBP 格式", "err");
+      if (f.size > 5 * 1024 * 1024) return toast("图片大小不能超过 5MB", "err");
+      try { const out = await compressImage(f); if (!out || out.size > 5 * 1024 * 1024) return toast("压缩后仍超过 5MB，请更换图片", "err"); avatarPreview.src = URL.createObjectURL(out); state.unsavedChanges = true; toast("头像处理完成，已压缩并预览"); } catch (_) { toast("图片处理失败，请更换图片重试", "err"); }
+    });
+    $("changePhoneBtn").addEventListener("click", () => openVerify("phone"));
+    $("changeEmailBtn").addEventListener("click", () => openVerify("email"));
+    $("verifyCancelBtn").addEventListener("click", closeVerify);
+    sendCodeBtn.addEventListener("click", () => {
+      if (state.sendCodeCooldown > 0) return;
+      const val = newValueInput.value.trim();
+      if (state.verifyType === "phone" && !/^1\d{10}$/.test(val)) return verifyError.textContent = "手机号格式不正确";
+      if (state.verifyType === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) return verifyError.textContent = "邮箱格式不正确";
+      verifyError.textContent = ""; state.sendCodeCooldown = 60; sendCodeBtn.disabled = true; toast("验证码已发送");
+      const t = setInterval(() => { state.sendCodeCooldown -= 1; sendCodeBtn.textContent = state.sendCodeCooldown > 0 ? `${state.sendCodeCooldown}s` : "发送验证码"; if (state.sendCodeCooldown <= 0) { clearInterval(t); sendCodeBtn.disabled = false; } }, 1000);
+    });
+    $("verifyConfirmBtn").addEventListener("click", () => {
+      const code = verifyCodeInput.value.trim(), val = newValueInput.value.trim();
+      if (!code) return verifyError.textContent = "请输入验证码";
+      if (code !== "123456") return verifyError.textContent = "验证码错误或已失效，请重新获取";
+      if (state.verifyType === "phone") $("phoneMasked").textContent = maskPhone(val); else $("emailMasked").textContent = maskEmail(val);
+      state.unsavedChanges = true; closeVerify(); toast("绑定信息已更新");
+    });
+    $("cancelBtn").addEventListener("click", () => { if (state.unsavedChanges && !window.confirm("存在未保存修改，确认取消并返回上一页？")) return; history.back(); });
+    saveBtn.addEventListener("click", () => { renderErrors(); if (validateNickname() || validateSignature()) return toast("请先修正表单错误", "err"); if (state.isFrozen) return toast("账号冻结中，无法保存", "err"); saveBtn.disabled = true; saveBtn.textContent = "保存中..."; setTimeout(() => { state.unsavedChanges = false; saveBtn.textContent = "保存"; saveBtn.disabled = state.isFrozen; toast("保存成功"); }, 700); });
+    nicknameEl.value = "创作方_Leo";
+    signatureEl.value = "专注高质量交付与长期协作。";
+    accountTypeText.textContent = "企业账号";
+    renderErrors();
+    setDisabled();
+  </script>
+</body>
+</html>

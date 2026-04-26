@@ -1,0 +1,1948 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>企业认证页 - 天合短剧剪辑接单平台</title>
+  <style>
+    :root {
+      --bg-page: #f5f5f5;
+      --bg-card: #ffffff;
+      --bg-soft: #fafafa;
+      --line: #f0f0f0;
+      --line-strong: #d9d9d9;
+      --text-main: #262626;
+      --text-sub: #595959;
+      --text-mute: #8c8c8c;
+      --brand: #1890ff;
+      --brand-soft: #e6f7ff;
+      --success: #52c41a;
+      --success-soft: #f6ffed;
+      --warning: #faad14;
+      --warning-soft: #fffbe6;
+      --danger: #ff4d4f;
+      --danger-soft: #fff2f0;
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg-page);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    button, input, textarea, select {
+      font: inherit;
+    }
+
+    .appLayout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 200px;
+      background: #fff;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
+      position: fixed;
+      inset: 0 auto 0 0;
+      overflow-y: auto;
+      z-index: 10;
+    }
+
+    .sidebarHeader {
+      padding: 20px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .logo {
+      display: block;
+      color: var(--brand);
+      font-size: 18px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .menu {
+      padding: 16px 0;
+    }
+
+    .menuItem {
+      display: block;
+      padding: 12px 24px;
+      color: var(--text-main);
+      text-decoration: none;
+      font-size: 14px;
+      border-left: 3px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .menuItem:hover {
+      color: var(--brand);
+      background: #f0f0f0;
+    }
+
+    .menuItem.active {
+      color: var(--brand);
+      background: var(--brand-soft);
+      border-left-color: var(--brand);
+      font-weight: 500;
+    }
+
+    .mainContent {
+      flex: 1;
+      margin-left: 200px;
+      min-height: 100vh;
+    }
+
+    .pageWrap {
+      max-width: 1360px;
+      padding: 24px;
+    }
+
+    .topArea {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .breadcrumb {
+      color: var(--text-mute);
+      font-size: 14px;
+    }
+
+    .versionTag {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--brand);
+      border: 1px solid #91d5ff;
+      background: var(--brand-soft);
+    }
+
+    .card,
+    .titleCard,
+    .contentCard,
+    .sideCard,
+    .statusCard {
+      background: var(--bg-card);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .titleCard {
+      padding: 18px 24px;
+      margin-bottom: 12px;
+    }
+
+    .titleHead {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .pageTitle {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .pageDesc {
+      margin: 8px 0 0;
+      color: var(--text-mute);
+      font-size: 14px;
+      line-height: 1.7;
+      max-width: 820px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .statusPill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 104px;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .statusPill::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.92;
+    }
+
+    .status-unverified { color: #8c8c8c; background: #fafafa; border-color: #e8e8e8; }
+    .status-pending { color: #096dd9; background: #e6f7ff; border-color: #91d5ff; }
+    .status-verified { color: #389e0d; background: var(--success-soft); border-color: #b7eb8f; }
+    .status-failed { color: #cf1322; background: var(--danger-soft); border-color: #ffccc7; }
+
+    .statusGrid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+      align-items: start;
+    }
+
+    .statusCard {
+      padding: 16px 18px;
+      border: 1px solid #f0f0f0;
+    }
+
+    .statusCard.failedAccent {
+      border-color: #ffccc7;
+      background: #fffafa;
+    }
+
+    .statusLead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .statusTitle {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .statusDesc {
+      margin: 0;
+      color: var(--text-sub);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .statusMeta {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: linear-gradient(180deg, #fff, #fcfcfc);
+      padding: 12px 14px;
+    }
+
+    .metricLabel {
+      color: var(--text-mute);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .metricValue {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .timelineCard {
+      padding: 18px 20px;
+    }
+
+    .sideTitle {
+      margin: 0 0 6px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .sideTip {
+      margin: 0 0 16px;
+      color: var(--text-mute);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .flowLine {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0;
+      margin-top: 18px;
+      position: relative;
+    }
+
+    .flowLine::before {
+      content: "";
+      position: absolute;
+      top: 16px;
+      left: 8%;
+      right: 8%;
+      height: 2px;
+      background: #d9d9d9;
+      z-index: 0;
+    }
+
+    .flowStep {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 0 12px;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    .flowStep:hover {
+      transform: translateY(-1px);
+    }
+
+    .flowDot {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid #d9d9d9;
+      background: #fff;
+      position: relative;
+      margin-bottom: 12px;
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #8c8c8c;
+    }
+
+    .flowStep.active .flowDot {
+      border-color: var(--brand);
+      background: var(--brand);
+      color: #fff;
+      box-shadow: 0 0 0 4px rgba(24, 144, 255, 0.14);
+    }
+
+    .flowStep.done .flowDot {
+      border-color: var(--success);
+      background: var(--success);
+      color: #fff;
+    }
+
+    .flowStep.failed .flowDot {
+      border-color: var(--danger);
+      background: var(--danger);
+      color: #fff;
+      box-shadow: 0 0 0 4px rgba(255, 77, 79, 0.12);
+    }
+
+    .flowName {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .flowDesc {
+      color: var(--text-mute);
+      font-size: 12px;
+      line-height: 1.6;
+      max-width: 190px;
+    }
+
+    .flowHint {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--text-mute);
+    }
+
+    .progressPanel {
+      margin-top: 14px;
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) auto;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .progressPanelMain {
+      min-width: 0;
+    }
+
+    .progressPanelTitle {
+      margin: 0 0 6px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .progressPanelTip {
+      margin: 0;
+      font-size: 13px;
+      color: var(--text-mute);
+      line-height: 1.7;
+    }
+
+    .progressActions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .alert {
+      display: none;
+      margin-bottom: 16px;
+      padding: 14px 16px;
+      border-radius: 8px;
+      border: 1px solid #ffd8bf;
+      background: #fff7e6;
+      color: #ad4e00;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .layoutGrid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.75fr);
+      gap: 12px;
+      align-items: start;
+    }
+
+    .formPanel {
+      display: none;
+    }
+
+    .formPanel.open {
+      display: block;
+    }
+
+    .contentCard {
+      padding: 18px 20px;
+    }
+
+    .section + .section {
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+    }
+
+    .sectionHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .sectionTitle {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .sectionTip {
+      margin: 0;
+      font-size: 13px;
+      color: var(--text-mute);
+    }
+
+    .sectionTag {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #fafafa;
+      border: 1px solid var(--line);
+      color: var(--text-sub);
+      font-size: 12px;
+    }
+
+    .fieldGrid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    .fieldLabel {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 14px;
+      color: var(--text-sub);
+    }
+
+    .required {
+      color: var(--danger);
+      font-weight: 600;
+    }
+
+    .input,
+    .textarea,
+    .select {
+      width: 100%;
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--text-main);
+      padding: 6px 11px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+
+    .input,
+    .select {
+      height: 38px;
+    }
+
+    .textarea {
+      min-height: 96px;
+      padding-top: 8px;
+      resize: vertical;
+    }
+
+    .input:focus,
+    .textarea:focus,
+    .select:focus {
+      border-color: #40a9ff;
+      box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.14);
+    }
+
+    .input[readonly],
+    .textarea[readonly] {
+      background: #fafafa;
+      color: var(--text-sub);
+      cursor: not-allowed;
+    }
+
+    .field.invalid .input,
+    .field.invalid .textarea {
+      border-color: #ff7875;
+      background: #fffafa;
+    }
+
+    .fieldHint {
+      min-height: 18px;
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--text-mute);
+      line-height: 1.5;
+    }
+
+    .field.invalid .fieldHint {
+      color: var(--danger);
+    }
+
+    .uploadGrid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .uploadBox {
+      border: 1px dashed #bfbfbf;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #fff, #fafafa);
+      min-height: 186px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .uploadPreview {
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(135deg, rgba(24, 144, 255, 0.08), rgba(24, 144, 255, 0.01)),
+        repeating-linear-gradient(135deg, rgba(24, 144, 255, 0.05) 0, rgba(24, 144, 255, 0.05) 8px, rgba(255, 255, 255, 0.95) 8px, rgba(255, 255, 255, 0.95) 16px);
+      min-height: 110px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 6px;
+      color: var(--text-main);
+      overflow: hidden;
+    }
+
+    .uploadTitle {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .uploadMeta {
+      color: var(--text-mute);
+      font-size: 12px;
+    }
+
+    .uploadActions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .btn {
+      height: 32px;
+      line-height: 30px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: #fff;
+      padding: 0 12px;
+      color: var(--text-sub);
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      color: var(--brand);
+      border-color: #91d5ff;
+    }
+
+    .btn:disabled {
+      cursor: not-allowed;
+      color: #bfbfbf;
+      border-color: var(--line);
+      background: #fafafa;
+    }
+
+    .btnPrimary {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #fff;
+      font-weight: 500;
+    }
+
+    .btnPrimary:hover {
+      color: #fff;
+      background: #40a9ff;
+      border-color: #40a9ff;
+    }
+
+    .btnDanger {
+      color: var(--danger);
+      border-color: #ffccc7;
+    }
+
+    .btnDanger:hover {
+      color: var(--danger);
+      border-color: #ff7875;
+    }
+
+    .btnGhost {
+      background: #fafafa;
+    }
+
+    .readonlyTag {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      color: #595959;
+      background: #fafafa;
+      border: 1px solid var(--line);
+    }
+
+    .kvList {
+      display: grid;
+      gap: 12px;
+    }
+
+    .kvItem {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 13px;
+      padding-bottom: 12px;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .kvItem:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .kvLabel {
+      color: var(--text-mute);
+    }
+
+    .kvValue {
+      color: var(--text-main);
+      font-weight: 500;
+      text-align: right;
+    }
+
+    .reasonList {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .reasonItem {
+      border: 1px solid #ffccc7;
+      background: linear-gradient(180deg, #fff, #fff8f8);
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+
+    .reasonField {
+      color: #cf1322;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .reasonText {
+      color: #595959;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .stickyActions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .sideStack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .sideCard {
+      padding: 16px 18px;
+    }
+
+    .helpWrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .helpBtn {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1px solid #91d5ff;
+      background: #e6f7ff;
+      color: #096dd9;
+      font-size: 12px;
+      line-height: 16px;
+      text-align: center;
+      cursor: help;
+      user-select: none;
+      display: inline-block;
+    }
+
+    .helpPanel {
+      position: absolute;
+      left: 0;
+      top: calc(100% + 8px);
+      min-width: 280px;
+      max-width: 420px;
+      border: 1px solid #d9d9d9;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+      padding: 10px 12px;
+      color: #595959;
+      font-size: 12px;
+      line-height: 1.7;
+      display: none;
+      z-index: 20;
+      white-space: normal;
+    }
+
+    .helpWrap:hover .helpPanel,
+    .helpWrap:focus-within .helpPanel {
+      display: block;
+    }
+
+    .ruleText {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .timelineList {
+      display: grid;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .timelineItem {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: #fff;
+    }
+
+    .timelineItemTitle {
+      margin: 0 0 4px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .timelineItemMeta {
+      margin: 0;
+      font-size: 12px;
+      color: var(--text-mute);
+      line-height: 1.6;
+    }
+
+    .noPermission {
+      display: none;
+      padding: 52px 32px;
+      text-align: center;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .noPermissionIcon {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #fff1f0, #fff);
+      border: 1px solid #ffccc7;
+      color: var(--danger);
+      display: grid;
+      place-items: center;
+      font-size: 30px;
+    }
+
+    .noPermissionTitle {
+      margin: 0 0 8px;
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    .noPermissionDesc {
+      margin: 0 auto;
+      max-width: 520px;
+      color: var(--text-mute);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .modalMask {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 120;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 460px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+      padding: 18px 20px;
+    }
+
+    .modalTitle {
+      margin: 0 0 8px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .modalDesc {
+      margin: 0;
+      color: var(--text-mute);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .modalActions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .toastWrap {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 150;
+      width: min(90vw, 360px);
+      display: grid;
+      gap: 8px;
+    }
+
+    .toast {
+      border-radius: 8px;
+      padding: 10px 12px;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+      border: 1px solid var(--line-strong);
+      background: #fff;
+      color: var(--text-main);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .toast.ok { color: #237804; border-color: #b7eb8f; background: var(--success-soft); }
+    .toast.warn { color: #ad6800; border-color: #ffe58f; background: var(--warning-soft); }
+    .toast.err { color: #a8071a; border-color: #ffccc7; background: var(--danger-soft); }
+
+    .hiddenFile {
+      display: none;
+    }
+
+    @media (max-width: 1100px) {
+      .statusGrid,
+      .layoutGrid {
+        grid-template-columns: 1fr;
+      }
+
+      .flowLine {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px 0;
+      }
+
+      .flowLine::before {
+        display: none;
+      }
+
+      .progressPanel {
+        grid-template-columns: 1fr;
+      }
+
+      .progressActions {
+        justify-content: flex-start;
+      }
+
+      .uploadGrid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 960px) {
+      .sidebar { display: none; }
+      .mainContent { margin-left: 0; }
+      .pageWrap { padding: 16px; }
+      .fieldGrid,
+      .statusMeta {
+        grid-template-columns: 1fr;
+      }
+
+      .titleHead,
+      .statusLead,
+      .sectionHeader,
+      .topArea {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="appLayout">
+    <aside class="sidebar">
+      <div class="sidebarHeader"><a class="logo" href="Home.html">🎬 天合接单平台</a></div>
+      <nav class="menu">
+        <a class="menuItem" href="ProjectHall.html">接单大厅</a>
+        <a class="menuItem" href="MyProjects.html">我的项目</a>
+        <a class="menuItem" href="account-basic-info-prototype.html">账户基础信息</a>
+        <a class="menuItem active" href="enterprise-verification-prototype.html">企业认证</a>
+        <a class="menuItem" href="account-security-prototype.html">账号安全</a>
+      </nav>
+    </aside>
+
+    <main class="mainContent">
+      <div class="pageWrap">
+        <div class="topArea">
+          <div class="breadcrumb">首页 &gt; 账户中心 &gt; 企业认证</div>
+          <div class="versionTag">企业认证流程页</div>
+        </div>
+
+        <section class="titleCard">
+          <div class="titleHead">
+            <div>
+              <h1 class="pageTitle">企业认证页</h1>
+              <p class="pageDesc">
+                用于企业账号管理员提交主体资料、查看审核进度，并在已认证后发起信息变更。
+                <span class="helpWrap">
+                  <span class="helpBtn" tabindex="0" aria-label="查看状态覆盖说明">?</span>
+                  <span class="helpPanel">
+                    页面覆盖：未认证、审核中、已认证、认证失败、变更编辑态。<br>
+                    可根据当前认证状态查看按钮可用性、字段编辑权限和失败原因映射变化。
+                  </span>
+                </span>
+              </p>
+            </div>
+            <div id="pageStatusPill" class="statusPill status-unverified">未认证</div>
+          </div>
+        </section>
+
+        <div id="noPermissionPage" class="noPermission" aria-live="polite">
+          <div class="noPermissionIcon">!</div>
+          <h2 class="noPermissionTitle">当前账号暂无查看权限</h2>
+          <p class="noPermissionDesc">
+            企业认证页仅对企业账号管理员开放。当前子账号不可查看企业主体信息、认证状态和材料附件。
+            如需操作，请切换至管理员账号或联系主账号处理。
+          </p>
+        </div>
+
+        <div id="mainPage">
+          <div class="statusGrid">
+            <section id="statusCard" class="statusCard">
+              <div class="statusLead">
+                <div>
+                  <h2 id="statusTitle" class="statusTitle">尚未完成企业认证</h2>
+                  <p id="statusDesc" class="statusDesc">请填写企业认证资料并提交审核，平台将在五个工作日内完成审核。</p>
+                </div>
+                <span id="editabilityTag" class="readonlyTag">当前可编辑</span>
+              </div>
+              <div class="statusMeta">
+                <div class="metric">
+                  <div class="metricLabel">审核时效</div>
+                  <div id="metricSla" class="metricValue">五个工作日内</div>
+                </div>
+                <div class="metric">
+                  <div class="metricLabel">最近提交时间</div>
+                  <div id="metricSubmittedAt" class="metricValue">未提交</div>
+                </div>
+                <div class="metric">
+                  <div class="metricLabel">当前可执行操作</div>
+                  <div id="metricAction" class="metricValue">提交认证</div>
+                </div>
+              </div>
+              <div class="flowLine">
+                <div id="step-unverified" class="flowStep">
+                  <div class="flowDot"></div>
+                  <div>
+                    <div class="flowName">未认证</div>
+                    <div class="flowDesc">表单可编辑，支持提交企业认证资料。</div>
+                  </div>
+                </div>
+                <div id="step-pending" class="flowStep">
+                  <div class="flowDot"></div>
+                  <div>
+                    <div class="flowName">审核中</div>
+                    <div class="flowDesc">材料锁定只读，支持撤回申请，不允许直接修改。</div>
+                  </div>
+                </div>
+                <div id="step-verified" class="flowStep">
+                  <div class="flowDot"></div>
+                  <div>
+                    <div class="flowName">已认证</div>
+                    <div class="flowDesc">默认只读，可发起企业信息变更并再次提交审核。</div>
+                  </div>
+                </div>
+                <div id="step-failed" class="flowStep">
+                  <div class="flowDot"></div>
+                  <div>
+                    <div class="flowName">认证失败</div>
+                    <div class="flowDesc">失败原因会映射到字段级错误，修改后可重新提交。</div>
+                  </div>
+                </div>
+              </div>
+              <div class="flowHint">可点击状态节点，查看对应状态下的表单展示与可编辑性。</div>
+              <div class="progressPanel">
+                <div class="progressPanelMain">
+                  <h3 id="progressPanelTitle" class="progressPanelTitle">当前可直接开始企业认证</h3>
+                  <p id="progressPanelTip" class="progressPanelTip">点击右侧按钮后展开认证表单。认证失败时，失败原因会在这里集中展示。</p>
+                  <div id="inlineReasonList" class="reasonList" style="display: none;"></div>
+                </div>
+                <div class="progressActions">
+                  <button id="progressSecondaryBtn" class="btn" style="display: none;">返回查看</button>
+                  <button id="progressPrimaryBtn" class="btn btnPrimary">开始认证</button>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div id="formPanel" class="formPanel">
+          <div class="layoutGrid">
+            <section class="contentCard">
+              <section class="section">
+                <div class="sectionHeader">
+                  <div>
+                    <h2 id="formTitle" class="sectionTitle">企业认证表单</h2>
+                    <p id="formIntro" class="sectionTip">企业名称需与营业执照主体一致，营业执照支持图片或 PDF。</p>
+                  </div>
+                  <span class="sectionTag">主体资料</span>
+                </div>
+                <div class="fieldGrid">
+                  <div class="field full" data-field="enterpriseName">
+                    <label class="fieldLabel" for="enterpriseName"><span class="required">*</span>企业名称</label>
+                    <input id="enterpriseName" class="input" type="text" maxlength="100" placeholder="请输入营业执照上的企业全称">
+                    <div class="fieldHint">2-100 字，支持中英文、数字、括号及常见企业名称符号。</div>
+                  </div>
+                </div>
+                <div class="uploadGrid" style="margin-top: 16px;">
+                  <div class="field full" data-field="businessLicense">
+                    <div class="fieldLabel"><span class="required">*</span>营业执照</div>
+                    <div class="uploadBox">
+                      <div id="preview-businessLicense" class="uploadPreview">
+                        <div class="uploadTitle">营业执照原件 / 扫描件</div>
+                        <div id="meta-businessLicense" class="uploadMeta">支持 jpg / jpeg / png / pdf，单文件不超过 10MB</div>
+                      </div>
+                      <div class="uploadActions">
+                        <button class="btn" data-upload-trigger="businessLicense" aria-label="上传营业执照">上传文件</button>
+                        <button class="btn btnGhost" data-preview-trigger="businessLicense">预览</button>
+                        <button class="btn btnDanger" data-clear-trigger="businessLicense">删除</button>
+                      </div>
+                      <div class="fieldHint">审核中和已认证状态下仅支持查看，不支持替换与删除。</div>
+                      <input class="hiddenFile" id="file-businessLicense" type="file" accept=".jpg,.jpeg,.png,.pdf">
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="section">
+                <div class="sectionHeader">
+                  <div>
+                    <h2 class="sectionTitle">法人信息</h2>
+                    <p class="sectionTip">法人姓名需填写真实姓名，身份证正反面须完整、清晰、无遮挡。</p>
+                  </div>
+                  <span class="sectionTag">身份材料</span>
+                </div>
+                <div class="fieldGrid">
+                  <div class="field full" data-field="legalPersonName">
+                    <label class="fieldLabel" for="legalPersonName"><span class="required">*</span>法人姓名</label>
+                    <input id="legalPersonName" class="input" type="text" maxlength="30" placeholder="请输入法人真实姓名">
+                    <div class="fieldHint">支持中文、英文、中点和空格。</div>
+                  </div>
+                </div>
+                <div class="uploadGrid" style="margin-top: 16px;">
+                  <div class="field" data-field="idCardFront">
+                    <div class="fieldLabel"><span class="required">*</span>法人身份证正面</div>
+                    <div class="uploadBox">
+                      <div id="preview-idCardFront" class="uploadPreview">
+                        <div class="uploadTitle">身份证人像面</div>
+                        <div id="meta-idCardFront" class="uploadMeta">支持 jpg / jpeg / png，单文件不超过 10MB</div>
+                      </div>
+                      <div class="uploadActions">
+                        <button class="btn" data-upload-trigger="idCardFront" aria-label="上传法人身份证正面">上传文件</button>
+                        <button class="btn btnGhost" data-preview-trigger="idCardFront">预览</button>
+                        <button class="btn btnDanger" data-clear-trigger="idCardFront">删除</button>
+                      </div>
+                      <input class="hiddenFile" id="file-idCardFront" type="file" accept=".jpg,.jpeg,.png">
+                    </div>
+                  </div>
+                  <div class="field" data-field="idCardBack">
+                    <div class="fieldLabel"><span class="required">*</span>法人身份证反面</div>
+                    <div class="uploadBox">
+                      <div id="preview-idCardBack" class="uploadPreview">
+                        <div class="uploadTitle">身份证国徽面</div>
+                        <div id="meta-idCardBack" class="uploadMeta">需包含有效期信息，支持 jpg / jpeg / png</div>
+                      </div>
+                      <div class="uploadActions">
+                        <button class="btn" data-upload-trigger="idCardBack" aria-label="上传法人身份证反面">上传文件</button>
+                        <button class="btn btnGhost" data-preview-trigger="idCardBack">预览</button>
+                        <button class="btn btnDanger" data-clear-trigger="idCardBack">删除</button>
+                      </div>
+                      <input class="hiddenFile" id="file-idCardBack" type="file" accept=".jpg,.jpeg,.png">
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="section">
+                <div class="sectionHeader">
+                  <div>
+                    <h2 class="sectionTitle">对公账户信息</h2>
+                    <p class="sectionTip">开户户名必须与企业主体一致，银行账号在只读状态下默认脱敏展示。</p>
+                  </div>
+                  <span class="sectionTag">结算信息</span>
+                </div>
+                <div class="fieldGrid">
+                  <div class="field" data-field="bankAccountName">
+                    <label class="fieldLabel" for="bankAccountName"><span class="required">*</span>开户户名</label>
+                    <input id="bankAccountName" class="input" type="text" maxlength="100" placeholder="请输入开户户名">
+                    <div class="fieldHint">需与企业主体一致。</div>
+                  </div>
+                  <div class="field" data-field="bankName">
+                    <label class="fieldLabel" for="bankName"><span class="required">*</span>开户银行</label>
+                    <input id="bankName" class="input" type="text" maxlength="80" placeholder="请输入开户银行">
+                    <div class="fieldHint">填写完整银行名称即可。</div>
+                  </div>
+                  <div class="field full" data-field="bankAccountNumber">
+                    <label class="fieldLabel" for="bankAccountNumber"><span class="required">*</span>银行账号</label>
+                    <input id="bankAccountNumber" class="input" type="text" maxlength="36" placeholder="请输入对公银行账号">
+                    <div class="fieldHint">8-30 位数字，输入时允许空格分组显示，提交时自动去空格。</div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="section">
+                <div class="sectionHeader">
+                  <div>
+                    <h2 class="sectionTitle">补充信息</h2>
+                    <p class="sectionTip">企业官网非必填，若填写则需为合法 URL。</p>
+                  </div>
+                  <span class="sectionTag">非必填</span>
+                </div>
+                <div class="fieldGrid">
+                  <div class="field full" data-field="website">
+                    <label class="fieldLabel" for="website">企业官网</label>
+                    <input id="website" class="input" type="url" maxlength="200" placeholder="请输入企业官网，如 https://www.example.com">
+                    <div class="fieldHint">支持自动补齐 https:// 输入提示，提交时按标准 URL 格式校验。</div>
+                  </div>
+                </div>
+              </section>
+
+              <div class="stickyActions">
+                <button id="secondaryActionBtn" class="btn">取消</button>
+                <button id="primaryActionBtn" class="btn btnPrimary">提交认证</button>
+              </div>
+            </section>
+
+            <aside class="sideStack">
+              <section class="sideCard">
+                <h3 class="sideTitle">审核说明</h3>
+                <p class="sideTip">企业认证提交后平台将在五个工作日内完成审核。审核中资料锁定不可编辑，若需修改可先撤回申请。</p>
+                <div class="kvList">
+                  <div class="kvItem"><span class="kvLabel">审核时效</span><span class="kvValue">五个工作日内</span></div>
+                  <div class="kvItem"><span class="kvLabel">审核范围</span><span class="kvValue">主体资料 + 法人信息 + 对公账户</span></div>
+                  <div class="kvItem"><span class="kvLabel">资料规范</span><span class="kvValue">证件清晰完整、信息一致</span></div>
+                  <div class="kvItem"><span class="kvLabel">失败处理</span><span class="kvValue">按字段提示修正后重新提交</span></div>
+                </div>
+              </section>
+
+              <section class="sideCard">
+                <h3 class="sideTitle">审核进度记录</h3>
+                <p class="sideTip">展示最近关键节点，便于定位当前审核阶段。</p>
+                <div class="timelineList">
+                  <div class="timelineItem">
+                    <p class="timelineItemTitle">提交企业认证申请</p>
+                    <p class="timelineItemMeta">2026-04-21 14:30 · 系统已受理</p>
+                  </div>
+                  <div class="timelineItem">
+                    <p class="timelineItemTitle">初审结论：认证失败</p>
+                    <p class="timelineItemMeta">2026-04-22 09:15 · 原因已同步至字段提示</p>
+                  </div>
+                  <div class="timelineItem">
+                    <p class="timelineItemTitle">等待重新提交</p>
+                    <p class="timelineItemMeta">请修正失败项后重新提交审核</p>
+                  </div>
+                </div>
+              </section>
+            </aside>
+          </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="confirmModalMask" class="modalMask" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+    <div class="modal">
+      <h3 id="confirmModalTitle" class="modalTitle">确认操作</h3>
+      <p id="confirmModalDesc" class="modalDesc">请确认当前操作。</p>
+      <div class="modalActions">
+        <button id="confirmCancelBtn" class="btn">取消</button>
+        <button id="confirmOkBtn" class="btn btnPrimary">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastWrap" class="toastWrap" aria-live="polite"></div>
+
+  <script>
+    const fieldNames = {
+      enterpriseName: "企业名称",
+      businessLicense: "营业执照",
+      legalPersonName: "法人姓名",
+      idCardFront: "法人身份证正面",
+      idCardBack: "法人身份证反面",
+      bankAccountName: "开户户名",
+      bankName: "开户银行",
+      bankAccountNumber: "银行账号",
+      website: "企业官网"
+    };
+
+    const defaultForm = {
+      enterpriseName: "骋风天合影视文化传媒有限公司",
+      legalPersonName: "张明远",
+      bankAccountName: "骋风天合影视文化传媒有限公司",
+      bankName: "招商银行上海徐汇支行",
+      bankAccountNumber: "6225880012345678",
+      website: "https://www.tianhemedia.cn"
+    };
+
+    const defaultUploads = {
+      businessLicense: { label: "天合营业执照.pdf", size: "3.2MB", mime: "PDF 文件" },
+      idCardFront: { label: "法人身份证正面.jpg", size: "1.6MB", mime: "JPG 图片" },
+      idCardBack: { label: "法人身份证反面.jpg", size: "1.4MB", mime: "JPG 图片" }
+    };
+
+    const failedReasonsMock = [
+      {
+        field: "businessLicense",
+        code: "IMAGE_BLUR",
+        message: "营业执照信息模糊，无法识别，请重新上传清晰图片"
+      },
+      {
+        field: "bankAccountName",
+        code: "ACCOUNT_NAME_MISMATCH",
+        message: "开户户名需与企业主体一致，请核对后修改"
+      }
+    ];
+
+    const statusConfig = {
+      UNVERIFIED: {
+        label: "未认证",
+        pillClass: "status-unverified",
+        title: "尚未完成企业认证",
+        desc: "请填写企业认证资料并提交审核，平台将在五个工作日内完成审核。",
+        action: "提交认证",
+        editable: true
+      },
+      PENDING: {
+        label: "审核中",
+        pillClass: "status-pending",
+        title: "企业认证审核中",
+        desc: "认证资料已提交，平台将在五个工作日内完成审核。审核期间材料锁定，只支持撤回申请。",
+        action: "撤回申请",
+        editable: false
+      },
+      VERIFIED: {
+        label: "已认证",
+        pillClass: "status-verified",
+        title: "企业认证已通过",
+        desc: "当前企业主体认证已通过。若需变更企业信息，请发起企业认证信息变更。",
+        action: "变更企业认证信息",
+        editable: false
+      },
+      FAILED: {
+        label: "认证失败",
+        pillClass: "status-failed",
+        title: "本次企业认证未通过",
+        desc: "失败原因会映射到字段级错误，请根据提示修改后重新提交。",
+        action: "重新提交认证",
+        editable: true
+      }
+    };
+
+    const state = {
+      role: "admin",
+      certStatus: "FAILED",
+      pageMode: "edit",
+      formPreviewByStatusBar: false,
+      confirmAction: null,
+      form: { ...defaultForm },
+      uploads: { ...defaultUploads },
+      failureReasons: [...failedReasonsMock],
+      submittedAt: "2026-04-21 14:30"
+    };
+
+    const inputs = {
+      enterpriseName: document.getElementById("enterpriseName"),
+      legalPersonName: document.getElementById("legalPersonName"),
+      bankAccountName: document.getElementById("bankAccountName"),
+      bankName: document.getElementById("bankName"),
+      bankAccountNumber: document.getElementById("bankAccountNumber"),
+      website: document.getElementById("website")
+    };
+
+    const pageStatusPill = document.getElementById("pageStatusPill");
+    const statusCard = document.getElementById("statusCard");
+    const statusTitle = document.getElementById("statusTitle");
+    const statusDesc = document.getElementById("statusDesc");
+    const editabilityTag = document.getElementById("editabilityTag");
+    const metricSubmittedAt = document.getElementById("metricSubmittedAt");
+    const metricAction = document.getElementById("metricAction");
+    const progressPanelTitle = document.getElementById("progressPanelTitle");
+    const progressPanelTip = document.getElementById("progressPanelTip");
+    const inlineReasonList = document.getElementById("inlineReasonList");
+    const progressPrimaryBtn = document.getElementById("progressPrimaryBtn");
+    const progressSecondaryBtn = document.getElementById("progressSecondaryBtn");
+    const formPanel = document.getElementById("formPanel");
+    const formTitle = document.getElementById("formTitle");
+    const formIntro = document.getElementById("formIntro");
+    const primaryActionBtn = document.getElementById("primaryActionBtn");
+    const secondaryActionBtn = document.getElementById("secondaryActionBtn");
+    const noPermissionPage = document.getElementById("noPermissionPage");
+    const mainPage = document.getElementById("mainPage");
+    const confirmModalMask = document.getElementById("confirmModalMask");
+    const confirmModalTitle = document.getElementById("confirmModalTitle");
+    const confirmModalDesc = document.getElementById("confirmModalDesc");
+
+    function toast(message, kind = "ok") {
+      const node = document.createElement("div");
+      node.className = `toast ${kind}`;
+      node.textContent = message;
+      document.getElementById("toastWrap").appendChild(node);
+      setTimeout(() => node.remove(), 2600);
+    }
+
+    function maskBankNumber(value) {
+      const digits = String(value).replace(/\s+/g, "");
+      if (digits.length <= 4) return digits;
+      return `**** **** **** ${digits.slice(-4)}`;
+    }
+
+    function formatBankInput(value) {
+      return String(value).replace(/\D/g, "").slice(0, 30).replace(/(.{4})/g, "$1 ").trim();
+    }
+
+    function getIsEditable() {
+      return state.role === "admin" && (
+        (state.certStatus === "UNVERIFIED" && state.pageMode === "edit") ||
+        (state.certStatus === "FAILED" && state.pageMode === "edit") ||
+        (state.certStatus === "VERIFIED" && state.pageMode === "change")
+      );
+    }
+
+    function syncFieldValues() {
+      inputs.enterpriseName.value = state.form.enterpriseName;
+      inputs.legalPersonName.value = state.form.legalPersonName;
+      inputs.bankAccountName.value = state.form.bankAccountName;
+      inputs.bankName.value = state.form.bankName;
+      inputs.website.value = state.form.website;
+      inputs.bankAccountNumber.value = getIsEditable()
+        ? formatBankInput(state.form.bankAccountNumber)
+        : maskBankNumber(state.form.bankAccountNumber);
+    }
+
+    function validateField(fieldKey) {
+      const raw = state.form[fieldKey] || "";
+      const value = String(raw).trim();
+
+      if (fieldKey === "enterpriseName") {
+        if (!value) return "请输入企业名称";
+        if (value.length < 2 || value.length > 100) return "企业名称需为 2-100 字";
+      }
+
+      if (fieldKey === "legalPersonName") {
+        if (!value) return "请输入法人姓名";
+        if (value.length < 2 || value.length > 30) return "请输入真实姓名";
+      }
+
+      if (fieldKey === "bankAccountName") {
+        if (!value) return "请输入开户户名";
+        if (value !== state.form.enterpriseName.trim()) return "开户户名需与企业主体一致";
+      }
+
+      if (fieldKey === "bankName") {
+        if (!value) return "请输入开户银行";
+      }
+
+      if (fieldKey === "bankAccountNumber") {
+        const digits = value.replace(/\D/g, "");
+        if (!digits) return "请输入银行账号";
+        if (digits.length < 8 || digits.length > 30) return "请输入正确的银行账号";
+      }
+
+      if (fieldKey === "website" && value) {
+        try {
+          const url = value.startsWith("http") ? value : `https://${value}`;
+          new URL(url);
+        } catch (error) {
+          return "请输入正确的网址";
+        }
+      }
+
+      return "";
+    }
+
+    function getUploadError(fieldKey) {
+      if (!state.uploads[fieldKey]) {
+        if (fieldKey === "businessLicense") return "请上传营业执照";
+        if (fieldKey === "idCardFront") return "请上传法人身份证正面";
+        if (fieldKey === "idCardBack") return "请上传法人身份证反面";
+      }
+      return "";
+    }
+
+    function getFailureMap() {
+      return Object.fromEntries(state.failureReasons.map((item) => [item.field, item.message]));
+    }
+
+    function applyFieldState(fieldKey) {
+      const fieldNode = document.querySelector(`[data-field="${fieldKey}"]`);
+      if (!fieldNode) return;
+      const hintNode = fieldNode.querySelector(".fieldHint");
+      const failureMap = getFailureMap();
+      const structuralError = state.certStatus === "FAILED" ? failureMap[fieldKey] : "";
+      const validationError = getIsEditable() ? validateField(fieldKey) : "";
+      const uploadError = ["businessLicense", "idCardFront", "idCardBack"].includes(fieldKey) ? getUploadError(fieldKey) : "";
+      const finalError = structuralError || validationError || uploadError;
+      fieldNode.classList.toggle("invalid", Boolean(finalError));
+      if (hintNode && finalError) hintNode.textContent = finalError;
+      if (hintNode && !finalError) {
+        if (fieldKey === "enterpriseName") hintNode.textContent = "2-100 字，支持中英文、数字、括号及常见企业名称符号。";
+        if (fieldKey === "businessLicense") hintNode.textContent = "审核中和已认证状态下仅支持查看，不支持替换与删除。";
+        if (fieldKey === "legalPersonName") hintNode.textContent = "支持中文、英文、中点和空格。";
+        if (fieldKey === "bankAccountName") hintNode.textContent = "需与企业主体一致。";
+        if (fieldKey === "bankName") hintNode.textContent = "填写完整银行名称即可。";
+        if (fieldKey === "bankAccountNumber") hintNode.textContent = "8-30 位数字，输入时允许空格分组显示，提交时自动去空格。";
+        if (fieldKey === "website") hintNode.textContent = "支持自动补齐 https:// 输入提示，提交时按标准 URL 格式校验。";
+      }
+    }
+
+    function renderFailureReasons() {
+      const shouldShow = state.certStatus === "FAILED" && state.failureReasons.length > 0;
+      inlineReasonList.style.display = shouldShow ? "grid" : "none";
+      inlineReasonList.innerHTML = "";
+      if (!shouldShow) return;
+
+      state.failureReasons.forEach((item) => {
+        const node = document.createElement("div");
+        node.className = "reasonItem";
+        node.innerHTML = `
+          <div class="reasonField">${fieldNames[item.field] || item.field} · ${item.code}</div>
+          <div class="reasonText">${item.message}</div>
+        `;
+        inlineReasonList.appendChild(node);
+      });
+    }
+
+    function renderUploads() {
+      Object.entries(defaultUploads).forEach(([key, defaults]) => {
+        const preview = document.getElementById(`preview-${key}`);
+        const meta = document.getElementById(`meta-${key}`);
+        const file = state.uploads[key];
+        if (file) {
+          preview.querySelector(".uploadTitle").textContent = file.label;
+          meta.textContent = `${file.mime} · ${file.size}`;
+        } else {
+          preview.querySelector(".uploadTitle").textContent = defaults.label.includes(".pdf")
+            ? "营业执照原件 / 扫描件"
+            : defaults.label.includes("正面")
+              ? "身份证人像面"
+              : "身份证国徽面";
+          if (key === "businessLicense") meta.textContent = "支持 jpg / jpeg / png / pdf，单文件不超过 10MB";
+          if (key === "idCardFront") meta.textContent = "支持 jpg / jpeg / png，单文件不超过 10MB";
+          if (key === "idCardBack") meta.textContent = "需包含有效期信息，支持 jpg / jpeg / png";
+        }
+      });
+    }
+
+    function renderFlow() {
+      const steps = ["UNVERIFIED", "PENDING", "VERIFIED", "FAILED"];
+      steps.forEach((status) => {
+        const node = document.getElementById(`step-${status.toLowerCase()}`);
+        node.classList.remove("active", "done", "failed");
+      });
+
+      if (state.certStatus === "UNVERIFIED") {
+        document.getElementById("step-unverified").classList.add("active");
+      }
+      if (state.certStatus === "PENDING") {
+        document.getElementById("step-unverified").classList.add("done");
+        document.getElementById("step-pending").classList.add("active");
+      }
+      if (state.certStatus === "VERIFIED") {
+        document.getElementById("step-unverified").classList.add("done");
+        document.getElementById("step-pending").classList.add("done");
+        document.getElementById("step-verified").classList.add("active");
+      }
+      if (state.certStatus === "FAILED") {
+        document.getElementById("step-unverified").classList.add("done");
+        document.getElementById("step-pending").classList.add("done");
+        document.getElementById("step-failed").classList.add("failed");
+      }
+    }
+
+    function renderActions() {
+      if (state.certStatus === "UNVERIFIED") {
+        primaryActionBtn.textContent = "提交认证";
+        primaryActionBtn.disabled = false;
+        secondaryActionBtn.textContent = "收起表单";
+      }
+
+      if (state.certStatus === "FAILED") {
+        primaryActionBtn.textContent = "提交认证";
+        primaryActionBtn.disabled = false;
+        secondaryActionBtn.textContent = "收起表单";
+      }
+
+      if (state.certStatus === "PENDING") {
+        primaryActionBtn.textContent = "撤回申请";
+        primaryActionBtn.disabled = false;
+        secondaryActionBtn.textContent = "返回";
+      }
+
+      if (state.certStatus === "VERIFIED" && state.pageMode !== "change") {
+        primaryActionBtn.textContent = "变更企业认证信息";
+        primaryActionBtn.disabled = false;
+        secondaryActionBtn.textContent = "返回";
+      }
+
+      if (state.certStatus === "VERIFIED" && state.pageMode === "change") {
+        primaryActionBtn.textContent = "提交变更";
+        primaryActionBtn.disabled = false;
+        secondaryActionBtn.textContent = "收起表单";
+      }
+    }
+
+    function renderProgressPanel() {
+      progressSecondaryBtn.style.display = "none";
+      progressPrimaryBtn.style.display = "inline-flex";
+
+      if (state.certStatus === "UNVERIFIED") {
+        progressPanelTitle.textContent = "当前可直接开始企业认证";
+        progressPanelTip.textContent = "点击右侧按钮展开认证表单，填写完成后提交审核。";
+        progressPrimaryBtn.textContent = "开始认证";
+      }
+
+      if (state.certStatus === "UNVERIFIED" && state.pageMode === "edit") {
+        progressPanelTitle.textContent = "正在填写企业认证资料";
+        progressPanelTip.textContent = "表单已展开，请完成资料填写后提交审核。";
+        progressPrimaryBtn.style.display = "none";
+        progressSecondaryBtn.style.display = "inline-flex";
+        progressSecondaryBtn.textContent = "收起表单";
+      }
+
+      if (state.certStatus === "PENDING") {
+        progressPanelTitle.textContent = "资料已提交，正在审核";
+        progressPanelTip.textContent = "审核中不允许直接修改信息，如确需调整，请先撤回申请再重新填写。";
+        progressPrimaryBtn.textContent = "撤回申请";
+      }
+
+      if (state.certStatus === "VERIFIED" && state.pageMode !== "change") {
+        progressPanelTitle.textContent = "企业主体已完成认证";
+        progressPanelTip.textContent = "如需调整企业名称、法人信息或对公账户，请发起企业认证信息变更。";
+        progressPrimaryBtn.textContent = "发起变更";
+      }
+
+      if (state.certStatus === "VERIFIED" && state.pageMode === "change") {
+        progressPanelTitle.textContent = "正在编辑企业认证变更表单";
+        progressPanelTip.textContent = "修改完成后提交变更申请，平台会重新进入审核流程。";
+        progressPrimaryBtn.style.display = "none";
+        progressSecondaryBtn.style.display = "inline-flex";
+        progressSecondaryBtn.textContent = "收起表单";
+      }
+
+      if (state.certStatus === "FAILED" && state.pageMode !== "edit") {
+        progressPanelTitle.textContent = "认证失败，请先处理以下原因";
+        progressPanelTip.textContent = "失败原因集中展示在这里。点击右侧“重新提交”后展开表单，修改完成再提交。";
+        progressPrimaryBtn.textContent = "重新提交";
+      }
+
+      if (state.certStatus === "FAILED" && state.pageMode === "edit") {
+        progressPanelTitle.textContent = "正在重新填写认证资料";
+        progressPanelTip.textContent = "表单已展开，请根据失败原因逐项修正后重新提交认证。";
+        progressPrimaryBtn.style.display = "none";
+        progressSecondaryBtn.style.display = "inline-flex";
+        progressSecondaryBtn.textContent = "收起表单";
+      }
+    }
+
+    function renderStatusSummary() {
+      const cfg = statusConfig[state.certStatus];
+      pageStatusPill.className = `statusPill ${cfg.pillClass}`;
+      pageStatusPill.textContent = cfg.label;
+      statusTitle.textContent = cfg.title;
+      statusDesc.textContent = cfg.desc;
+      metricSubmittedAt.textContent = state.certStatus === "UNVERIFIED" ? "未提交" : state.submittedAt;
+      if (state.certStatus === "FAILED" && state.pageMode !== "edit") metricAction.textContent = "重新提交";
+      else if (state.certStatus === "UNVERIFIED" && state.pageMode !== "edit") metricAction.textContent = "开始认证";
+      else if (state.certStatus === "VERIFIED" && state.pageMode !== "change") metricAction.textContent = "发起变更";
+      else metricAction.textContent = primaryActionBtn.textContent;
+
+      const editable = getIsEditable();
+      editabilityTag.textContent = editable ? "当前可编辑" : "当前只读";
+      statusCard.classList.toggle("failedAccent", state.certStatus === "FAILED");
+    }
+
+    function renderFormPanel() {
+      const open = (
+        state.formPreviewByStatusBar ||
+        (state.certStatus === "UNVERIFIED" && state.pageMode === "edit") ||
+        (state.certStatus === "FAILED" && state.pageMode === "edit") ||
+        (state.certStatus === "VERIFIED" && state.pageMode === "change")
+      );
+
+      formPanel.classList.toggle("open", open);
+
+      if (state.certStatus === "FAILED") {
+        formTitle.textContent = "重新提交认证表单";
+        formIntro.textContent = "请根据上方失败原因修改对应字段，确认无误后重新提交。";
+      } else if (state.certStatus === "PENDING") {
+        formTitle.textContent = "企业认证资料（审核中）";
+        formIntro.textContent = "当前处于审核中状态，表单仅支持查看。若需调整资料，请先撤回申请。";
+      } else if (state.certStatus === "VERIFIED" && state.pageMode !== "change") {
+        formTitle.textContent = "企业认证资料（已认证）";
+        formIntro.textContent = "当前为已认证资料快照，默认只读；如需修改请点击“发起变更”。";
+      } else if (state.certStatus === "VERIFIED" && state.pageMode === "change") {
+        formTitle.textContent = "企业认证变更表单";
+        formIntro.textContent = "已认证信息默认只读，发起变更后才进入编辑态。提交后将重新进入审核中。";
+      } else {
+        formTitle.textContent = "企业认证表单";
+        formIntro.textContent = "企业名称需与营业执照主体一致，营业执照支持图片或 PDF。";
+      }
+    }
+
+    function renderReadonlyMode() {
+      const editable = getIsEditable();
+      const readOnlyFields = ["enterpriseName", "legalPersonName", "bankAccountName", "bankName", "website"];
+      readOnlyFields.forEach((key) => {
+        inputs[key].readOnly = !editable;
+      });
+      inputs.bankAccountNumber.readOnly = !editable;
+
+      document.querySelectorAll("[data-upload-trigger]").forEach((btn) => { btn.disabled = !editable; });
+      document.querySelectorAll("[data-clear-trigger]").forEach((btn) => { btn.disabled = !editable; });
+      document.querySelectorAll("[data-preview-trigger]").forEach((btn) => { btn.disabled = false; });
+    }
+
+    function renderPermission() {
+      const noPermission = state.role !== "admin";
+      noPermissionPage.style.display = noPermission ? "block" : "none";
+      mainPage.style.display = noPermission ? "none" : "block";
+    }
+
+    function renderAllFieldStates() {
+      [
+        "enterpriseName",
+        "businessLicense",
+        "legalPersonName",
+        "idCardFront",
+        "idCardBack",
+        "bankAccountName",
+        "bankName",
+        "bankAccountNumber",
+        "website"
+      ].forEach(applyFieldState);
+    }
+
+    function render() {
+      syncFieldValues();
+      renderPermission();
+      if (state.role !== "admin") return;
+      renderActions();
+      renderStatusSummary();
+      renderProgressPanel();
+      renderFailureReasons();
+      renderFormPanel();
+      renderUploads();
+      renderFlow();
+      renderReadonlyMode();
+      renderAllFieldStates();
+    }
+
+    function collectForm() {
+      state.form.enterpriseName = inputs.enterpriseName.value.trim();
+      state.form.legalPersonName = inputs.legalPersonName.value.trim();
+      state.form.bankAccountName = inputs.bankAccountName.value.trim();
+      state.form.bankName = inputs.bankName.value.trim();
+      state.form.bankAccountNumber = inputs.bankAccountNumber.value.replace(/\s+/g, "");
+      state.form.website = inputs.website.value.trim();
+    }
+
+    function validateBeforeSubmit() {
+      collectForm();
+      const fields = ["enterpriseName", "legalPersonName", "bankAccountName", "bankName", "bankAccountNumber", "website"];
+      const hasFieldError = fields.some((field) => validateField(field));
+      const hasUploadError = ["businessLicense", "idCardFront", "idCardBack"].some((field) => getUploadError(field));
+      renderAllFieldStates();
+      return !(hasFieldError || hasUploadError);
+    }
+
+    function openConfirmModal(title, desc, action) {
+      state.confirmAction = action;
+      confirmModalTitle.textContent = title;
+      confirmModalDesc.textContent = desc;
+      confirmModalMask.style.display = "flex";
+    }
+
+    function closeConfirmModal() {
+      state.confirmAction = null;
+      confirmModalMask.style.display = "none";
+    }
+
+    function handlePrimaryAction() {
+      state.formPreviewByStatusBar = false;
+      if (state.certStatus === "PENDING") {
+        openConfirmModal(
+          "确认撤回认证申请？",
+          "撤回后当前审核将被终止，您可以重新修改资料并再次提交。",
+          "withdraw"
+        );
+        return;
+      }
+
+      if (state.certStatus === "UNVERIFIED" && state.pageMode !== "edit") {
+        state.pageMode = "edit";
+        toast("已展开企业认证表单", "warn");
+        render();
+        return;
+      }
+
+      if (state.certStatus === "FAILED" && state.pageMode !== "edit") {
+        state.pageMode = "edit";
+        toast("已展开重新提交表单", "warn");
+        render();
+        return;
+      }
+
+      if (state.certStatus === "VERIFIED" && state.pageMode !== "change") {
+        state.pageMode = "change";
+        toast("已进入企业认证信息变更态", "warn");
+        render();
+        return;
+      }
+
+      if (!validateBeforeSubmit()) {
+        toast("请先补全必填字段并处理错误后再提交", "err");
+        return;
+      }
+
+      state.certStatus = "PENDING";
+      state.pageMode = "view";
+      state.failureReasons = [];
+      state.submittedAt = "2026-04-22 10:18";
+      toast("提交成功，平台将在五个工作日内完成审核", "ok");
+      render();
+    }
+
+    function handleSecondaryAction() {
+      state.formPreviewByStatusBar = false;
+      if (
+        (state.certStatus === "VERIFIED" && state.pageMode === "change") ||
+        (state.certStatus === "FAILED" && state.pageMode === "edit") ||
+        (state.certStatus === "UNVERIFIED" && state.pageMode === "edit")
+      ) {
+        state.pageMode = "view";
+        toast("已收起表单，返回状态查看", "warn");
+        render();
+        return;
+      }
+      toast("当前状态无需额外操作", "warn");
+    }
+
+    progressPrimaryBtn.addEventListener("click", handlePrimaryAction);
+    progressSecondaryBtn.addEventListener("click", handleSecondaryAction);
+    primaryActionBtn.addEventListener("click", handlePrimaryAction);
+    secondaryActionBtn.addEventListener("click", handleSecondaryAction);
+
+    document.getElementById("confirmCancelBtn").addEventListener("click", closeConfirmModal);
+    document.getElementById("confirmOkBtn").addEventListener("click", () => {
+      if (state.confirmAction === "withdraw") {
+        state.formPreviewByStatusBar = false;
+        state.certStatus = "UNVERIFIED";
+        state.pageMode = "edit";
+        state.failureReasons = [];
+        toast("认证申请已撤回，您可以重新修改资料并提交", "ok");
+        render();
+      }
+      closeConfirmModal();
+    });
+
+    confirmModalMask.addEventListener("click", (event) => {
+      if (event.target === confirmModalMask) closeConfirmModal();
+    });
+
+    Object.entries(inputs).forEach(([key, input]) => {
+      input.addEventListener("input", () => {
+        if (key === "bankAccountNumber") {
+          input.value = formatBankInput(input.value);
+        }
+        state.form[key] = input.value;
+        if (state.role === "admin") applyFieldState(key);
+      });
+
+      input.addEventListener("blur", () => {
+        if (key === "bankAccountNumber") state.form[key] = input.value.replace(/\s+/g, "");
+        if (state.role === "admin") applyFieldState(key);
+      });
+    });
+
+    document.querySelectorAll("[data-upload-trigger]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const field = button.getAttribute("data-upload-trigger");
+        const input = document.getElementById(`file-${field}`);
+        if (input) input.click();
+      });
+    });
+
+    document.querySelectorAll(".hiddenFile").forEach((input) => {
+      input.addEventListener("change", (event) => {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+        const field = event.target.id.replace("file-", "");
+        const ext = (file.name.split(".").pop() || "").toUpperCase();
+        state.uploads[field] = {
+          label: file.name,
+          size: `${(file.size / 1024 / 1024).toFixed(1)}MB`,
+          mime: `${ext} 文件`
+        };
+        applyFieldState(field);
+        renderUploads();
+        toast(`${fieldNames[field]}上传成功`, "ok");
+      });
+    });
+
+    document.querySelectorAll("[data-clear-trigger]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const field = button.getAttribute("data-clear-trigger");
+        state.uploads[field] = null;
+        applyFieldState(field);
+        renderUploads();
+        toast(`已移除${fieldNames[field]}`, "warn");
+      });
+    });
+
+    document.querySelectorAll("[data-preview-trigger]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const field = button.getAttribute("data-preview-trigger");
+        const file = state.uploads[field];
+        if (!file) {
+          toast("当前暂无可预览文件", "warn");
+          return;
+        }
+        toast(`已打开 ${file.label} 预览`, "ok");
+      });
+    });
+
+    const statusNodeMap = {
+      unverified: "UNVERIFIED",
+      pending: "PENDING",
+      verified: "VERIFIED",
+      failed: "FAILED"
+    };
+
+    Object.entries(statusNodeMap).forEach(([nodeKey, status]) => {
+      const node = document.getElementById(`step-${nodeKey}`);
+      if (!node) return;
+      node.addEventListener("click", () => {
+        if (state.role !== "admin") return;
+        state.certStatus = status;
+        state.failureReasons = status === "FAILED" ? [...failedReasonsMock] : [];
+        state.pageMode = status === "FAILED" ? "edit" : "view";
+        state.formPreviewByStatusBar = true;
+        if (status === "UNVERIFIED") state.pageMode = "edit";
+        render();
+        toast(`已切换到${statusConfig[status].label}状态查看`, "warn");
+      });
+    });
+
+    render();
+  </script>
+</body>
+</html>
