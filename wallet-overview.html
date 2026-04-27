@@ -31,9 +31,11 @@
     .ws-item .ws-item-name { font-weight: 500; color: #262626; }
     .ws-item .ws-item-desc { font-size: 12px; color: #8c8c8c; margin-top: 2px; }
     .ws-item .ws-item-check { color: #1890ff; font-size: 14px; }
-    .identity-switch { display: flex; gap: 4px; background: #f0f0f0; border-radius: 18px; padding: 3px; }
-    .identity-switch button { border: none; background: transparent; padding: 5px 14px; border-radius: 16px; font-size: 13px; color: #595959; cursor: pointer; }
+    .identity-switch { display: flex; gap: 4px; background: #f0f0f0; border-radius: 18px; padding: 3px; flex-wrap: wrap; }
+    .identity-switch button { border: none; background: transparent; padding: 5px 10px; border-radius: 16px; font-size: 13px; color: #595959; cursor: pointer; }
     .identity-switch button.active { background: #fff; color: #1890ff; box-shadow: 0 1px 2px rgba(0,0,0,.06); font-weight: 500; }
+    .identity-switch button[data-identity="admin"].active { background: #fff; color: #722ed1; box-shadow: 0 1px 2px rgba(114,46,209,.12); font-weight: 500; }
+    .identity-switch button[data-identity="ops"].active { background: #fff; color: #08979c; box-shadow: 0 1px 2px rgba(8,151,156,.2); font-weight: 500; }
     .wallet-chip { display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: linear-gradient(135deg, #fff7e6, #fff1d6); border: 1px solid #ffd591; border-radius: 18px; cursor: pointer; font-size: 13px; color: #d46b08; text-decoration: none; }
     .wallet-chip:hover { border-color: #fa8c16; }
     .wallet-chip .wallet-amount { font-weight: 600; font-size: 14px; }
@@ -211,6 +213,115 @@
     .btn.primary { background: #1890ff; border-color: #1890ff; color: #fff; }
     .btn.primary:hover { background: #40a9ff; border-color: #40a9ff; color: #fff; }
 
+    /* 上下文条（空间 + 角色） */
+    .context-banner { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 10px 16px; margin: -4px 0 14px; background: #f0f7ff; border: 1px solid #bae0ff; border-radius: 8px; font-size: 13px; color: #096dd9; }
+    .context-banner .ctx-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; background: #fff; border: 1px solid #91d5ff; border-radius: 12px; font-weight: 500; }
+    .context-banner .ctx-chip.role { color: #d46b08; border-color: #ffd591; }
+    .context-banner .ctx-arrow { color: #8c8c8c; }
+    .context-banner .ctx-rule { color: #595959; font-size: 12px; }
+
+    /* 页内角色 / 视图 Tab */
+    .role-tabs { display: flex; gap: 4px; padding: 6px; background: #fff; border-radius: 10px; margin-bottom: 14px; box-shadow: 0 2px 6px rgba(0,0,0,.04); }
+    .role-tabs button { flex: 1; border: none; background: transparent; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; color: #595959; display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 500; }
+    .role-tabs button:hover { background: #f5f5f5; color: #1890ff; }
+    .role-tabs button.active { background: #e6f7ff; color: #1890ff; box-shadow: inset 0 -2px 0 #1890ff; }
+    .role-tabs button .tab-sub { font-size: 11px; color: #8c8c8c; font-weight: 400; margin-left: 4px; }
+    .role-tabs button.active .tab-sub { color: #69c0ff; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* 冻结余额拆分 */
+    .frozen-breakdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0; }
+    .frozen-cell { background: #fff; border-radius: 8px; padding: 12px 14px; border: 1px solid #f0f0f0; }
+    .frozen-cell .fc-label { font-size: 12px; color: #8c8c8c; display: flex; align-items: center; gap: 4px; }
+    .frozen-cell .fc-value { font-size: 18px; font-weight: 600; color: #d46b08; margin: 4px 0; }
+    .frozen-cell.refund .fc-value { color: #cf1322; }
+    .frozen-cell.dispute .fc-value { color: #722ed1; }
+    .frozen-cell .fc-meta { font-size: 11px; color: #8c8c8c; }
+
+    /* 承制方收入卡 */
+    .income-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+    .income-card { background: #fff; border-radius: 8px; padding: 16px 20px; border: 1px solid #f0f0f0; }
+    .income-card.settle { border-left: 3px solid #722ed1; }
+    .income-card.withdraw { border-left: 3px solid #fa8c16; }
+    .income-card.invoice { border-left: 3px solid #1890ff; }
+    .income-card .ic-label { font-size: 12px; color: #8c8c8c; }
+    .income-card .ic-value { font-size: 24px; font-weight: 700; margin: 6px 0; }
+    .income-card .ic-meta { font-size: 12px; color: #595959; padding-top: 8px; border-top: 1px dashed #f0f0f0; margin-top: 8px; }
+    .income-card .ic-actions { margin-top: 10px; display: flex; gap: 6px; }
+    .income-card .ic-actions button { flex: 1; height: 30px; border: 1px solid #d9d9d9; background: #fff; border-radius: 4px; font-size: 12px; cursor: pointer; }
+    .income-card .ic-actions button.primary { background: #1890ff; border-color: #1890ff; color: #fff; }
+    .income-card .ic-actions button:hover { border-color: #40a9ff; color: #1890ff; }
+    .income-card .ic-actions button.primary:hover { background: #40a9ff; color: #fff; }
+
+    /* 简单条目列表（提现/开票/退款/订单消费） */
+    .simple-list { background: #fff; border-radius: 8px; overflow: hidden; }
+    .simple-list .sl-head { padding: 12px 18px; border-bottom: 1px solid #f0f0f0; font-size: 14px; font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
+    .simple-list .sl-row { display: grid; grid-template-columns: 1.4fr 1fr 1fr 110px 90px; padding: 11px 18px; border-bottom: 1px solid #f5f5f5; font-size: 13px; align-items: center; }
+    .simple-list .sl-row.head { background: #fafafa; color: #8c8c8c; font-size: 12px; }
+    .simple-list .sl-row:last-child { border-bottom: none; }
+    .simple-list .sl-status { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+    .simple-list .sl-status.ok { background: #f6ffed; color: #389e0d; }
+    .simple-list .sl-status.warn { background: #fff7e6; color: #d46b08; }
+    .simple-list .sl-status.danger { background: #fff1f0; color: #cf1322; }
+    .simple-list .sl-status.processing { background: #e6f7ff; color: #096dd9; }
+    .simple-list .sl-amt { font-weight: 600; text-align: right; }
+    .simple-list .sl-amt.in { color: #389e0d; }
+    .simple-list .sl-amt.out { color: #cf1322; }
+
+    /* 升级版账务流水 - 多行结构 */
+    .flow-row.acct { grid-template-columns: 50px 1.4fr 1.6fr 130px 130px; }
+    .flow-row.acct.head { font-size: 12px; }
+    .flow-acct-meta { font-size: 11px; color: #8c8c8c; margin-top: 4px; line-height: 1.5; }
+    .flow-acct-meta .acct-arrow { color: #1890ff; padding: 0 4px; }
+    .flow-acct-meta .acct-tag { display: inline-block; padding: 1px 6px; border-radius: 3px; background: #f5f5f5; color: #595959; font-size: 10px; margin-right: 4px; }
+    .flow-acct-meta .ctx-link { color: #1890ff; text-decoration: none; }
+    .flow-acct-meta .ctx-link:hover { text-decoration: underline; }
+    .flow-balance { font-size: 11px; color: #8c8c8c; line-height: 1.5; }
+    .flow-balance .bal-after { color: #262626; font-weight: 600; font-size: 13px; }
+
+    /* 异常 / 边界状态 banner */
+    .state-banner { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; line-height: 1.55; border-left: 4px solid transparent; }
+    .state-banner .sb-icon { font-size: 18px; line-height: 1; flex-shrink: 0; margin-top: 1px; }
+    .state-banner .sb-body { flex: 1; min-width: 0; }
+    .state-banner .sb-title { font-weight: 600; margin-bottom: 2px; }
+    .state-banner .sb-meta { font-size: 12px; opacity: .8; }
+    .state-banner .sb-action { display: flex; gap: 6px; flex-shrink: 0; }
+    .state-banner .sb-action button { height: 28px; padding: 0 12px; border: 1px solid currentColor; background: transparent; border-radius: 4px; cursor: pointer; font-size: 12px; color: inherit; }
+    .state-banner .sb-action button:hover { background: rgba(0,0,0,.04); }
+    .state-banner .sb-action button.primary { background: currentColor; color: #fff !important; }
+    .state-banner.info { background: #e6f7ff; border-left-color: #1890ff; color: #096dd9; }
+    .state-banner.processing { background: #f0f5ff; border-left-color: #2f54eb; color: #1d39c4; }
+    .state-banner.warn { background: #fff7e6; border-left-color: #fa8c16; color: #d46b08; }
+    .state-banner.danger { background: #fff1f0; border-left-color: #ff4d4f; color: #cf1322; }
+    .state-banner.success { background: #f6ffed; border-left-color: #52c41a; color: #389e0d; }
+    .state-banner.dispute { background: #f9f0ff; border-left-color: #722ed1; color: #531dab; }
+
+    /* 异常 / 边界场景预览 gallery */
+    .exception-gallery { background: #fff; border-radius: 8px; padding: 18px 22px; margin-bottom: 14px; border: 1px dashed #d9d9d9; }
+    .exception-gallery h3 { margin: 0 0 4px; font-size: 15px; font-weight: 600; }
+    .exception-gallery .ex-sub { color: #8c8c8c; font-size: 12px; margin-bottom: 14px; }
+    .exception-gallery .ex-grid { display: grid; gap: 10px; }
+    .exception-gallery .ex-tag { display: inline-block; padding: 1px 8px; border-radius: 10px; background: #f0f0f0; color: #595959; font-size: 11px; margin-right: 6px; }
+
+    /* 空状态 */
+    .empty-state { text-align: center; padding: 48px 24px; color: #8c8c8c; }
+    .empty-state .es-icon { font-size: 36px; opacity: .35; margin-bottom: 10px; }
+    .empty-state .es-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; color: #595959; }
+    .empty-state .es-sub { font-size: 12px; }
+
+    /* 分层动作：主操作 + 二级抽屉 */
+    .actions-tier { display: flex; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.2); position: relative; z-index: 2; flex-wrap: wrap; align-items: center; }
+    .actions-tier .tier-primary { display: flex; gap: 8px; flex-wrap: wrap; }
+    .actions-tier .tier-more { margin-left: auto; position: relative; }
+    .actions-tier .tier-more-trigger { background: rgba(255,255,255,.15); color: #fff; border: 1px solid rgba(255,255,255,.3); padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+    .actions-tier .tier-more-trigger:hover { background: rgba(255,255,255,.25); }
+    .actions-tier .tier-more-menu { display: none; position: absolute; right: 0; top: calc(100% + 6px); min-width: 220px; background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,.15); padding: 6px; z-index: 50; }
+    .actions-tier .tier-more-menu.open { display: block; }
+    .actions-tier .tier-more-menu a { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 6px; color: #262626; text-decoration: none; font-size: 13px; cursor: pointer; }
+    .actions-tier .tier-more-menu a:hover { background: #f0f7ff; color: #1890ff; }
+    .actions-tier .tier-more-menu .menu-label { padding: 6px 12px; font-size: 11px; color: #8c8c8c; text-transform: uppercase; letter-spacing: .5px; }
+
     /* Toast */
     .toasts { position: fixed; top: 72px; right: 20px; width: min(90vw, 360px); display: grid; gap: 8px; z-index: 1100; }
     .toast { background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; padding: 10px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.1); animation: slideIn .25s ease-out; }
@@ -239,11 +350,11 @@
       <button data-identity="demander" class="active">📥 需求方</button>
       <button data-identity="contractor">🛠 承制方</button>
     </div>
-    <a href="wallet-overview.html" class="wallet-chip" id="walletChip">
+    <a href="wallet-overview.html" class="wallet-chip" id="walletChip" title="当前空间绑定账户的可用余额">
       <span>💰</span>
       <span>
         <span class="wallet-amount" id="walletAmount">¥185,000</span>
-        <span class="wallet-account" id="walletAccount">团队预算账户</span>
+        <span class="wallet-account" id="walletAccount">当前空间可用余额 · 团队预算账户</span>
       </span>
     </a>
     <div class="avatar-wrap">
@@ -282,85 +393,161 @@
     <main class="main">
       <section class="page-head">
         <h1>💰 钱包与结算</h1>
-        <div class="sub">骋风天合采用「统一账号 + 多工作空间 + 分层资金账户」体系。下单时实际扣款主体由当前工作空间决定，订单履约后再正式结算。</div>
+        <div class="sub">骋风天合采用「统一账号 + 多工作空间 + 分层资金账户」体系。<strong>工作空间</strong>决定花谁的钱，<strong>角色视角</strong>决定看哪类菜单 / 待办 / 指标。</div>
       </section>
 
-      <!-- KPI 总览（按当前空间上下文动态变化） -->
-      <div class="kpi-row" id="kpiRow"></div>
-
-      <!-- 待处理事项（按当前空间上下文动态变化） -->
-      <div class="pending-bar" id="pendingBar"></div>
-
-      <!-- 当前空间绑定账户 -->
-      <div class="section-head">当前空间绑定账户 <span class="section-sub">切换顶部空间，下方卡片实时变化</span></div>
-      <div class="current-card team-budget" id="currentCard">
-        <div class="cc-label">当前工作空间：<span id="ccWsName">骋风天合 · 短剧制作中心</span></div>
-        <div class="cc-name" id="ccAccountName">短剧制作中心 - 团队预算账户</div>
-        <div class="cc-balance" id="ccBalance">¥185,000</div>
-        <div class="cc-meta">
-          <div class="cc-meta-item"><div class="cc-meta-label">已锁定（订单中）</div><div class="cc-meta-value" id="ccLocked">¥28,000</div></div>
-          <div class="cc-meta-item"><div class="cc-meta-label">总预算</div><div class="cc-meta-value" id="ccAllocated">¥200,000</div></div>
-          <div class="cc-meta-item"><div class="cc-meta-label">使用率</div><div class="cc-meta-value" id="ccUsage">8%</div></div>
-        </div>
-        <div class="cc-actions" id="ccActions"></div>
+      <!-- 上下文条：当前空间 + 当前角色（统一显示） -->
+      <div class="context-banner" id="contextBanner">
+        <span>📍 当前上下文</span>
+        <span class="ctx-chip">🏢 <span id="ctxWsName">骋风天合 · 短剧制作中心</span></span>
+        <span class="ctx-arrow">×</span>
+        <span class="ctx-chip role" id="ctxRoleChip">📥 <span id="ctxRoleName">需求方视角</span></span>
+        <span class="ctx-rule" id="ctxRuleNote">本空间下发起的订单，将默认从「短剧制作中心 - 团队预算账户」中扣款或冻结资金。</span>
       </div>
 
-      <!-- 账户矩阵（按当前空间权限过滤） -->
-      <div class="section-head" id="accountsSection">
-        <span id="accountsSectionTitle">骋风天合 · 全部资金账户</span>
-        <span class="section-sub" id="accountsSectionSub">企业主账户 → 团队预算账户 → 个人账户</span>
+      <!-- 页内角色 / 视图 Tab：拆开需求方钱包 / 承制方钱包 -->
+      <div class="role-tabs" id="roleTabs">
+        <button data-tab="overview" class="active">📊 资金总览<span class="tab-sub">余额 / 账户 / 流水</span></button>
+        <button data-tab="demander">📥 需求方结算<span class="tab-sub">充值 / 冻结 / 订单消费 / 退款</span></button>
+        <button data-tab="contractor">🛠 承制方结算<span class="tab-sub">收入 / 提现 / 开票</span></button>
       </div>
-      <div class="accounts-grid" id="accountsGrid"></div>
 
-      <!-- 团队预算使用率（仅团队空间 + 管理员视角可见） -->
-      <div id="budgetUsageWrap">
-        <div class="section-head"><span id="budgetSectionTitle">团队预算使用率</span> <span class="section-sub" id="budgetSectionSub">本季度（2026 Q2）</span></div>
-        <section class="budget-usage-card">
-          <h3 id="budgetCardTitle">各团队预算分配与使用情况</h3>
-          <div class="bu-sub" id="budgetCardSub">企业主账户共划拨 ¥270,000 至 2 个团队，本季度已使用 ¥73,000（含已结算 + 已锁定）。</div>
-          <div id="budgetRows"></div>
-          <div class="bu-legend">
-            <span><span class="lg-dot spent"></span>已结算（实际花掉）</span>
-            <span><span class="lg-dot locked"></span>已锁定（订单中）</span>
-            <span><span class="lg-dot available"></span>可用余额</span>
+      <!-- ============ 面板 A：资金总览 ============ -->
+      <section class="panel active" id="panel-overview">
+        <!-- KPI 总览（按当前空间 + 角色上下文动态变化） -->
+        <div class="kpi-row" id="kpiRow"></div>
+
+        <!-- 待处理事项（按当前空间 + 角色上下文动态变化） -->
+        <div class="pending-bar" id="pendingBar"></div>
+
+        <!-- P1-8：实时异常 banner（条件命中时自动出现） -->
+        <div id="liveBanners"></div>
+
+        <!-- 当前空间绑定账户 -->
+        <div class="section-head">当前空间绑定账户 <span class="section-sub">切换顶部空间，下方卡片实时变化</span></div>
+        <div class="current-card team-budget" id="currentCard">
+          <div class="cc-label">当前工作空间：<span id="ccWsName">骋风天合 · 短剧制作中心</span></div>
+          <div class="cc-name" id="ccAccountName">短剧制作中心 - 团队预算账户</div>
+          <div class="cc-balance" id="ccBalance">¥185,000</div>
+          <div class="cc-meta" id="ccMeta">
+            <div class="cc-meta-item"><div class="cc-meta-label">已锁定（订单中）</div><div class="cc-meta-value" id="ccLocked">¥28,000</div></div>
+            <div class="cc-meta-item"><div class="cc-meta-label">总预算</div><div class="cc-meta-value" id="ccAllocated">¥200,000</div></div>
+            <div class="cc-meta-item"><div class="cc-meta-label">使用率</div><div class="cc-meta-value" id="ccUsage">8%</div></div>
           </div>
+          <div class="actions-tier">
+            <div class="tier-primary" id="ccActions"></div>
+            <div class="tier-more" id="ccMoreWrap" style="display:none">
+              <button class="tier-more-trigger" id="ccMoreTrigger">⚙ 管理动作 ▾</button>
+              <div class="tier-more-menu" id="ccMoreMenu"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 当前可见账户（旧称：账户矩阵；按当前空间 + 角色权限过滤） -->
+        <div class="section-head" id="accountsSection">
+          <span id="accountsSectionTitle">当前可见账户</span>
+          <span class="section-sub" id="accountsSectionSub">仅展示与你当前空间 + 角色相关的账户</span>
+        </div>
+        <div class="accounts-grid" id="accountsGrid"></div>
+
+        <!-- 团队预算使用率（仅团队空间 + 管理员视角可见） -->
+        <div id="budgetUsageWrap">
+          <div class="section-head"><span id="budgetSectionTitle">团队预算使用率</span> <span class="section-sub" id="budgetSectionSub">本季度（2026 Q2）</span></div>
+          <section class="budget-usage-card">
+            <h3 id="budgetCardTitle">各团队预算分配与使用情况</h3>
+            <div class="bu-sub" id="budgetCardSub">企业总账户共划拨 ¥270,000 至 2 个团队，本季度已使用 ¥73,000（含已结算 + 已锁定）。</div>
+            <div id="budgetRows"></div>
+            <div class="bu-legend">
+              <span><span class="lg-dot spent"></span>已结算（实际花掉）</span>
+              <span><span class="lg-dot locked"></span>已锁定（订单中）</span>
+              <span><span class="lg-dot available"></span>可用余额</span>
+            </div>
+          </section>
+        </div>
+
+        <!-- 升级版账务流水：付款账户 → 收款账户 + 变动前/后余额 + 关联订单 -->
+        <div class="section-head">账务流水 <span class="section-sub">最近 30 天 · 含付款方 / 收款方 / 变动前后余额 / 关联订单</span></div>
+        <section class="flow-card">
+          <div class="flow-head">
+            <span>共 <span id="flowCount">8</span> 条记录</span>
+            <div class="flow-filter">
+              <select id="flowAccountFilter">
+                <option value="all">所有账户</option>
+                <option value="personal-account-lixueqin">个人账户</option>
+                <option value="team-budget-cf-drama">短剧制作中心 - 预算</option>
+                <option value="team-budget-cf-marketing">市场宣传组 - 预算</option>
+                <option value="enterprise-main-cf">企业总账户</option>
+              </select>
+              <select id="flowTypeFilter">
+                <option value="all">所有类型</option>
+                <option value="recharge">充值</option>
+                <option value="lock">锁定</option>
+                <option value="unlock">解冻</option>
+                <option value="allocate">划拨</option>
+                <option value="settle">结算</option>
+                <option value="refund">退款</option>
+                <option value="withdraw">提现</option>
+                <option value="invoice">开票</option>
+              </select>
+            </div>
+          </div>
+          <div class="flow-row acct head">
+            <div></div>
+            <div>类型 / 关联订单 / 时间</div>
+            <div>付款账户 → 收款账户 / 上下文</div>
+            <div>金额 / 操作人</div>
+            <div>变动前 → 变动后</div>
+          </div>
+          <div id="flowList"></div>
         </section>
-      </div>
 
-      <!-- 流水记录 -->
-      <div class="section-head">资金流水 <span class="section-sub">最近 30 天</span></div>
-      <section class="flow-card">
-        <div class="flow-head">
-          <span>共 <span id="flowCount">8</span> 条记录</span>
-          <div class="flow-filter">
-            <select id="flowAccountFilter">
-              <option value="all">所有账户</option>
-              <option value="personal-account-lixueqin">个人账户</option>
-              <option value="team-budget-cf-drama">短剧制作中心 - 预算</option>
-              <option value="team-budget-cf-marketing">市场宣传组 - 预算</option>
-              <option value="enterprise-main-cf">企业主账户</option>
-            </select>
-            <select id="flowTypeFilter">
-              <option value="all">所有类型</option>
-              <option value="recharge">充值</option>
-              <option value="lock">锁定</option>
-              <option value="allocate">划拨</option>
-              <option value="settle">结算</option>
-              <option value="refund">退款</option>
-              <option value="withdraw">提现</option>
-              <option value="invoice">开票</option>
-            </select>
-          </div>
+        <!-- P1-8：异常 / 边界场景预览 — 设计参考 -->
+        <div class="section-head" style="margin-top:22px">🧪 异常 / 边界状态预览 <span class="section-sub">高保真前先把支付系统真正难的部分（异常）露出来</span></div>
+        <div class="exception-gallery">
+          <h3>10 类资金异常 / 边界状态</h3>
+          <div class="ex-sub">点击右侧动作按钮可演示对应行为。运行时若条件命中（如团队余额不足、有对公充值审核中），相同样式的 banner 会自动出现在「当前空间绑定账户」上方。</div>
+          <div class="ex-grid" id="exceptionGallery"></div>
         </div>
-        <div class="flow-row head">
-          <div></div>
-          <div>类型 / 时间</div>
-          <div>说明</div>
-          <div>关联账户</div>
-          <div>金额</div>
-          <div>操作人</div>
-        </div>
-        <div id="flowList"></div>
+      </section>
+
+      <!-- ============ 面板 B：需求方结算 ============ -->
+      <section class="panel" id="panel-demander">
+        <div class="section-head">📥 需求方结算 <span class="section-sub">下单 / 锁资 / 验收 / 退款 链路下的资金视图</span></div>
+
+        <!-- 余额 + 冻结拆分 -->
+        <div class="kpi-row" id="demanderKpiRow"></div>
+
+        <!-- 冻结余额拆分（订单冻结 / 退款冻结 / 纠纷冻结） -->
+        <div class="section-head">🔒 冻结余额拆分 <span class="section-sub">点击查看明细</span></div>
+        <div class="frozen-breakdown" id="frozenBreakdown"></div>
+
+        <!-- 订单消费流水 -->
+        <div class="section-head">订单消费流水 <span class="section-sub">由本空间发起、扣减绑定账户的订单</span></div>
+        <div class="simple-list" id="demanderOrderFlows"></div>
+
+        <!-- 退款记录（原路退款） -->
+        <div class="section-head" style="margin-top:18px">原路退款记录 <span class="section-sub">退款将原路退回原付款账户</span></div>
+        <div class="simple-list" id="demanderRefundFlows"></div>
+      </section>
+
+      <!-- ============ 面板 C：承制方结算 ============ -->
+      <section class="panel" id="panel-contractor">
+        <div class="section-head">🛠 承制方结算 <span class="section-sub">交付 / 验收 / 结算 / 提现 / 开票 链路下的收入视图</span></div>
+
+        <!-- 收入概览 -->
+        <div class="income-grid" id="contractorIncomeGrid"></div>
+
+        <!-- 提现记录 -->
+        <div class="section-head">💸 提现记录 <span class="section-sub">最近 90 天</span></div>
+        <div class="simple-list" id="contractorWithdrawList"></div>
+
+        <!-- 收入流水 -->
+        <div class="section-head" style="margin-top:18px">📈 收入流水 <span class="section-sub">来自需求方订单的结算入账</span></div>
+        <div class="simple-list" id="contractorIncomeFlows"></div>
+
+        <!-- 开票入口 -->
+        <div class="section-head" style="margin-top:18px">🧾 开票申请 <span class="section-sub">已结算订单可申请开票</span></div>
+        <div class="simple-list" id="contractorInvoiceList"></div>
       </section>
     </main>
   </div>
@@ -370,7 +557,7 @@
     <div class="modal">
       <div class="modal-head">
         <h3>💳 账户充值</h3>
-        <p id="rechargeAccountName">骋风天合 - 企业主账户</p>
+        <p id="rechargeAccountName">骋风天合 - 企业总账户</p>
       </div>
       <div class="modal-body">
         <div class="info-tip" id="rechargeInfoTip">
@@ -397,7 +584,7 @@
           </select>
         </div>
         <div class="summary-box">
-          <div class="sb-row"><span class="sb-label">充值至账户</span><span class="sb-val" id="rechargeTargetName">企业主账户</span></div>
+          <div class="sb-row"><span class="sb-label">充值至账户</span><span class="sb-val" id="rechargeTargetName">企业总账户</span></div>
           <div class="sb-row"><span class="sb-label">当前余额</span><span class="sb-val" id="rechargeCurrentBalance">¥0</span></div>
           <div class="sb-row"><span class="sb-label">充值金额</span><span class="sb-val" id="rechargeAmtPreview" style="color:#389e0d">+¥0</span></div>
           <div class="sb-row" style="border-top:1px solid #e8e8e8;padding-top:8px;margin-top:4px"><span class="sb-label">到账后余额</span><span class="sb-val" id="rechargeAfterBalance" style="color:#389e0d;font-size:16px">¥0</span></div>
@@ -415,7 +602,7 @@
     <div class="modal">
       <div class="modal-head">
         <h3>📤 团队预算划拨</h3>
-        <p>从企业主账户划拨预算到指定团队预算账户</p>
+        <p>从企业总账户划拨预算到指定团队预算账户</p>
       </div>
       <div class="modal-body">
         <div class="info-tip">
@@ -423,7 +610,7 @@
         </div>
         <div class="form-field">
           <label>从（来源账户）</label>
-          <input type="text" value="骋风天合 - 企业主账户（余额 ¥1,250,000）" disabled>
+          <input type="text" value="骋风天合 - 企业总账户（余额 ¥1,250,000）" disabled>
         </div>
         <div class="form-field">
           <label>到（目标团队预算账户）</label>
@@ -444,9 +631,9 @@
           </div>
         </div>
         <div class="summary-box">
-          <div class="sb-row"><span class="sb-label">企业主账户当前余额</span><span class="sb-val" id="allocFromBalance">¥1,250,000</span></div>
+          <div class="sb-row"><span class="sb-label">企业总账户当前余额</span><span class="sb-val" id="allocFromBalance">¥1,250,000</span></div>
           <div class="sb-row"><span class="sb-label">划拨金额</span><span class="sb-val" id="allocAmtPreview" style="color:#cf1322">−¥0</span></div>
-          <div class="sb-row"><span class="sb-label">企业主账户划拨后</span><span class="sb-val" id="allocFromAfter">¥1,250,000</span></div>
+          <div class="sb-row"><span class="sb-label">企业总账户划拨后</span><span class="sb-val" id="allocFromAfter">¥1,250,000</span></div>
           <div class="sb-arrow">↓</div>
           <div class="sb-row"><span class="sb-label">目标账户当前余额</span><span class="sb-val" id="allocToBalance">¥185,000</span></div>
           <div class="sb-row"><span class="sb-label">划拨后</span><span class="sb-val" id="allocToAfter" style="color:#389e0d;font-size:16px">¥185,000</span></div>
@@ -490,20 +677,6 @@
     </div>
   </div>
 
-  <!-- 通用待处理详情 modal -->
-  <div class="modal-mask" id="pendingDetailModal">
-    <div class="modal" style="max-width:560px">
-      <div class="modal-head">
-        <h3 id="pdmTitle">详情</h3>
-        <p id="pdmSubtitle"></p>
-      </div>
-      <div class="modal-body" id="pdmBody"></div>
-      <div class="modal-foot" id="pdmFoot">
-        <button class="btn" onclick="document.getElementById('pendingDetailModal').classList.remove('open')">关闭</button>
-      </div>
-    </div>
-  </div>
-
   <div id="toastWrap" class="toasts"></div>
 
   <!-- 共享底座 -->
@@ -521,7 +694,8 @@
         var $amt = document.getElementById("walletAmount");
         var $acc = document.getElementById("walletAccount");
         if ($amt) $amt.textContent = window.fmtMoney(balance);
-        if ($acc) $acc.textContent = ws.accountType;
+        // P2-13：明确语义为"当前空间可用余额"，并标出绑定账户类型
+        if ($acc) $acc.textContent = "当前空间可用 · " + (ws.accountType || "");
       }
       // 暴露给页内业务代码（充值 / 划拨 / 提现完成后刷新顶栏）
       window.refreshTopbar = refreshWalletChipFromKv;
@@ -543,7 +717,182 @@
   (function () {
     const $ = (id) => document.getElementById(id);
 
-    // 当前空间账户大卡
+    // ============================================================
+    // P0-1：上下文条 + 角色 / 视图 Tab + 身份切换拦截
+    // ============================================================
+    function renderContextBanner() {
+      const ws = window.demoApp.getCurrentWorkspace();
+      const id = window.demoApp.getCurrentIdentity();
+      $("ctxWsName").textContent = ws.name;
+      const roleName = id === "contractor" ? "承制方视角" : "需求方视角";
+      const roleIcon = id === "contractor" ? "🛠 " : "📥 ";
+      $("ctxRoleName").textContent = roleName;
+      const roleChip = $("ctxRoleChip");
+      if (roleChip && roleChip.firstChild) roleChip.firstChild.textContent = roleIcon;
+      // P2-12 规则说明
+      let rule = "";
+      const wallets = window.demoApp.getWallets();
+      if (id === "contractor") {
+        rule = "承制方视角：钱包以「收入 / 提现 / 开票」为主，账户类型不参与扣款。";
+      } else if (ws.id === "personal") {
+        rule = "本空间下发起的订单，将默认从「昭岚 - 个人账户」中扣款或冻结资金。";
+      } else if (ws.id === "cf-ip" && ws.budgetMissing) {
+        rule = "本空间未配置团队预算账户，订单将自动回退至「企业总账户」结算。";
+      } else if (ws.id === "cf-admin") {
+        rule = "管理员视角下查看的资金不直接扣款；扣款主体仍以发起团队为准。";
+      } else {
+        const w = wallets[ws.walletKey];
+        const wname = w ? w.name : ws.accountType;
+        rule = "本空间下发起的订单，将默认从「" + wname + "」中扣款或冻结资金。";
+      }
+      $("ctxRuleNote").textContent = rule;
+    }
+
+    // ============================================================
+    // P1-8：异常 / 边界状态 — 通用 banner 渲染
+    // ============================================================
+    function bannerHtml(b) {
+      const action = (b.actions || []).map(a => '<button class="' + (a.primary ? "primary" : "") + '" onclick="' + a.onclick.replace(/"/g, "&quot;") + '">' + a.label + '</button>').join("");
+      return '<div class="state-banner ' + b.kind + '">'
+        + '<div class="sb-icon">' + (b.icon || "ℹ️") + '</div>'
+        + '<div class="sb-body">'
+          + '<div class="sb-title">' + (b.tag ? '<span class="ex-tag">' + b.tag + '</span>' : '') + b.title + '</div>'
+          + (b.meta ? '<div class="sb-meta">' + b.meta + '</div>' : '')
+        + '</div>'
+        + (action ? '<div class="sb-action">' + action + '</div>' : '')
+      + '</div>';
+    }
+
+    // 异常 / 边界场景预览 gallery（10 类）
+    const EXCEPTION_BANNERS = [
+      { kind: "processing", icon: "⏳", tag: "对公充值", title: "对公转账充值审核中（¥200,000）",
+        meta: "凭证已上传 17:32 · 财务审核中，预计 1 个工作日内到账。期间余额暂不变化。",
+        actions: [{ label: "查看凭证", onclick: "location.href='admin-finance.html?from=wallet&tab=recharges'" }] },
+      { kind: "warn", icon: "⚠️", tag: "支付异步", title: "支付成功但余额未到账",
+        meta: "在线支付通道延迟，建议 5 分钟后刷新。如 30 分钟仍未到账，请联系客服。",
+        actions: [{ label: "刷新", onclick: "window.refreshAll(); window.demoToast('已刷新', 'info')" }, { label: "联系客服", onclick: "window.demoToast('已为你转接客服', 'info')" }] },
+      { kind: "danger", icon: "❌", tag: "锁资失败", title: "下单锁资失败：余额不足",
+        meta: "DM-2026042512 需锁定 ¥48,000，当前可用余额 ¥18,200。订单已退回草稿箱。",
+        actions: [{ label: "去充值", primary: true, onclick: "window.openRecharge('team-budget-cf-drama')" }, { label: "调整订单金额", onclick: "location.href='demand-publish.html?from=wallet&demandId=DM-2026042512'" }] },
+      { kind: "danger", icon: "📉", tag: "预算不足", title: "本团队季度预算余额不足",
+        meta: "短剧制作中心 Q2 剩余 ¥12,000，无法覆盖待支付订单。请向企业管理员申请追加预算。",
+        actions: [{ label: "申请追加预算", primary: true, onclick: "window.demoToast('追加预算申请已发送', 'ok')" }] },
+      { kind: "warn", icon: "🎯", tag: "未配置预算", title: "本空间未配置团队预算账户",
+        meta: "IP 孵化组下发起的订单将自动回退至「企业总账户」结算。",
+        actions: [{ label: "管理员：配置预算", primary: true, onclick: "window.openAllocate('team-budget-cf-ip')" }] },
+      { kind: "info", icon: "⏲", tag: "自动验收", title: "订单 OD-2026041807「广告片配音」自动验收完成",
+        meta: "买方未在 7 天内主动验收，按平台规则自动确认验收并结算给承制方。",
+        actions: [{ label: "查看结算明细", onclick: "location.href='admin-finance.html?from=wallet&tab=settlements'" }, { label: "打开订单", onclick: "location.href='project-space.html?from=wallet&orderId=OD-2026041807'" }] },
+      { kind: "processing", icon: "↩️", tag: "退款审核中", title: "退款申请审核中（¥1,500）",
+        meta: "DM-2026031908「电商主图」交付不达标，退款由平台风控审核中（约 1-2 个工作日）。资金保留在退款冻结池。",
+        actions: [{ label: "查看处理进度", onclick: "location.href='admin-finance.html?from=wallet&tab=settlements'" }, { label: "打开需求", onclick: "location.href='demand-list.html?from=wallet&demandId=DM-2026031908'" }] },
+      { kind: "dispute", icon: "⚖", tag: "纠纷冻结", title: "订单 OD-2026041112 进入争议冻结",
+        meta: "买卖双方对验收结果存在争议，订单金额 ¥35,000 已进入纠纷冻结，等待平台介入裁决。",
+        actions: [{ label: "提交申诉材料", primary: true, onclick: "location.href='project-space.html?from=wallet&orderId=OD-2026041112&action=appeal'" }] },
+      { kind: "processing", icon: "💸", tag: "提现审核中", title: "提现申请财务审核中（¥12,000）",
+        meta: "WD-2026040801 已提交 4 月 8 日，财务审核通过后 1-3 个工作日到账建行 ****8826。",
+        actions: [{ label: "查看提现单", onclick: "location.href='admin-finance.html?from=wallet&tab=withdrawals'" }] },
+      { kind: "danger", icon: "🚫", tag: "提现失败", title: "提现失败：风控驳回（¥80,000）",
+        meta: "WD-2026032702 因短期内大额提现触发风控规则，已原路退回可提现余额。原因详情请咨询客服。",
+        actions: [{ label: "重新发起", primary: true, onclick: "window.openWithdraw('personal-account-lixueqin'); window.demoToast('已带入原参数重新提交', 'ok')" }, { label: "咨询客服", onclick: "window.demoToast('已为你转接风控客服', 'info')" }] }
+    ];
+
+    function renderExceptionGallery() {
+      const wrap = document.getElementById("exceptionGallery");
+      if (!wrap) return;
+      wrap.innerHTML = EXCEPTION_BANNERS.map(bannerHtml).join("");
+    }
+
+    // P1-8 实时异常 banner — 真实条件命中时插到 currentCard 上方
+    function renderLiveBanners() {
+      const target = document.getElementById("liveBanners");
+      if (!target) return;
+      const ws = window.demoApp.getCurrentWorkspace();
+      const wallets = window.demoApp.getWallets();
+      const flows = window.demoApp.getFlows();
+      const banners = [];
+
+      // 1. IP 孵化组 - 未配置预算
+      if (ws.id === "cf-ip" && ws.budgetMissing) {
+        banners.push({ kind: "warn", icon: "🎯", tag: "未配置预算", title: "本空间未配置团队预算账户",
+          meta: "下单将自动回退至「企业总账户」结算。建议管理员尽快为 IP 孵化组配置独立预算。",
+          actions: [{ label: "管理员：现在配置", primary: true, onclick: "window.openAllocate('team-budget-cf-ip')" }] });
+      }
+      // 2. 团队空间预算告急（balance < allocated 的 15%）
+      const w = wallets[ws.walletKey];
+      if (w && w.allocated && w.balance / w.allocated < 0.15) {
+        banners.push({ kind: "danger", icon: "📉", tag: "预算不足", title: ws.shortName.replace("骋风天合·", "") + " · 季度预算余额不足 15%",
+          meta: "剩余 " + window.fmtMoney(w.balance) + " / 总预算 " + window.fmtMoney(w.allocated) + "。请向企业管理员申请追加预算。",
+          actions: [{ label: "申请追加", primary: true, onclick: "window.demoToast('追加预算申请已发送', 'ok')" }] });
+      }
+      // 3. 任意账户存在"对公充值审核中"的流水
+      const auditFlow = flows.find(f => f.type === "recharge" && f.amount === 0 && (f.lockedNote || (f.desc || "").includes("待审核") || (f.desc || "").includes("待审核")));
+      if (auditFlow && (ws.id === "cf-admin" || auditFlow.account === ws.walletKey)) {
+        banners.push({ kind: "processing", icon: "⏳", tag: "对公充值", title: "有 1 笔对公转账充值财务审核中",
+          meta: auditFlow.lockedNote ? ("状态：" + auditFlow.lockedNote + " · 提交时间 " + auditFlow.time) : ("提交时间 " + auditFlow.time),
+          actions: [{ label: "查看凭证", onclick: "location.href='admin-finance.html?from=wallet&tab=recharges'" }] });
+      }
+
+      target.innerHTML = banners.map(bannerHtml).join("");
+    }
+
+    // P0-3 / P0-1：页内 Tab（资金总览 / 需求方结算 / 承制方结算）
+    function setActiveTab(name) {
+      document.querySelectorAll("#roleTabs button").forEach(b => b.classList.toggle("active", b.getAttribute("data-tab") === name));
+      document.querySelectorAll(".panel").forEach(p => p.classList.toggle("active", p.id === "panel-" + name));
+      if (name === "demander") renderDemanderPanel();
+      if (name === "contractor") renderContractorPanel();
+      try { localStorage.setItem("walletPanelTab", name); } catch (e) {}
+    }
+    document.getElementById("roleTabs").addEventListener("click", function (e) {
+      const b = e.target.closest("button[data-tab]");
+      if (!b) return;
+      setActiveTab(b.getAttribute("data-tab"));
+    });
+
+    // P0-1：拦截顶部需求方/承制方 — 在钱包页内不跳走，仅切换面板（管理后台由 SharedHeader 真跳转）
+    document.addEventListener("click", function (e) {
+      const b = e.target.closest("#identitySwitch button[data-identity]");
+      if (!b) return;
+      const next = b.getAttribute("data-identity");
+      if (next === "admin" || next === "ops") return;
+      e.stopImmediatePropagation();
+      e.preventDefault();
+      window.demoApp.setCurrentIdentity(next);
+      document.querySelectorAll("#identitySwitch button").forEach(x => x.classList.toggle("active", x === b));
+      setActiveTab(next === "contractor" ? "contractor" : "demander");
+      renderContextBanner();
+      renderKPIs();
+      window.demoToast(next === "contractor"
+        ? "已切换到承制方视角，下方为收入 / 提现 / 开票"
+        : "已切换到需求方视角，下方为充值 / 冻结 / 退款", "info");
+    }, true); // capture phase 抢先于 SharedHeader 跳转
+
+    // P2-14：工作空间切换提示（SharedHeader 切换会 reload，这里读取上次 hint 再 toast）
+    (function workspaceSwitchHint() {
+      try {
+        const last = sessionStorage.getItem("walletWsHint");
+        if (last) {
+          sessionStorage.removeItem("walletWsHint");
+          setTimeout(() => window.demoToast(last, "info"), 250);
+        }
+      } catch (e) {}
+      // ws-item 点击：先写一条 hint，再让 SharedHeader 接管 reload
+      document.addEventListener("click", function (e) {
+        const it = e.target.closest("#wsDropdown .ws-item");
+        if (!it) return;
+        const id = it.getAttribute("data-ws");
+        if (id === "cf-admin") return;
+        const tgt = window.demoApp.WORKSPACES[id];
+        if (!tgt) return;
+        const note = "已切换至「" + tgt.name + "」，本空间消费将默认计入：" + tgt.accountType;
+        try { sessionStorage.setItem("walletWsHint", note); } catch (err) {}
+      }, true);
+    })();
+
+    // ============================================================
+    // P1-4：当前空间账户大卡（按账户类型差异化展示）
+    // ============================================================
     function renderCurrentCard() {
       const ws = window.demoApp.getCurrentWorkspace();
       const wallets = window.demoApp.getWallets();
@@ -551,157 +900,265 @@
       const card = $("currentCard");
 
       card.classList.remove("team-budget", "personal", "enterprise-main", "budget-missing");
+      const oldTip = card.querySelector(".missing-tip"); if (oldTip) oldTip.remove();
 
+      // ---- 未配置预算的特殊态 ----
       if (ws.id === "cf-ip" && ws.budgetMissing) {
         card.classList.add("budget-missing");
         $("ccWsName").textContent = ws.name;
         $("ccAccountName").textContent = "未配置团队预算账户";
         $("ccBalance").textContent = "—";
-        $("ccLocked").textContent = "—";
-        $("ccAllocated").textContent = "—";
-        $("ccUsage").textContent = "—";
-        $("ccActions").innerHTML = '<button class="cc-btn">向企业管理员申请预算</button><button class="cc-btn ghost" onclick="window.openAllocate(\'team-budget-cf-ip\')">企业管理员：现在配置</button>';
-        if (!card.querySelector(".missing-tip")) {
-          const tip = document.createElement("div");
-          tip.className = "missing-tip";
-          tip.innerHTML = "ℹ️ <strong>规则提醒</strong>：本空间未配置独立预算账户，按平台规则将自动回退至企业主账户结算。订单仍记录「由 IP 孵化组发起」，但实际扣款主体为企业主账户（¥1,250,000）。";
-          card.appendChild(tip);
-        }
+        $("ccMeta").innerHTML = ''
+          + '<div class="cc-meta-item"><div class="cc-meta-label">回退账户</div><div class="cc-meta-value">企业总账户</div></div>'
+          + '<div class="cc-meta-item"><div class="cc-meta-label">回退账户余额</div><div class="cc-meta-value">' + window.fmtMoney(wallets["enterprise-main-cf"].balance) + '</div></div>'
+          + '<div class="cc-meta-item"><div class="cc-meta-label">本空间订单数</div><div class="cc-meta-value">0</div></div>';
+        $("ccActions").innerHTML = '<button class="cc-btn">向企业管理员申请预算</button>';
+        renderCcMore("missing");
+        const tip = document.createElement("div");
+        tip.className = "missing-tip";
+        tip.innerHTML = "ℹ️ <strong>规则提醒</strong>：本空间未配置独立预算账户，将自动回退至「企业总账户」结算。订单仍记录「由 IP 孵化组发起」，但实际扣款主体为企业总账户。";
+        card.appendChild(tip);
         return;
       }
-      // 移除回退提示
-      const oldTip = card.querySelector(".missing-tip");
-      if (oldTip) oldTip.remove();
 
       card.classList.add(ws.payer.type);
       $("ccWsName").textContent = ws.name;
-      $("ccAccountName").textContent = wallet ? wallet.name : ws.payer.name;
+      $("ccAccountName").textContent = wallet ? wallet.name.replace("企业主账户", "企业总账户") : ws.payer.name;
       $("ccBalance").textContent = window.fmtMoney(wallet ? wallet.balance : 0);
-      $("ccLocked").textContent = window.fmtMoney(wallet ? (wallet.lockedAmount || 0) : 0);
 
-      if (wallet && wallet.allocated) {
-        $("ccAllocated").textContent = window.fmtMoney(wallet.allocated);
-        const usage = wallet.allocated > 0 ? Math.round((wallet.allocated - wallet.balance) / wallet.allocated * 100) : 0;
-        $("ccUsage").textContent = usage + "%";
-      } else {
-        $("ccAllocated").textContent = "—";
-        $("ccUsage").textContent = "—";
-      }
-
-      // 操作按钮
-      let actions = "";
+      // ---- meta：按账户类型差异化 ----
+      const fmt = window.fmtMoney;
+      let metaHtml = "";
       if (ws.payer.type === "personal") {
-        actions = '<button class="cc-btn" onclick="window.openRecharge(\'' + ws.walletKey + '\')">充值</button>'
-          + '<button class="cc-btn ghost" onclick="window.openWithdraw(\'' + ws.walletKey + '\')">提现</button>';
+        // 个人：可用 / 冻结 / 近30天充值 / 近30天支出
+        const last30 = computeLast30(wallets, "personal-account-lixueqin");
+        metaHtml = ''
+          + '<div class="cc-meta-item"><div class="cc-meta-label">可用余额</div><div class="cc-meta-value">' + fmt(wallet.balance) + '</div></div>'
+          + '<div class="cc-meta-item"><div class="cc-meta-label">冻结余额</div><div class="cc-meta-value">' + fmt(wallet.lockedAmount || 0) + '</div></div>'
+          + '<div class="cc-meta-item"><div class="cc-meta-label">近 30 天充值</div><div class="cc-meta-value">' + fmt(last30.in) + '</div></div>'
+          + '<div class="cc-meta-item"><div class="cc-meta-label">近 30 天支出</div><div class="cc-meta-value">' + fmt(last30.out) + '</div></div>';
       } else if (ws.payer.type === "team-budget") {
-        actions = '<button class="cc-btn ghost" onclick="window.demoToast(\'团队成员可申请增加预算 →\', \'info\')">申请追加预算</button>'
-          + '<button class="cc-btn ghost" onclick="window.demoToast(\'扣款记录已聚合到下方流水\', \'info\')">查看团队消费</button>';
+        // 团队：总预算 / 已使用 / 已冻结 / 剩余 / 本团队订单数
+        const allocated = wallet.allocated || 0;
+        const balance = wallet.balance;
+        const locked = wallet.lockedAmount || 0;
+        const spent = Math.max(0, allocated - balance - locked);
+        const orderCount = countOrdersByAccount(ws.walletKey);
+        metaHtml = ''
+          + '<div class="cc-meta-item"><div class="cc-meta-label">总预算</div><div class="cc-meta-value">' + fmt(allocated) + '</div></div>'
+          + '<div class="cc-meta-item"><div class="cc-meta-label">已使用</div><div class="cc-meta-value">' + fmt(spent) + '</div></div>'
+          + '<div class="cc-meta-item"><div class="cc-meta-label">已冻结</div><div class="cc-meta-value">' + fmt(locked) + '</div></div>'
+          + '<div class="cc-meta-item"><div class="cc-meta-label">剩余</div><div class="cc-meta-value">' + fmt(balance) + '</div></div>'
+          + '<div class="cc-meta-item"><div class="cc-meta-label">本团队订单</div><div class="cc-meta-value">' + orderCount + ' 笔</div></div>';
       } else if (ws.payer.type === "enterprise-main") {
-        actions = '<button class="cc-btn" onclick="window.openRecharge(\'' + ws.walletKey + '\')">企业充值</button>';
-        if (ws.canAllocateBudget) {
-          actions += '<button class="cc-btn ghost" onclick="window.openAllocate()">📤 划拨预算给团队</button>';
-        }
+        // 企业总账户：总可用 / 已分配各团队 / 待审核充值 / 待处理退款 / 待处理提现 + 开票
+        const allocatedToTeams = ["team-budget-cf-drama", "team-budget-cf-marketing"]
+          .reduce((s, k) => s + ((wallets[k] && wallets[k].allocated) || 0), 0);
+        metaHtml = ''
+          + '<div class="cc-meta-item"><div class="cc-meta-label">企业总可用</div><div class="cc-meta-value">' + fmt(wallet.balance) + '</div></div>'
+          + '<div class="cc-meta-item"><div class="cc-meta-label">已分配给团队</div><div class="cc-meta-value">' + fmt(allocatedToTeams) + '</div></div>'
+          + '<div class="cc-meta-item"><div class="cc-meta-label">待审核充值</div><div class="cc-meta-value">1 笔 · ¥200,000</div></div>'
+          + '<div class="cc-meta-item"><div class="cc-meta-label">待处理退款</div><div class="cc-meta-value">0 笔</div></div>'
+          + '<div class="cc-meta-item"><div class="cc-meta-label">待开票</div><div class="cc-meta-value">3 笔</div></div>';
       }
-      $("ccActions").innerHTML = actions;
+      $("ccMeta").innerHTML = metaHtml;
+
+      // ---- P2-15：分层动作（主操作 + 二级"管理动作"抽屉）----
+      let primary = "", more = [];
+      if (ws.payer.type === "personal") {
+        primary = '<button class="cc-btn" onclick="window.openRecharge(\'' + ws.walletKey + '\')">💳 充值</button>'
+                + '<button class="cc-btn ghost" onclick="window.openWithdraw(\'' + ws.walletKey + '\')">💸 提现</button>';
+        more = [
+          { label: "查看流水", onclick: "document.querySelector('[data-tab=overview]').click(); window.scrollTo({top: document.querySelector('.flow-card').offsetTop - 80, behavior:'smooth'})" },
+          { label: "导出对账单 (CSV)", onclick: "window.demoToast('演示环境，未实现导出', 'warn')" }
+        ];
+      } else if (ws.payer.type === "team-budget") {
+        primary = '<button class="cc-btn ghost" onclick="window.demoToast(\'团队成员可申请增加预算 →\', \'info\')">📥 申请追加预算</button>'
+                + '<button class="cc-btn ghost" onclick="document.querySelector(\'[data-tab=demander]\').click()">📊 查看团队消费</button>';
+        more = [
+          { label: "查看预算规则", onclick: "window.demoToast('预算规则：季度初由企业管理员划拨；不足时可申请追加', 'info')" },
+          { label: "查看来源账户（企业总账户）", onclick: "window.demoToast('企业总账户由企业管理员维护，团队成员仅可见已划拨额度', 'info')" }
+        ];
+        if (ws.canAdjustBudget) more.push({ label: "调整团队预算（仅管理员）", onclick: "window.demoToast('团队预算调整需企业管理员操作', 'warn')" });
+      } else if (ws.payer.type === "enterprise-main") {
+        primary = '<button class="cc-btn" onclick="window.openRecharge(\'' + ws.walletKey + '\')">💳 企业充值</button>'
+                + '<button class="cc-btn ghost" onclick="window.openAllocate()">📤 划拨预算给团队</button>';
+        more = [
+          { label: "审核充值（待审 1 笔）", onclick: "location.href='admin-finance.html?from=wallet&tab=recharges'" },
+          { label: "处理提现申请", onclick: "location.href='admin-finance.html?from=wallet&tab=withdrawals'" },
+          { label: "处理开票申请", onclick: "location.href='admin-finance.html?from=wallet&tab=invoices'" },
+          { label: "查看订单结算明细", onclick: "location.href='admin-finance.html?from=wallet&tab=settlements'" },
+          { label: "导出对账单 (CSV)", onclick: "window.demoToast('演示环境，未实现导出', 'warn')" },
+          { label: "配置账户 / 规则", onclick: "location.href='admin-console.html'" }
+        ];
+      }
+      $("ccActions").innerHTML = primary;
+      renderCcMore(more);
     }
 
-    // 账户矩阵（按当前空间权限过滤展示）
+    function renderCcMore(items) {
+      const wrap = document.getElementById("ccMoreWrap");
+      const menu = document.getElementById("ccMoreMenu");
+      if (!wrap || !menu) return;
+      if (!items || items === "missing" || items.length === 0) {
+        wrap.style.display = "none";
+        menu.classList.remove("open");
+        return;
+      }
+      wrap.style.display = "";
+      menu.innerHTML = '<div class="menu-label">管理 / 二级动作</div>'
+        + items.map(it => '<a onclick="' + it.onclick.replace(/"/g, "&quot;") + '">▸ ' + it.label + '</a>').join("");
+    }
+    document.addEventListener("click", function (e) {
+      const trig = e.target.closest("#ccMoreTrigger");
+      const menu = document.getElementById("ccMoreMenu");
+      if (trig) { e.stopPropagation(); menu && menu.classList.toggle("open"); return; }
+      if (menu && !e.target.closest("#ccMoreMenu")) menu.classList.remove("open");
+    });
+
+    // 工具：近 30 天个人账户充值 / 支出（基于 flows）
+    function computeLast30(wallets, accountKey) {
+      const flows = window.demoApp.getFlows().filter(f => f.account === accountKey);
+      let inAmt = 0, outAmt = 0;
+      flows.forEach(f => {
+        if (f.amount > 0) inAmt += f.amount;
+        if (f.amount < 0) outAmt += -f.amount;
+      });
+      return { in: inAmt, out: outAmt };
+    }
+    // 工具：账户相关订单数（基于流水中 OD-/DM- 标识）
+    function countOrdersByAccount(accountKey) {
+      const flows = window.demoApp.getFlows().filter(f => f.account === accountKey);
+      const ids = new Set();
+      flows.forEach(f => {
+        const m = (f.desc || "").match(/(OD|DM)-\d+/g);
+        if (m) m.forEach(x => ids.add(x));
+      });
+      return ids.size;
+    }
+
+    // ============================================================
+    // P0-2 / P2-10：当前可见账户（按"强 / 弱 / 不展示"三档收紧）
+    // ============================================================
     function renderAccountsGrid() {
       const ws = window.demoApp.getCurrentWorkspace();
       const wallets = window.demoApp.getWallets();
 
-      // 全量账户清单
       const ALL = {
-        "enterprise-main-cf": { wallet: wallets["enterprise-main-cf"], type: "enterprise-main", title: "骋风天合 - 企业主账户", subtitle: "由企业管理员维护", key: "enterprise-main-cf" },
+        "enterprise-main-cf": { wallet: wallets["enterprise-main-cf"], type: "enterprise-main", title: "骋风天合 - 企业总账户", subtitle: "由企业管理员维护", key: "enterprise-main-cf" },
         "team-budget-cf-drama": { wallet: wallets["team-budget-cf-drama"], type: "team-budget", title: "短剧制作中心 - 团队预算账户", subtitle: "归属：骋风天合·短剧制作中心", key: "team-budget-cf-drama", boundWs: "cf-drama" },
         "team-budget-cf-marketing": { wallet: wallets["team-budget-cf-marketing"], type: "team-budget", title: "市场宣传组 - 团队预算账户", subtitle: "归属：骋风天合·市场宣传组", key: "team-budget-cf-marketing", boundWs: "cf-marketing" },
         "team-budget-cf-ip": { wallet: wallets["team-budget-cf-ip"] || null, type: wallets["team-budget-cf-ip"] ? "team-budget" : "unset", title: "IP 孵化组 - 团队预算账户", subtitle: "归属：骋风天合·IP 孵化组", key: "team-budget-cf-ip", boundWs: "cf-ip", isUnset: !wallets["team-budget-cf-ip"] },
-        "personal-account-lixueqin": { wallet: wallets["personal-account-lixueqin"], type: "personal", title: "昭岚 - 个人账户", subtitle: "个人空间下使用", key: "personal-account-lixueqin", boundWs: "personal" }
+        "personal-account-lixueqin": { wallet: wallets["personal-account-lixueqin"], type: "personal", title: "昭岚 - 个人账户", subtitle: "仅个人空间下可用", key: "personal-account-lixueqin", boundWs: "personal" }
       };
 
-      // 根据当前空间决定可见账户（权限隔离）
-      let visibleKeys = []; // 完整可见的账户
-      let limitedKeys = []; // 受限可见（只显示部分信息，如"上游来源"）
-      let sectionTitle = "", sectionSub = "";
+      // 三档可见性：A=强展示 / B=弱展示（仅来源摘要）/ C=不展示
+      let strongKeys = [];
+      let weakKeys = [];
+      let sectionTitle = "当前可见账户", sectionSub = "";
 
       if (ws.id === "personal") {
-        // 个人空间：只看个人账户
-        visibleKeys = ["personal-account-lixueqin"];
-        sectionTitle = "我的账户";
-        sectionSub = "个人空间下仅可见个人账户。如需企业资金请切换到对应工作空间。";
+        // 个人空间：只展示个人账户
+        strongKeys = ["personal-account-lixueqin"];
+        sectionSub = "个人空间下仅展示个人账户。其他团队 / 企业账户对你不可见。";
       } else if (ws.id === "cf-admin") {
-        // 企业管理员：看全部
-        visibleKeys = ["enterprise-main-cf", "team-budget-cf-drama", "team-budget-cf-marketing", "team-budget-cf-ip", "personal-account-lixueqin"];
-        sectionTitle = "骋风天合 · 全部资金账户";
-        sectionSub = "管理员视角：企业主 → 团队预算 → 个人，完整可见。";
+        // 企业管理员：完整看全部（这是管理员特权）
+        strongKeys = ["enterprise-main-cf", "team-budget-cf-drama", "team-budget-cf-marketing", "team-budget-cf-ip"];
+        sectionTitle = "骋风天合 · 企业可管理账户";
+        sectionSub = "管理员视角：企业总账户 + 全部团队预算账户。个人账户已隐藏（默认不向管理员展示成员个人余额）。";
       } else if (ws.id === "cf-drama" || ws.id === "cf-marketing" || ws.id === "cf-ip") {
-        // 团队空间成员：本团队完整可见 + 企业主受限可见 + 个人账户
-        visibleKeys = [ws.walletKey === "enterprise-main-cf" ? null : ws.walletKey, "personal-account-lixueqin"].filter(Boolean);
-        // IP 孵化组也要展示自己的"未配置"状态
-        if (ws.id === "cf-ip" && !visibleKeys.includes("team-budget-cf-ip")) visibleKeys.unshift("team-budget-cf-ip");
-        // 企业主账户受限可见
-        limitedKeys = ["enterprise-main-cf"];
-        sectionTitle = "本团队可见账户";
-        sectionSub = "团队成员视角：仅可见本团队预算 + 上级企业主账户（受限）+ 个人账户。其他团队的预算账户对你不可见。";
+        // 团队空间成员：仅强展示本团队预算；企业总账户作"来源摘要"弱展示；不展示个人/其他团队
+        strongKeys = [ws.walletKey === "enterprise-main-cf" ? null : ws.walletKey].filter(Boolean);
+        if (ws.id === "cf-ip" && !strongKeys.includes("team-budget-cf-ip")) strongKeys.unshift("team-budget-cf-ip");
+        weakKeys = ["enterprise-main-cf"];
+        sectionSub = "团队成员视角：仅强展示本团队预算账户；上游企业总账户仅显示「来源摘要」；其他团队的预算与你的个人账户均不展示。";
       }
 
-      // 写入标题
       $("accountsSectionTitle").textContent = sectionTitle;
       $("accountsSectionSub").textContent = sectionSub;
 
-      // 渲染卡片
-      const renderCard = (item, mode) => {
+      const fmt = window.fmtMoney;
+
+      // 强展示卡片
+      const renderStrong = (item) => {
         const isCurrent = ws.walletKey === item.key;
-        const cls = "account-card" + (isCurrent ? " current" : "") + (mode === "limited" ? " limited" : "");
-        let typeLabel = item.type === "personal" ? "个人账户" : item.type === "team-budget" ? "团队预算账户" : item.type === "enterprise-main" ? "企业主账户" : "未配置";
-        let actions = "";
+        const cls = "account-card" + (isCurrent ? " current" : "");
+        const typeLabel = item.type === "personal" ? "个人账户" : item.type === "team-budget" ? "团队预算账户" : item.type === "enterprise-main" ? "企业总账户" : "未配置";
 
-        if (mode === "limited") {
-          // 受限视图：团队成员看企业主
-          const allocatedToTeam = wallets[ws.walletKey] && wallets[ws.walletKey].allocated;
-          return '<div class="' + cls + '">'
-            + '<div class="ac-head"><div><div class="ac-title">' + item.title + '</div><div style="font-size:11px;color:#8c8c8c;margin-top:2px">上游账户 · 受限可见</div></div><span class="ac-type ' + item.type + '">企业主账户</span></div>'
-            + '<div class="ac-balance" style="font-size:18px;color:#bfbfbf">¥ ****</div>'
-            + '<div class="ac-meta"><span>已划拨给本团队</span><span class="ac-meta-val">' + window.fmtMoney(allocatedToTeam || 0) + '</span></div>'
-            + '<div class="ac-meta"><span>权限说明</span><span class="ac-meta-val" style="color:#8c8c8c;font-size:11px">仅企业管理员可见完整余额</span></div>'
-            + '<div class="ac-actions"><button onclick="window.demoToast(\'你不是企业管理员，无权操作企业主账户\', \'warn\')" disabled style="cursor:not-allowed;color:#bfbfbf">充值</button><button onclick="window.demoToast(\'追加预算需联系企业管理员\', \'info\')">申请追加预算</button></div>'
-            + '</div>';
-        }
-
+        // 主操作：仅"查看 / 申请"等浅操作
+        // 二级操作：管理动作（仅有权限时）
+        let primary = "", manage = [];
         if (item.isUnset) {
-          actions = '<button class="warn" onclick="window.openAllocate(\'' + item.key + '\')">企业管理员：配置预算</button>';
+          primary = '<button class="warn" onclick="window.openAllocate(\'' + item.key + '\')">⚙ 配置预算账户</button>';
         } else if (item.type === "personal") {
-          actions = '<button class="primary" onclick="window.openRecharge(\'' + item.key + '\')">充值</button><button onclick="window.openWithdraw(\'' + item.key + '\')">提现</button>';
+          primary = '<button class="primary" onclick="window.openRecharge(\'' + item.key + '\')">💳 充值</button>'
+                  + '<button onclick="window.openWithdraw(\'' + item.key + '\')">💸 提现</button>';
+          manage.push({ label: "查看流水", js: "document.querySelector(\\'[data-tab=overview]\\').click()" });
         } else if (item.type === "team-budget") {
           if (ws.id === "cf-admin") {
-            actions = '<button onclick="window.demoToast(\'切换到该团队空间查看详情\', \'info\'); setTimeout(() => { window.demoApp.setCurrentWorkspace(\'' + item.boundWs + '\'); window.refreshAll(); window.renderWsDropdownGlobal(); }, 500)">切到该空间</button><button onclick="window.demoToast(\'团队预算调整需企业管理员操作\', \'warn\')">调整预算</button>';
+            primary = '<button onclick="window.demoToast(\'切到该空间查看详情\', \'info\'); setTimeout(()=>{window.demoApp.setCurrentWorkspace(\'' + item.boundWs + '\'); location.reload();}, 400)">↗ 切到该空间</button>'
+                    + '<button onclick="window.openAllocate(\'' + item.key + '\')">📤 追加预算</button>';
+            manage = [
+              { label: "调整 / 收回预算", js: "window.demoToast(\\'演示：跳转到预算调整页\\', \\'info\\')" },
+              { label: "冻结 / 解冻该账户", js: "window.demoToast(\\'演示：账户冻结（管理员）\\', \\'warn\\')" }
+            ];
           } else {
-            actions = '<button onclick="window.demoToast(\'团队预算追加需联系企业管理员\', \'info\')">申请追加预算</button><button onclick="window.demoToast(\'查看本团队消费明细\', \'info\')">查看消费</button>';
+            primary = '<button onclick="window.demoToast(\'追加预算需联系企业管理员\', \'info\')">📥 申请追加预算</button>'
+                    + '<button onclick="document.querySelector(\'[data-tab=demander]\').click()">📊 查看消费</button>';
+            manage = [
+              { label: "查看预算规则", js: "window.demoToast(\\'季度初统一划拨；不足时申请追加\\', \\'info\\')" }
+            ];
           }
         } else if (item.type === "enterprise-main") {
-          actions = '<button class="primary" onclick="window.openRecharge(\'' + item.key + '\')">企业充值</button><button onclick="window.openAllocate()">划拨给团队</button>';
+          primary = '<button class="primary" onclick="window.openRecharge(\'' + item.key + '\')">💳 企业充值</button>'
+                  + '<button onclick="window.openAllocate()">📤 划拨</button>';
+          manage = [
+            { label: "审核充值（待审 1 笔）", js: "location.href=\\'admin-finance.html?from=wallet&tab=recharges\\'" },
+            { label: "处理提现申请", js: "location.href=\\'admin-finance.html?from=wallet&tab=withdrawals\\'" },
+            { label: "处理开票申请", js: "location.href=\\'admin-finance.html?from=wallet&tab=invoices\\'" },
+            { label: "查看订单结算明细", js: "location.href=\\'admin-finance.html?from=wallet&tab=settlements\\'" },
+            { label: "配置账户 / 规则", js: "location.href=\\'admin-console.html\\'" }
+          ];
         }
+        const manageHtml = manage.length
+          ? '<details class="ac-manage" style="margin-top:8px"><summary style="cursor:pointer;font-size:11px;color:#8c8c8c;list-style:none">⚙ 管理 / 二级动作 ▾</summary>'
+            + '<div style="display:flex;flex-direction:column;gap:4px;margin-top:6px">'
+            + manage.map(m => '<a style="font-size:12px;color:#1890ff;cursor:pointer" onclick="' + m.js + '">▸ ' + m.label + '</a>').join("")
+            + '</div></details>'
+          : "";
 
         const balanceHtml = item.isUnset
           ? '<div class="ac-balance unset">未配置</div>'
-          : '<div class="ac-balance">' + window.fmtMoney(item.wallet.balance) + '</div>';
+          : '<div class="ac-balance">' + fmt(item.wallet.balance) + '</div>';
         const meta = item.isUnset
-          ? '<div class="ac-meta"><span>说明</span><span class="ac-meta-val" style="color:#cf1322">下单将回退至企业主账户</span></div>'
-          : '<div class="ac-meta"><span>已锁定</span><span class="ac-meta-val">' + window.fmtMoney(item.wallet.lockedAmount || 0) + '</span></div>'
-            + (item.wallet.allocated ? '<div class="ac-meta"><span>总预算</span><span class="ac-meta-val">' + window.fmtMoney(item.wallet.allocated) + '</span></div>' : '');
+          ? '<div class="ac-meta"><span>说明</span><span class="ac-meta-val" style="color:#cf1322">下单将回退至企业总账户</span></div>'
+          : '<div class="ac-meta"><span>已冻结</span><span class="ac-meta-val">' + fmt(item.wallet.lockedAmount || 0) + '</span></div>'
+            + (item.wallet.allocated ? '<div class="ac-meta"><span>总预算</span><span class="ac-meta-val">' + fmt(item.wallet.allocated) + '</span></div>' : '');
 
         return '<div class="' + cls + '">'
           + '<div class="ac-head"><div><div class="ac-title">' + item.title + (isCurrent ? ' <span style="color:#1890ff;font-size:11px">· 当前</span>' : '') + '</div>' + (item.subtitle ? '<div style="font-size:11px;color:#8c8c8c;margin-top:2px">' + item.subtitle + '</div>' : '') + '</div><span class="ac-type ' + item.type + '">' + typeLabel + '</span></div>'
           + balanceHtml
           + meta
-          + '<div class="ac-actions">' + actions + '</div>'
+          + '<div class="ac-actions">' + primary + '</div>'
+          + manageHtml
           + '</div>';
       };
 
-      const visible = visibleKeys.map(k => ALL[k]).filter(Boolean);
-      const limited = limitedKeys.map(k => ALL[k]).filter(Boolean);
-      const html = visible.map(it => renderCard(it, "full")).join("") + limited.map(it => renderCard(it, "limited")).join("");
-      $("accountsGrid").innerHTML = html;
+      // 弱展示：仅显示来源摘要（不显示完整余额、不挂任何管理操作）
+      const renderWeak = (item) => {
+        const allocatedToTeam = wallets[ws.walletKey] && wallets[ws.walletKey].allocated;
+        return '<div class="account-card limited" style="position:relative">'
+          + '<div class="ac-head"><div><div class="ac-title">' + item.title + '</div><div style="font-size:11px;color:#8c8c8c;margin-top:2px">来源账户 · 摘要可见</div></div><span class="ac-type enterprise-main">企业总账户</span></div>'
+          + '<div class="ac-balance" style="font-size:16px;color:#bfbfbf">完整余额仅企业管理员可见</div>'
+          + '<div class="ac-meta"><span>已划拨给本团队</span><span class="ac-meta-val">' + window.fmtMoney(allocatedToTeam || 0) + '</span></div>'
+          + '<div class="ac-meta"><span>预算规则</span><span class="ac-meta-val" style="font-size:11px;color:#8c8c8c">季度初由管理员划拨；不足可申请追加</span></div>'
+          + '<div class="ac-actions"><a style="font-size:12px;color:#1890ff;cursor:pointer" onclick="window.demoToast(\'查看预算规则与上游来源\', \'info\')">查看预算规则 →</a></div>'
+          + '</div>';
+      };
+
+      const html = strongKeys.map(k => ALL[k]).filter(Boolean).map(renderStrong).join("")
+                 + weakKeys.map(k => ALL[k]).filter(Boolean).map(renderWeak).join("");
+      $("accountsGrid").innerHTML = html || '<div style="padding:24px;text-align:center;color:#8c8c8c;background:#fff;border-radius:8px">当前空间下没有可见账户</div>';
     }
 
     // 团队预算使用率（个人空间隐藏；团队成员只看本团队；管理员看全部）
@@ -766,18 +1223,46 @@
       if (el) el.innerHTML = html;
     }
 
-    // KPI 动态化（按当前空间）
+    // KPI + 待处理事项（按当前空间 + 角色动态化）
     function renderKPIs() {
       const ws = window.demoApp.getCurrentWorkspace();
       const wallets = window.demoApp.getWallets();
+      const identity = window.demoApp.getCurrentIdentity();
       const row = document.getElementById("kpiRow");
       const bar = document.getElementById("pendingBar");
       if (!row || !bar) return;
+
+      // P1-7：承制方视角下，待办与 KPI 完全切换为收入 / 提现 / 开票视角
+      if (identity === "contractor") {
+        const kpisC = [
+          { icon: "📊", label: "待结算收入", value: "¥18,400", trend: "3 笔订单已完成验收", cls: "" },
+          { icon: "💸", label: "可提现金额", value: "¥56,200", trend: "T+1 提现到账", cls: "orange" },
+          { icon: "📈", label: "本月已结算", value: "¥29,450", trend: "<span class=\"delta-up\">↑ 14% vs 上月</span>", cls: "green" },
+          { icon: "🧾", label: "可开票订单", value: "3 笔", trend: "合计 ¥168,400", cls: "purple" }
+        ];
+        const pendingsC = [
+          { num: "1", text: "笔提现待财务审核", cls: "warn" },
+          { num: "1", text: "笔提现失败需重新提交", cls: "danger" },
+          { num: "3", text: "笔订单可申请开票", cls: "warn" },
+          { num: "0", text: "笔收入异常待核对", cls: "" }
+        ];
+        row.innerHTML = kpisC.map(k => '<div class="kpi-card ' + k.cls + '">'
+          + '<div class="kpi-label"><span class="kpi-icon">' + k.icon + '</span> ' + k.label + '</div>'
+          + '<div class="kpi-value">' + k.value + '</div>'
+          + '<div class="kpi-trend">' + k.trend + '</div>'
+          + '</div>').join("");
+        bar.innerHTML = '<span class="pb-label">📌 承制方待处理</span>' + pendingsC.map(p =>
+          '<div class="pb-item ' + p.cls + '" onclick="window.demoToast(\'' + p.text + '\', \'info\')">'
+            + '<span class="pb-num">' + p.num + '</span><span class="pb-text">' + p.text + '</span>'
+          + '</div>').join("");
+        return;
+      }
 
       let kpis = [];
       let pendings = [];
 
       if (ws.id === "personal") {
+        // 个人空间：个人维度
         const w = wallets["personal-account-lixueqin"];
         kpis = [
           { icon: "💳", label: "个人累计充值（年初至今）", value: "¥4,200", trend: "本月充值 <strong>¥1,000</strong>", cls: "" },
@@ -785,12 +1270,16 @@
           { icon: "🔒", label: "已锁定", value: window.fmtMoney(w ? (w.lockedAmount || 0) : 0), trend: "无进行中订单", cls: "green" },
           { icon: "💰", label: "当前可用余额", value: window.fmtMoney(w ? w.balance : 0), trend: "建议保持 ¥3,000+ 以接受小额下单", cls: "purple" }
         ];
+        // P1-7：需求方视角 - 个人空间
         pendings = [
-          { num: "0", text: "笔提现待审核", cls: "", action: "withdraw-list" },
-          { num: "1", text: "条新通知（来自骋风天合）", cls: "warn", action: "notifications" },
-          { num: "2", text: "项个人协议待确认", cls: "", action: "agreements" }
+          { num: "0", text: "笔待支付", cls: "" },
+          { num: "0", text: "笔待锁资确认", cls: "" },
+          { num: "0", text: "笔待验收", cls: "" },
+          { num: "0", text: "笔退款处理中", cls: "" },
+          { num: "1", text: "条新通知（来自骋风天合）", cls: "warn" }
         ];
       } else if (ws.id === "cf-admin") {
+        // 企业管理员：全企业
         const accounts = ["personal-account-lixueqin", "team-budget-cf-drama", "team-budget-cf-marketing", "enterprise-main-cf"];
         let totalAvailable = 0, totalLocked = 0;
         accounts.forEach(k => { const w = wallets[k]; if (w) { totalAvailable += w.balance; totalLocked += (w.lockedAmount || 0); } });
@@ -800,27 +1289,30 @@
           { icon: "🔒", label: "全企业已锁定", value: window.fmtMoney(totalLocked), trend: "分布在 <strong>2 个团队</strong>·<strong>3 笔订单</strong>", cls: "green" },
           { icon: "📥", label: "全企业可用余额", value: window.fmtMoney(totalAvailable), trend: "企业主 + 各团队 + 个人合计", cls: "purple" }
         ];
+        // P1-7：管理员视角
         pendings = [
-          { num: "1", text: "笔对公转账待财务审核", cls: "warn", action: "bank-transfer-review" },
-          { num: "0", text: "笔提现待审核", cls: "", action: "withdraw-list" },
-          { num: "3", text: "笔订单可开票", cls: "warn", action: "invoice-list" },
-          { num: "1", text: "个团队未配置预算", cls: "danger", action: "allocate-budget" },
-          { num: "27%", text: "本季度团队预算使用率", cls: "", action: "budget-report" }
+          { num: "1", text: "笔对公充值待财务审核", cls: "warn" },
+          { num: "3", text: "笔订单可开票（待审批）", cls: "warn" },
+          { num: "0", text: "笔提现待审核", cls: "" },
+          { num: "1", text: "个团队未配置预算", cls: "danger" },
+          { num: "0", text: "笔争议冻结订单", cls: "" }
         ];
       } else {
+        // 团队空间成员（cf-drama / cf-marketing / cf-ip）
         const w = wallets[ws.walletKey];
         const teamName = ws.shortName.replace("骋风天合·", "");
         if (ws.budgetMissing) {
+          // IP 孵化组未配置预算的特殊视图
           kpis = [
-            { icon: "💎", label: teamName + " 预算状态", value: "未配置", trend: "下单将回退至企业主账户结算", cls: "orange" },
+            { icon: "💎", label: teamName + " 预算状态", value: "未配置", trend: "下单将回退至企业总账户结算", cls: "orange" },
             { icon: "📤", label: teamName + " 本季度支出", value: "¥0", trend: "暂无独立预算账户", cls: "" },
             { icon: "🔒", label: teamName + " 已锁定", value: "¥0", trend: "无进行中订单", cls: "green" },
             { icon: "👥", label: "团队成员", value: "8 人", trend: "包含 1 主理人 + 7 创作者", cls: "purple" }
           ];
           pendings = [
-            { num: "1", text: "项：申请配置团队预算账户", cls: "danger", action: "allocate-budget" },
-            { num: "0", text: "笔订单进行中", cls: "", action: "order-list" },
-            { num: "0", text: "笔订单可开票", cls: "", action: "invoice-list" }
+            { num: "1", text: "项：申请配置团队预算账户", cls: "danger" },
+            { num: "0", text: "笔订单进行中", cls: "" },
+            { num: "0", text: "笔订单可开票", cls: "" }
           ];
         } else {
           const allocated = w ? (w.allocated || 0) : 0;
@@ -833,11 +1325,13 @@
             { icon: "🔒", label: "已锁定（订单中）", value: window.fmtMoney(locked), trend: "占预算 <strong>" + (allocated > 0 ? (locked / allocated * 100).toFixed(1) : 0) + "%</strong>", cls: "green" },
             { icon: "💰", label: "当前可用", value: window.fmtMoney(balance), trend: "占预算 <strong>" + (allocated > 0 ? (balance / allocated * 100).toFixed(1) : 0) + "%</strong>", cls: "purple" }
           ];
+          // P1-7：需求方视角 - 团队空间
           pendings = [
-            { num: ws.id === "cf-drama" ? "2" : "1", text: "笔订单进行中", cls: "", action: "order-list" },
-            { num: ws.id === "cf-drama" ? "1" : "0", text: "笔需求待选承制方", cls: "warn", action: "demand-list" },
-            { num: "0", text: "笔订单可开票", cls: "", action: "invoice-list" },
-            { num: ws.id === "cf-drama" ? "23%" : "11%", text: "本季度本团队预算使用率", cls: "", action: "budget-report" }
+            { num: ws.id === "cf-drama" ? "1" : "0", text: "笔待支付", cls: "" },
+            { num: ws.id === "cf-drama" ? "1" : "0", text: "笔待锁资确认", cls: "warn" },
+            { num: ws.id === "cf-drama" ? "2" : "1", text: "笔待验收", cls: "" },
+            { num: "0", text: "笔退款处理中", cls: "" },
+            { num: ws.id === "cf-drama" ? "23%" : "11%", text: "本季度本团队预算使用率", cls: "" }
           ];
         }
       }
@@ -849,47 +1343,335 @@
         + '</div>').join("");
 
       bar.innerHTML = '<span class="pb-label">📌 待处理事项</span>' + pendings.map(p =>
-        '<div class="pb-item ' + p.cls + '" onclick="handlePendingAction(\'' + p.action + '\')" style="cursor:pointer">'
+        '<div class="pb-item ' + p.cls + '" onclick="window.demoToast(\'' + p.text + '\', \'info\')">'
           + '<span class="pb-num">' + p.num + '</span><span class="pb-text">' + p.text + '</span>'
         + '</div>'
       ).join("");
     }
 
-    // 流水
+    // ============================================================
+    // P1-6：升级版账务流水
+    // 字段：类型 / 关联订单 / 付款账户 → 收款账户 / 上下文 / 变动前 → 变动后 / 操作人
+    // 特别字段：原付款账户、退款去向、锁定来源 / 解冻来源
+    // ============================================================
     const TYPE_CONFIG = {
       "recharge": { icon: "💳", label: "充值", className: "recharge" },
-      "lock": { icon: "🔒", label: "锁定", className: "lock" },
+      "lock":     { icon: "🔒", label: "锁定", className: "lock" },
+      "unlock":   { icon: "🔓", label: "解冻", className: "lock" },
       "allocate": { icon: "📤", label: "划拨", className: "allocate" },
-      "settle": { icon: "✅", label: "结算", className: "settle" },
-      "refund": { icon: "↩️", label: "退款", className: "refund" },
+      "settle":   { icon: "✅", label: "结算", className: "settle" },
+      "refund":   { icon: "↩️", label: "退款", className: "refund" },
       "withdraw": { icon: "💸", label: "提现", className: "refund" },
-      "invoice": { icon: "🧾", label: "开票", className: "allocate" }
+      "invoice":  { icon: "🧾", label: "开票", className: "allocate" }
     };
+
+    // 从 desc 中提取订单 / 需求 ID
+    function extractOrderId(desc) {
+      const m = (desc || "").match(/(OD|DM)-\d+/);
+      return m ? m[0] : null;
+    }
+    function extractOrderTitle(desc) {
+      const m = (desc || "").match(/「([^」]+)」/);
+      return m ? m[1] : null;
+    }
+
+    // 推导 付款方 → 收款方 + 锁定/解冻/退款上下文
+    function deriveCounterparty(f, accountName) {
+      const t = f.type;
+      const isOut = f.amount < 0;
+      const desc = f.desc || "";
+      // 默认结构
+      let payer = accountName;
+      let payee = "—";
+      let context = "";
+      let badges = [];
+
+      if (t === "recharge") {
+        if (desc.includes("对公转账")) {
+          payer = "外部 · 对公银行";
+          badges.push("对公");
+        } else if (desc.includes("支付宝")) {
+          payer = "外部 · 支付宝";
+        } else if (desc.includes("微信")) {
+          payer = "外部 · 微信支付";
+        } else if (desc.includes("银联")) {
+          payer = "外部 · 银联";
+        } else { payer = "外部支付"; }
+        payee = accountName;
+        if (f.amount === 0 && f.lockedNote) { context = "状态：" + f.lockedNote; badges.push("审核中"); }
+      } else if (t === "lock") {
+        payer = accountName;
+        payee = "锁定池（订单履约保证金）";
+        badges.push("锁定来源 = " + accountName);
+        const oid = extractOrderId(desc);
+        if (oid) context = "锁定来源订单：" + oid;
+      } else if (t === "unlock") {
+        payer = "锁定池";
+        payee = accountName;
+        badges.push("解冻去向 = " + accountName);
+      } else if (t === "allocate") {
+        if (isOut) { payer = accountName; payee = "团队预算账户（划拨目标）"; }
+        else       { payer = "企业总账户（来源）"; payee = accountName; }
+        badges.push("划拨");
+      } else if (t === "settle") {
+        if (isOut) { payer = accountName; payee = "承制方钱包（外部）"; badges.push("结算出账"); }
+        else       { payer = "需求方扣款账户"; payee = accountName; badges.push("分账入账"); }
+        if (desc.includes("平台服务费")) badges.push("平台服务费");
+      } else if (t === "refund") {
+        // 原路退款：退回原付款账户
+        payer = "订单冻结池";
+        payee = accountName + "（原付款账户）";
+        badges.push("原路退款");
+      } else if (t === "withdraw") {
+        payer = accountName;
+        payee = "外部 · 银行卡 ****8826";
+        badges.push("提现");
+      } else if (t === "invoice") {
+        payer = "—";
+        payee = "—";
+        context = "事件：开票（不影响余额）";
+        badges.push("仅事件");
+      }
+      return { payer, payee, context, badges };
+    }
+
+    // 计算每条流水的"变动前 → 变动后"余额（基于当前快照倒推）
+    function computeBalanceTrails(flows, wallets) {
+      // flows 是按时间倒序（newest first）排列；从当前余额向前倒推
+      const after = {};   // accountKey -> running afterBalance
+      const trails = {};
+      // 初始化为当前余额
+      Object.keys(wallets).forEach(k => { after[k] = wallets[k].balance; });
+      flows.forEach(f => {
+        const k = f.account;
+        const cur = after[k] != null ? after[k] : 0;
+        const before = cur - (f.amount || 0);
+        trails[f.id] = { before, after: cur };
+        after[k] = before; // 上一条流水的 after 就是当前的 before
+      });
+      return trails;
+    }
+
     let flowAccount = "all", flowType = "all";
     function renderFlows() {
-      let flows = window.demoApp.getFlows();
-      if (flowAccount !== "all") flows = flows.filter(f => f.account === flowAccount);
-      if (flowType !== "all") flows = flows.filter(f => f.type === flowType);
-      $("flowCount").textContent = flows.length;
+      const allFlows = window.demoApp.getFlows();
       const wallets = window.demoApp.getWallets();
+      const trails = computeBalanceTrails(allFlows, wallets);
+      let flows = allFlows;
+      if (flowAccount !== "all") flows = flows.filter(f => f.account === flowAccount);
+      if (flowType !== "all")   flows = flows.filter(f => f.type === flowType);
+      $("flowCount").textContent = flows.length;
       const html = flows.map(f => {
         const cfg = TYPE_CONFIG[f.type] || { icon: "•", label: f.type, className: "" };
-        const accountName = wallets[f.account] ? wallets[f.account].name : f.account;
+        const accountName = wallets[f.account] ? (wallets[f.account].name.replace("企业主账户", "企业总账户")) : f.account;
+        const cp = deriveCounterparty(f, accountName);
+        const orderId = extractOrderId(f.desc);
+        const orderTitle = extractOrderTitle(f.desc);
         const amtCls = f.type === "lock" ? "lock" : f.amount > 0 ? "in" : f.amount < 0 ? "out" : "";
         const amtDisplay = f.amount === 0 ? (f.lockedNote || "—") : (f.amount > 0 ? "+" : "") + window.fmtMoney(f.amount);
-        return '<div class="flow-row">'
+        const trail = trails[f.id] || { before: null, after: null };
+
+        const orderHref = orderId && orderId.indexOf("OD-") === 0
+          ? "project-space.html?from=wallet&orderId=" + orderId
+          : (orderId ? "demand-list.html?from=wallet&demandId=" + orderId : null);
+        const orderLine = orderHref
+          ? '<a class="ctx-link" href="' + orderHref + '">🔗 ' + orderId + (orderTitle ? '「' + orderTitle + '」' : '') + '</a>'
+          : '<span style="color:#bfbfbf">无关联订单</span>';
+        const badgesHtml = cp.badges.map(b => '<span class="acct-tag">' + b + '</span>').join("");
+
+        const balanceCell = (f.amount === 0)
+          ? '<div style="font-size:11px;color:#8c8c8c">余额未变（事件流水）</div>'
+          : '<div class="flow-balance">' + window.fmtMoney(trail.before) + ' <span class="acct-arrow">→</span> <span class="bal-after">' + window.fmtMoney(trail.after) + '</span></div>';
+
+        return '<div class="flow-row acct">'
           + '<div class="flow-icon">' + cfg.icon + '</div>'
-          + '<div><span class="flow-type-pill ' + cfg.className + '">' + cfg.label + '</span><div style="font-size:11px;color:#8c8c8c;margin-top:3px">' + f.time + '</div></div>'
-          + '<div style="font-size:13px">' + f.desc + '</div>'
-          + '<div style="font-size:12px;color:#595959">' + accountName + '</div>'
-          + '<div class="flow-amt ' + amtCls + '" style="' + (f.amount === 0 ? "color:#8c8c8c;font-size:11px" : "") + '">' + amtDisplay + '</div>'
-          + '<div style="font-size:12px;color:#8c8c8c">' + f.operator + '</div>'
+          + '<div>'
+            + '<span class="flow-type-pill ' + cfg.className + '">' + cfg.label + '</span>'
+            + '<div class="flow-acct-meta">' + orderLine + '</div>'
+            + '<div style="font-size:11px;color:#8c8c8c;margin-top:3px">' + f.time + '</div>'
+          + '</div>'
+          + '<div>'
+            + '<div style="font-size:13px">' + f.desc + '</div>'
+            + '<div class="flow-acct-meta">'
+              + '<strong style="color:#262626">' + cp.payer + '</strong>'
+              + '<span class="acct-arrow">→</span>'
+              + '<strong style="color:#262626">' + cp.payee + '</strong>'
+              + (cp.context ? '<div style="margin-top:2px">' + cp.context + '</div>' : '')
+              + (badgesHtml ? '<div style="margin-top:4px">' + badgesHtml + '</div>' : '')
+            + '</div>'
+          + '</div>'
+          + '<div>'
+            + '<div class="flow-amt ' + amtCls + '" style="text-align:left;' + (f.amount === 0 ? "color:#8c8c8c;font-size:11px" : "") + '">' + amtDisplay + '</div>'
+            + '<div style="font-size:11px;color:#8c8c8c;margin-top:3px">操作人：' + f.operator + '</div>'
+          + '</div>'
+          + '<div>' + balanceCell + '</div>'
           + '</div>';
-      }).join("") || '<div style="padding:40px;text-align:center;color:#8c8c8c">暂无流水记录</div>';
+      }).join("") || '<div class="empty-state"><div class="es-icon">📒</div><div class="es-title">没有匹配的流水</div><div class="es-sub">尝试调整账户 / 类型筛选，或先在本空间下发起一笔交易。</div></div>';
       $("flowList").innerHTML = html;
     }
     $("flowAccountFilter").addEventListener("change", e => { flowAccount = e.target.value; renderFlows(); });
     $("flowTypeFilter").addEventListener("change", e => { flowType = e.target.value; renderFlows(); });
+
+    // ============================================================
+    // P0-3 / P1-9：需求方结算面板（充值 / 冻结拆分 / 订单消费 / 退款）
+    // ============================================================
+    function renderDemanderPanel() {
+      const ws = window.demoApp.getCurrentWorkspace();
+      const wallets = window.demoApp.getWallets();
+      const w = wallets[ws.walletKey] || wallets["enterprise-main-cf"];
+      const fmt = window.fmtMoney;
+
+      // 顶部 KPI
+      const totalLocked = w.lockedAmount || 0;
+      // 演示：把"冻结余额"按业务拆分（订单冻结占 70%、退款冻结 20%、纠纷冻结 10%）
+      const orderLock = Math.round(totalLocked * 0.72);
+      const refundLock = Math.round(totalLocked * 0.20);
+      const disputeLock = Math.max(0, totalLocked - orderLock - refundLock);
+      const refundFlows = window.demoApp.getFlows().filter(f => f.type === "refund");
+      const orderFlows = window.demoApp.getFlows().filter(f => (f.type === "lock" || f.type === "settle") && f.amount < 0 && (ws.id === "cf-admin" || f.account === ws.walletKey));
+
+      const kpis = [
+        { icon: "💰", label: "当前可用余额", value: fmt(w.balance), trend: "本空间下下单的可支配金额", cls: "" },
+        { icon: "🔒", label: "总冻结金额", value: fmt(totalLocked), trend: "拆分见下方「冻结余额拆分」", cls: "orange" },
+        { icon: "📤", label: "近 30 天订单消费", value: fmt(Math.abs(orderFlows.slice(0, 10).reduce((s, f) => s + f.amount, 0))), trend: orderFlows.length + " 笔订单流水", cls: "purple" },
+        { icon: "↩️", label: "近 30 天退款", value: fmt(refundFlows.reduce((s, f) => s + Math.abs(f.amount), 0)), trend: refundFlows.length + " 笔原路退款", cls: "green" }
+      ];
+      document.getElementById("demanderKpiRow").innerHTML = kpis.map(k => '<div class="kpi-card ' + k.cls + '">'
+        + '<div class="kpi-label"><span class="kpi-icon">' + k.icon + '</span> ' + k.label + '</div>'
+        + '<div class="kpi-value">' + k.value + '</div>'
+        + '<div class="kpi-trend">' + k.trend + '</div>'
+        + '</div>').join("");
+
+      // P1-9：冻结余额拆分（订单冻结 / 退款冻结 / 纠纷冻结）
+      const frozen = [
+        { cls: "", label: "📦 订单冻结", value: orderLock, meta: "订单履约中，验收完成后释放或结算" },
+        { cls: "refund", label: "↩️ 退款冻结", value: refundLock, meta: "退款审核中，到原付款账户后释放" },
+        { cls: "dispute", label: "⚖ 纠纷冻结", value: disputeLock, meta: "争议处理中，由平台介入裁决" }
+      ];
+      document.getElementById("frozenBreakdown").innerHTML = frozen.map(c => '<div class="frozen-cell ' + c.cls + '">'
+        + '<div class="fc-label">' + c.label + '</div>'
+        + '<div class="fc-value">' + fmt(c.value) + '</div>'
+        + '<div class="fc-meta">' + c.meta + '</div>'
+        + '<a style="font-size:11px;color:#1890ff;cursor:pointer;display:inline-block;margin-top:6px" onclick="window.demoToast(\'查看' + c.label.slice(2) + '明细\', \'info\')">查看明细 →</a>'
+        + '</div>').join("");
+
+      // 订单消费流水
+      document.getElementById("demanderOrderFlows").innerHTML = ''
+        + '<div class="sl-row head"><div>订单 / 需求</div><div>账户上下文</div><div>状态</div><div>金额</div><div>时间</div></div>'
+        + orderFlows.slice(0, 6).map(f => {
+            const oid = extractOrderId(f.desc) || "—";
+            const title = extractOrderTitle(f.desc) || "（无标题）";
+            const accountName = (wallets[f.account] && wallets[f.account].name.replace("企业主账户", "企业总账户")) || f.account;
+            const status = f.type === "lock" ? '<span class="sl-status warn">🔒 已锁定</span>' : '<span class="sl-status ok">✅ 已结算</span>';
+            const oidHref = oid.indexOf("OD-") === 0 ? "project-space.html?from=wallet&orderId=" + oid : (oid.indexOf("DM-") === 0 ? "demand-list.html?from=wallet&demandId=" + oid : null);
+            const oidHtml = oidHref ? '<a href="' + oidHref + '" style="color:#1890ff;text-decoration:none">' + oid + '</a>' : oid;
+            return '<div class="sl-row">'
+              + '<div><strong>' + oidHtml + '</strong><div style="font-size:11px;color:#8c8c8c">' + title + '</div></div>'
+              + '<div style="font-size:12px;color:#595959">扣款方：' + accountName + '</div>'
+              + '<div>' + status + '</div>'
+              + '<div class="sl-amt out">' + fmt(f.amount) + '</div>'
+              + '<div style="font-size:11px;color:#8c8c8c">' + f.time + '</div>'
+              + '</div>';
+          }).join("") || '<div class="empty-state"><div class="es-icon">📦</div><div class="es-title">暂无订单消费记录</div><div class="es-sub">本空间下尚未有订单流水。下单后将在此聚合。</div></div>';
+
+      // 退款记录（原路退款）
+      document.getElementById("demanderRefundFlows").innerHTML = ''
+        + '<div class="sl-row head"><div>关联订单</div><div>退回去向（原付款账户）</div><div>状态</div><div>退款金额</div><div>时间</div></div>'
+        + refundFlows.map(f => {
+            const oid = extractOrderId(f.desc) || "—";
+            const title = extractOrderTitle(f.desc) || "（无标题）";
+            const accountName = (wallets[f.account] && wallets[f.account].name.replace("企业主账户", "企业总账户")) || f.account;
+            const oidHref = oid.indexOf("OD-") === 0 ? "project-space.html?from=wallet&orderId=" + oid : (oid.indexOf("DM-") === 0 ? "demand-list.html?from=wallet&demandId=" + oid : null);
+            const oidHtml = oidHref ? '<a href="' + oidHref + '" style="color:#1890ff;text-decoration:none">' + oid + '</a>' : oid;
+            return '<div class="sl-row">'
+              + '<div><strong>' + oidHtml + '</strong><div style="font-size:11px;color:#8c8c8c">' + title + '</div></div>'
+              + '<div style="font-size:12px;color:#595959">↩️ 原路退回 → <strong>' + accountName + '</strong></div>'
+              + '<div><span class="sl-status ok">✅ 已到账</span></div>'
+              + '<div class="sl-amt in">+' + fmt(f.amount) + '</div>'
+              + '<div style="font-size:11px;color:#8c8c8c">' + f.time + '</div>'
+              + '</div>';
+          }).join("") || '<div class="empty-state"><div class="es-icon">↩️</div><div class="es-title">暂无退款记录</div><div class="es-sub">未发生退款。退款将原路退回原付款账户。</div></div>';
+    }
+
+    // ============================================================
+    // P0-3：承制方结算面板（收入 / 提现 / 开票）
+    // ============================================================
+    function renderContractorPanel() {
+      const fmt = window.fmtMoney;
+      // 演示数据 — 承制方"星辰创作工作室"的待结算 / 可提现 / 已结算
+      const pendingSettle = 18400;       // 待结算（订单已完成，平台对账中）
+      const withdrawable = 56200;        // 可提现
+      const totalIncome = 327800;        // 累计收入
+      const invoiceable = 3;             // 可开票订单数
+
+      document.getElementById("contractorIncomeGrid").innerHTML = ''
+        + '<div class="income-card settle">'
+          + '<div class="ic-label">📊 待结算收入</div>'
+          + '<div class="ic-value">' + fmt(pendingSettle) + '</div>'
+          + '<div class="ic-meta">3 笔订单已完成验收，平台 T+1 结算中</div>'
+          + '<div class="ic-actions"><button onclick="location.href=\'admin-finance.html?from=wallet&tab=settlements\'">查看待结算明细</button></div>'
+        + '</div>'
+        + '<div class="income-card withdraw">'
+          + '<div class="ic-label">💸 可提现金额</div>'
+          + '<div class="ic-value" style="color:#fa8c16">' + fmt(withdrawable) + '</div>'
+          + '<div class="ic-meta">提现到账时效 1 - 3 个工作日</div>'
+          + '<div class="ic-actions"><button class="primary" onclick="window.openWithdraw(\'personal-account-lixueqin\')">立即提现</button><button onclick="window.demoToast(\'查看提现规则\', \'info\')">规则</button></div>'
+        + '</div>'
+        + '<div class="income-card invoice">'
+          + '<div class="ic-label">🧾 可开票订单</div>'
+          + '<div class="ic-value" style="color:#1890ff">' + invoiceable + ' 笔</div>'
+          + '<div class="ic-meta">合计 ¥168,400，可申请增值税专票 / 普票</div>'
+          + '<div class="ic-actions"><button class="primary" onclick="location.href=\'admin-finance.html?from=wallet&tab=invoices\'">申请开票</button><button onclick="location.href=\'admin-finance.html?from=wallet&tab=invoices\'">历史发票</button></div>'
+        + '</div>';
+
+      // 提现记录
+      document.getElementById("contractorWithdrawList").innerHTML = ''
+        + '<div class="sl-row head"><div>提现单号</div><div>到账方式</div><div>状态</div><div>金额</div><div>时间</div></div>'
+        + [
+          { id: "WD-2026042201", method: "建行储蓄卡 ****8826", status: ["ok", "✅ 已到账"], amt: 25000, time: "2026-04-22 18:20" },
+          { id: "WD-2026041502", method: "建行储蓄卡 ****8826", status: ["ok", "✅ 已到账"], amt: 18000, time: "2026-04-15 14:08" },
+          { id: "WD-2026040801", method: "建行储蓄卡 ****8826", status: ["processing", "⏳ 财务审核中"], amt: 12000, time: "2026-04-08 10:55" },
+          { id: "WD-2026032702", method: "建行储蓄卡 ****8826", status: ["danger", "❌ 风控驳回"], amt: 80000, time: "2026-03-27 16:40" }
+        ].map(r => '<div class="sl-row">'
+            + '<div><strong>' + r.id + '</strong></div>'
+            + '<div style="font-size:12px;color:#595959">' + r.method + '</div>'
+            + '<div><span class="sl-status ' + r.status[0] + '">' + r.status[1] + '</span></div>'
+            + '<div class="sl-amt out">−' + fmt(r.amt) + '</div>'
+            + '<div style="font-size:11px;color:#8c8c8c">' + r.time + '</div>'
+            + '</div>').join("");
+
+      // 收入流水
+      document.getElementById("contractorIncomeFlows").innerHTML = ''
+        + '<div class="sl-row head"><div>关联订单</div><div>需求方</div><div>状态</div><div>结算金额</div><div>时间</div></div>'
+        + [
+          { oid: "OD-2026042009", title: "广告片配音", buyer: "市场宣传组（骋风天合）", status: ["ok", "✅ 已结算"], amt: 7600, time: "2026-04-20 16:40" },
+          { oid: "OD-2026041807", title: "广告片配音 - 修订版", buyer: "市场宣传组（骋风天合）", status: ["ok", "✅ 已结算"], amt: 7600, time: "2026-04-18 11:08" },
+          { oid: "OD-2026041401", title: "IP 形象设计", buyer: "短剧制作中心（骋风天合）", status: ["ok", "✅ 已结算"], amt: 14250, time: "2026-04-12 17:42" },
+          { oid: "OD-2026040506", title: "短剧海报系列", buyer: "短剧制作中心（骋风天合）", status: ["processing", "⏳ 平台对账中"], amt: 18400, time: "2026-04-26 09:00" }
+        ].map(r => '<div class="sl-row">'
+            + '<div><strong>' + r.oid + '</strong><div style="font-size:11px;color:#8c8c8c">' + r.title + '</div></div>'
+            + '<div style="font-size:12px;color:#595959">' + r.buyer + '</div>'
+            + '<div><span class="sl-status ' + r.status[0] + '">' + r.status[1] + '</span></div>'
+            + '<div class="sl-amt in">+' + fmt(r.amt) + '</div>'
+            + '<div style="font-size:11px;color:#8c8c8c">' + r.time + '</div>'
+            + '</div>').join("");
+
+      // 开票申请
+      document.getElementById("contractorInvoiceList").innerHTML = ''
+        + '<div class="sl-row head"><div>关联订单</div><div>抬头 / 票种</div><div>状态</div><div>金额</div><div>时间</div></div>'
+        + [
+          { oid: "OD-2026031502", title: "品牌片拍摄", header: "骋风天合（增值税专票）", status: ["ok", "✅ 已开具"], amt: 120000, time: "2026-04-19 15:00" },
+          { oid: "OD-2026042009", title: "广告片配音", header: "骋风天合（专票）", status: ["warn", "⏳ 待提交"], amt: 8000, time: "—" },
+          { oid: "OD-2026041807", title: "广告片配音 - 修订版", header: "骋风天合（专票）", status: ["warn", "⏳ 待提交"], amt: 8000, time: "—" },
+          { oid: "OD-2026041401", title: "IP 形象设计", header: "骋风天合（专票）", status: ["warn", "⏳ 待提交"], amt: 15000, time: "—" }
+        ].map(r => '<div class="sl-row">'
+            + '<div><strong>' + r.oid + '</strong><div style="font-size:11px;color:#8c8c8c">' + r.title + '</div></div>'
+            + '<div style="font-size:12px;color:#595959">' + r.header + '</div>'
+            + '<div><span class="sl-status ' + r.status[0] + '">' + r.status[1] + '</span></div>'
+            + '<div class="sl-amt out">' + fmt(r.amt) + '</div>'
+            + '<div style="font-size:11px;color:#8c8c8c">' + r.time + '</div>'
+            + '</div>').join("");
+    }
 
     // ============================================================
     // 充值 modal
@@ -980,7 +1762,7 @@
       if (!amt || amt < 1000) { window.demoToast("划拨金额需 ≥ ¥1,000", "err"); return; }
       const wallets = window.demoApp.getWallets();
       const fromBal = wallets["enterprise-main-cf"].balance;
-      if (amt > fromBal) { window.demoToast("企业主账户余额不足", "err"); return; }
+      if (amt > fromBal) { window.demoToast("企业总账户余额不足", "err"); return; }
       const toKey = $("allocateTarget").value;
       const teamMap = { "team-budget-cf-drama": { ws: "cf-drama", teamName: "短剧制作中心" }, "team-budget-cf-marketing": { ws: "cf-marketing", teamName: "市场宣传组" }, "team-budget-cf-ip": { ws: "cf-ip", teamName: "IP 孵化组" } };
       const team = teamMap[toKey];
@@ -992,12 +1774,12 @@
       wallets[toKey].balance += amt;
       wallets[toKey].allocated = (wallets[toKey].allocated || 0) + amt;
       window.demoApp.setWallets(wallets);
-      window.demoApp.addFlow({ id: "F-" + Date.now() + "a", time: now(), type: "allocate", desc: "从企业主账户划拨至 " + team.teamName, account: "enterprise-main-cf", amount: -amt, operator: "昭岚（企业管理员）" });
+      window.demoApp.addFlow({ id: "F-" + Date.now() + "a", time: now(), type: "allocate", desc: "从企业总账户划拨至 " + team.teamName, account: "enterprise-main-cf", amount: -amt, operator: "昭岚（企业管理员）" });
       window.demoApp.addFlow({ id: "F-" + Date.now() + "b", time: now(), type: "allocate", desc: "企业管理员划拨预算 → " + team.teamName, account: toKey, amount: amt, operator: "昭岚（企业管理员）" });
       window.demoToast("✅ 已划拨 " + window.fmtMoney(amt) + " 至 " + team.teamName, "ok");
       $("allocateModal").classList.remove("open");
       window.refreshAll();
-      if (toKey === "team-budget-cf-ip") setTimeout(() => window.demoToast("提示：IP 孵化组已开通预算账户，下次该空间下单不再回退至企业主账户", "info"), 800);
+      if (toKey === "team-budget-cf-ip") setTimeout(() => window.demoToast("提示：IP 孵化组已开通预算账户，下次该空间下单不再回退至企业总账户", "info"), 800);
     });
 
     // ============================================================
@@ -1023,166 +1805,6 @@
       $("withdrawModal").classList.remove("open");
     });
 
-    // ============================================================
-    // 待处理事项 action handlers
-    // ============================================================
-    window.handlePendingAction = function (action) {
-      const m = $("pendingDetailModal");
-      const title = $("pdmTitle");
-      const sub = $("pdmSubtitle");
-      const body = $("pdmBody");
-      const foot = $("pdmFoot");
-
-      function openModal(t, s, html, footHtml) {
-        title.textContent = t; sub.textContent = s || "";
-        body.innerHTML = html;
-        foot.innerHTML = '<button class="btn" onclick="document.getElementById(\'pendingDetailModal\').classList.remove(\'open\')">关闭</button>' + (footHtml || "");
-        m.classList.add("open");
-      }
-
-      switch (action) {
-        case "withdraw-list":
-          openModal("💸 提现审核列表", "所有待审核与历史提现记录", `
-            <div class="info-tip">暂无待审核的提现申请。</div>
-            <table style="width:100%;font-size:12px;border-collapse:collapse;margin-top:10px">
-              <thead><tr style="background:#fafafa"><th style="padding:8px;text-align:left;border-bottom:1px solid #f0f0f0">时间</th><th style="padding:8px;text-align:left;border-bottom:1px solid #f0f0f0">金额</th><th style="padding:8px;text-align:left;border-bottom:1px solid #f0f0f0">状态</th><th style="padding:8px;text-align:left;border-bottom:1px solid #f0f0f0">到账卡</th></tr></thead>
-              <tbody>
-                <tr><td style="padding:8px;border-bottom:1px solid #f0f0f0">2026-04-22 18:20</td><td style="padding:8px;border-bottom:1px solid #f0f0f0;color:#cf1322">-¥800</td><td style="padding:8px;border-bottom:1px solid #f0f0f0"><span style="color:#52c41a">✅ 已到账</span></td><td style="padding:8px;border-bottom:1px solid #f0f0f0">建行 8826</td></tr>
-                <tr><td style="padding:8px;border-bottom:1px solid #f0f0f0">2026-03-15 10:05</td><td style="padding:8px;border-bottom:1px solid #f0f0f0;color:#cf1322">-¥1,200</td><td style="padding:8px;border-bottom:1px solid #f0f0f0"><span style="color:#52c41a">✅ 已到账</span></td><td style="padding:8px;border-bottom:1px solid #f0f0f0">建行 8826</td></tr>
-              </tbody>
-            </table>`);
-          break;
-
-        case "notifications":
-          openModal("🔔 通知中心", "来自平台和企业的通知消息", `
-            <div style="display:flex;flex-direction:column;gap:10px">
-              <div style="padding:12px 14px;background:#e6f7ff;border:1px solid #91d5ff;border-radius:8px;font-size:13px;cursor:pointer" onclick="window.demoToast('已读：骋风天合邀请您加入短剧制作中心', 'ok');this.style.opacity='.5'">
-                <div style="display:flex;justify-content:space-between;align-items:center"><strong>🏢 骋风天合</strong><span style="font-size:11px;color:#8c8c8c">2026-04-26 14:30</span></div>
-                <div style="margin-top:4px;color:#595959">管理员昭岚已将您的个人账户关联至企业「骋风天合」，您可在工作空间中切换至企业团队下发布需求。</div>
-              </div>
-              <div style="padding:12px 14px;background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;font-size:13px;opacity:.6">
-                <div style="display:flex;justify-content:space-between;align-items:center"><strong>📢 平台公告</strong><span style="font-size:11px;color:#8c8c8c">2026-04-20 09:00</span></div>
-                <div style="margin-top:4px;color:#8c8c8c">平台资金安全升级完成，新增对公转账充值通道，详见帮助中心。</div>
-              </div>
-              <div style="padding:12px 14px;background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;font-size:13px;opacity:.6">
-                <div style="display:flex;justify-content:space-between;align-items:center"><strong>📢 平台公告</strong><span style="font-size:11px;color:#8c8c8c">2026-04-10 11:00</span></div>
-                <div style="margin-top:4px;color:#8c8c8c">五一假期期间（5.1-5.5）财务审核/提现到账可能延迟 1-2 个工作日。</div>
-              </div>
-            </div>`);
-          break;
-
-        case "agreements":
-          openModal("📋 协议确认", "以下协议需要您确认签署后方可使用相关功能", `
-            <div style="display:flex;flex-direction:column;gap:10px">
-              <div style="padding:14px;background:#fffbe6;border:1px solid #ffe58f;border-radius:8px;font-size:13px">
-                <div style="display:flex;justify-content:space-between;align-items:center"><strong>⚠️ 《平台创作者服务协议 v2.1》</strong><span style="font-size:11px;color:#d48806;background:#fff7e6;padding:2px 8px;border-radius:10px">待确认</span></div>
-                <div style="margin-top:6px;color:#595959;font-size:12px">更新内容：新增承制方收益提现规则、争议仲裁条款修订</div>
-                <div style="margin-top:8px"><button class="btn primary" style="height:30px;font-size:12px;padding:0 14px" onclick="this.parentElement.parentElement.style.opacity='.5';this.textContent='✅ 已确认';window.demoToast('已确认签署','ok')">确认签署</button></div>
-              </div>
-              <div style="padding:14px;background:#fffbe6;border:1px solid #ffe58f;border-radius:8px;font-size:13px">
-                <div style="display:flex;justify-content:space-between;align-items:center"><strong>⚠️ 《资金账户使用须知 v1.3》</strong><span style="font-size:11px;color:#d48806;background:#fff7e6;padding:2px 8px;border-radius:10px">待确认</span></div>
-                <div style="margin-top:6px;color:#595959;font-size:12px">更新内容：对公转账充值流程、提现到账时效说明</div>
-                <div style="margin-top:8px"><button class="btn primary" style="height:30px;font-size:12px;padding:0 14px" onclick="this.parentElement.parentElement.style.opacity='.5';this.textContent='✅ 已确认';window.demoToast('已确认签署','ok')">确认签署</button></div>
-              </div>
-            </div>`);
-          break;
-
-        case "bank-transfer-review":
-          openModal("🏦 对公转账待审核", "财务审核中的转账充值申请", `
-            <div style="display:flex;flex-direction:column;gap:10px">
-              <div style="padding:14px;background:#e6f7ff;border:1px solid #91d5ff;border-radius:8px;font-size:13px">
-                <div style="display:flex;justify-content:space-between"><strong>企业主账户充值</strong><span style="font-size:11px;color:#1890ff;background:#e6f7ff;padding:2px 8px;border-radius:10px">审核中</span></div>
-                <div style="margin-top:6px;display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px;color:#595959">
-                  <div>申请金额：<strong style="color:#1890ff">¥50,000</strong></div>
-                  <div>申请人：昭岚</div>
-                  <div>申请时间：2026-04-26 16:45</div>
-                  <div>转账凭证：已上传</div>
-                </div>
-                <div style="margin-top:8px;display:flex;gap:8px">
-                  <button class="btn primary" style="height:30px;font-size:12px;padding:0 14px" onclick="approveBankTransfer(this, 50000)">✅ 审核通过</button>
-                  <button class="btn" style="height:30px;font-size:12px;padding:0 14px" onclick="this.parentElement.parentElement.style.opacity='.5';window.demoToast('已驳回该转账申请','info')">❌ 驳回</button>
-                </div>
-              </div>
-            </div>`, "");
-          break;
-
-        case "invoice-list":
-          openModal("🧾 可开票订单", "以下已完成订单可申请开具发票", `
-            <div style="display:flex;flex-direction:column;gap:10px">
-              <div style="padding:14px;background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;font-size:13px">
-                <div style="display:flex;justify-content:space-between"><strong>广告片配音</strong><span style="color:#52c41a;font-size:11px">已完成</span></div>
-                <div style="margin-top:4px;font-size:12px;color:#595959">订单号 OD-2026042009 · 声海传媒 · ¥8,000</div>
-                <div style="margin-top:8px"><button class="btn primary" style="height:30px;font-size:12px;padding:0 14px" onclick="this.textContent='📨 已申请';this.disabled=true;window.demoToast('发票申请已提交，预计 3 个工作日寄出','ok')">申请开票</button></div>
-              </div>
-              <div style="padding:14px;background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;font-size:13px">
-                <div style="display:flex;justify-content:space-between"><strong>品牌VI设计</strong><span style="color:#52c41a;font-size:11px">已完成</span></div>
-                <div style="margin-top:4px;font-size:12px;color:#595959">订单号 OD-2026031505 · 色彩工坊 · ¥15,000</div>
-                <div style="margin-top:8px"><button class="btn primary" style="height:30px;font-size:12px;padding:0 14px" onclick="this.textContent='📨 已申请';this.disabled=true;window.demoToast('发票申请已提交','ok')">申请开票</button></div>
-              </div>
-              <div style="padding:14px;background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;font-size:13px">
-                <div style="display:flex;justify-content:space-between"><strong>公众号头图设计</strong><span style="color:#52c41a;font-size:11px">已完成</span></div>
-                <div style="margin-top:4px;font-size:12px;color:#595959">订单号 OD-2026041501 · 色彩工坊 · ¥800</div>
-                <div style="margin-top:8px"><button class="btn primary" style="height:30px;font-size:12px;padding:0 14px" onclick="this.textContent='📨 已申请';this.disabled=true;window.demoToast('发票申请已提交','ok')">申请开票</button></div>
-              </div>
-            </div>`);
-          break;
-
-        case "allocate-budget":
-          $("pendingDetailModal").classList.remove("open");
-          window.openAllocate("team-budget-cf-ip");
-          break;
-
-        case "order-list":
-          location.href = "demand-list.html";
-          break;
-
-        case "demand-list":
-          location.href = "demand-list.html";
-          break;
-
-        case "budget-report":
-          openModal("📊 团队预算使用报告", "本季度各团队预算执行情况", function () {
-            const wallets = window.demoApp.getWallets();
-            const teams = [
-              { name: "短剧制作中心", key: "team-budget-cf-drama" },
-              { name: "市场宣传组", key: "team-budget-cf-marketing" },
-              { name: "IP 孵化组", key: "team-budget-cf-ip" }
-            ];
-            return '<div style="display:flex;flex-direction:column;gap:12px">' + teams.map(t => {
-              const w = wallets[t.key];
-              if (!w) return '<div style="padding:12px;background:#fff7e6;border:1px solid #ffe58f;border-radius:8px;font-size:13px"><strong>' + t.name + '</strong><span style="margin-left:8px;color:#d48806">⚠️ 未配置预算</span></div>';
-              const alloc = w.allocated || 0, bal = w.balance, locked = w.lockedAmount || 0;
-              const spent = Math.max(0, alloc - bal - locked);
-              const pct = alloc > 0 ? ((spent + locked) / alloc * 100).toFixed(1) : 0;
-              return '<div style="padding:12px;background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;font-size:13px">'
-                + '<div style="display:flex;justify-content:space-between"><strong>' + t.name + '</strong><span style="color:#1890ff">' + pct + '% 已用</span></div>'
-                + '<div style="height:6px;background:#f0f0f0;border-radius:3px;margin:8px 0;overflow:hidden"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#1890ff,#722ed1);border-radius:3px"></div></div>'
-                + '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;font-size:11px;color:#8c8c8c">'
-                + '<div>总预算 ' + window.fmtMoney(alloc) + '</div>'
-                + '<div>已用 ' + window.fmtMoney(spent + locked) + '</div>'
-                + '<div>可用 ' + window.fmtMoney(bal) + '</div>'
-                + '</div></div>';
-            }).join("") + '</div>';
-          }());
-          break;
-
-        default:
-          window.demoToast(action, "info");
-      }
-    };
-
-    window.approveBankTransfer = function (btn, amt) {
-      const wallets = window.demoApp.getWallets();
-      wallets["enterprise-main-cf"].balance += amt;
-      window.demoApp.setWallets(wallets);
-      window.demoApp.addFlow({ id: "F-" + Date.now(), time: now(), type: "recharge", desc: "对公转账充值（财务审核通过）", account: "enterprise-main-cf", amount: amt, operator: "财务" });
-      btn.parentElement.parentElement.style.opacity = ".5";
-      btn.textContent = "✅ 已通过";
-      btn.disabled = true;
-      window.demoToast("已审核通过，¥" + amt.toLocaleString() + " 已到账企业主账户", "ok");
-      window.refreshAll();
-    };
-
     function now() {
       const t = new Date();
       return t.getFullYear() + "-" + pad(t.getMonth() + 1) + "-" + pad(t.getDate()) + " " + pad(t.getHours()) + ":" + pad(t.getMinutes());
@@ -1191,19 +1813,42 @@
 
     window.refreshAll = function () {
       window.refreshTopbar();
+      renderContextBanner();
+      renderLiveBanners();
       renderCurrentCard();
       renderAccountsGrid();
       renderBudgetUsage();
       renderKPIs();
       renderFlows();
+      // 重新渲染当前激活的角色面板
+      const activeTab = document.querySelector("#roleTabs button.active");
+      const tabName = activeTab ? activeTab.getAttribute("data-tab") : "overview";
+      if (tabName === "demander") renderDemanderPanel();
+      if (tabName === "contractor") renderContractorPanel();
     };
     window.onWorkspaceChanged = window.refreshAll;
 
+    // 初次渲染
+    renderContextBanner();
+    renderLiveBanners();
     renderCurrentCard();
     renderAccountsGrid();
     renderBudgetUsage();
     renderKPIs();
     renderFlows();
+    renderExceptionGallery();
+
+    // P0-1：根据上次选择 / 身份决定默认 Tab
+    (function pickDefaultTab() {
+      let saved = null;
+      try { saved = localStorage.getItem("walletPanelTab"); } catch (e) {}
+      if (saved && ["overview", "demander", "contractor"].includes(saved)) {
+        setActiveTab(saved);
+      } else {
+        const id = window.demoApp.getCurrentIdentity();
+        setActiveTab(id === "contractor" ? "contractor" : "overview");
+      }
+    })();
   })();
   </script>
 </body>

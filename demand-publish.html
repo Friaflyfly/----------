@@ -34,9 +34,11 @@
     .ws-item .ws-item-desc { font-size: 12px; color: #8c8c8c; margin-top: 2px; }
     .ws-item .ws-item-check { color: #1890ff; font-size: 14px; }
 
-    .identity-switch { display: flex; gap: 4px; background: #f0f0f0; border-radius: 18px; padding: 3px; }
-    .identity-switch button { border: none; background: transparent; padding: 5px 14px; border-radius: 16px; font-size: 13px; color: #595959; cursor: pointer; }
+    .identity-switch { display: flex; gap: 4px; background: #f0f0f0; border-radius: 18px; padding: 3px; flex-wrap: wrap; }
+    .identity-switch button { border: none; background: transparent; padding: 5px 10px; border-radius: 16px; font-size: 13px; color: #595959; cursor: pointer; }
     .identity-switch button.active { background: #fff; color: #1890ff; box-shadow: 0 1px 2px rgba(0,0,0,.06); font-weight: 500; }
+    .identity-switch button[data-identity="admin"].active { background: #fff; color: #722ed1; box-shadow: 0 1px 2px rgba(114,46,209,.12); font-weight: 500; }
+    .identity-switch button[data-identity="ops"].active { background: #fff; color: #08979c; box-shadow: 0 1px 2px rgba(8,151,156,.2); font-weight: 500; }
 
     .wallet-chip { display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: linear-gradient(135deg, #fff7e6, #fff1d6); border: 1px solid #ffd591; border-radius: 18px; cursor: pointer; font-size: 13px; color: #d46b08; text-decoration: none; }
     .wallet-chip:hover { border-color: #fa8c16; box-shadow: 0 2px 6px rgba(250,140,22,.18); }
@@ -484,6 +486,16 @@
   <script src="_shared.js"></script>
   <script>
     SharedHeader.mount({ activeNav: "publish" });
+    // 钱包页深链：?from=wallet 时给一句来源提示（常用于"锁资失败 → 调整订单金额"路径）
+    (function () {
+      try {
+        var qp = new URLSearchParams(window.location.search);
+        if (qp.get("from") !== "wallet") return;
+        var did = qp.get("demandId") || "";
+        var msg = "📍 从钱包页跳入" + (did ? "需求 " + did + " 的编辑" : "发布需求") + " · 锁资失败后可调整金额或追加预算";
+        setTimeout(function () { if (window.demoToast) window.demoToast(msg, "info"); }, 350);
+      } catch (e) {}
+    })();
     // 页内"当前空间"芯片同步 + ws:changed 事件
     (function () {
       function syncWsChip() {

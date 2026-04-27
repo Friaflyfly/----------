@@ -1,7 +1,7 @@
 /* ============================================================================
  * _shared.js  ——  骋风天合 demo 公共底座
  *   - 所有页面的 demoApp / demoToast / fmtMoney 单一来源
- *   - 顶部栏（空间切换 / 身份切换 / 钱包 chip / 头像下拉）SharedHeader.mount()
+ *   - 顶部栏（空间切换 / 工作台模式：需求方·承制方·管理后台·运营后台 / 钱包 chip / 头像下拉）SharedHeader.mount()
  *   - 默认 mock 数据扩展了 contractor / members / categoryConfig，给 B/C/D 组用
  *
  * 用法：
@@ -352,29 +352,48 @@
   initDemoState();
 
   // ============================================================
+  // SharedHeader：根据当前 URL 推断工作台模式（与 localStorage 同步）
+  // ============================================================
+  function inferTopbarIdentity() {
+    var file = (window.location.pathname || "").split("/").pop() || "";
+    if (file === "admin-console.html") return "admin";
+    if (file.indexOf("admin-") === 0) return "ops";
+    if (file === "platform-home-contractor.html" || file.indexOf("contractor-") === 0) return "contractor";
+    return "demander";
+  }
+
+  // ============================================================
   // SharedHeader：渲染 + 装配顶部全局栏
   //   pages 需要预先有一个 <header class="topbar" id="topbar-shared"></header>
   //   以及 <div id="toastWrap" class="toasts"></div>
   // ============================================================
   function buildTopbarHTML(opts) {
-    var identity = opts.identity || window.demoApp.getCurrentIdentity();
-    var brandHref = opts.brandHref || (identity === "contractor" ? "platform-home-contractor.html" : "platform-home-demander.html");
+    var identity = opts.identity != null ? opts.identity : window.demoApp.getCurrentIdentity();
+    var brandHref = opts.brandHref;
+    if (!brandHref) {
+      if (identity === "contractor") brandHref = "platform-home-contractor.html";
+      else if (identity === "admin") brandHref = "admin-console.html";
+      else if (identity === "ops") brandHref = "admin-demand-review.html";
+      else brandHref = "platform-home-demander.html";
+    }
     var brandLabel = opts.brandLabel || "🎬 骋风天合";
     var brandSub = opts.brandSub || "创作门户交易平台";
 
     return ''
       + '<a href="' + brandHref + '" class="brand">' + brandLabel + '<span class="brand-sub">' + brandSub + '</span></a>'
       + '<div class="ws-switcher">'
-      +   '<button class="ws-trigger" id="wsTrigger">'
+      +   '<button type="button" class="ws-trigger" id="wsTrigger">'
       +     '<span class="ws-icon" id="wsIcon"></span>'
       +     '<span class="ws-name" id="wsName"></span>'
       +     '<span class="ws-arrow">▼</span>'
       +   '</button>'
       +   '<div class="ws-dropdown" id="wsDropdown"></div>'
       + '</div>'
-      + '<div class="identity-switch" id="identitySwitch" title="切换身份">'
-      +   '<button data-identity="demander"' + (identity === "demander" ? ' class="active"' : '') + '>📥 需求方</button>'
-      +   '<button data-identity="contractor"' + (identity === "contractor" ? ' class="active"' : '') + '>🛠 承制方</button>'
+      + '<div class="identity-switch" id="identitySwitch" title="切换工作台模式">'
+      +   '<button type="button" data-identity="demander"' + (identity === "demander" ? ' class="active"' : '') + '>📥 需求方</button>'
+      +   '<button type="button" data-identity="contractor"' + (identity === "contractor" ? ' class="active"' : '') + '>🛠 承制方</button>'
+      +   '<button type="button" data-identity="admin"' + (identity === "admin" ? ' class="active"' : '') + '>👑 管理后台</button>'
+      +   '<button type="button" data-identity="ops"' + (identity === "ops" ? ' class="active"' : '') + '>🔍 运营后台</button>'
       + '</div>'
       + '<a href="wallet-overview.html" class="wallet-chip" id="walletChip" title="点击进入钱包">'
       +   '<span>💰</span>'
@@ -392,7 +411,8 @@
       +     '<a href="account-security-prototype.html"><span>🔐</span> 账号安全</a>'
       +     '<a href="wallet-overview.html"><span>💰</span> 我的钱包</a>'
       +     '<div class="divider"></div>'
-      +     '<a href="admin-console.html"><span>👑</span> 切换到管理员后台</a>'
+      +     '<a href="admin-console.html"><span>👑</span> 管理后台</a>'
+      +     '<a href="admin-demand-review.html"><span>🔍</span> 运营后台</a>'
       +     '<div class="divider"></div>'
       +     '<a href="#" id="logoutLink"><span>🚪</span> 退出登录</a>'
       +   '</div>'
@@ -412,7 +432,9 @@
       html += '<div class="ws-group-label">' + g.label + '</div>';
       g.items.forEach(function (id) {
         var ws = WORKSPACES[id]; if (!ws) return;
-        var desc = ws.accountType + (ws.accountBalance != null ? "：" + window.fmtMoney(ws.accountBalance) : "");
+        var desc = id === "cf-admin"
+          ? "成员、权限、预算与平台审核；进入管理总览"
+          : ws.accountType + (ws.accountBalance != null ? "：" + window.fmtMoney(ws.accountBalance) : "");
         html += '<div class="ws-item ' + (id === cur ? "active" : "") + '" data-ws="' + id + '">'
           +    '<div class="ws-item-icon ' + ws.iconClass + '">' + ws.icon + '</div>'
           +    '<div class="ws-item-main"><div class="ws-item-name">' + ws.name + '</div><div class="ws-item-desc">' + desc + '</div></div>'
@@ -426,6 +448,14 @@
         var id = el.getAttribute("data-ws");
         var prev = window.demoApp.getCurrentWorkspaceId();
         if (id === prev) { dd.classList.remove("open"); return; }
+        if (id === "cf-admin") {
+          window.demoApp.setCurrentWorkspace("cf-admin");
+          window.demoApp.setCurrentIdentity("admin");
+          dd.classList.remove("open");
+          window.demoToast("进入企业管理员视角…", "info");
+          setTimeout(function () { location.href = "admin-console.html"; }, 320);
+          return;
+        }
         window.demoApp.setCurrentWorkspace(id);
         refreshTopbar();
         renderWsDropdown();
@@ -472,7 +502,7 @@
       if (avatarDropdown) avatarDropdown.classList.remove("open");
     });
 
-    // 身份切换：真路由（不是 toast 假切换）
+    // 工作台模式切换：真路由
     if (identitySwitch) {
       Array.prototype.forEach.call(identitySwitch.querySelectorAll("button"), function (b) {
         b.addEventListener("click", function (e) {
@@ -481,11 +511,18 @@
           var cur = window.demoApp.getCurrentIdentity();
           if (next === cur) return;
           window.demoApp.setCurrentIdentity(next);
-          if (next === "contractor") {
-            window.demoToast("已切换为承制方，正在跳转...", "info");
+          if (next === "admin") {
+            window.demoApp.setCurrentWorkspace("cf-admin");
+            window.demoToast("正在进入管理后台…", "info");
+            setTimeout(function () { location.href = "admin-console.html"; }, 350);
+          } else if (next === "ops") {
+            window.demoToast("正在进入平台运营后台…", "info");
+            setTimeout(function () { location.href = "admin-demand-review.html"; }, 350);
+          } else if (next === "contractor") {
+            window.demoToast("已切换为承制方，正在跳转…", "info");
             setTimeout(function () { location.href = "platform-home-contractor.html"; }, 400);
           } else {
-            window.demoToast("已切换为需求方，正在跳转...", "info");
+            window.demoToast("已切换为需求方，正在跳转…", "info");
             setTimeout(function () { location.href = "platform-home-demander.html"; }, 400);
           }
         });
@@ -505,6 +542,9 @@
   window.SharedHeader = {
     mount: function (opts) {
       opts = opts || {};
+      var identity = opts.identity != null ? opts.identity : inferTopbarIdentity();
+      window.demoApp.setCurrentIdentity(identity);
+      opts = Object.assign({}, opts, { identity: identity });
       var host = document.getElementById("topbar-shared");
       if (!host) {
         // 兼容旧页：找到第一个 <header class="topbar">，整体接管并替换内容

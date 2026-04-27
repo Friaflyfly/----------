@@ -11,9 +11,11 @@
     .topbar { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.06); z-index: 200; display: flex; align-items: center; padding: 0 20px; gap: 16px; }
     .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 16px; color: #1890ff; text-decoration: none; min-width: 220px; }
     .brand-sub { color: #8c8c8c; font-weight: 400; font-size: 12px; margin-left: 4px; }
-    .identity-switch { display: flex; gap: 4px; background: #f0f0f0; border-radius: 18px; padding: 3px; }
-    .identity-switch button { border: none; background: transparent; padding: 5px 14px; border-radius: 16px; font-size: 13px; color: #595959; cursor: pointer; }
+    .identity-switch { display: flex; gap: 4px; background: #f0f0f0; border-radius: 18px; padding: 3px; flex-wrap: wrap; }
+    .identity-switch button { border: none; background: transparent; padding: 5px 10px; border-radius: 16px; font-size: 13px; color: #595959; cursor: pointer; }
     .identity-switch button.active { background: #fff; color: #1890ff; box-shadow: 0 1px 2px rgba(0,0,0,.06); font-weight: 500; }
+    .identity-switch button[data-identity="admin"].active { background: #fff; color: #722ed1; box-shadow: 0 1px 2px rgba(114,46,209,.12); font-weight: 500; }
+    .identity-switch button[data-identity="ops"].active { background: #fff; color: #08979c; box-shadow: 0 1px 2px rgba(8,151,156,.2); font-weight: 500; }
     .profile-chip { display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: #f9f0ff; border: 1px solid #d3adf7; border-radius: 18px; font-size: 13px; color: #531dab; }
     .wallet-chip { display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: linear-gradient(135deg, #fff7e6, #fff1d6); border: 1px solid #ffd591; border-radius: 18px; cursor: pointer; font-size: 13px; color: #d46b08; text-decoration: none; }
     .wallet-chip strong { font-size: 14px; }
