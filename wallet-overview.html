@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>钱包与结算 - 骋风天合 · 创作门户交易平台</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #262626; }
+
+    /* 顶部全局栏 */
+    .topbar { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.06); z-index: 200; display: flex; align-items: center; padding: 0 20px; gap: 16px; }
+    .topbar .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 16px; color: #1890ff; text-decoration: none; min-width: 220px; }
+    .topbar .brand-sub { color: #8c8c8c; font-weight: 400; font-size: 12px; margin-left: 4px; }
+    .ws-switcher { position: relative; }
+    .ws-trigger { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid #e8e8e8; border-radius: 6px; background: #fafafa; cursor: pointer; font-size: 13px; min-width: 240px; }
+    .ws-trigger:hover { border-color: #1890ff; background: #e6f7ff; }
+    .ws-trigger .ws-name { font-weight: 500; color: #262626; flex: 1; }
+    .ws-trigger .ws-arrow { color: #8c8c8c; font-size: 10px; }
+    .ws-dropdown { display: none; position: absolute; top: calc(100% + 6px); left: 0; min-width: 320px; background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,.12); padding: 8px; z-index: 300; }
+    .ws-dropdown.open { display: block; }
+    .ws-group-label { font-size: 12px; color: #8c8c8c; padding: 6px 10px; }
+    .ws-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+    .ws-item:hover { background: #f0f7ff; }
+    .ws-item.active { background: #e6f7ff; }
+    .ws-item .ws-item-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .ws-item .ws-item-icon.personal { background: #fff7e6; color: #fa8c16; }
+    .ws-item .ws-item-icon.team { background: #e6f7ff; color: #1890ff; }
+    .ws-item .ws-item-icon.admin { background: #f9f0ff; color: #722ed1; }
+    .ws-item .ws-item-main { flex: 1; min-width: 0; }
+    .ws-item .ws-item-name { font-weight: 500; color: #262626; }
+    .ws-item .ws-item-desc { font-size: 12px; color: #8c8c8c; margin-top: 2px; }
+    .ws-item .ws-item-check { color: #1890ff; font-size: 14px; }
+    .identity-switch { display: flex; gap: 4px; background: #f0f0f0; border-radius: 18px; padding: 3px; }
+    .identity-switch button { border: none; background: transparent; padding: 5px 14px; border-radius: 16px; font-size: 13px; color: #595959; cursor: pointer; }
+    .identity-switch button.active { background: #fff; color: #1890ff; box-shadow: 0 1px 2px rgba(0,0,0,.06); font-weight: 500; }
+    .wallet-chip { display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: linear-gradient(135deg, #fff7e6, #fff1d6); border: 1px solid #ffd591; border-radius: 18px; cursor: pointer; font-size: 13px; color: #d46b08; text-decoration: none; }
+    .wallet-chip:hover { border-color: #fa8c16; }
+    .wallet-chip .wallet-amount { font-weight: 600; font-size: 14px; }
+    .wallet-chip .wallet-account { font-size: 11px; opacity: .85; }
+    .avatar-wrap { position: relative; margin-left: auto; }
+    .avatar-trigger { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px 8px; border-radius: 18px; }
+    .avatar-trigger:hover { background: #f5f5f5; }
+    .avatar-trigger img { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #f0f0f0; }
+    .avatar-trigger .avatar-name { font-size: 13px; color: #262626; }
+    .avatar-dropdown { display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 220px; background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,.12); padding: 8px; z-index: 300; }
+    .avatar-dropdown.open { display: block; }
+    .avatar-dropdown a { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 6px; color: #262626; text-decoration: none; font-size: 13px; }
+    .avatar-dropdown a:hover { background: #f0f7ff; color: #1890ff; }
+    .avatar-dropdown .divider { height: 1px; background: #f0f0f0; margin: 6px 4px; }
+
+    /* 布局 */
+    .app { display: flex; padding-top: 56px; min-height: 100vh; }
+    .sidebar { width: 200px; background: #fff; box-shadow: 2px 0 8px rgba(0,0,0,.06); position: fixed; top: 56px; left: 0; bottom: 0; padding: 16px 0; overflow-y: auto; }
+    .menu a { display: flex; align-items: center; gap: 10px; padding: 11px 24px; color: #262626; text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
+    .menu a:hover { background: #f0f7ff; color: #1890ff; }
+    .menu a.active { background: #e6f7ff; color: #1890ff; border-left-color: #1890ff; font-weight: 500; }
+    .menu-icon { width: 18px; text-align: center; }
+    .menu-group { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+    .menu-group-title { padding: 8px 24px; font-size: 11px; color: #8c8c8c; text-transform: uppercase; letter-spacing: .5px; }
+    .main { margin-left: 200px; flex: 1; padding: 24px 28px; }
+
+    /* 页头 */
+    .page-head { background: #fff; border-radius: 8px; padding: 18px 24px; margin-bottom: 14px; }
+    .page-head h1 { margin: 0 0 4px; font-size: 22px; }
+    .page-head .sub { color: #8c8c8c; font-size: 13px; }
+
+    /* KPI 行 */
+    .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 14px; }
+    .kpi-card { background: #fff; border-radius: 8px; padding: 16px 20px; box-shadow: 0 2px 6px rgba(0,0,0,.04); position: relative; overflow: hidden; }
+    .kpi-card::after { content: ""; position: absolute; right: -20px; bottom: -20px; width: 80px; height: 80px; background: var(--kpi-bg, rgba(24,144,255,.06)); border-radius: 50%; }
+    .kpi-card.green { --kpi-bg: rgba(82,196,26,.06); }
+    .kpi-card.orange { --kpi-bg: rgba(250,140,22,.06); }
+    .kpi-card.purple { --kpi-bg: rgba(114,46,209,.06); }
+    .kpi-card .kpi-label { font-size: 12px; color: #8c8c8c; display: flex; align-items: center; gap: 6px; }
+    .kpi-card .kpi-icon { font-size: 14px; }
+    .kpi-card .kpi-value { font-size: 26px; font-weight: 700; color: #262626; margin: 6px 0 4px; line-height: 1.1; position: relative; z-index: 2; }
+    .kpi-card .kpi-trend { font-size: 11px; color: #8c8c8c; }
+    .kpi-card .kpi-trend .delta-up { color: #389e0d; font-weight: 500; }
+    .kpi-card .kpi-trend .delta-down { color: #cf1322; font-weight: 500; }
+
+    /* 待处理小条 */
+    .pending-bar { background: #fff; border-radius: 8px; padding: 12px 18px; margin-bottom: 14px; display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+    .pending-bar .pb-label { font-size: 13px; color: #595959; font-weight: 500; padding-right: 12px; border-right: 1px solid #f0f0f0; }
+    .pending-bar .pb-item { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; padding: 4px 8px; border-radius: 4px; }
+    .pending-bar .pb-item:hover { background: #f0f7ff; }
+    .pending-bar .pb-item .pb-num { font-weight: 700; color: #1890ff; font-size: 16px; }
+    .pending-bar .pb-item.warn .pb-num { color: #fa8c16; }
+    .pending-bar .pb-item.danger .pb-num { color: #cf1322; }
+    .pending-bar .pb-item .pb-text { color: #595959; }
+
+    /* 团队预算使用率 */
+    .budget-usage-card { background: #fff; border-radius: 8px; padding: 18px 22px; margin-bottom: 14px; }
+    .budget-usage-card h3 { margin: 0 0 4px; font-size: 15px; font-weight: 600; }
+    .budget-usage-card .bu-sub { color: #8c8c8c; font-size: 12px; margin-bottom: 14px; }
+    .budget-row { display: grid; grid-template-columns: 180px 1fr 220px; gap: 14px; align-items: center; padding: 10px 0; border-bottom: 1px dashed #f5f5f5; }
+    .budget-row:last-child { border-bottom: none; }
+    .bu-name { font-size: 13px; font-weight: 500; }
+    .bu-name .bu-tag { font-size: 11px; color: #8c8c8c; font-weight: 400; }
+    .bu-bar { height: 14px; background: #f5f5f5; border-radius: 7px; overflow: hidden; display: flex; }
+    .bu-segment-spent { background: linear-gradient(90deg, #1890ff, #36cfc9); }
+    .bu-segment-locked { background: linear-gradient(90deg, #fa8c16, #ffa940); }
+    .bu-stat { font-size: 12px; color: #595959; text-align: right; }
+    .bu-stat .bu-stat-val { font-weight: 600; color: #262626; }
+    .bu-legend { display: flex; gap: 14px; padding-top: 10px; margin-top: 6px; border-top: 1px solid #f0f0f0; font-size: 12px; color: #8c8c8c; }
+    .bu-legend .lg-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+    .bu-legend .lg-dot.spent { background: #1890ff; }
+    .bu-legend .lg-dot.locked { background: #fa8c16; }
+    .bu-legend .lg-dot.available { background: #f5f5f5; border: 1px solid #d9d9d9; }
+
+    /* 当前空间账户大卡 */
+    .current-card { background: linear-gradient(135deg, #1890ff, #2f54eb); border-radius: 12px; padding: 24px 28px; color: #fff; margin-bottom: 16px; position: relative; overflow: hidden; }
+    .current-card.team-budget { background: linear-gradient(135deg, #1890ff, #2f54eb); }
+    .current-card.personal { background: linear-gradient(135deg, #fa8c16, #d46b08); }
+    .current-card.enterprise-main { background: linear-gradient(135deg, #722ed1, #531dab); }
+    .current-card::after { content: ""; position: absolute; right: -40px; top: -40px; width: 220px; height: 220px; background: rgba(255,255,255,.08); border-radius: 50%; }
+    .current-card .cc-label { font-size: 12px; opacity: .8; margin-bottom: 4px; position: relative; z-index: 2; }
+    .current-card .cc-name { font-size: 18px; font-weight: 500; margin-bottom: 12px; position: relative; z-index: 2; }
+    .current-card .cc-balance { font-size: 38px; font-weight: 700; line-height: 1.1; position: relative; z-index: 2; }
+    .current-card .cc-meta { display: flex; gap: 28px; margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.2); position: relative; z-index: 2; }
+    .current-card .cc-meta-item .cc-meta-label { font-size: 11px; opacity: .7; }
+    .current-card .cc-meta-item .cc-meta-value { font-size: 16px; font-weight: 600; margin-top: 2px; }
+    .current-card .cc-actions { margin-top: 16px; display: flex; gap: 10px; position: relative; z-index: 2; flex-wrap: wrap; }
+    .current-card .cc-btn { background: #fff; color: #1890ff; border: none; padding: 8px 18px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; }
+    .current-card .cc-btn:hover { background: #f0f0f0; }
+    .current-card .cc-btn.ghost { background: rgba(255,255,255,.15); color: #fff; }
+    .current-card .cc-btn.ghost:hover { background: rgba(255,255,255,.25); }
+
+    .current-card.budget-missing { background: linear-gradient(135deg, #fa541c, #d4380d); }
+    .current-card .missing-tip { padding: 10px 14px; background: rgba(255,255,255,.15); border-radius: 6px; font-size: 12px; line-height: 1.6; margin-top: 12px; position: relative; z-index: 2; }
+
+    /* 账户矩阵 */
+    .section-head { font-size: 14px; color: #595959; margin: 16px 0 10px; padding: 0 4px; display: flex; align-items: center; gap: 8px; }
+    .section-head::before { content: ""; width: 3px; height: 14px; background: #1890ff; border-radius: 2px; }
+    .section-head .section-sub { font-weight: 400; color: #8c8c8c; font-size: 12px; }
+
+    .accounts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
+    .account-card { background: #fff; border-radius: 8px; padding: 16px 20px; border: 1px solid #f0f0f0; transition: all .2s; }
+    .account-card.current { border-color: #1890ff; box-shadow: 0 4px 12px rgba(24,144,255,.12); }
+    .account-card .ac-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .account-card .ac-title { font-size: 14px; font-weight: 500; }
+    .account-card .ac-type { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+    .account-card .ac-type.personal { background: #fff7e6; color: #d46b08; }
+    .account-card .ac-type.team-budget { background: #e6f7ff; color: #096dd9; }
+    .account-card .ac-type.enterprise-main { background: #f9f0ff; color: #531dab; }
+    .account-card .ac-type.unset { background: #fff1f0; color: #cf1322; }
+    .account-card .ac-balance { font-size: 24px; font-weight: 700; color: #262626; margin: 6px 0; }
+    .account-card .ac-balance.unset { color: #bfbfbf; font-size: 18px; }
+    .account-card .ac-meta { display: flex; justify-content: space-between; padding: 8px 0; font-size: 12px; color: #8c8c8c; border-top: 1px dashed #f0f0f0; margin-top: 6px; }
+    .account-card .ac-meta-val { color: #262626; font-weight: 500; }
+    .account-card .ac-actions { display: flex; gap: 6px; margin-top: 10px; }
+    .account-card .ac-actions button { flex: 1; height: 30px; border: 1px solid #d9d9d9; background: #fff; border-radius: 4px; font-size: 12px; cursor: pointer; }
+    .account-card .ac-actions button:hover { border-color: #1890ff; color: #1890ff; }
+    .account-card .ac-actions button.primary { background: #1890ff; border-color: #1890ff; color: #fff; }
+    .account-card .ac-actions button.primary:hover { background: #40a9ff; border-color: #40a9ff; }
+    .account-card .ac-actions button.warn { background: #fa8c16; border-color: #fa8c16; color: #fff; }
+    .account-card .ac-actions button.warn:hover { background: #ffa940; border-color: #ffa940; }
+    .account-card.limited { background: repeating-linear-gradient(135deg, #fff, #fff 10px, #fafafa 10px, #fafafa 20px); border-style: dashed; }
+    .account-card.limited .ac-title { color: #595959; }
+    .account-card.limited::before { content: "🔒 受限视图"; position: absolute; top: 12px; right: 14px; font-size: 11px; color: #8c8c8c; background: #fff; padding: 2px 8px; border-radius: 8px; border: 1px solid #f0f0f0; }
+    .account-card.limited { position: relative; }
+
+    /* 流水记录 */
+    .flow-card { background: #fff; border-radius: 8px; overflow: hidden; }
+    .flow-head { padding: 12px 18px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 500; }
+    .flow-head .flow-filter { display: flex; gap: 8px; }
+    .flow-head .flow-filter select { height: 28px; border: 1px solid #d9d9d9; border-radius: 4px; padding: 0 22px 0 8px; font-size: 12px; }
+    .flow-row { display: grid; grid-template-columns: 60px 1fr 1.4fr 130px 110px 100px; padding: 12px 18px; align-items: center; border-bottom: 1px solid #f5f5f5; font-size: 13px; }
+    .flow-row:last-child { border-bottom: none; }
+    .flow-row.head { background: #fafafa; color: #8c8c8c; font-size: 12px; font-weight: 500; }
+    .flow-row .flow-icon { font-size: 18px; }
+    .flow-row .flow-type-pill { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; }
+    .flow-row .flow-type-pill.recharge { background: #f6ffed; color: #389e0d; }
+    .flow-row .flow-type-pill.lock { background: #fff7e6; color: #d46b08; }
+    .flow-row .flow-type-pill.allocate { background: #e6f7ff; color: #096dd9; }
+    .flow-row .flow-type-pill.settle { background: #f9f0ff; color: #531dab; }
+    .flow-row .flow-type-pill.refund { background: #fff1f0; color: #cf1322; }
+    .flow-row .flow-amt.in { color: #389e0d; font-weight: 600; }
+    .flow-row .flow-amt.out { color: #cf1322; font-weight: 600; }
+    .flow-row .flow-amt.lock { color: #d46b08; font-weight: 600; }
+
+    /* Modal */
+    .modal-mask { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 999; align-items: center; justify-content: center; padding: 20px; }
+    .modal-mask.open { display: flex; }
+    .modal { width: 100%; max-width: 520px; background: #fff; border-radius: 12px; box-shadow: 0 12px 36px rgba(0,0,0,.25); overflow: hidden; }
+    .modal-head { padding: 16px 22px; background: #fafafa; border-bottom: 1px solid #f0f0f0; }
+    .modal-head h3 { margin: 0; font-size: 16px; font-weight: 600; }
+    .modal-head p { margin: 4px 0 0; font-size: 12px; color: #8c8c8c; }
+    .modal-body { padding: 18px 22px; }
+    .modal-foot { padding: 12px 22px; background: #fafafa; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 8px; }
+
+    .form-field { margin-bottom: 12px; }
+    .form-field label { display: block; font-size: 13px; color: #595959; margin-bottom: 6px; }
+    .form-field input[type=number], .form-field input[type=text], .form-field select { width: 100%; height: 36px; border: 1px solid #d9d9d9; border-radius: 6px; padding: 0 11px; font-size: 14px; outline: none; }
+    .form-field input:focus, .form-field select:focus { border-color: #40a9ff; box-shadow: 0 0 0 2px rgba(24,144,255,.15); }
+    .quick-amt { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+    .quick-amt button { height: 28px; border: 1px solid #d9d9d9; background: #fff; border-radius: 4px; padding: 0 12px; font-size: 12px; cursor: pointer; }
+    .quick-amt button:hover { border-color: #1890ff; color: #1890ff; }
+
+    .summary-box { background: #fafafa; border-radius: 6px; padding: 12px; margin: 10px 0; font-size: 13px; }
+    .summary-box .sb-row { display: flex; justify-content: space-between; padding: 4px 0; }
+    .summary-box .sb-row .sb-label { color: #8c8c8c; }
+    .summary-box .sb-row .sb-val { color: #262626; font-weight: 500; }
+    .summary-box .sb-arrow { text-align: center; color: #1890ff; padding: 4px 0; font-size: 18px; }
+
+    .info-tip { padding: 10px 12px; background: #e6f7ff; border-left: 3px solid #1890ff; border-radius: 4px; font-size: 12px; color: #096dd9; margin-bottom: 12px; line-height: 1.6; }
+    .warn-tip { padding: 10px 12px; background: #fff1f0; border-left: 3px solid #ff4d4f; border-radius: 4px; font-size: 12px; color: #cf1322; margin-bottom: 12px; line-height: 1.6; }
+
+    .btn { height: 36px; border: 1px solid #d9d9d9; background: #fff; border-radius: 6px; padding: 0 18px; font-size: 14px; color: #595959; cursor: pointer; }
+    .btn:hover { border-color: #91d5ff; color: #1890ff; }
+    .btn.primary { background: #1890ff; border-color: #1890ff; color: #fff; }
+    .btn.primary:hover { background: #40a9ff; border-color: #40a9ff; color: #fff; }
+
+    /* Toast */
+    .toasts { position: fixed; top: 72px; right: 20px; width: min(90vw, 360px); display: grid; gap: 8px; z-index: 1100; }
+    .toast { background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; padding: 10px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.1); animation: slideIn .25s ease-out; }
+    .toast.ok { border-color: #b7eb8f; background: #f6ffed; color: #389e0d; }
+    .toast.err { border-color: #ffccc7; background: #fff2f0; color: #cf1322; }
+    .toast.warn { border-color: #ffe58f; background: #fffbe6; color: #d48806; }
+    .toast.info { border-color: #91d5ff; background: #e6f7ff; color: #096dd9; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+    @media (max-width: 1100px) { .accounts-grid { grid-template-columns: 1fr; } .flow-row { grid-template-columns: 50px 1fr 1fr 100px; } .flow-row > :nth-child(n+5) { display: none; } }
+    @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding: 16px; } .ws-trigger { min-width: auto; } .topbar .brand-sub { display: none; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a href="platform-home-demander.html" class="brand">🎬 骋风天合<span class="brand-sub">创作门户交易平台</span></a>
+    <div class="ws-switcher">
+      <button class="ws-trigger" id="wsTrigger">
+        <span id="wsIcon">🏢</span>
+        <span class="ws-name" id="wsName">骋风天合 · 短剧制作中心</span>
+        <span class="ws-arrow">▼</span>
+      </button>
+      <div class="ws-dropdown" id="wsDropdown"></div>
+    </div>
+    <div class="identity-switch" id="identitySwitch">
+      <button data-identity="demander" class="active">📥 需求方</button>
+      <button data-identity="contractor">🛠 承制方</button>
+    </div>
+    <a href="wallet-overview.html" class="wallet-chip" id="walletChip">
+      <span>💰</span>
+      <span>
+        <span class="wallet-amount" id="walletAmount">¥185,000</span>
+        <span class="wallet-account" id="walletAccount">团队预算账户</span>
+      </span>
+    </a>
+    <div class="avatar-wrap">
+      <div class="avatar-trigger" id="avatarTrigger">
+        <img src="https://api.dicebear.com/9.x/lorelei/svg?seed=account" alt="头像">
+        <span class="avatar-name">昭岚</span>
+        <span class="ws-arrow">▼</span>
+      </div>
+      <div class="avatar-dropdown" id="avatarDropdown">
+        <a href="account-basic-info-prototype-platform-style.html"><span>👤</span> 账户基础信息</a>
+        <a href="enterprise-verification-prototype.html"><span>🏢</span> 企业认证</a>
+        <a href="account-security-prototype.html"><span>🔐</span> 账号安全</a>
+        <a href="wallet-overview.html"><span>💰</span> 我的钱包</a>
+        <div class="divider"></div>
+        <a href="#" onclick="event.preventDefault(); window.demoToast('演示环境，未实现退出', 'warn')"><span>🚪</span> 退出登录</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="app">
+    <aside class="sidebar">
+      <nav class="menu">
+        <a href="platform-home-demander.html"><span class="menu-icon">🏠</span> 工作台</a>
+        <a href="demand-publish.html"><span class="menu-icon">📤</span> 发布需求</a>
+        <a href="demand-list.html"><span class="menu-icon">📋</span> 我的需求</a>
+        <a href="contractor-marketplace.html"><span class="menu-icon">🏪</span> 承制方广场</a>
+        <a href="project-space.html"><span class="menu-icon">🤝</span> 项目协同空间</a>
+        <a href="wallet-overview.html" class="active"><span class="menu-icon">💰</span> 钱包与结算</a>
+        <div class="menu-group">
+          <div class="menu-group-title">账户</div>
+          <a href="account-basic-info-prototype-platform-style.html"><span class="menu-icon">⚙️</span> 账户中心</a>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <section class="page-head">
+        <h1>💰 钱包与结算</h1>
+        <div class="sub">骋风天合采用「统一账号 + 多工作空间 + 分层资金账户」体系。下单时实际扣款主体由当前工作空间决定，订单履约后再正式结算。</div>
+      </section>
+
+      <!-- KPI 总览（按当前空间上下文动态变化） -->
+      <div class="kpi-row" id="kpiRow"></div>
+
+      <!-- 待处理事项（按当前空间上下文动态变化） -->
+      <div class="pending-bar" id="pendingBar"></div>
+
+      <!-- 当前空间绑定账户 -->
+      <div class="section-head">当前空间绑定账户 <span class="section-sub">切换顶部空间，下方卡片实时变化</span></div>
+      <div class="current-card team-budget" id="currentCard">
+        <div class="cc-label">当前工作空间：<span id="ccWsName">骋风天合 · 短剧制作中心</span></div>
+        <div class="cc-name" id="ccAccountName">短剧制作中心 - 团队预算账户</div>
+        <div class="cc-balance" id="ccBalance">¥185,000</div>
+        <div class="cc-meta">
+          <div class="cc-meta-item"><div class="cc-meta-label">已锁定（订单中）</div><div class="cc-meta-value" id="ccLocked">¥28,000</div></div>
+          <div class="cc-meta-item"><div class="cc-meta-label">总预算</div><div class="cc-meta-value" id="ccAllocated">¥200,000</div></div>
+          <div class="cc-meta-item"><div class="cc-meta-label">使用率</div><div class="cc-meta-value" id="ccUsage">8%</div></div>
+        </div>
+        <div class="cc-actions" id="ccActions"></div>
+      </div>
+
+      <!-- 账户矩阵（按当前空间权限过滤） -->
+      <div class="section-head" id="accountsSection">
+        <span id="accountsSectionTitle">骋风天合 · 全部资金账户</span>
+        <span class="section-sub" id="accountsSectionSub">企业主账户 → 团队预算账户 → 个人账户</span>
+      </div>
+      <div class="accounts-grid" id="accountsGrid"></div>
+
+      <!-- 团队预算使用率（仅团队空间 + 管理员视角可见） -->
+      <div id="budgetUsageWrap">
+        <div class="section-head"><span id="budgetSectionTitle">团队预算使用率</span> <span class="section-sub" id="budgetSectionSub">本季度（2026 Q2）</span></div>
+        <section class="budget-usage-card">
+          <h3 id="budgetCardTitle">各团队预算分配与使用情况</h3>
+          <div class="bu-sub" id="budgetCardSub">企业主账户共划拨 ¥270,000 至 2 个团队，本季度已使用 ¥73,000（含已结算 + 已锁定）。</div>
+          <div id="budgetRows"></div>
+          <div class="bu-legend">
+            <span><span class="lg-dot spent"></span>已结算（实际花掉）</span>
+            <span><span class="lg-dot locked"></span>已锁定（订单中）</span>
+            <span><span class="lg-dot available"></span>可用余额</span>
+          </div>
+        </section>
+      </div>
+
+      <!-- 流水记录 -->
+      <div class="section-head">资金流水 <span class="section-sub">最近 30 天</span></div>
+      <section class="flow-card">
+        <div class="flow-head">
+          <span>共 <span id="flowCount">8</span> 条记录</span>
+          <div class="flow-filter">
+            <select id="flowAccountFilter">
+              <option value="all">所有账户</option>
+              <option value="personal-account-lixueqin">个人账户</option>
+              <option value="team-budget-cf-drama">短剧制作中心 - 预算</option>
+              <option value="team-budget-cf-marketing">市场宣传组 - 预算</option>
+              <option value="enterprise-main-cf">企业主账户</option>
+            </select>
+            <select id="flowTypeFilter">
+              <option value="all">所有类型</option>
+              <option value="recharge">充值</option>
+              <option value="lock">锁定</option>
+              <option value="allocate">划拨</option>
+              <option value="settle">结算</option>
+              <option value="refund">退款</option>
+              <option value="withdraw">提现</option>
+              <option value="invoice">开票</option>
+            </select>
+          </div>
+        </div>
+        <div class="flow-row head">
+          <div></div>
+          <div>类型 / 时间</div>
+          <div>说明</div>
+          <div>关联账户</div>
+          <div>金额</div>
+          <div>操作人</div>
+        </div>
+        <div id="flowList"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- 充值 modal -->
+  <div class="modal-mask" id="rechargeModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>💳 账户充值</h3>
+        <p id="rechargeAccountName">骋风天合 - 企业主账户</p>
+      </div>
+      <div class="modal-body">
+        <div class="info-tip" id="rechargeInfoTip">
+          在线充值实时到账；对公转账需上传凭证后由财务审核（约 1 个工作日）。
+        </div>
+        <div class="form-field">
+          <label>充值金额（元）</label>
+          <input type="number" id="rechargeAmount" placeholder="请输入金额" min="100">
+          <div class="quick-amt">
+            <button data-amt="1000">¥1,000</button>
+            <button data-amt="5000">¥5,000</button>
+            <button data-amt="20000">¥2万</button>
+            <button data-amt="50000">¥5万</button>
+            <button data-amt="100000">¥10万</button>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>充值方式</label>
+          <select id="rechargeMethod">
+            <option value="online-alipay">支付宝（实时到账）</option>
+            <option value="online-wechat">微信支付（实时到账）</option>
+            <option value="online-unionpay">银联（实时到账）</option>
+            <option value="bank-transfer">对公转账（财务审核）</option>
+          </select>
+        </div>
+        <div class="summary-box">
+          <div class="sb-row"><span class="sb-label">充值至账户</span><span class="sb-val" id="rechargeTargetName">企业主账户</span></div>
+          <div class="sb-row"><span class="sb-label">当前余额</span><span class="sb-val" id="rechargeCurrentBalance">¥0</span></div>
+          <div class="sb-row"><span class="sb-label">充值金额</span><span class="sb-val" id="rechargeAmtPreview" style="color:#389e0d">+¥0</span></div>
+          <div class="sb-row" style="border-top:1px solid #e8e8e8;padding-top:8px;margin-top:4px"><span class="sb-label">到账后余额</span><span class="sb-val" id="rechargeAfterBalance" style="color:#389e0d;font-size:16px">¥0</span></div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="document.getElementById('rechargeModal').classList.remove('open')">取消</button>
+        <button class="btn primary" id="rechargeConfirmBtn">确认充值</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 团队预算划拨 modal（管理员视角） -->
+  <div class="modal-mask" id="allocateModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>📤 团队预算划拨</h3>
+        <p>从企业主账户划拨预算到指定团队预算账户</p>
+      </div>
+      <div class="modal-body">
+        <div class="info-tip">
+          仅企业管理员可操作。划拨后，对应团队成员在该团队空间下下单时将优先消耗该预算账户。
+        </div>
+        <div class="form-field">
+          <label>从（来源账户）</label>
+          <input type="text" value="骋风天合 - 企业主账户（余额 ¥1,250,000）" disabled>
+        </div>
+        <div class="form-field">
+          <label>到（目标团队预算账户）</label>
+          <select id="allocateTarget">
+            <option value="team-budget-cf-drama">短剧制作中心（当前 ¥185,000）</option>
+            <option value="team-budget-cf-marketing">市场宣传组（当前 ¥62,000）</option>
+            <option value="team-budget-cf-ip">IP 孵化组（暂未开通预算账户）</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>划拨金额（元）</label>
+          <input type="number" id="allocateAmount" placeholder="请输入金额" min="1000">
+          <div class="quick-amt">
+            <button data-amt="10000">¥1万</button>
+            <button data-amt="50000">¥5万</button>
+            <button data-amt="100000">¥10万</button>
+            <button data-amt="200000">¥20万</button>
+          </div>
+        </div>
+        <div class="summary-box">
+          <div class="sb-row"><span class="sb-label">企业主账户当前余额</span><span class="sb-val" id="allocFromBalance">¥1,250,000</span></div>
+          <div class="sb-row"><span class="sb-label">划拨金额</span><span class="sb-val" id="allocAmtPreview" style="color:#cf1322">−¥0</span></div>
+          <div class="sb-row"><span class="sb-label">企业主账户划拨后</span><span class="sb-val" id="allocFromAfter">¥1,250,000</span></div>
+          <div class="sb-arrow">↓</div>
+          <div class="sb-row"><span class="sb-label">目标账户当前余额</span><span class="sb-val" id="allocToBalance">¥185,000</span></div>
+          <div class="sb-row"><span class="sb-label">划拨后</span><span class="sb-val" id="allocToAfter" style="color:#389e0d;font-size:16px">¥185,000</span></div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="document.getElementById('allocateModal').classList.remove('open')">取消</button>
+        <button class="btn primary" id="allocConfirmBtn">确认划拨</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 提现 modal -->
+  <div class="modal-mask" id="withdrawModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>💸 余额提现</h3>
+        <p id="withdrawAccountName">个人账户</p>
+      </div>
+      <div class="modal-body">
+        <div class="info-tip">
+          提现申请提交后由风控/财务审核，审核通过后 1-3 个工作日到账。
+        </div>
+        <div class="form-field">
+          <label>提现金额（元）</label>
+          <input type="number" id="withdrawAmount" placeholder="请输入金额">
+          <div style="font-size:12px;color:#8c8c8c;margin-top:4px">可提现 <span id="withdrawableAmount" style="color:#1890ff;font-weight:500">¥0</span></div>
+        </div>
+        <div class="form-field">
+          <label>到账银行卡</label>
+          <select>
+            <option>中国建设银行 储蓄卡 (尾号 8826)</option>
+            <option>+ 添加新银行卡</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="document.getElementById('withdrawModal').classList.remove('open')">取消</button>
+        <button class="btn primary" id="withdrawConfirmBtn">提交提现申请</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 通用待处理详情 modal -->
+  <div class="modal-mask" id="pendingDetailModal">
+    <div class="modal" style="max-width:560px">
+      <div class="modal-head">
+        <h3 id="pdmTitle">详情</h3>
+        <p id="pdmSubtitle"></p>
+      </div>
+      <div class="modal-body" id="pdmBody"></div>
+      <div class="modal-foot" id="pdmFoot">
+        <button class="btn" onclick="document.getElementById('pendingDetailModal').classList.remove('open')">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastWrap" class="toasts"></div>
+
+  <!-- 共享底座 -->
+  <script src="_shared.js"></script>
+  <script>
+    SharedHeader.mount({ activeNav: "wallet" });
+    // wallet-overview.html 的 wallet chip 显示当前空间钱包真实余额（而不是 ws.accountBalance）
+    // SharedHeader.refresh 默认显示 accountBalance；这里覆盖一次，并在空间切换后由 onWorkspaceChanged 再次刷新
+    (function () {
+      function refreshWalletChipFromKv() {
+        var ws = window.demoApp.getCurrentWorkspace();
+        var wallets = window.demoApp.getWallets();
+        var w = wallets[ws.walletKey];
+        var balance = w ? w.balance : ws.accountBalance;
+        var $amt = document.getElementById("walletAmount");
+        var $acc = document.getElementById("walletAccount");
+        if ($amt) $amt.textContent = window.fmtMoney(balance);
+        if ($acc) $acc.textContent = ws.accountType;
+      }
+      // 暴露给页内业务代码（充值 / 划拨 / 提现完成后刷新顶栏）
+      window.refreshTopbar = refreshWalletChipFromKv;
+      window.renderWsDropdownGlobal = function () { /* SharedHeader 自己渲染，外部触发刷新即可 */ refreshWalletChipFromKv(); };
+      window.refreshAll = window.refreshAll || function () { refreshWalletChipFromKv(); };
+      // 切换空间时刷新（SharedHeader 会调用 onWorkspaceChanged）
+      var prevHook = window.onWorkspaceChanged;
+      window.onWorkspaceChanged = function () {
+        refreshWalletChipFromKv();
+        if (typeof prevHook === "function") prevHook();
+      };
+      refreshWalletChipFromKv();
+    })();
+  </script>
+
+
+  <!-- 钱包业务交互 -->
+  <script>
+  (function () {
+    const $ = (id) => document.getElementById(id);
+
+    // 当前空间账户大卡
+    function renderCurrentCard() {
+      const ws = window.demoApp.getCurrentWorkspace();
+      const wallets = window.demoApp.getWallets();
+      const wallet = wallets[ws.walletKey];
+      const card = $("currentCard");
+
+      card.classList.remove("team-budget", "personal", "enterprise-main", "budget-missing");
+
+      if (ws.id === "cf-ip" && ws.budgetMissing) {
+        card.classList.add("budget-missing");
+        $("ccWsName").textContent = ws.name;
+        $("ccAccountName").textContent = "未配置团队预算账户";
+        $("ccBalance").textContent = "—";
+        $("ccLocked").textContent = "—";
+        $("ccAllocated").textContent = "—";
+        $("ccUsage").textContent = "—";
+        $("ccActions").innerHTML = '<button class="cc-btn">向企业管理员申请预算</button><button class="cc-btn ghost" onclick="window.openAllocate(\'team-budget-cf-ip\')">企业管理员：现在配置</button>';
+        if (!card.querySelector(".missing-tip")) {
+          const tip = document.createElement("div");
+          tip.className = "missing-tip";
+          tip.innerHTML = "ℹ️ <strong>规则提醒</strong>：本空间未配置独立预算账户，按平台规则将自动回退至企业主账户结算。订单仍记录「由 IP 孵化组发起」，但实际扣款主体为企业主账户（¥1,250,000）。";
+          card.appendChild(tip);
+        }
+        return;
+      }
+      // 移除回退提示
+      const oldTip = card.querySelector(".missing-tip");
+      if (oldTip) oldTip.remove();
+
+      card.classList.add(ws.payer.type);
+      $("ccWsName").textContent = ws.name;
+      $("ccAccountName").textContent = wallet ? wallet.name : ws.payer.name;
+      $("ccBalance").textContent = window.fmtMoney(wallet ? wallet.balance : 0);
+      $("ccLocked").textContent = window.fmtMoney(wallet ? (wallet.lockedAmount || 0) : 0);
+
+      if (wallet && wallet.allocated) {
+        $("ccAllocated").textContent = window.fmtMoney(wallet.allocated);
+        const usage = wallet.allocated > 0 ? Math.round((wallet.allocated - wallet.balance) / wallet.allocated * 100) : 0;
+        $("ccUsage").textContent = usage + "%";
+      } else {
+        $("ccAllocated").textContent = "—";
+        $("ccUsage").textContent = "—";
+      }
+
+      // 操作按钮
+      let actions = "";
+      if (ws.payer.type === "personal") {
+        actions = '<button class="cc-btn" onclick="window.openRecharge(\'' + ws.walletKey + '\')">充值</button>'
+          + '<button class="cc-btn ghost" onclick="window.openWithdraw(\'' + ws.walletKey + '\')">提现</button>';
+      } else if (ws.payer.type === "team-budget") {
+        actions = '<button class="cc-btn ghost" onclick="window.demoToast(\'团队成员可申请增加预算 →\', \'info\')">申请追加预算</button>'
+          + '<button class="cc-btn ghost" onclick="window.demoToast(\'扣款记录已聚合到下方流水\', \'info\')">查看团队消费</button>';
+      } else if (ws.payer.type === "enterprise-main") {
+        actions = '<button class="cc-btn" onclick="window.openRecharge(\'' + ws.walletKey + '\')">企业充值</button>';
+        if (ws.canAllocateBudget) {
+          actions += '<button class="cc-btn ghost" onclick="window.openAllocate()">📤 划拨预算给团队</button>';
+        }
+      }
+      $("ccActions").innerHTML = actions;
+    }
+
+    // 账户矩阵（按当前空间权限过滤展示）
+    function renderAccountsGrid() {
+      const ws = window.demoApp.getCurrentWorkspace();
+      const wallets = window.demoApp.getWallets();
+
+      // 全量账户清单
+      const ALL = {
+        "enterprise-main-cf": { wallet: wallets["enterprise-main-cf"], type: "enterprise-main", title: "骋风天合 - 企业主账户", subtitle: "由企业管理员维护", key: "enterprise-main-cf" },
+        "team-budget-cf-drama": { wallet: wallets["team-budget-cf-drama"], type: "team-budget", title: "短剧制作中心 - 团队预算账户", subtitle: "归属：骋风天合·短剧制作中心", key: "team-budget-cf-drama", boundWs: "cf-drama" },
+        "team-budget-cf-marketing": { wallet: wallets["team-budget-cf-marketing"], type: "team-budget", title: "市场宣传组 - 团队预算账户", subtitle: "归属：骋风天合·市场宣传组", key: "team-budget-cf-marketing", boundWs: "cf-marketing" },
+        "team-budget-cf-ip": { wallet: wallets["team-budget-cf-ip"] || null, type: wallets["team-budget-cf-ip"] ? "team-budget" : "unset", title: "IP 孵化组 - 团队预算账户", subtitle: "归属：骋风天合·IP 孵化组", key: "team-budget-cf-ip", boundWs: "cf-ip", isUnset: !wallets["team-budget-cf-ip"] },
+        "personal-account-lixueqin": { wallet: wallets["personal-account-lixueqin"], type: "personal", title: "昭岚 - 个人账户", subtitle: "个人空间下使用", key: "personal-account-lixueqin", boundWs: "personal" }
+      };
+
+      // 根据当前空间决定可见账户（权限隔离）
+      let visibleKeys = []; // 完整可见的账户
+      let limitedKeys = []; // 受限可见（只显示部分信息，如"上游来源"）
+      let sectionTitle = "", sectionSub = "";
+
+      if (ws.id === "personal") {
+        // 个人空间：只看个人账户
+        visibleKeys = ["personal-account-lixueqin"];
+        sectionTitle = "我的账户";
+        sectionSub = "个人空间下仅可见个人账户。如需企业资金请切换到对应工作空间。";
+      } else if (ws.id === "cf-admin") {
+        // 企业管理员：看全部
+        visibleKeys = ["enterprise-main-cf", "team-budget-cf-drama", "team-budget-cf-marketing", "team-budget-cf-ip", "personal-account-lixueqin"];
+        sectionTitle = "骋风天合 · 全部资金账户";
+        sectionSub = "管理员视角：企业主 → 团队预算 → 个人，完整可见。";
+      } else if (ws.id === "cf-drama" || ws.id === "cf-marketing" || ws.id === "cf-ip") {
+        // 团队空间成员：本团队完整可见 + 企业主受限可见 + 个人账户
+        visibleKeys = [ws.walletKey === "enterprise-main-cf" ? null : ws.walletKey, "personal-account-lixueqin"].filter(Boolean);
+        // IP 孵化组也要展示自己的"未配置"状态
+        if (ws.id === "cf-ip" && !visibleKeys.includes("team-budget-cf-ip")) visibleKeys.unshift("team-budget-cf-ip");
+        // 企业主账户受限可见
+        limitedKeys = ["enterprise-main-cf"];
+        sectionTitle = "本团队可见账户";
+        sectionSub = "团队成员视角：仅可见本团队预算 + 上级企业主账户（受限）+ 个人账户。其他团队的预算账户对你不可见。";
+      }
+
+      // 写入标题
+      $("accountsSectionTitle").textContent = sectionTitle;
+      $("accountsSectionSub").textContent = sectionSub;
+
+      // 渲染卡片
+      const renderCard = (item, mode) => {
+        const isCurrent = ws.walletKey === item.key;
+        const cls = "account-card" + (isCurrent ? " current" : "") + (mode === "limited" ? " limited" : "");
+        let typeLabel = item.type === "personal" ? "个人账户" : item.type === "team-budget" ? "团队预算账户" : item.type === "enterprise-main" ? "企业主账户" : "未配置";
+        let actions = "";
+
+        if (mode === "limited") {
+          // 受限视图：团队成员看企业主
+          const allocatedToTeam = wallets[ws.walletKey] && wallets[ws.walletKey].allocated;
+          return '<div class="' + cls + '">'
+            + '<div class="ac-head"><div><div class="ac-title">' + item.title + '</div><div style="font-size:11px;color:#8c8c8c;margin-top:2px">上游账户 · 受限可见</div></div><span class="ac-type ' + item.type + '">企业主账户</span></div>'
+            + '<div class="ac-balance" style="font-size:18px;color:#bfbfbf">¥ ****</div>'
+            + '<div class="ac-meta"><span>已划拨给本团队</span><span class="ac-meta-val">' + window.fmtMoney(allocatedToTeam || 0) + '</span></div>'
+            + '<div class="ac-meta"><span>权限说明</span><span class="ac-meta-val" style="color:#8c8c8c;font-size:11px">仅企业管理员可见完整余额</span></div>'
+            + '<div class="ac-actions"><button onclick="window.demoToast(\'你不是企业管理员，无权操作企业主账户\', \'warn\')" disabled style="cursor:not-allowed;color:#bfbfbf">充值</button><button onclick="window.demoToast(\'追加预算需联系企业管理员\', \'info\')">申请追加预算</button></div>'
+            + '</div>';
+        }
+
+        if (item.isUnset) {
+          actions = '<button class="warn" onclick="window.openAllocate(\'' + item.key + '\')">企业管理员：配置预算</button>';
+        } else if (item.type === "personal") {
+          actions = '<button class="primary" onclick="window.openRecharge(\'' + item.key + '\')">充值</button><button onclick="window.openWithdraw(\'' + item.key + '\')">提现</button>';
+        } else if (item.type === "team-budget") {
+          if (ws.id === "cf-admin") {
+            actions = '<button onclick="window.demoToast(\'切换到该团队空间查看详情\', \'info\'); setTimeout(() => { window.demoApp.setCurrentWorkspace(\'' + item.boundWs + '\'); window.refreshAll(); window.renderWsDropdownGlobal(); }, 500)">切到该空间</button><button onclick="window.demoToast(\'团队预算调整需企业管理员操作\', \'warn\')">调整预算</button>';
+          } else {
+            actions = '<button onclick="window.demoToast(\'团队预算追加需联系企业管理员\', \'info\')">申请追加预算</button><button onclick="window.demoToast(\'查看本团队消费明细\', \'info\')">查看消费</button>';
+          }
+        } else if (item.type === "enterprise-main") {
+          actions = '<button class="primary" onclick="window.openRecharge(\'' + item.key + '\')">企业充值</button><button onclick="window.openAllocate()">划拨给团队</button>';
+        }
+
+        const balanceHtml = item.isUnset
+          ? '<div class="ac-balance unset">未配置</div>'
+          : '<div class="ac-balance">' + window.fmtMoney(item.wallet.balance) + '</div>';
+        const meta = item.isUnset
+          ? '<div class="ac-meta"><span>说明</span><span class="ac-meta-val" style="color:#cf1322">下单将回退至企业主账户</span></div>'
+          : '<div class="ac-meta"><span>已锁定</span><span class="ac-meta-val">' + window.fmtMoney(item.wallet.lockedAmount || 0) + '</span></div>'
+            + (item.wallet.allocated ? '<div class="ac-meta"><span>总预算</span><span class="ac-meta-val">' + window.fmtMoney(item.wallet.allocated) + '</span></div>' : '');
+
+        return '<div class="' + cls + '">'
+          + '<div class="ac-head"><div><div class="ac-title">' + item.title + (isCurrent ? ' <span style="color:#1890ff;font-size:11px">· 当前</span>' : '') + '</div>' + (item.subtitle ? '<div style="font-size:11px;color:#8c8c8c;margin-top:2px">' + item.subtitle + '</div>' : '') + '</div><span class="ac-type ' + item.type + '">' + typeLabel + '</span></div>'
+          + balanceHtml
+          + meta
+          + '<div class="ac-actions">' + actions + '</div>'
+          + '</div>';
+      };
+
+      const visible = visibleKeys.map(k => ALL[k]).filter(Boolean);
+      const limited = limitedKeys.map(k => ALL[k]).filter(Boolean);
+      const html = visible.map(it => renderCard(it, "full")).join("") + limited.map(it => renderCard(it, "limited")).join("");
+      $("accountsGrid").innerHTML = html;
+    }
+
+    // 团队预算使用率（个人空间隐藏；团队成员只看本团队；管理员看全部）
+    function renderBudgetUsage() {
+      const ws = window.demoApp.getCurrentWorkspace();
+      const wrap = document.getElementById("budgetUsageWrap");
+      if (!wrap) return;
+
+      // 个人空间：隐藏整个 section
+      if (ws.id === "personal") { wrap.style.display = "none"; return; }
+      wrap.style.display = "";
+
+      const ALL_TEAMS = [
+        { key: "team-budget-cf-drama", name: "短剧制作中心", icon: "🎬", boundWs: "cf-drama" },
+        { key: "team-budget-cf-marketing", name: "市场宣传组", icon: "📢", boundWs: "cf-marketing" },
+        { key: "team-budget-cf-ip", name: "IP 孵化组", icon: "💎", boundWs: "cf-ip" }
+      ];
+      let teams;
+      if (ws.id === "cf-admin") {
+        teams = ALL_TEAMS;
+        document.getElementById("budgetSectionTitle").textContent = "团队预算使用率";
+        document.getElementById("budgetCardTitle").textContent = "各团队预算分配与使用情况";
+        document.getElementById("budgetCardSub").textContent = "管理员视角：可见全部团队预算分配。";
+      } else {
+        // 团队成员：只看本团队
+        teams = ALL_TEAMS.filter(t => t.boundWs === ws.id);
+        document.getElementById("budgetSectionTitle").textContent = "本团队预算使用率";
+        document.getElementById("budgetCardTitle").textContent = "本团队预算分配与使用情况";
+        document.getElementById("budgetCardSub").textContent = "团队成员仅可见本团队预算情况，其他团队的预算对你不可见。";
+      }
+
+      const wallets = window.demoApp.getWallets();
+      const html = teams.map(t => {
+        const w = wallets[t.key];
+        if (!w || !w.allocated) {
+          return '<div class="budget-row">'
+            + '<div class="bu-name">' + t.icon + ' ' + t.name + '<div class="bu-tag" style="color:#cf1322">未配置预算</div></div>'
+            + '<div class="bu-bar"><div class="bu-segment-spent" style="width:0;background:#f5f5f5"></div></div>'
+            + '<div class="bu-stat" style="color:#8c8c8c">未配置 · <a href="#" onclick="event.preventDefault(); window.openAllocate(\'' + t.key + '\')" style="color:#1890ff">立即配置</a></div>'
+            + '</div>';
+        }
+        const allocated = w.allocated;
+        const balance = w.balance;
+        const locked = w.lockedAmount || 0;
+        const spent = Math.max(0, allocated - balance - locked);
+        const spentPct = (spent / allocated * 100).toFixed(1);
+        const lockedPct = (locked / allocated * 100).toFixed(1);
+        const totalUsedPct = ((spent + locked) / allocated * 100).toFixed(1);
+        return '<div class="budget-row">'
+          + '<div class="bu-name">' + t.icon + ' ' + t.name + '<div class="bu-tag">总预算 ' + window.fmtMoney(allocated) + '</div></div>'
+          + '<div class="bu-bar">'
+            + '<div class="bu-segment-spent" style="width:' + spentPct + '%" title="已结算 ' + window.fmtMoney(spent) + '"></div>'
+            + '<div class="bu-segment-locked" style="width:' + lockedPct + '%" title="已锁定 ' + window.fmtMoney(locked) + '"></div>'
+          + '</div>'
+          + '<div class="bu-stat">'
+            + '已用 <span class="bu-stat-val">' + window.fmtMoney(spent + locked) + '</span> / ' + window.fmtMoney(allocated)
+            + '<div style="font-size:11px;color:#8c8c8c;margin-top:2px">使用率 ' + totalUsedPct + '%（结算 ' + spentPct + '% + 锁定 ' + lockedPct + '%）</div>'
+          + '</div>'
+          + '</div>';
+      }).join("");
+      const el = document.getElementById("budgetRows");
+      if (el) el.innerHTML = html;
+    }
+
+    // KPI 动态化（按当前空间）
+    function renderKPIs() {
+      const ws = window.demoApp.getCurrentWorkspace();
+      const wallets = window.demoApp.getWallets();
+      const row = document.getElementById("kpiRow");
+      const bar = document.getElementById("pendingBar");
+      if (!row || !bar) return;
+
+      let kpis = [];
+      let pendings = [];
+
+      if (ws.id === "personal") {
+        const w = wallets["personal-account-lixueqin"];
+        kpis = [
+          { icon: "💳", label: "个人累计充值（年初至今）", value: "¥4,200", trend: "本月充值 <strong>¥1,000</strong>", cls: "" },
+          { icon: "📤", label: "个人累计支出（年初至今）", value: "¥1,800", trend: "本月支出 <strong>¥800</strong> · <span class=\"delta-up\">↑ 16%</span>", cls: "orange" },
+          { icon: "🔒", label: "已锁定", value: window.fmtMoney(w ? (w.lockedAmount || 0) : 0), trend: "无进行中订单", cls: "green" },
+          { icon: "💰", label: "当前可用余额", value: window.fmtMoney(w ? w.balance : 0), trend: "建议保持 ¥3,000+ 以接受小额下单", cls: "purple" }
+        ];
+        pendings = [
+          { num: "0", text: "笔提现待审核", cls: "", action: "withdraw-list" },
+          { num: "1", text: "条新通知（来自骋风天合）", cls: "warn", action: "notifications" },
+          { num: "2", text: "项个人协议待确认", cls: "", action: "agreements" }
+        ];
+      } else if (ws.id === "cf-admin") {
+        const accounts = ["personal-account-lixueqin", "team-budget-cf-drama", "team-budget-cf-marketing", "enterprise-main-cf"];
+        let totalAvailable = 0, totalLocked = 0;
+        accounts.forEach(k => { const w = wallets[k]; if (w) { totalAvailable += w.balance; totalLocked += (w.lockedAmount || 0); } });
+        kpis = [
+          { icon: "💳", label: "企业累计充值（年初至今）", value: "¥1,750,000", trend: "本月充值 <strong>¥120,000</strong> · <span class=\"delta-up\">↑ 18% vs 上月</span>", cls: "" },
+          { icon: "📤", label: "企业累计支出（年初至今）", value: "¥328,500", trend: "本月支出 <strong>¥48,000</strong> · <span class=\"delta-up\">↑ 22% vs 上月</span>", cls: "orange" },
+          { icon: "🔒", label: "全企业已锁定", value: window.fmtMoney(totalLocked), trend: "分布在 <strong>2 个团队</strong>·<strong>3 笔订单</strong>", cls: "green" },
+          { icon: "📥", label: "全企业可用余额", value: window.fmtMoney(totalAvailable), trend: "企业主 + 各团队 + 个人合计", cls: "purple" }
+        ];
+        pendings = [
+          { num: "1", text: "笔对公转账待财务审核", cls: "warn", action: "bank-transfer-review" },
+          { num: "0", text: "笔提现待审核", cls: "", action: "withdraw-list" },
+          { num: "3", text: "笔订单可开票", cls: "warn", action: "invoice-list" },
+          { num: "1", text: "个团队未配置预算", cls: "danger", action: "allocate-budget" },
+          { num: "27%", text: "本季度团队预算使用率", cls: "", action: "budget-report" }
+        ];
+      } else {
+        const w = wallets[ws.walletKey];
+        const teamName = ws.shortName.replace("骋风天合·", "");
+        if (ws.budgetMissing) {
+          kpis = [
+            { icon: "💎", label: teamName + " 预算状态", value: "未配置", trend: "下单将回退至企业主账户结算", cls: "orange" },
+            { icon: "📤", label: teamName + " 本季度支出", value: "¥0", trend: "暂无独立预算账户", cls: "" },
+            { icon: "🔒", label: teamName + " 已锁定", value: "¥0", trend: "无进行中订单", cls: "green" },
+            { icon: "👥", label: "团队成员", value: "8 人", trend: "包含 1 主理人 + 7 创作者", cls: "purple" }
+          ];
+          pendings = [
+            { num: "1", text: "项：申请配置团队预算账户", cls: "danger", action: "allocate-budget" },
+            { num: "0", text: "笔订单进行中", cls: "", action: "order-list" },
+            { num: "0", text: "笔订单可开票", cls: "", action: "invoice-list" }
+          ];
+        } else {
+          const allocated = w ? (w.allocated || 0) : 0;
+          const balance = w ? w.balance : 0;
+          const locked = w ? (w.lockedAmount || 0) : 0;
+          const spent = Math.max(0, allocated - balance - locked);
+          kpis = [
+            { icon: "🎯", label: teamName + " · 本季度总预算", value: window.fmtMoney(allocated), trend: "由企业管理员划拨", cls: "" },
+            { icon: "📤", label: "已结算（实际花掉）", value: window.fmtMoney(spent), trend: "占预算 <strong>" + (allocated > 0 ? (spent / allocated * 100).toFixed(1) : 0) + "%</strong>", cls: "orange" },
+            { icon: "🔒", label: "已锁定（订单中）", value: window.fmtMoney(locked), trend: "占预算 <strong>" + (allocated > 0 ? (locked / allocated * 100).toFixed(1) : 0) + "%</strong>", cls: "green" },
+            { icon: "💰", label: "当前可用", value: window.fmtMoney(balance), trend: "占预算 <strong>" + (allocated > 0 ? (balance / allocated * 100).toFixed(1) : 0) + "%</strong>", cls: "purple" }
+          ];
+          pendings = [
+            { num: ws.id === "cf-drama" ? "2" : "1", text: "笔订单进行中", cls: "", action: "order-list" },
+            { num: ws.id === "cf-drama" ? "1" : "0", text: "笔需求待选承制方", cls: "warn", action: "demand-list" },
+            { num: "0", text: "笔订单可开票", cls: "", action: "invoice-list" },
+            { num: ws.id === "cf-drama" ? "23%" : "11%", text: "本季度本团队预算使用率", cls: "", action: "budget-report" }
+          ];
+        }
+      }
+
+      row.innerHTML = kpis.map(k => '<div class="kpi-card ' + k.cls + '">'
+        + '<div class="kpi-label"><span class="kpi-icon">' + k.icon + '</span> ' + k.label + '</div>'
+        + '<div class="kpi-value">' + k.value + '</div>'
+        + '<div class="kpi-trend">' + k.trend + '</div>'
+        + '</div>').join("");
+
+      bar.innerHTML = '<span class="pb-label">📌 待处理事项</span>' + pendings.map(p =>
+        '<div class="pb-item ' + p.cls + '" onclick="handlePendingAction(\'' + p.action + '\')" style="cursor:pointer">'
+          + '<span class="pb-num">' + p.num + '</span><span class="pb-text">' + p.text + '</span>'
+        + '</div>'
+      ).join("");
+    }
+
+    // 流水
+    const TYPE_CONFIG = {
+      "recharge": { icon: "💳", label: "充值", className: "recharge" },
+      "lock": { icon: "🔒", label: "锁定", className: "lock" },
+      "allocate": { icon: "📤", label: "划拨", className: "allocate" },
+      "settle": { icon: "✅", label: "结算", className: "settle" },
+      "refund": { icon: "↩️", label: "退款", className: "refund" },
+      "withdraw": { icon: "💸", label: "提现", className: "refund" },
+      "invoice": { icon: "🧾", label: "开票", className: "allocate" }
+    };
+    let flowAccount = "all", flowType = "all";
+    function renderFlows() {
+      let flows = window.demoApp.getFlows();
+      if (flowAccount !== "all") flows = flows.filter(f => f.account === flowAccount);
+      if (flowType !== "all") flows = flows.filter(f => f.type === flowType);
+      $("flowCount").textContent = flows.length;
+      const wallets = window.demoApp.getWallets();
+      const html = flows.map(f => {
+        const cfg = TYPE_CONFIG[f.type] || { icon: "•", label: f.type, className: "" };
+        const accountName = wallets[f.account] ? wallets[f.account].name : f.account;
+        const amtCls = f.type === "lock" ? "lock" : f.amount > 0 ? "in" : f.amount < 0 ? "out" : "";
+        const amtDisplay = f.amount === 0 ? (f.lockedNote || "—") : (f.amount > 0 ? "+" : "") + window.fmtMoney(f.amount);
+        return '<div class="flow-row">'
+          + '<div class="flow-icon">' + cfg.icon + '</div>'
+          + '<div><span class="flow-type-pill ' + cfg.className + '">' + cfg.label + '</span><div style="font-size:11px;color:#8c8c8c;margin-top:3px">' + f.time + '</div></div>'
+          + '<div style="font-size:13px">' + f.desc + '</div>'
+          + '<div style="font-size:12px;color:#595959">' + accountName + '</div>'
+          + '<div class="flow-amt ' + amtCls + '" style="' + (f.amount === 0 ? "color:#8c8c8c;font-size:11px" : "") + '">' + amtDisplay + '</div>'
+          + '<div style="font-size:12px;color:#8c8c8c">' + f.operator + '</div>'
+          + '</div>';
+      }).join("") || '<div style="padding:40px;text-align:center;color:#8c8c8c">暂无流水记录</div>';
+      $("flowList").innerHTML = html;
+    }
+    $("flowAccountFilter").addEventListener("change", e => { flowAccount = e.target.value; renderFlows(); });
+    $("flowTypeFilter").addEventListener("change", e => { flowType = e.target.value; renderFlows(); });
+
+    // ============================================================
+    // 充值 modal
+    // ============================================================
+    let rechargeWalletKey = null;
+    window.openRecharge = function (walletKey) {
+      rechargeWalletKey = walletKey;
+      const wallets = window.demoApp.getWallets();
+      const wallet = wallets[walletKey];
+      $("rechargeAccountName").textContent = wallet.name;
+      $("rechargeTargetName").textContent = wallet.name;
+      $("rechargeCurrentBalance").textContent = window.fmtMoney(wallet.balance);
+      $("rechargeAmount").value = "";
+      updateRechargePreview();
+      $("rechargeModal").classList.add("open");
+    };
+    function updateRechargePreview() {
+      const wallets = window.demoApp.getWallets();
+      const wallet = wallets[rechargeWalletKey];
+      if (!wallet) return;
+      const amt = Number($("rechargeAmount").value) || 0;
+      $("rechargeAmtPreview").textContent = "+" + window.fmtMoney(amt);
+      $("rechargeAfterBalance").textContent = window.fmtMoney(wallet.balance + amt);
+    }
+    $("rechargeAmount").addEventListener("input", updateRechargePreview);
+    document.querySelectorAll("#rechargeModal .quick-amt button").forEach(btn => {
+      btn.addEventListener("click", () => { $("rechargeAmount").value = btn.getAttribute("data-amt"); updateRechargePreview(); });
+    });
+    $("rechargeConfirmBtn").addEventListener("click", () => {
+      const amt = Number($("rechargeAmount").value);
+      if (!amt || amt < 100) { window.demoToast("请输入有效金额（最低 ¥100）", "err"); return; }
+      const method = $("rechargeMethod").value;
+      const wallets = window.demoApp.getWallets();
+      if (method === "bank-transfer") {
+        // 对公转账：需财务审核，余额不立即变
+        window.demoApp.addFlow({ id: "F-" + Date.now(), time: now(), type: "recharge", desc: "对公转账充值（待审核 - " + window.fmtMoney(amt) + "）", account: rechargeWalletKey, amount: 0, operator: "昭岚" });
+        window.demoToast("✅ 对公转账凭证已提交，财务审核中（约 1 个工作日到账）", "info");
+        $("rechargeModal").classList.remove("open");
+        // 模拟 3 秒后审核通过
+        setTimeout(() => {
+          const ws = window.demoApp.getWallets();
+          ws[rechargeWalletKey].balance += amt;
+          window.demoApp.setWallets(ws);
+          window.demoApp.addFlow({ id: "F-" + Date.now(), time: now(), type: "recharge", desc: "对公转账充值（财务审核通过）", account: rechargeWalletKey, amount: amt, operator: "财务" });
+          window.demoToast("💰 对公转账已审核通过，余额到账 " + window.fmtMoney(amt), "ok");
+          window.refreshAll();
+        }, 3000);
+      } else {
+        wallets[rechargeWalletKey].balance += amt;
+        window.demoApp.setWallets(wallets);
+        const methodLabel = { "online-alipay": "支付宝", "online-wechat": "微信", "online-unionpay": "银联" }[method] || "在线";
+        window.demoApp.addFlow({ id: "F-" + Date.now(), time: now(), type: "recharge", desc: methodLabel + "充值", account: rechargeWalletKey, amount: amt, operator: "昭岚" });
+        window.demoToast("✅ 充值成功 " + window.fmtMoney(amt), "ok");
+        $("rechargeModal").classList.remove("open");
+        window.refreshAll();
+      }
+    });
+
+    // ============================================================
+    // 划拨预算 modal
+    // ============================================================
+    window.openAllocate = function (presetTarget) {
+      if (presetTarget) $("allocateTarget").value = presetTarget;
+      $("allocateAmount").value = "";
+      updateAllocPreview();
+      $("allocateModal").classList.add("open");
+    };
+    function updateAllocPreview() {
+      const wallets = window.demoApp.getWallets();
+      const fromBal = wallets["enterprise-main-cf"].balance;
+      const toKey = $("allocateTarget").value;
+      const toWallet = wallets[toKey];
+      const toBal = toWallet ? toWallet.balance : 0;
+      const amt = Number($("allocateAmount").value) || 0;
+      $("allocFromBalance").textContent = window.fmtMoney(fromBal);
+      $("allocFromAfter").textContent = window.fmtMoney(fromBal - amt);
+      $("allocToBalance").textContent = toWallet ? window.fmtMoney(toBal) : "（暂未开通）";
+      $("allocToAfter").textContent = window.fmtMoney(toBal + amt);
+      $("allocAmtPreview").textContent = "−" + window.fmtMoney(amt);
+    }
+    $("allocateAmount").addEventListener("input", updateAllocPreview);
+    $("allocateTarget").addEventListener("change", updateAllocPreview);
+    document.querySelectorAll("#allocateModal .quick-amt button").forEach(btn => {
+      btn.addEventListener("click", () => { $("allocateAmount").value = btn.getAttribute("data-amt"); updateAllocPreview(); });
+    });
+    $("allocConfirmBtn").addEventListener("click", () => {
+      const amt = Number($("allocateAmount").value);
+      if (!amt || amt < 1000) { window.demoToast("划拨金额需 ≥ ¥1,000", "err"); return; }
+      const wallets = window.demoApp.getWallets();
+      const fromBal = wallets["enterprise-main-cf"].balance;
+      if (amt > fromBal) { window.demoToast("企业主账户余额不足", "err"); return; }
+      const toKey = $("allocateTarget").value;
+      const teamMap = { "team-budget-cf-drama": { ws: "cf-drama", teamName: "短剧制作中心" }, "team-budget-cf-marketing": { ws: "cf-marketing", teamName: "市场宣传组" }, "team-budget-cf-ip": { ws: "cf-ip", teamName: "IP 孵化组" } };
+      const team = teamMap[toKey];
+      if (!wallets[toKey]) {
+        wallets[toKey] = { type: "team-budget", name: team.teamName + " - 团队预算账户", balance: 0, lockedAmount: 0, allocated: 0, owner: team.ws };
+        // 同时把工作空间的 walletKey/budgetMissing 在 LocalStorage 里没有更新（运行时 WORKSPACES 是 const，但这页的 walletKey 也指向 enterprise-main，只能下次刷新生效）
+      }
+      wallets["enterprise-main-cf"].balance -= amt;
+      wallets[toKey].balance += amt;
+      wallets[toKey].allocated = (wallets[toKey].allocated || 0) + amt;
+      window.demoApp.setWallets(wallets);
+      window.demoApp.addFlow({ id: "F-" + Date.now() + "a", time: now(), type: "allocate", desc: "从企业主账户划拨至 " + team.teamName, account: "enterprise-main-cf", amount: -amt, operator: "昭岚（企业管理员）" });
+      window.demoApp.addFlow({ id: "F-" + Date.now() + "b", time: now(), type: "allocate", desc: "企业管理员划拨预算 → " + team.teamName, account: toKey, amount: amt, operator: "昭岚（企业管理员）" });
+      window.demoToast("✅ 已划拨 " + window.fmtMoney(amt) + " 至 " + team.teamName, "ok");
+      $("allocateModal").classList.remove("open");
+      window.refreshAll();
+      if (toKey === "team-budget-cf-ip") setTimeout(() => window.demoToast("提示：IP 孵化组已开通预算账户，下次该空间下单不再回退至企业主账户", "info"), 800);
+    });
+
+    // ============================================================
+    // 提现 modal
+    // ============================================================
+    let withdrawWalletKey = null;
+    window.openWithdraw = function (walletKey) {
+      withdrawWalletKey = walletKey;
+      const wallets = window.demoApp.getWallets();
+      const wallet = wallets[walletKey];
+      $("withdrawAccountName").textContent = wallet.name;
+      $("withdrawableAmount").textContent = window.fmtMoney(wallet.balance);
+      $("withdrawAmount").value = "";
+      $("withdrawModal").classList.add("open");
+    };
+    $("withdrawConfirmBtn").addEventListener("click", () => {
+      const amt = Number($("withdrawAmount").value);
+      const wallets = window.demoApp.getWallets();
+      const wallet = wallets[withdrawWalletKey];
+      if (!amt || amt < 1) { window.demoToast("请输入有效金额", "err"); return; }
+      if (amt > wallet.balance) { window.demoToast("超过可提现金额", "err"); return; }
+      window.demoToast("✅ 提现申请已提交，财务审核中（1-3 个工作日到账）", "info");
+      $("withdrawModal").classList.remove("open");
+    });
+
+    // ============================================================
+    // 待处理事项 action handlers
+    // ============================================================
+    window.handlePendingAction = function (action) {
+      const m = $("pendingDetailModal");
+      const title = $("pdmTitle");
+      const sub = $("pdmSubtitle");
+      const body = $("pdmBody");
+      const foot = $("pdmFoot");
+
+      function openModal(t, s, html, footHtml) {
+        title.textContent = t; sub.textContent = s || "";
+        body.innerHTML = html;
+        foot.innerHTML = '<button class="btn" onclick="document.getElementById(\'pendingDetailModal\').classList.remove(\'open\')">关闭</button>' + (footHtml || "");
+        m.classList.add("open");
+      }
+
+      switch (action) {
+        case "withdraw-list":
+          openModal("💸 提现审核列表", "所有待审核与历史提现记录", `
+            <div class="info-tip">暂无待审核的提现申请。</div>
+            <table style="width:100%;font-size:12px;border-collapse:collapse;margin-top:10px">
+              <thead><tr style="background:#fafafa"><th style="padding:8px;text-align:left;border-bottom:1px solid #f0f0f0">时间</th><th style="padding:8px;text-align:left;border-bottom:1px solid #f0f0f0">金额</th><th style="padding:8px;text-align:left;border-bottom:1px solid #f0f0f0">状态</th><th style="padding:8px;text-align:left;border-bottom:1px solid #f0f0f0">到账卡</th></tr></thead>
+              <tbody>
+                <tr><td style="padding:8px;border-bottom:1px solid #f0f0f0">2026-04-22 18:20</td><td style="padding:8px;border-bottom:1px solid #f0f0f0;color:#cf1322">-¥800</td><td style="padding:8px;border-bottom:1px solid #f0f0f0"><span style="color:#52c41a">✅ 已到账</span></td><td style="padding:8px;border-bottom:1px solid #f0f0f0">建行 8826</td></tr>
+                <tr><td style="padding:8px;border-bottom:1px solid #f0f0f0">2026-03-15 10:05</td><td style="padding:8px;border-bottom:1px solid #f0f0f0;color:#cf1322">-¥1,200</td><td style="padding:8px;border-bottom:1px solid #f0f0f0"><span style="color:#52c41a">✅ 已到账</span></td><td style="padding:8px;border-bottom:1px solid #f0f0f0">建行 8826</td></tr>
+              </tbody>
+            </table>`);
+          break;
+
+        case "notifications":
+          openModal("🔔 通知中心", "来自平台和企业的通知消息", `
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="padding:12px 14px;background:#e6f7ff;border:1px solid #91d5ff;border-radius:8px;font-size:13px;cursor:pointer" onclick="window.demoToast('已读：骋风天合邀请您加入短剧制作中心', 'ok');this.style.opacity='.5'">
+                <div style="display:flex;justify-content:space-between;align-items:center"><strong>🏢 骋风天合</strong><span style="font-size:11px;color:#8c8c8c">2026-04-26 14:30</span></div>
+                <div style="margin-top:4px;color:#595959">管理员昭岚已将您的个人账户关联至企业「骋风天合」，您可在工作空间中切换至企业团队下发布需求。</div>
+              </div>
+              <div style="padding:12px 14px;background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;font-size:13px;opacity:.6">
+                <div style="display:flex;justify-content:space-between;align-items:center"><strong>📢 平台公告</strong><span style="font-size:11px;color:#8c8c8c">2026-04-20 09:00</span></div>
+                <div style="margin-top:4px;color:#8c8c8c">平台资金安全升级完成，新增对公转账充值通道，详见帮助中心。</div>
+              </div>
+              <div style="padding:12px 14px;background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;font-size:13px;opacity:.6">
+                <div style="display:flex;justify-content:space-between;align-items:center"><strong>📢 平台公告</strong><span style="font-size:11px;color:#8c8c8c">2026-04-10 11:00</span></div>
+                <div style="margin-top:4px;color:#8c8c8c">五一假期期间（5.1-5.5）财务审核/提现到账可能延迟 1-2 个工作日。</div>
+              </div>
+            </div>`);
+          break;
+
+        case "agreements":
+          openModal("📋 协议确认", "以下协议需要您确认签署后方可使用相关功能", `
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="padding:14px;background:#fffbe6;border:1px solid #ffe58f;border-radius:8px;font-size:13px">
+                <div style="display:flex;justify-content:space-between;align-items:center"><strong>⚠️ 《平台创作者服务协议 v2.1》</strong><span style="font-size:11px;color:#d48806;background:#fff7e6;padding:2px 8px;border-radius:10px">待确认</span></div>
+                <div style="margin-top:6px;color:#595959;font-size:12px">更新内容：新增承制方收益提现规则、争议仲裁条款修订</div>
+                <div style="margin-top:8px"><button class="btn primary" style="height:30px;font-size:12px;padding:0 14px" onclick="this.parentElement.parentElement.style.opacity='.5';this.textContent='✅ 已确认';window.demoToast('已确认签署','ok')">确认签署</button></div>
+              </div>
+              <div style="padding:14px;background:#fffbe6;border:1px solid #ffe58f;border-radius:8px;font-size:13px">
+                <div style="display:flex;justify-content:space-between;align-items:center"><strong>⚠️ 《资金账户使用须知 v1.3》</strong><span style="font-size:11px;color:#d48806;background:#fff7e6;padding:2px 8px;border-radius:10px">待确认</span></div>
+                <div style="margin-top:6px;color:#595959;font-size:12px">更新内容：对公转账充值流程、提现到账时效说明</div>
+                <div style="margin-top:8px"><button class="btn primary" style="height:30px;font-size:12px;padding:0 14px" onclick="this.parentElement.parentElement.style.opacity='.5';this.textContent='✅ 已确认';window.demoToast('已确认签署','ok')">确认签署</button></div>
+              </div>
+            </div>`);
+          break;
+
+        case "bank-transfer-review":
+          openModal("🏦 对公转账待审核", "财务审核中的转账充值申请", `
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="padding:14px;background:#e6f7ff;border:1px solid #91d5ff;border-radius:8px;font-size:13px">
+                <div style="display:flex;justify-content:space-between"><strong>企业主账户充值</strong><span style="font-size:11px;color:#1890ff;background:#e6f7ff;padding:2px 8px;border-radius:10px">审核中</span></div>
+                <div style="margin-top:6px;display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px;color:#595959">
+                  <div>申请金额：<strong style="color:#1890ff">¥50,000</strong></div>
+                  <div>申请人：昭岚</div>
+                  <div>申请时间：2026-04-26 16:45</div>
+                  <div>转账凭证：已上传</div>
+                </div>
+                <div style="margin-top:8px;display:flex;gap:8px">
+                  <button class="btn primary" style="height:30px;font-size:12px;padding:0 14px" onclick="approveBankTransfer(this, 50000)">✅ 审核通过</button>
+                  <button class="btn" style="height:30px;font-size:12px;padding:0 14px" onclick="this.parentElement.parentElement.style.opacity='.5';window.demoToast('已驳回该转账申请','info')">❌ 驳回</button>
+                </div>
+              </div>
+            </div>`, "");
+          break;
+
+        case "invoice-list":
+          openModal("🧾 可开票订单", "以下已完成订单可申请开具发票", `
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="padding:14px;background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;font-size:13px">
+                <div style="display:flex;justify-content:space-between"><strong>广告片配音</strong><span style="color:#52c41a;font-size:11px">已完成</span></div>
+                <div style="margin-top:4px;font-size:12px;color:#595959">订单号 OD-2026042009 · 声海传媒 · ¥8,000</div>
+                <div style="margin-top:8px"><button class="btn primary" style="height:30px;font-size:12px;padding:0 14px" onclick="this.textContent='📨 已申请';this.disabled=true;window.demoToast('发票申请已提交，预计 3 个工作日寄出','ok')">申请开票</button></div>
+              </div>
+              <div style="padding:14px;background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;font-size:13px">
+                <div style="display:flex;justify-content:space-between"><strong>品牌VI设计</strong><span style="color:#52c41a;font-size:11px">已完成</span></div>
+                <div style="margin-top:4px;font-size:12px;color:#595959">订单号 OD-2026031505 · 色彩工坊 · ¥15,000</div>
+                <div style="margin-top:8px"><button class="btn primary" style="height:30px;font-size:12px;padding:0 14px" onclick="this.textContent='📨 已申请';this.disabled=true;window.demoToast('发票申请已提交','ok')">申请开票</button></div>
+              </div>
+              <div style="padding:14px;background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;font-size:13px">
+                <div style="display:flex;justify-content:space-between"><strong>公众号头图设计</strong><span style="color:#52c41a;font-size:11px">已完成</span></div>
+                <div style="margin-top:4px;font-size:12px;color:#595959">订单号 OD-2026041501 · 色彩工坊 · ¥800</div>
+                <div style="margin-top:8px"><button class="btn primary" style="height:30px;font-size:12px;padding:0 14px" onclick="this.textContent='📨 已申请';this.disabled=true;window.demoToast('发票申请已提交','ok')">申请开票</button></div>
+              </div>
+            </div>`);
+          break;
+
+        case "allocate-budget":
+          $("pendingDetailModal").classList.remove("open");
+          window.openAllocate("team-budget-cf-ip");
+          break;
+
+        case "order-list":
+          location.href = "demand-list.html";
+          break;
+
+        case "demand-list":
+          location.href = "demand-list.html";
+          break;
+
+        case "budget-report":
+          openModal("📊 团队预算使用报告", "本季度各团队预算执行情况", function () {
+            const wallets = window.demoApp.getWallets();
+            const teams = [
+              { name: "短剧制作中心", key: "team-budget-cf-drama" },
+              { name: "市场宣传组", key: "team-budget-cf-marketing" },
+              { name: "IP 孵化组", key: "team-budget-cf-ip" }
+            ];
+            return '<div style="display:flex;flex-direction:column;gap:12px">' + teams.map(t => {
+              const w = wallets[t.key];
+              if (!w) return '<div style="padding:12px;background:#fff7e6;border:1px solid #ffe58f;border-radius:8px;font-size:13px"><strong>' + t.name + '</strong><span style="margin-left:8px;color:#d48806">⚠️ 未配置预算</span></div>';
+              const alloc = w.allocated || 0, bal = w.balance, locked = w.lockedAmount || 0;
+              const spent = Math.max(0, alloc - bal - locked);
+              const pct = alloc > 0 ? ((spent + locked) / alloc * 100).toFixed(1) : 0;
+              return '<div style="padding:12px;background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;font-size:13px">'
+                + '<div style="display:flex;justify-content:space-between"><strong>' + t.name + '</strong><span style="color:#1890ff">' + pct + '% 已用</span></div>'
+                + '<div style="height:6px;background:#f0f0f0;border-radius:3px;margin:8px 0;overflow:hidden"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#1890ff,#722ed1);border-radius:3px"></div></div>'
+                + '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;font-size:11px;color:#8c8c8c">'
+                + '<div>总预算 ' + window.fmtMoney(alloc) + '</div>'
+                + '<div>已用 ' + window.fmtMoney(spent + locked) + '</div>'
+                + '<div>可用 ' + window.fmtMoney(bal) + '</div>'
+                + '</div></div>';
+            }).join("") + '</div>';
+          }());
+          break;
+
+        default:
+          window.demoToast(action, "info");
+      }
+    };
+
+    window.approveBankTransfer = function (btn, amt) {
+      const wallets = window.demoApp.getWallets();
+      wallets["enterprise-main-cf"].balance += amt;
+      window.demoApp.setWallets(wallets);
+      window.demoApp.addFlow({ id: "F-" + Date.now(), time: now(), type: "recharge", desc: "对公转账充值（财务审核通过）", account: "enterprise-main-cf", amount: amt, operator: "财务" });
+      btn.parentElement.parentElement.style.opacity = ".5";
+      btn.textContent = "✅ 已通过";
+      btn.disabled = true;
+      window.demoToast("已审核通过，¥" + amt.toLocaleString() + " 已到账企业主账户", "ok");
+      window.refreshAll();
+    };
+
+    function now() {
+      const t = new Date();
+      return t.getFullYear() + "-" + pad(t.getMonth() + 1) + "-" + pad(t.getDate()) + " " + pad(t.getHours()) + ":" + pad(t.getMinutes());
+    }
+    function pad(n) { return String(n).padStart(2, "0"); }
+
+    window.refreshAll = function () {
+      window.refreshTopbar();
+      renderCurrentCard();
+      renderAccountsGrid();
+      renderBudgetUsage();
+      renderKPIs();
+      renderFlows();
+    };
+    window.onWorkspaceChanged = window.refreshAll;
+
+    renderCurrentCard();
+    renderAccountsGrid();
+    renderBudgetUsage();
+    renderKPIs();
+    renderFlows();
+  })();
+  </script>
+</body>
+</html>

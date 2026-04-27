@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>承制方主页编辑 - 骋风天合 · 创作门户交易平台</title>
+  <link rel="stylesheet" href="_shared.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #262626; }
+    .app { display: flex; padding-top: 56px; min-height: 100vh; }
+    .sidebar { width: 200px; background: #fff; box-shadow: 2px 0 8px rgba(0,0,0,.06); position: fixed; top: 56px; left: 0; bottom: 0; padding: 16px 0; overflow-y: auto; }
+    .menu a { display: flex; align-items: center; gap: 10px; padding: 11px 24px; color: #262626; text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
+    .menu a:hover { background: #f0f7ff; color: #1890ff; }
+    .menu a.active { background: #e6f7ff; color: #1890ff; border-left-color: #1890ff; font-weight: 500; }
+    .menu-icon { width: 18px; text-align: center; }
+    .menu-group { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+    .menu-group-title { padding: 8px 24px; font-size: 11px; color: #8c8c8c; text-transform: uppercase; letter-spacing: .5px; }
+    .main { margin-left: 200px; flex: 1; padding: 24px 28px 60px; }
+    .page-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+    .page-head h1 { margin: 0 0 6px; font-size: 22px; }
+    .page-head .sub { color: #8c8c8c; font-size: 13px; }
+    .head-actions { display: flex; gap: 8px; }
+    .btn { height: 34px; border: 1px solid #d9d9d9; background: #fff; border-radius: 6px; padding: 0 16px; font-size: 13px; color: #595959; cursor: pointer; }
+    .btn:hover { border-color: #91d5ff; color: #1890ff; }
+    .btn.primary { background: #1890ff; border-color: #1890ff; color: #fff; }
+    .btn.primary:hover { background: #40a9ff; }
+    .btn.success { background: #52c41a; border-color: #52c41a; color: #fff; }
+    .btn.success:hover { background: #73d13d; }
+
+    .layout { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(380px, .7fr); gap: 16px; }
+
+    .panel { background: #fff; border-radius: 10px; padding: 22px 24px; box-shadow: 0 2px 8px rgba(0,0,0,.04); margin-bottom: 16px; }
+    .panel h2 { margin: 0 0 4px; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+    .panel .desc { font-size: 12px; color: #8c8c8c; margin: 0 0 16px; }
+
+    .form-row { display: grid; grid-template-columns: 120px 1fr; gap: 10px; align-items: start; margin-bottom: 14px; }
+    .form-label { font-size: 13px; color: #595959; padding-top: 8px; text-align: right; }
+    .form-label .req { color: #ff4d4f; margin-left: 2px; }
+    input[type="text"], input[type="email"], input[type="url"], textarea, select {
+      width: 100%; border: 1px solid #d9d9d9; border-radius: 6px; padding: 8px 10px; font-size: 13px; font-family: inherit; transition: border .2s;
+    }
+    input:focus, textarea:focus, select:focus { border-color: #1890ff; outline: none; box-shadow: 0 0 0 2px rgba(24,144,255,.1); }
+    textarea { resize: vertical; min-height: 80px; }
+    .hint { font-size: 11px; color: #8c8c8c; margin-top: 4px; }
+
+    .logo-upload { display: flex; align-items: center; gap: 16px; }
+    .logo-box { width: 80px; height: 80px; border-radius: 14px; background: linear-gradient(135deg, #ffd6e7, #adc6ff); display: flex; align-items: center; justify-content: center; font-size: 36px; cursor: pointer; border: 2px dashed #d9d9d9; transition: all .2s; }
+    .logo-box:hover { border-color: #1890ff; }
+    .logo-hint { font-size: 12px; color: #8c8c8c; }
+
+    .tag-group { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag-chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: #f0f0f0; border-radius: 14px; font-size: 12px; cursor: pointer; border: 1px solid transparent; transition: all .15s; }
+    .tag-chip.selected { background: #e6f7ff; border-color: #91d5ff; color: #1890ff; font-weight: 500; }
+    .tag-chip .remove { font-size: 14px; color: #bfbfbf; cursor: pointer; margin-left: 2px; }
+    .tag-chip .remove:hover { color: #ff4d4f; }
+
+    .case-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .case-card { border: 1px solid #f0f0f0; border-radius: 10px; overflow: hidden; transition: all .18s; position: relative; }
+    .case-card:hover { border-color: #91d5ff; box-shadow: 0 4px 12px rgba(24,144,255,.1); }
+    .case-thumb { width: 100%; aspect-ratio: 16/10; background: #f5f5f5; display: flex; align-items: center; justify-content: center; }
+    .case-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .case-info { padding: 10px 12px; }
+    .case-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+    .case-meta { font-size: 11px; color: #8c8c8c; }
+    .case-remove { position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%; background: rgba(0,0,0,.5); color: #fff; border: none; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity .15s; }
+    .case-card:hover .case-remove { opacity: 1; }
+    .case-add { border: 2px dashed #d9d9d9; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 20px; cursor: pointer; color: #8c8c8c; font-size: 13px; min-height: 120px; transition: all .18s; }
+    .case-add:hover { border-color: #1890ff; color: #1890ff; }
+
+    .preview-bar { background: linear-gradient(135deg, #f9f0ff, #e6f7ff); border: 1px solid #d3adf7; border-radius: 10px; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .preview-bar .info { font-size: 13px; color: #531dab; }
+    .preview-bar .info strong { font-size: 15px; }
+
+    .preview-card { border: 1px solid #e8e8e8; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,.06); }
+    .preview-header { background: linear-gradient(135deg, #722ed1, #1890ff); padding: 22px 24px; color: #fff; display: flex; gap: 16px; align-items: center; }
+    .preview-logo { width: 64px; height: 64px; border-radius: 14px; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+    .preview-name { font-size: 20px; font-weight: 700; }
+    .preview-sub { font-size: 12px; opacity: .85; margin-top: 4px; }
+    .preview-body { padding: 20px 24px; }
+    .preview-section { margin-bottom: 16px; }
+    .preview-section h4 { margin: 0 0 8px; font-size: 14px; color: #8c8c8c; }
+    .preview-intro { font-size: 13px; line-height: 1.7; color: #595959; }
+    .preview-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .preview-tag { padding: 3px 10px; background: #f0f0f0; border-radius: 12px; font-size: 11px; color: #595959; }
+    .preview-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .preview-stat { text-align: center; padding: 12px; background: #fafafa; border-radius: 8px; }
+    .preview-stat .val { font-size: 22px; font-weight: 700; color: #262626; }
+    .preview-stat .lbl { font-size: 11px; color: #8c8c8c; margin-top: 2px; }
+    .preview-cases { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .preview-case-thumb { width: 100%; aspect-ratio: 16/10; border-radius: 6px; overflow: hidden; background: #f5f5f5; }
+    .preview-case-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .preview-case-title { font-size: 11px; color: #595959; margin-top: 4px; text-align: center; }
+
+    .toasts { position: fixed; top: 72px; right: 20px; width: min(90vw, 360px); display: grid; gap: 8px; z-index: 1100; }
+    .toast { background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; padding: 10px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.1); animation: slideIn .25s ease-out; }
+    .toast.ok { border-color: #b7eb8f; background: #f6ffed; color: #389e0d; }
+    .toast.info { border-color: #91d5ff; background: #e6f7ff; color: #096dd9; }
+    .toast.warn { border-color: #ffe58f; background: #fffbe6; color: #d48806; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    @media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } .case-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding: 16px; } .form-row { grid-template-columns: 1fr; } .form-label { text-align: left; padding-top: 0; } }
+  </style>
+</head>
+<body>
+  <header class="topbar" id="topbar-shared"></header>
+  <div class="app">
+    <aside class="sidebar">
+      <nav class="menu">
+        <a href="platform-home-contractor.html"><span class="menu-icon">🏠</span> 承制方工作台</a>
+        <a href="contractor-demand-hall.html"><span class="menu-icon">📢</span> 接单大厅</a>
+        <a href="contractor-orders.html"><span class="menu-icon">📋</span> 接单与订单</a>
+        <a href="project-space.html"><span class="menu-icon">🤝</span> 项目协同空间</a>
+        <a href="contractor-profile-edit.html" class="active"><span class="menu-icon">🏪</span> 编辑对外主页</a>
+        <a href="wallet-overview.html"><span class="menu-icon">💰</span> 收益中心</a>
+        <div class="menu-group">
+          <div class="menu-group-title">账户</div>
+          <a href="account-basic-info-prototype-platform-style.html"><span class="menu-icon">⚙️</span> 账户中心</a>
+        </div>
+      </nav>
+    </aside>
+    <main class="main">
+      <div class="page-head">
+        <div>
+          <h1>编辑对外主页</h1>
+          <div class="sub">需求方在「承制方广场」看到的信息由此编辑。修改后点保存即可生效。</div>
+        </div>
+        <div class="head-actions">
+          <button class="btn" onclick="location.href='contractor-marketplace.html'">预览广场效果</button>
+          <button class="btn success" id="saveBtn">💾 保存</button>
+        </div>
+      </div>
+
+      <div class="layout">
+        <div>
+          <section class="panel">
+            <h2>🏪 基本信息</h2>
+            <p class="desc">工作室名称、Logo、简介等核心展示信息</p>
+
+            <div class="form-row">
+              <div class="form-label">Logo<span class="req">*</span></div>
+              <div class="logo-upload">
+                <div class="logo-box" id="logoBox" title="点击上传">🌟</div>
+                <div>
+                  <div class="logo-hint">建议 200×200，支持 JPG/PNG</div>
+                  <button class="btn" style="margin-top:6px;height:28px;font-size:12px" onclick="toast('演示环境，使用 emoji 代替上传', 'info')">更换 Logo</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-label">名称<span class="req">*</span></div>
+              <div>
+                <input type="text" id="fldName" value="星辰创作工作室">
+                <div class="hint">对外展示的工作室/个人品牌名</div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-label">一句话简介<span class="req">*</span></div>
+              <div>
+                <input type="text" id="fldTagline" value="短剧专精 · 影视级 · 原创解说" maxlength="30">
+                <div class="hint">最多 30 字，展示在名称下方</div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-label">详细介绍</div>
+              <div>
+                <textarea id="fldIntro" rows="4">8 年短视频 / 短剧 / 海报设计经验，擅长奇幻、修仙、玄幻题材。已服务 200+ 品牌方与制片方。</textarea>
+                <div class="hint">展示在主页详情区，支持换行</div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-label">联系方式</div>
+              <div>
+                <input type="email" id="fldContact" value="starlight@example.com">
+                <div class="hint">仅在需求方选定后可见</div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-label">报价区间</div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <input type="text" id="fldPriceMin" value="3,000" style="width:120px"> 
+                <span>~</span>
+                <input type="text" id="fldPriceMax" value="80,000" style="width:120px">
+                <span style="font-size:12px;color:#8c8c8c">元</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <h2>🏷 服务类目与标签</h2>
+            <p class="desc">选择擅长的类目和风格标签，影响平台推荐匹配</p>
+
+            <div class="form-row">
+              <div class="form-label">服务类目<span class="req">*</span></div>
+              <div class="tag-group" id="catGroup"></div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-label">风格标签</div>
+              <div class="tag-group" id="tagGroup"></div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <h2>🎨 代表案例</h2>
+            <p class="desc">最多展示 6 个案例，建议包含缩略图和项目名称</p>
+            <div class="case-grid" id="caseGrid"></div>
+          </section>
+        </div>
+
+        <div>
+          <div class="preview-bar">
+            <div class="info"><strong>实时预览</strong><br>需求方在承制方广场看到的效果</div>
+            <button class="btn primary" onclick="location.href='contractor-marketplace.html'">看广场页效果 →</button>
+          </div>
+          <div class="preview-card" id="previewCard"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div id="toastWrap" class="toasts"></div>
+  <script src="_shared.js"></script>
+  <script>
+    window.demoApp.setCurrentIdentity('contractor');
+    SharedHeader.mount({ activeNav: 'profile-edit', identity: 'contractor', brandHref: 'platform-home-contractor.html', brandSub: '承制方工作台' });
+
+    function toast(msg, kind) {
+      const wrap = document.getElementById('toastWrap');
+      const t = document.createElement('div');
+      t.className = 'toast ' + (kind || 'ok');
+      t.textContent = msg;
+      wrap.appendChild(t);
+      setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(20px)'; setTimeout(() => t.remove(), 260); }, 2400);
+    }
+
+    const allCategories = ['视频制作', '图片设计', '文案服务', '内容创作', '资质服务'];
+    const allTags = ['古代', '玄幻', '修仙', '2D', '3D', '都市', '青春', '搞笑', '治愈', '国风', '赛博朋克', '极简', '写实', '水墨'];
+
+    const profile = window.demoApp.getContractorProfile ? window.demoApp.getContractorProfile() : JSON.parse(localStorage.getItem('demoContractorProfile') || 'null') || {
+      name: '星辰创作工作室', logo: '🌟', intro: '', contact: '', quoteRange: '¥3,000 - ¥80,000',
+      categories: ['视频制作', '图片设计'], tags: ['古代', '玄幻', '修仙', '2D', '3D'],
+      cases: [], stats: { ordersCompleted: 187, rating: 4.9, responseTimeHours: 2 }
+    };
+
+    const selectedCats = new Set(profile.categories || []);
+    const selectedTags = new Set(profile.tags || []);
+
+    function renderCatGroup() {
+      document.getElementById('catGroup').innerHTML = allCategories.map(c =>
+        '<span class="tag-chip ' + (selectedCats.has(c) ? 'selected' : '') + '" data-val="' + c + '">' + c + '</span>'
+      ).join('');
+      document.getElementById('catGroup').addEventListener('click', e => {
+        const chip = e.target.closest('.tag-chip');
+        if (!chip) return;
+        const val = chip.getAttribute('data-val');
+        if (selectedCats.has(val)) selectedCats.delete(val); else selectedCats.add(val);
+        renderCatGroup();
+        updatePreview();
+      });
+    }
+
+    function renderTagGroup() {
+      document.getElementById('tagGroup').innerHTML = allTags.map(t =>
+        '<span class="tag-chip ' + (selectedTags.has(t) ? 'selected' : '') + '" data-val="' + t + '">' + t + '</span>'
+      ).join('');
+      document.getElementById('tagGroup').addEventListener('click', e => {
+        const chip = e.target.closest('.tag-chip');
+        if (!chip) return;
+        const val = chip.getAttribute('data-val');
+        if (selectedTags.has(val)) selectedTags.delete(val); else selectedTags.add(val);
+        renderTagGroup();
+        updatePreview();
+      });
+    }
+
+    const cases = (profile.cases || []).slice();
+
+    function renderCases() {
+      const grid = document.getElementById('caseGrid');
+      grid.innerHTML = cases.map((c, i) =>
+        '<div class="case-card">' +
+          '<button class="case-remove" onclick="removeCase(' + i + ')">×</button>' +
+          '<div class="case-thumb"><img src="' + c.thumb + '" alt=""></div>' +
+          '<div class="case-info"><div class="case-title">' + c.title + '</div><div class="case-meta">' + c.year + '</div></div>' +
+        '</div>'
+      ).join('') +
+      (cases.length < 6 ? '<div class="case-add" onclick="addCase()"><span style="font-size:24px">+</span>添加案例</div>' : '');
+    }
+
+    window.removeCase = function (i) {
+      cases.splice(i, 1);
+      renderCases();
+      updatePreview();
+    };
+
+    window.addCase = function () {
+      const title = prompt('案例名称：', '新作品 ' + (cases.length + 1));
+      if (!title) return;
+      cases.push({
+        title: title,
+        thumb: 'https://api.dicebear.com/9.x/shapes/svg?seed=case' + Date.now(),
+        year: 2026
+      });
+      renderCases();
+      updatePreview();
+      toast('案例已添加', 'ok');
+    };
+
+    function updatePreview() {
+      const name = document.getElementById('fldName').value || '未填名称';
+      const tagline = document.getElementById('fldTagline').value || '';
+      const intro = document.getElementById('fldIntro').value || '';
+      const stats = profile.stats || { ordersCompleted: 187, rating: 4.9, responseTimeHours: 2 };
+
+      const tagsHtml = [...selectedCats, ...selectedTags].map(t => '<span class="preview-tag">' + t + '</span>').join('');
+      const casesHtml = cases.slice(0, 3).map(c =>
+        '<div><div class="preview-case-thumb"><img src="' + c.thumb + '"></div><div class="preview-case-title">' + c.title + '</div></div>'
+      ).join('');
+
+      document.getElementById('previewCard').innerHTML =
+        '<div class="preview-header">' +
+          '<div class="preview-logo">' + (document.getElementById('logoBox').textContent || '🌟') + '</div>' +
+          '<div><div class="preview-name">' + name + '</div><div class="preview-sub">' + tagline + ' · ★' + stats.rating + '</div></div>' +
+        '</div>' +
+        '<div class="preview-body">' +
+          '<div class="preview-section"><h4>简介</h4><div class="preview-intro">' + (intro || '<span style="color:#bfbfbf">未填写</span>') + '</div></div>' +
+          '<div class="preview-section"><h4>擅长领域</h4><div class="preview-tags">' + (tagsHtml || '<span style="color:#bfbfbf">未选择</span>') + '</div></div>' +
+          '<div class="preview-section"><h4>核心数据</h4><div class="preview-stats">' +
+            '<div class="preview-stat"><div class="val">' + stats.ordersCompleted + '</div><div class="lbl">累计完成</div></div>' +
+            '<div class="preview-stat"><div class="val">★ ' + stats.rating + '</div><div class="lbl">服务评分</div></div>' +
+            '<div class="preview-stat"><div class="val">' + stats.responseTimeHours + 'h</div><div class="lbl">平均响应</div></div>' +
+          '</div></div>' +
+          (casesHtml ? '<div class="preview-section"><h4>代表案例</h4><div class="preview-cases">' + casesHtml + '</div></div>' : '') +
+        '</div>';
+    }
+
+    ['fldName', 'fldTagline', 'fldIntro', 'fldContact', 'fldPriceMin', 'fldPriceMax'].forEach(id => {
+      document.getElementById(id).addEventListener('input', updatePreview);
+    });
+
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      const updated = Object.assign({}, profile, {
+        name: document.getElementById('fldName').value,
+        intro: document.getElementById('fldIntro').value,
+        contact: document.getElementById('fldContact').value,
+        quoteRange: '¥' + document.getElementById('fldPriceMin').value + ' - ¥' + document.getElementById('fldPriceMax').value,
+        categories: [...selectedCats],
+        tags: [...selectedTags],
+        cases: cases
+      });
+      try { localStorage.setItem('demoContractorProfile', JSON.stringify(updated)); } catch (_) {}
+      toast('主页信息已保存，需求方可在广场看到更新', 'ok');
+    });
+
+    renderCatGroup();
+    renderTagGroup();
+    renderCases();
+    updatePreview();
+  </script>
+</body>
+</html>

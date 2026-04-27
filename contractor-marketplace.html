@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>承制方广场 - 骋风天合 · 创作门户交易平台</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #262626; }
+
+    /* 顶部全局栏（与其他页面一致） */
+    .topbar { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.06); z-index: 200; display: flex; align-items: center; padding: 0 20px; gap: 16px; }
+    .topbar .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 16px; color: #1890ff; text-decoration: none; min-width: 220px; }
+    .topbar .brand-sub { color: #8c8c8c; font-weight: 400; font-size: 12px; margin-left: 4px; }
+    .ws-switcher { position: relative; }
+    .ws-trigger { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid #e8e8e8; border-radius: 6px; background: #fafafa; cursor: pointer; font-size: 13px; min-width: 240px; }
+    .ws-trigger:hover { border-color: #1890ff; background: #e6f7ff; }
+    .ws-trigger .ws-name { font-weight: 500; color: #262626; flex: 1; }
+    .ws-trigger .ws-arrow { color: #8c8c8c; font-size: 10px; }
+    .ws-dropdown { display: none; position: absolute; top: calc(100% + 6px); left: 0; min-width: 320px; background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,.12); padding: 8px; z-index: 300; }
+    .ws-dropdown.open { display: block; }
+    .ws-group-label { font-size: 12px; color: #8c8c8c; padding: 6px 10px; }
+    .ws-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+    .ws-item:hover { background: #f0f7ff; }
+    .ws-item.active { background: #e6f7ff; }
+    .ws-item .ws-item-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .ws-item .ws-item-icon.personal { background: #fff7e6; color: #fa8c16; }
+    .ws-item .ws-item-icon.team { background: #e6f7ff; color: #1890ff; }
+    .ws-item .ws-item-icon.admin { background: #f9f0ff; color: #722ed1; }
+    .ws-item .ws-item-main { flex: 1; min-width: 0; }
+    .ws-item .ws-item-name { font-weight: 500; color: #262626; }
+    .ws-item .ws-item-desc { font-size: 12px; color: #8c8c8c; margin-top: 2px; }
+    .ws-item .ws-item-check { color: #1890ff; font-size: 14px; }
+    .identity-switch { display: flex; gap: 4px; background: #f0f0f0; border-radius: 18px; padding: 3px; }
+    .identity-switch button { border: none; background: transparent; padding: 5px 14px; border-radius: 16px; font-size: 13px; color: #595959; cursor: pointer; }
+    .identity-switch button.active { background: #fff; color: #1890ff; box-shadow: 0 1px 2px rgba(0,0,0,.06); font-weight: 500; }
+    .wallet-chip { display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: linear-gradient(135deg, #fff7e6, #fff1d6); border: 1px solid #ffd591; border-radius: 18px; cursor: pointer; font-size: 13px; color: #d46b08; text-decoration: none; }
+    .wallet-chip:hover { border-color: #fa8c16; }
+    .wallet-chip .wallet-amount { font-weight: 600; font-size: 14px; }
+    .wallet-chip .wallet-account { font-size: 11px; opacity: .85; }
+    .avatar-wrap { position: relative; margin-left: auto; }
+    .avatar-trigger { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px 8px; border-radius: 18px; }
+    .avatar-trigger:hover { background: #f5f5f5; }
+    .avatar-trigger img { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #f0f0f0; }
+    .avatar-trigger .avatar-name { font-size: 13px; color: #262626; }
+    .avatar-dropdown { display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 220px; background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,.12); padding: 8px; z-index: 300; }
+    .avatar-dropdown.open { display: block; }
+    .avatar-dropdown a { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 6px; color: #262626; text-decoration: none; font-size: 13px; }
+    .avatar-dropdown a:hover { background: #f0f7ff; color: #1890ff; }
+    .avatar-dropdown .divider { height: 1px; background: #f0f0f0; margin: 6px 4px; }
+
+    /* 布局 */
+    .app { display: flex; padding-top: 56px; min-height: 100vh; }
+    .sidebar { width: 200px; background: #fff; box-shadow: 2px 0 8px rgba(0,0,0,.06); position: fixed; top: 56px; left: 0; bottom: 0; padding: 16px 0; overflow-y: auto; }
+    .menu a { display: flex; align-items: center; gap: 10px; padding: 11px 24px; color: #262626; text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
+    .menu a:hover { background: #f0f7ff; color: #1890ff; }
+    .menu a.active { background: #e6f7ff; color: #1890ff; border-left-color: #1890ff; font-weight: 500; }
+    .menu-icon { width: 18px; text-align: center; }
+    .menu-group { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+    .menu-group-title { padding: 8px 24px; font-size: 11px; color: #8c8c8c; text-transform: uppercase; letter-spacing: .5px; }
+    .main { margin-left: 200px; flex: 1; padding: 24px 28px; }
+
+    /* 头部 banner */
+    .market-banner { background: linear-gradient(135deg, #f9f0ff, #fff0f6); border-radius: 12px; padding: 28px 32px; margin-bottom: 16px; position: relative; overflow: hidden; }
+    .market-banner::before { content: "🏪"; position: absolute; right: 24px; top: 16px; font-size: 90px; opacity: .12; }
+    .market-banner h1 { margin: 0 0 6px; font-size: 22px; }
+    .market-banner .mb-sub { color: #595959; font-size: 13px; margin-bottom: 14px; max-width: 720px; line-height: 1.6; }
+    .market-banner .mb-stats { display: flex; gap: 28px; }
+    .market-banner .mb-stat-item { font-size: 13px; }
+    .market-banner .mb-stat-num { color: #722ed1; font-weight: 700; font-size: 22px; }
+    .market-banner .mb-stat-label { color: #8c8c8c; }
+
+    /* 工具栏 */
+    .toolbar { background: #fff; border-radius: 8px; padding: 14px 18px; margin-bottom: 14px; }
+    .filter-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .filter-row + .filter-row { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #f0f0f0; }
+    .filter-label { font-size: 13px; color: #595959; min-width: 56px; }
+    .chip-group { display: flex; gap: 6px; flex-wrap: wrap; }
+    .chip { padding: 4px 12px; border: 1px solid #d9d9d9; border-radius: 14px; cursor: pointer; font-size: 12px; color: #595959; background: #fafafa; transition: all .15s; }
+    .chip:hover { border-color: #91d5ff; color: #1890ff; }
+    .chip.active { background: #e6f7ff; border-color: #1890ff; color: #1890ff; font-weight: 500; }
+    .toolbar input[type=text] { height: 32px; border: 1px solid #d9d9d9; border-radius: 6px; padding: 0 10px; font-size: 13px; outline: none; min-width: 240px; }
+    .toolbar input[type=text]:focus { border-color: #40a9ff; }
+    .toolbar select { height: 32px; border: 1px solid #d9d9d9; border-radius: 6px; padding: 0 28px 0 10px; font-size: 13px; outline: none; cursor: pointer; }
+    .right-area { margin-left: auto; display: flex; align-items: center; gap: 10px; font-size: 12px; color: #8c8c8c; }
+
+    /* 承制方卡片网格 */
+    .contractor-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 16px; }
+    .contractor-card { background: #fff; border-radius: 10px; padding: 18px 20px; cursor: pointer; transition: all .2s; border: 1px solid #f0f0f0; position: relative; overflow: hidden; }
+    .contractor-card:hover { border-color: #91d5ff; transform: translateY(-3px); box-shadow: 0 8px 18px rgba(24,144,255,.12); }
+    .contractor-card.cooperated::before { content: "🤝 合作过"; position: absolute; top: 14px; right: 14px; background: #f6ffed; color: #389e0d; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; border: 1px solid #b7eb8f; }
+    .contractor-card.featured::before { content: "⭐ 平台精选"; position: absolute; top: 14px; right: 14px; background: #fff7e6; color: #d46b08; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; border: 1px solid #ffd591; }
+
+    .cc-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .cc-avatar { width: 48px; height: 48px; border-radius: 10px; background: #fff7e6; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .cc-avatar.style-blue { background: #e6f7ff; }
+    .cc-avatar.style-green { background: #f6ffed; }
+    .cc-avatar.style-purple { background: #f9f0ff; }
+    .cc-avatar.style-pink { background: #fff0f6; }
+    .cc-name-block .cc-name { font-size: 15px; font-weight: 600; }
+    .cc-name-block .cc-rating { font-size: 11px; color: #8c8c8c; margin-top: 2px; }
+    .cc-name-block .cc-rating .star { color: #fa8c16; }
+
+    .cc-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
+    .cc-tag { padding: 1px 8px; background: #f5f5f5; color: #595959; border-radius: 4px; font-size: 11px; }
+    .cc-tag.cat { background: #e6f7ff; color: #096dd9; font-weight: 500; }
+
+    .cc-intro { font-size: 12px; color: #595959; line-height: 1.6; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px dashed #f0f0f0; min-height: 38px; }
+
+    .cc-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px; margin-bottom: 12px; }
+    .cc-meta-item .cc-meta-label { color: #8c8c8c; }
+    .cc-meta-item .cc-meta-value { color: #262626; font-weight: 500; }
+
+    .cc-cases { display: flex; gap: 4px; margin-bottom: 12px; }
+    .cc-case-thumb { flex: 1; aspect-ratio: 16 / 9; border-radius: 4px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #bfbfbf; }
+    .cc-case-thumb.thumb-1 { background: linear-gradient(135deg, #ffd6e7, #ffadd2); }
+    .cc-case-thumb.thumb-2 { background: linear-gradient(135deg, #b5f5ec, #87e8de); }
+    .cc-case-thumb.thumb-3 { background: linear-gradient(135deg, #d3adf7, #b37feb); }
+    .cc-case-thumb.thumb-4 { background: linear-gradient(135deg, #ffe7ba, #ffd591); }
+    .cc-case-thumb.thumb-5 { background: linear-gradient(135deg, #d6e4ff, #adc6ff); }
+
+    .cc-actions { display: flex; gap: 6px; }
+    .cc-actions button { flex: 1; height: 32px; border: 1px solid #d9d9d9; background: #fff; border-radius: 6px; font-size: 12px; cursor: pointer; }
+    .cc-actions button:hover { border-color: #1890ff; color: #1890ff; }
+    .cc-actions button.primary { background: #1890ff; border-color: #1890ff; color: #fff; }
+    .cc-actions button.primary:hover { background: #40a9ff; border-color: #40a9ff; color: #fff; }
+
+    /* 抽屉（承制方主页摘要） */
+    .drawer-mask { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 999; }
+    .drawer-mask.open { display: block; }
+    .drawer { position: fixed; top: 0; right: -640px; width: 600px; max-width: 96vw; height: 100vh; background: #fff; box-shadow: -4px 0 16px rgba(0,0,0,.18); transition: right .3s ease; z-index: 1000; display: flex; flex-direction: column; }
+    .drawer.open { right: 0; }
+    .drawer-head { padding: 18px 24px; background: linear-gradient(135deg, #f9f0ff, #fff0f6); border-bottom: 1px solid #f0f0f0; }
+    .drawer-head .dh-row { display: flex; align-items: center; gap: 14px; }
+    .drawer-head .dh-avatar { width: 56px; height: 56px; border-radius: 12px; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+    .drawer-head .dh-name { font-size: 18px; font-weight: 700; }
+    .drawer-head .dh-rating { font-size: 12px; color: #595959; margin-top: 4px; }
+    .drawer-head .dh-rating .star { color: #fa8c16; }
+    .drawer-head .dh-close { position: absolute; top: 14px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer; color: #8c8c8c; }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 18px 24px; }
+    .drawer-foot { padding: 14px 24px; background: #fafafa; border-top: 1px solid #f0f0f0; display: flex; gap: 10px; justify-content: flex-end; }
+
+    .drawer-section { margin-bottom: 16px; }
+    .drawer-section h3 { margin: 0 0 8px; font-size: 14px; }
+    .drawer-section .ds-content { font-size: 13px; color: #595959; line-height: 1.7; }
+
+    .price-table { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; font-size: 12px; }
+    .price-table .pt-head { color: #8c8c8c; padding: 6px 10px; background: #fafafa; border-radius: 4px; }
+    .price-table .pt-cell { padding: 8px 10px; border-bottom: 1px solid #f5f5f5; }
+    .price-table .pt-cell.price { color: #cf1322; font-weight: 600; }
+
+    .case-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .case-item { aspect-ratio: 16 / 9; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; font-size: 13px; padding: 12px; text-align: center; }
+
+    .btn { height: 36px; border: 1px solid #d9d9d9; background: #fff; border-radius: 6px; padding: 0 18px; font-size: 14px; color: #595959; cursor: pointer; }
+    .btn:hover { border-color: #91d5ff; color: #1890ff; }
+    .btn.primary { background: #1890ff; border-color: #1890ff; color: #fff; }
+    .btn.primary:hover { background: #40a9ff; border-color: #40a9ff; color: #fff; }
+
+    /* Toast */
+    .toasts { position: fixed; top: 72px; right: 20px; width: min(90vw, 360px); display: grid; gap: 8px; z-index: 1100; }
+    .toast { background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; padding: 10px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.1); animation: slideIn .25s ease-out; }
+    .toast.ok { border-color: #b7eb8f; background: #f6ffed; color: #389e0d; }
+    .toast.err { border-color: #ffccc7; background: #fff2f0; color: #cf1322; }
+    .toast.warn { border-color: #ffe58f; background: #fffbe6; color: #d48806; }
+    .toast.info { border-color: #91d5ff; background: #e6f7ff; color: #096dd9; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+    @media (max-width: 1100px) { .contractor-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding: 16px; } .contractor-grid { grid-template-columns: 1fr; } .ws-trigger { min-width: auto; } .topbar .brand-sub { display: none; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a href="platform-home-demander.html" class="brand">🎬 骋风天合<span class="brand-sub">创作门户交易平台</span></a>
+    <div class="ws-switcher">
+      <button class="ws-trigger" id="wsTrigger">
+        <span id="wsIcon">🏢</span>
+        <span class="ws-name" id="wsName">骋风天合 · 短剧制作中心</span>
+        <span class="ws-arrow">▼</span>
+      </button>
+      <div class="ws-dropdown" id="wsDropdown"></div>
+    </div>
+    <div class="identity-switch" id="identitySwitch">
+      <button data-identity="demander" class="active">📥 需求方</button>
+      <button data-identity="contractor">🛠 承制方</button>
+    </div>
+    <a href="wallet-overview.html" class="wallet-chip" id="walletChip">
+      <span>💰</span>
+      <span>
+        <span class="wallet-amount" id="walletAmount">¥185,000</span>
+        <span class="wallet-account" id="walletAccount">团队预算账户</span>
+      </span>
+    </a>
+    <div class="avatar-wrap">
+      <div class="avatar-trigger" id="avatarTrigger">
+        <img src="https://api.dicebear.com/9.x/lorelei/svg?seed=account" alt="头像">
+        <span class="avatar-name">昭岚</span>
+        <span class="ws-arrow">▼</span>
+      </div>
+      <div class="avatar-dropdown" id="avatarDropdown">
+        <a href="account-basic-info-prototype-platform-style.html"><span>👤</span> 账户基础信息</a>
+        <a href="enterprise-verification-prototype.html"><span>🏢</span> 企业认证</a>
+        <a href="account-security-prototype.html"><span>🔐</span> 账号安全</a>
+        <a href="wallet-overview.html"><span>💰</span> 我的钱包</a>
+        <div class="divider"></div>
+        <a href="#" onclick="event.preventDefault(); window.demoToast('演示环境，未实现退出', 'warn')"><span>🚪</span> 退出登录</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="app">
+    <aside class="sidebar">
+      <nav class="menu">
+        <a href="platform-home-demander.html"><span class="menu-icon">🏠</span> 工作台</a>
+        <a href="demand-publish.html"><span class="menu-icon">📤</span> 发布需求</a>
+        <a href="demand-list.html"><span class="menu-icon">📋</span> 我的需求</a>
+        <a href="contractor-marketplace.html" class="active"><span class="menu-icon">🏪</span> 承制方广场</a>
+        <a href="project-space.html"><span class="menu-icon">🤝</span> 项目协同空间</a>
+        <a href="wallet-overview.html"><span class="menu-icon">💰</span> 钱包与结算</a>
+        <div class="menu-group">
+          <div class="menu-group-title">账户</div>
+          <a href="account-basic-info-prototype-platform-style.html"><span class="menu-icon">⚙️</span> 账户中心</a>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <section class="market-banner">
+        <h1>🏪 承制方广场</h1>
+        <div class="mb-sub">浏览平台入驻的承制方能力、案例、报价区间，主动邀请合作；也可通过「发布需求」让平台撮合后再对比报价。</div>
+        <div class="mb-stats">
+          <div class="mb-stat-item"><span class="mb-stat-num">238</span> <span class="mb-stat-label">家入驻承制方</span></div>
+          <div class="mb-stat-item"><span class="mb-stat-num">42</span> <span class="mb-stat-label">家骋风天合合作过</span></div>
+          <div class="mb-stat-item"><span class="mb-stat-num">5</span> <span class="mb-stat-label">大类目可承接</span></div>
+          <div class="mb-stat-item"><span class="mb-stat-num">98%</span> <span class="mb-stat-label">订单按时交付率</span></div>
+        </div>
+      </section>
+
+      <!-- 工具栏 -->
+      <section class="toolbar">
+        <div class="filter-row">
+          <span class="filter-label">类目：</span>
+          <div class="chip-group" id="catChips">
+            <span class="chip active" data-cat="all">全部</span>
+            <span class="chip" data-cat="video">视频制作</span>
+            <span class="chip" data-cat="copy">文案服务</span>
+            <span class="chip" data-cat="image">图片设计</span>
+            <span class="chip" data-cat="content">内容创作</span>
+            <span class="chip" data-cat="license">资质服务</span>
+          </div>
+        </div>
+        <div class="filter-row">
+          <span class="filter-label">能力标签：</span>
+          <div class="chip-group" id="tagChips">
+            <span class="chip" data-tag="影视级">影视级</span>
+            <span class="chip" data-tag="短剧专精">短剧专精</span>
+            <span class="chip" data-tag="性价比">性价比</span>
+            <span class="chip" data-tag="AI 高效">AI 高效</span>
+            <span class="chip" data-tag="电影感">电影感</span>
+            <span class="chip" data-tag="原创解说">原创解说</span>
+            <span class="chip" data-tag="品牌服务">品牌服务</span>
+            <span class="chip" data-tag="新合作">新合作</span>
+          </div>
+        </div>
+        <div class="filter-row">
+          <span class="filter-label">关键词：</span>
+          <input type="text" id="searchInput" placeholder="搜索承制方名称">
+          <span style="font-size:13px;color:#595959">排序：</span>
+          <select id="sortSelect">
+            <option value="recommend">综合推荐</option>
+            <option value="rating">评分最高</option>
+            <option value="price-asc">报价从低到高</option>
+            <option value="price-desc">报价从高到低</option>
+            <option value="cooperated">合作过的优先</option>
+          </select>
+          <div class="right-area">共 <strong id="resultCount" style="color:#1890ff">0</strong> 家</div>
+        </div>
+      </section>
+
+      <!-- 承制方网格 -->
+      <div id="contractorGrid" class="contractor-grid"></div>
+    </main>
+  </div>
+
+  <!-- 承制方主页抽屉 -->
+  <div class="drawer-mask" id="drawerMask"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer-head">
+      <button class="dh-close" id="drawerClose">×</button>
+      <div class="dh-row">
+        <div class="dh-avatar" id="dhAvatar">🌟</div>
+        <div>
+          <div class="dh-name" id="dhName">星辰创作工作室</div>
+          <div class="dh-rating" id="dhRating"><span class="star">★ 4.9</span> · 86 评 · 85 单完成 · 入驻 7 年</div>
+        </div>
+      </div>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+    <div class="drawer-foot">
+      <button class="btn" id="drawerCloseBtn">关闭</button>
+      <button class="btn primary" id="drawerInviteBtn">邀请报价</button>
+    </div>
+  </div>
+
+  <div id="toastWrap" class="toasts"></div>
+
+  <!-- 共享底座 -->
+  <script src="_shared.js"></script>
+  <script>SharedHeader.mount({ activeNav: "marketplace" });</script>
+
+
+  <!-- 承制方数据 + 列表交互 -->
+  <script>
+  (function () {
+    const $ = (id) => document.getElementById(id);
+
+    const CONTRACTORS = [
+      { id: "c-xingchen", name: "星辰创作工作室", avatar: "🌟", avatarStyle: "", featured: true, cooperated: 3, foundYear: 2019, completedCount: 85, rating: 4.9, reviewCount: 86, cats: ["video"], tags: ["影视级", "短剧专精", "原创解说"], priceFrom: 12000, priceTo: 80000, intro: "8 年短剧解说与品牌片经验，原创编剧 + 配音 + 调色全链路。擅长修仙、武侠、悬疑题材。", cases: ["thumb-3", "thumb-1", "thumb-2"] },
+      { id: "c-yinhe", name: "银河剪辑社", avatar: "🌌", avatarStyle: "style-blue", cooperated: 1, foundYear: 2022, completedCount: 320, rating: 4.6, reviewCount: 312, cats: ["video", "image"], tags: ["AI 高效", "性价比", "新合作"], priceFrom: 3000, priceTo: 25000, intro: "AI 工作流为核心，月产能 80 单。性价比首选，模板化解说视频效率极高。", cases: ["thumb-2", "thumb-5", "thumb-4"] },
+      { id: "c-jinli", name: "锦鲤创意", avatar: "🎨", avatarStyle: "style-purple", featured: true, cooperated: 0, foundYear: 2017, completedCount: 42, rating: 5.0, reviewCount: 38, cats: ["video", "image"], tags: ["影视级", "电影感", "重度调色"], priceFrom: 15000, priceTo: 200000, intro: "院线美术指导团队，专注电影级调色与分镜。预算高、品质顶级。代表作《追光者》《长夜未央》。", cases: ["thumb-3", "thumb-1", "thumb-5"] },
+      { id: "c-yicheng", name: "翼程文化", avatar: "🚀", avatarStyle: "style-green", cooperated: 0, foundYear: 2021, completedCount: 156, rating: 4.7, reviewCount: 142, cats: ["video", "copy"], tags: ["性价比", "节奏紧凑", "新合作"], priceFrom: 5000, priceTo: 35000, intro: "电商营销视频专家，节奏紧凑。3 万抖音爆款经验。承接量大单也能保证交付。", cases: ["thumb-4", "thumb-2", "thumb-1"] },
+      { id: "c-shenghai", name: "声海传媒", avatar: "🎙", avatarStyle: "style-pink", cooperated: 1, foundYear: 2018, completedCount: 1240, rating: 4.8, reviewCount: 980, cats: ["content"], tags: ["原创解说", "影视级", "AI 高效"], priceFrom: 500, priceTo: 30000, intro: "国内顶级配音公司，签约 200+ 配音艺术家。语种全、音色全，影视、广告、有声书全覆盖。", cases: ["thumb-5", "thumb-3", "thumb-2"] },
+      { id: "c-secai", name: "色彩工坊", avatar: "🎨", avatarStyle: "style-pink", cooperated: 1, foundYear: 2020, completedCount: 480, rating: 4.7, reviewCount: 412, cats: ["image"], tags: ["品牌服务", "性价比"], priceFrom: 200, priceTo: 8000, intro: "海报、IP、封面图、电商主图一站式。日均产出 30 张精修，电商客户首选。", cases: ["thumb-1", "thumb-4", "thumb-5"] },
+      { id: "c-mingyao", name: "明耀文创", avatar: "✨", avatarStyle: "style-purple", cooperated: 0, foundYear: 2016, completedCount: 60, rating: 4.9, reviewCount: 54, cats: ["copy"], tags: ["品牌服务", "影视级"], priceFrom: 8000, priceTo: 100000, intro: "高端品牌文案专家。服务过 50+ 上市公司品牌发布会、年报、PR 稿件。", cases: ["thumb-3", "thumb-5", "thumb-1"] },
+      { id: "c-zhongchen", name: "众陈资质服务", avatar: "📜", avatarStyle: "style-blue", cooperated: 0, foundYear: 2014, completedCount: 2300, rating: 4.6, reviewCount: 1850, cats: ["license"], tags: ["影视级", "新合作"], priceFrom: 800, priceTo: 25000, intro: "10 年资质代办经验。营业执照、ICP、广电许可证、网络文化经营许可证全包。", cases: ["thumb-5", "thumb-4", "thumb-3"] },
+      { id: "c-xiaomi", name: "小米动画工作室", avatar: "🎬", avatarStyle: "style-green", cooperated: 0, foundYear: 2020, completedCount: 78, rating: 4.8, reviewCount: 65, cats: ["video", "content"], tags: ["影视级", "短剧专精"], priceFrom: 8000, priceTo: 60000, intro: "AI 漫剧 + 国风动画双赛道，独家三维渲染管线。月产 8-10 集中长篇 AI 漫剧。", cases: ["thumb-2", "thumb-3", "thumb-1"] }
+    ];
+
+    const CAT_LABEL = { "video": "视频制作", "copy": "文案服务", "image": "图片设计", "content": "内容创作", "license": "资质服务" };
+
+    let activeCat = "all";
+    let activeTags = [];
+    let searchKey = "";
+    let sortType = "recommend";
+
+    function render() {
+      let list = CONTRACTORS.slice();
+      if (activeCat !== "all") list = list.filter(c => c.cats.indexOf(activeCat) >= 0);
+      if (activeTags.length) list = list.filter(c => activeTags.every(t => c.tags.indexOf(t) >= 0));
+      if (searchKey) list = list.filter(c => c.name.toLowerCase().includes(searchKey.toLowerCase()));
+
+      // 排序
+      if (sortType === "rating") list.sort((a, b) => b.rating - a.rating);
+      else if (sortType === "price-asc") list.sort((a, b) => a.priceFrom - b.priceFrom);
+      else if (sortType === "price-desc") list.sort((a, b) => b.priceFrom - a.priceFrom);
+      else if (sortType === "cooperated") list.sort((a, b) => b.cooperated - a.cooperated);
+      else list.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || b.rating - a.rating);
+
+      $("resultCount").textContent = list.length;
+      const html = list.map(c => {
+        const cls = "contractor-card" + (c.cooperated > 0 ? " cooperated" : "") + (c.featured && c.cooperated === 0 ? " featured" : "");
+        const cats = c.cats.map(x => '<span class="cc-tag cat">' + CAT_LABEL[x] + '</span>').join("");
+        const tagsHtml = c.tags.slice(0, 3).map(t => '<span class="cc-tag">' + t + '</span>').join("");
+        return '<div class="' + cls + '" onclick="window.openContractor(\'' + c.id + '\')">'
+          + '<div class="cc-head">'
+            + '<div class="cc-avatar ' + (c.avatarStyle || "") + '">' + c.avatar + '</div>'
+            + '<div class="cc-name-block"><div class="cc-name">' + c.name + '</div><div class="cc-rating"><span class="star">★ ' + c.rating + '</span> · ' + c.reviewCount + ' 评 · ' + c.completedCount + ' 单</div></div>'
+          + '</div>'
+          + '<div class="cc-tags">' + cats + tagsHtml + '</div>'
+          + '<div class="cc-intro">' + c.intro + '</div>'
+          + '<div class="cc-meta-grid">'
+            + '<div class="cc-meta-item"><div class="cc-meta-label">报价区间</div><div class="cc-meta-value">' + window.fmtMoney(c.priceFrom) + ' - ' + window.fmtMoney(c.priceTo) + '</div></div>'
+            + '<div class="cc-meta-item"><div class="cc-meta-label">合作过</div><div class="cc-meta-value" style="' + (c.cooperated > 0 ? "color:#389e0d" : "") + '">' + (c.cooperated > 0 ? c.cooperated + " 次 ✓" : "未合作") + '</div></div>'
+          + '</div>'
+          + '<div class="cc-cases">'
+            + c.cases.map(t => '<div class="cc-case-thumb ' + t + '"></div>').join("")
+          + '</div>'
+          + '<div class="cc-actions">'
+            + '<button onclick="event.stopPropagation(); window.openContractor(\'' + c.id + '\')">查看主页</button>'
+            + '<button class="primary" onclick="event.stopPropagation(); window.inviteContractor(\'' + c.id + '\')">邀请报价</button>'
+          + '</div>'
+        + '</div>';
+      }).join("");
+      $("contractorGrid").innerHTML = html || '<div style="grid-column:1/-1;padding:60px;text-align:center;color:#8c8c8c">没有符合条件的承制方</div>';
+    }
+
+    // 抽屉
+    let drawerActiveId = null;
+    window.openContractor = function (id) {
+      const c = CONTRACTORS.find(x => x.id === id); if (!c) return;
+      drawerActiveId = id;
+      $("dhAvatar").textContent = c.avatar;
+      $("dhAvatar").className = "dh-avatar " + (c.avatarStyle || "");
+      $("dhName").textContent = c.name;
+      $("dhRating").innerHTML = '<span class="star">★ ' + c.rating + '</span> · ' + c.reviewCount + ' 评 · ' + c.completedCount + ' 单完成 · 入驻 ' + (2026 - c.foundYear) + ' 年';
+
+      const caseColors = ["#722ed1", "#13c2c2", "#fa541c", "#f5222d", "#1890ff", "#52c41a"];
+      const cases = ["代表作 1", "代表作 2", "代表作 3", "代表作 4", "代表作 5", "代表作 6"].map((t, i) => '<div class="case-item" style="background:linear-gradient(135deg,' + caseColors[i % caseColors.length] + ',' + caseColors[(i + 1) % caseColors.length] + ')">' + t + '</div>').join("");
+      const priceTable = c.cats.map(cat => {
+        return [
+          '<div class="pt-cell">' + CAT_LABEL[cat] + ' / 入门级</div><div class="pt-cell">' + (c.priceFrom * 0.8).toFixed(0) + ' - ' + (c.priceFrom * 1.5).toFixed(0) + '</div><div class="pt-cell">7-10 天</div>',
+          '<div class="pt-cell">' + CAT_LABEL[cat] + ' / 进阶级</div><div class="pt-cell price">' + (c.priceFrom * 1.5).toFixed(0) + ' - ' + (c.priceFrom * 4).toFixed(0) + '</div><div class="pt-cell">10-21 天</div>',
+          '<div class="pt-cell">' + CAT_LABEL[cat] + ' / 高品质</div><div class="pt-cell price">' + (c.priceFrom * 4).toFixed(0) + ' - ' + (c.priceTo).toFixed(0) + '</div><div class="pt-cell">21-45 天</div>'
+        ].join("");
+      }).join("");
+
+      $("drawerBody").innerHTML = ''
+        + '<div class="drawer-section"><h3>承制方简介</h3><div class="ds-content">' + c.intro + '<br><br>能力标签：<strong style="color:#1890ff">' + c.tags.join(" / ") + '</strong></div></div>'
+        + '<div class="drawer-section"><h3>报价区间（' + c.cats.map(x => CAT_LABEL[x]).join(" / ") + '）</h3><div class="price-table"><div class="pt-head">服务等级</div><div class="pt-head">报价（¥）</div><div class="pt-head">交期</div>' + priceTable + '</div></div>'
+        + '<div class="drawer-section"><h3>历史合作</h3><div class="ds-content">'
+          + (c.cooperated > 0 ? '🤝 与骋风天合已合作 <strong style="color:#389e0d">' + c.cooperated + ' 次</strong>，按时交付率 100%。<br>' : '本承制方<strong>暂未与骋风天合合作过</strong>。<br>')
+          + '平台累计完成 <strong>' + c.completedCount + '</strong> 单，好评率 <strong>' + (c.rating / 5 * 100).toFixed(1) + '%</strong>。'
+        + '</div></div>'
+        + '<div class="drawer-section"><h3>代表作品（mock）</h3><div class="case-grid">' + cases + '</div></div>'
+        + '<div class="drawer-section"><h3>团队成员</h3><div class="ds-content">总监 1 名、主创 ' + (3 + c.cooperated) + ' 名、后期 ' + (5 + Math.floor(c.completedCount / 50)) + ' 名。配备完整的 AI 工作流与版权审核机制。</div></div>';
+
+      $("drawerMask").classList.add("open");
+      $("drawer").classList.add("open");
+    };
+    function closeDrawer() {
+      $("drawerMask").classList.remove("open");
+      $("drawer").classList.remove("open");
+      drawerActiveId = null;
+    }
+    $("drawerMask").addEventListener("click", closeDrawer);
+    $("drawerClose").addEventListener("click", closeDrawer);
+    $("drawerCloseBtn").addEventListener("click", closeDrawer);
+    $("drawerInviteBtn").addEventListener("click", () => { if (drawerActiveId) window.inviteContractor(drawerActiveId); });
+
+    window.inviteContractor = function (id) {
+      const c = CONTRACTORS.find(x => x.id === id); if (!c) return;
+      window.demoToast("✉️ 已向「" + c.name + "」发出报价邀请，将在「我的需求」中收到该承制方的报价", "ok");
+      setTimeout(() => window.demoToast("提示：先发布需求，平台再撮合 → 报价对比 是更典型的流程", "info"), 1500);
+      closeDrawer();
+    };
+
+    // 筛选交互
+    $("catChips").querySelectorAll(".chip").forEach(el => el.addEventListener("click", () => {
+      $("catChips").querySelectorAll(".chip").forEach(x => x.classList.remove("active"));
+      el.classList.add("active");
+      activeCat = el.getAttribute("data-cat");
+      render();
+    }));
+    $("tagChips").querySelectorAll(".chip").forEach(el => el.addEventListener("click", () => {
+      el.classList.toggle("active");
+      const tag = el.getAttribute("data-tag");
+      const i = activeTags.indexOf(tag);
+      if (i >= 0) activeTags.splice(i, 1); else activeTags.push(tag);
+      render();
+    }));
+    $("searchInput").addEventListener("input", e => { searchKey = e.target.value.trim(); render(); });
+    $("sortSelect").addEventListener("change", e => { sortType = e.target.value; render(); });
+
+    render();
+  })();
+  </script>
+</body>
+</html>

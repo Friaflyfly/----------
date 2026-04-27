@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的需求 - 骋风天合 · 创作门户交易平台</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #262626; }
+
+    /* 顶部全局栏 */
+    .topbar { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.06); z-index: 200; display: flex; align-items: center; padding: 0 20px; gap: 16px; }
+    .topbar .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 16px; color: #1890ff; text-decoration: none; min-width: 220px; }
+    .topbar .brand-sub { color: #8c8c8c; font-weight: 400; font-size: 12px; margin-left: 4px; }
+    .ws-switcher { position: relative; }
+    .ws-trigger { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid #e8e8e8; border-radius: 6px; background: #fafafa; cursor: pointer; font-size: 13px; min-width: 240px; }
+    .ws-trigger:hover { border-color: #1890ff; background: #e6f7ff; }
+    .ws-trigger .ws-name { font-weight: 500; color: #262626; flex: 1; }
+    .ws-trigger .ws-arrow { color: #8c8c8c; font-size: 10px; }
+    .ws-dropdown { display: none; position: absolute; top: calc(100% + 6px); left: 0; min-width: 320px; background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,.12); padding: 8px; z-index: 300; }
+    .ws-dropdown.open { display: block; }
+    .ws-group-label { font-size: 12px; color: #8c8c8c; padding: 6px 10px; }
+    .ws-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+    .ws-item:hover { background: #f0f7ff; }
+    .ws-item.active { background: #e6f7ff; }
+    .ws-item .ws-item-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .ws-item .ws-item-icon.personal { background: #fff7e6; color: #fa8c16; }
+    .ws-item .ws-item-icon.team { background: #e6f7ff; color: #1890ff; }
+    .ws-item .ws-item-icon.admin { background: #f9f0ff; color: #722ed1; }
+    .ws-item .ws-item-main { flex: 1; min-width: 0; }
+    .ws-item .ws-item-name { font-weight: 500; color: #262626; }
+    .ws-item .ws-item-desc { font-size: 12px; color: #8c8c8c; margin-top: 2px; }
+    .ws-item .ws-item-check { color: #1890ff; font-size: 14px; }
+    .identity-switch { display: flex; gap: 4px; background: #f0f0f0; border-radius: 18px; padding: 3px; }
+    .identity-switch button { border: none; background: transparent; padding: 5px 14px; border-radius: 16px; font-size: 13px; color: #595959; cursor: pointer; }
+    .identity-switch button.active { background: #fff; color: #1890ff; box-shadow: 0 1px 2px rgba(0,0,0,.06); font-weight: 500; }
+    .wallet-chip { display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: linear-gradient(135deg, #fff7e6, #fff1d6); border: 1px solid #ffd591; border-radius: 18px; cursor: pointer; font-size: 13px; color: #d46b08; text-decoration: none; }
+    .wallet-chip:hover { border-color: #fa8c16; }
+    .wallet-chip .wallet-amount { font-weight: 600; font-size: 14px; }
+    .wallet-chip .wallet-account { font-size: 11px; opacity: .85; }
+    .avatar-wrap { position: relative; margin-left: auto; }
+    .avatar-trigger { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px 8px; border-radius: 18px; }
+    .avatar-trigger:hover { background: #f5f5f5; }
+    .avatar-trigger img { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #f0f0f0; }
+    .avatar-trigger .avatar-name { font-size: 13px; color: #262626; }
+    .avatar-dropdown { display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 220px; background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,.12); padding: 8px; z-index: 300; }
+    .avatar-dropdown.open { display: block; }
+    .avatar-dropdown a { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 6px; color: #262626; text-decoration: none; font-size: 13px; }
+    .avatar-dropdown a:hover { background: #f0f7ff; color: #1890ff; }
+    .avatar-dropdown .divider { height: 1px; background: #f0f0f0; margin: 6px 4px; }
+
+    /* 布局 */
+    .app { display: flex; padding-top: 56px; min-height: 100vh; }
+    .sidebar { width: 200px; background: #fff; box-shadow: 2px 0 8px rgba(0,0,0,.06); position: fixed; top: 56px; left: 0; bottom: 0; padding: 16px 0; overflow-y: auto; }
+    .menu a { display: flex; align-items: center; gap: 10px; padding: 11px 24px; color: #262626; text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
+    .menu a:hover { background: #f0f7ff; color: #1890ff; }
+    .menu a.active { background: #e6f7ff; color: #1890ff; border-left-color: #1890ff; font-weight: 500; }
+    .menu-icon { width: 18px; text-align: center; }
+    .menu-group { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+    .menu-group-title { padding: 8px 24px; font-size: 11px; color: #8c8c8c; text-transform: uppercase; letter-spacing: .5px; }
+    .main { margin-left: 200px; flex: 1; padding: 24px 28px; }
+
+    /* 页头 */
+    .page-head { background: #fff; border-radius: 8px; padding: 18px 24px; margin-bottom: 14px; }
+    .page-head h1 { margin: 0 0 4px; font-size: 22px; }
+    .page-head .sub { color: #8c8c8c; font-size: 13px; }
+    .page-head .new-btn { float: right; }
+
+    /* 状态卡片栏 */
+    .stat-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 14px; }
+    .stat-card { background: #fff; border-radius: 8px; padding: 14px 16px; cursor: pointer; transition: all .2s; border: 1px solid transparent; }
+    .stat-card:hover { border-color: #91d5ff; box-shadow: 0 2px 8px rgba(24,144,255,.1); }
+    .stat-card.active { border-color: #1890ff; background: #e6f7ff; }
+    .stat-card .stat-label { font-size: 12px; color: #8c8c8c; margin-bottom: 4px; }
+    .stat-card .stat-value { font-size: 22px; font-weight: 700; color: #262626; }
+    .stat-card.active .stat-value { color: #1890ff; }
+    .stat-card .stat-suffix { font-size: 13px; color: #8c8c8c; margin-left: 4px; font-weight: 400; }
+
+    /* 工具栏 */
+    .toolbar { background: #fff; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .toolbar .filter-label { font-size: 13px; color: #595959; }
+    .toolbar select { height: 32px; border: 1px solid #d9d9d9; border-radius: 6px; padding: 0 28px 0 10px; font-size: 13px; outline: none; cursor: pointer; }
+    .toolbar select:focus { border-color: #40a9ff; }
+    .toolbar input[type=text] { height: 32px; border: 1px solid #d9d9d9; border-radius: 6px; padding: 0 10px; font-size: 13px; outline: none; min-width: 220px; }
+    .toolbar input[type=text]:focus { border-color: #40a9ff; }
+    .toolbar .right { margin-left: auto; }
+
+    /* 列表 */
+    .list-table { background: #fff; border-radius: 8px; overflow: hidden; }
+    .list-row { display: grid; grid-template-columns: 1.5fr 1.2fr 1fr 1fr 0.8fr 1fr 0.9fr; padding: 14px 18px; align-items: center; border-bottom: 1px solid #f0f0f0; transition: background .15s; }
+    .list-row:last-child { border-bottom: none; }
+    .list-row.head { background: #fafafa; font-size: 12px; color: #8c8c8c; font-weight: 500; }
+    .list-row:not(.head):hover { background: #f0f7ff; }
+    .list-row.highlight { background: #fff7e6; animation: flash 1.5s ease; }
+    @keyframes flash { 0% { background: #ffe58f; } 100% { background: #fff7e6; } }
+
+    .demand-title { font-weight: 500; color: #262626; }
+    .demand-id { font-size: 12px; color: #8c8c8c; margin-top: 2px; font-family: monospace; }
+    .ws-pill { display: inline-block; padding: 2px 8px; background: #f5f5f5; border-radius: 10px; font-size: 11px; color: #595959; margin-top: 2px; }
+    .ws-pill.cf-drama { background: #e6f7ff; color: #096dd9; }
+    .ws-pill.cf-marketing { background: #fff0f6; color: #c41d7f; }
+    .ws-pill.cf-ip { background: #f9f0ff; color: #531dab; }
+    .ws-pill.personal { background: #fff7e6; color: #d46b08; }
+    .ws-pill.cf-admin { background: #f9f0ff; color: #531dab; }
+
+    .status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 11px; font-size: 12px; font-weight: 500; }
+    .status-badge.auditing { background: #fff7e6; color: #d46b08; }
+    .status-badge.matching { background: #e6f7ff; color: #1890ff; }
+    .status-badge.quoting { background: #fff1f0; color: #cf1322; }
+    .status-badge.in-progress { background: #f6ffed; color: #389e0d; }
+    .status-badge.completed { background: #f0f0f0; color: #595959; }
+
+    .quotes-count { display: inline-flex; align-items: center; gap: 4px; }
+    .quotes-count.active { color: #cf1322; font-weight: 600; }
+    .quotes-count.active::before { content: "🔥"; }
+
+    .row-actions { display: flex; gap: 6px; }
+    .btn-link { padding: 4px 10px; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff; color: #595959; font-size: 12px; cursor: pointer; text-decoration: none; }
+    .btn-link:hover { border-color: #1890ff; color: #1890ff; }
+    .btn-link.primary { background: #1890ff; border-color: #1890ff; color: #fff; }
+    .btn-link.primary:hover { background: #40a9ff; border-color: #40a9ff; color: #fff; }
+    .btn-link.urgent { background: #ff4d4f; border-color: #ff4d4f; color: #fff; }
+    .btn-link.urgent:hover { background: #ff7875; border-color: #ff7875; color: #fff; }
+
+    .empty { padding: 60px 20px; text-align: center; color: #8c8c8c; font-size: 14px; }
+    .empty .empty-icon { font-size: 40px; margin-bottom: 10px; }
+
+    .btn { height: 36px; border: 1px solid #d9d9d9; background: #fff; border-radius: 6px; padding: 0 18px; font-size: 14px; color: #595959; cursor: pointer; }
+    .btn.primary { background: #1890ff; border-color: #1890ff; color: #fff; }
+    .btn.primary:hover { background: #40a9ff; border-color: #40a9ff; color: #fff; }
+
+    /* Toast */
+    .toasts { position: fixed; top: 72px; right: 20px; width: min(90vw, 360px); display: grid; gap: 8px; z-index: 500; }
+    .toast { background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; padding: 10px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.1); animation: slideIn .25s ease-out; }
+    .toast.ok { border-color: #b7eb8f; background: #f6ffed; color: #389e0d; }
+    .toast.err { border-color: #ffccc7; background: #fff2f0; color: #cf1322; }
+    .toast.warn { border-color: #ffe58f; background: #fffbe6; color: #d48806; }
+    .toast.info { border-color: #91d5ff; background: #e6f7ff; color: #096dd9; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+    @media (max-width: 1100px) {
+      .stat-row { grid-template-columns: repeat(3, 1fr); }
+      .list-row { grid-template-columns: 2fr 1.2fr 1fr; }
+      .list-row > :nth-child(n+4) { display: none; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 16px; }
+      .stat-row { grid-template-columns: repeat(2, 1fr); }
+      .ws-trigger { min-width: auto; }
+      .topbar .brand-sub { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a href="platform-home-demander.html" class="brand">🎬 骋风天合<span class="brand-sub">创作门户交易平台</span></a>
+    <div class="ws-switcher">
+      <button class="ws-trigger" id="wsTrigger">
+        <span id="wsIcon">🏢</span>
+        <span class="ws-name" id="wsName">骋风天合 · 短剧制作中心</span>
+        <span class="ws-arrow">▼</span>
+      </button>
+      <div class="ws-dropdown" id="wsDropdown"></div>
+    </div>
+    <div class="identity-switch" id="identitySwitch">
+      <button data-identity="demander" class="active">📥 需求方</button>
+      <button data-identity="contractor">🛠 承制方</button>
+    </div>
+    <a href="wallet-overview.html" class="wallet-chip" id="walletChip">
+      <span>💰</span>
+      <span>
+        <span class="wallet-amount" id="walletAmount">¥185,000</span>
+        <span class="wallet-account" id="walletAccount">团队预算账户</span>
+      </span>
+    </a>
+    <div class="avatar-wrap">
+      <div class="avatar-trigger" id="avatarTrigger">
+        <img src="https://api.dicebear.com/9.x/lorelei/svg?seed=account" alt="头像">
+        <span class="avatar-name">昭岚</span>
+        <span class="ws-arrow">▼</span>
+      </div>
+      <div class="avatar-dropdown" id="avatarDropdown">
+        <a href="account-basic-info-prototype-platform-style.html"><span>👤</span> 账户基础信息</a>
+        <a href="enterprise-verification-prototype.html"><span>🏢</span> 企业认证</a>
+        <a href="account-security-prototype.html"><span>🔐</span> 账号安全</a>
+        <a href="wallet-overview.html"><span>💰</span> 我的钱包</a>
+        <div class="divider"></div>
+        <a href="#" onclick="event.preventDefault(); window.demoToast('演示环境，未实现退出', 'warn')"><span>🚪</span> 退出登录</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="app">
+    <aside class="sidebar">
+      <nav class="menu">
+        <a href="platform-home-demander.html"><span class="menu-icon">🏠</span> 工作台</a>
+        <a href="demand-publish.html"><span class="menu-icon">📤</span> 发布需求</a>
+        <a href="demand-list.html" class="active"><span class="menu-icon">📋</span> 我的需求</a>
+        <a href="contractor-marketplace.html"><span class="menu-icon">🏪</span> 承制方广场</a>
+        <a href="project-space.html"><span class="menu-icon">🤝</span> 项目协同空间</a>
+        <a href="wallet-overview.html"><span class="menu-icon">💰</span> 钱包与结算</a>
+        <div class="menu-group">
+          <div class="menu-group-title">账户</div>
+          <a href="account-basic-info-prototype-platform-style.html"><span class="menu-icon">⚙️</span> 账户中心</a>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <section class="page-head">
+        <a href="demand-publish.html" class="btn primary new-btn">📤 发布新需求</a>
+        <h1>📋 我的需求</h1>
+        <div class="sub">查看所有空间下的需求与订单状态。可按工作空间筛选只看当前空间相关的内容。</div>
+      </section>
+
+      <!-- 状态聚合卡 -->
+      <div class="stat-row" id="statRow"></div>
+
+      <!-- 工具栏 -->
+      <section class="toolbar">
+        <span class="filter-label">空间范围：</span>
+        <select id="filterScope">
+          <option value="current">仅当前空间</option>
+          <option value="all" selected>所有空间（我参与的）</option>
+        </select>
+        <span class="filter-label">类目：</span>
+        <select id="filterCat">
+          <option value="">全部类目</option>
+          <option value="视频制作">视频制作</option>
+          <option value="文案服务">文案服务</option>
+          <option value="图片设计">图片设计</option>
+          <option value="内容创作">内容创作</option>
+          <option value="资质服务">资质服务</option>
+        </select>
+        <input type="text" id="searchInput" placeholder="搜索需求名 / 需求号">
+        <span class="right" style="font-size:12px;color:#8c8c8c" id="resultCount">共 0 条</span>
+      </section>
+
+      <!-- 列表 -->
+      <section class="list-table" id="listTable">
+        <div class="list-row head">
+          <div>需求</div>
+          <div>类目</div>
+          <div>归属空间</div>
+          <div>状态</div>
+          <div>报价数</div>
+          <div>预算 / 截止</div>
+          <div>操作</div>
+        </div>
+        <div id="listBody"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toastWrap" class="toasts"></div>
+
+  <!-- 共享底座（demoApp / demoToast / fmtMoney / SharedHeader） -->
+  <script src="_shared.js"></script>
+  <script>SharedHeader.mount({ activeNav: "my-demands" });</script>
+
+
+  <!-- 列表交互 -->
+  <script>
+  (function () {
+    const $ = (id) => document.getElementById(id);
+
+    const STATUS_CONFIG = {
+      "auditing":   { label: "📋 审核中", className: "auditing", desc: "平台核定需求中（≤24h）" },
+      "matching":   { label: "🔍 撮合中", className: "matching", desc: "已通过审核，承制方报价中" },
+      "quoting":    { label: "💬 待选承制方", className: "quoting", desc: "已收到报价，请尽快选定" },
+      "in-progress":{ label: "🛠 进行中", className: "in-progress", desc: "已下单，承制方制作中" },
+      "completed":  { label: "✅ 已完成", className: "completed", desc: "已结算" }
+    };
+
+    let activeStatus = "all";
+    let activeScope = "all";
+    let activeCat = "";
+    let searchKey = "";
+    const highlightId = new URLSearchParams(location.search).get("highlight");
+
+    function renderStats() {
+      const all = window.demoApp.getDemands();
+      const filtered = activeScope === "current" ? all.filter((d) => d.workspace === window.demoApp.getCurrentWorkspaceId()) : all;
+      const counts = { all: filtered.length };
+      Object.keys(STATUS_CONFIG).forEach((k) => { counts[k] = filtered.filter((d) => d.status === k).length; });
+      const cards = [
+        { key: "all", label: "全部", value: counts.all, suffix: "条" },
+        { key: "auditing", label: "审核中", value: counts.auditing, suffix: "条" },
+        { key: "matching", label: "撮合中", value: counts.matching, suffix: "条" },
+        { key: "quoting", label: "待选承制方", value: counts.quoting, suffix: "条" },
+        { key: "in-progress", label: "进行中", value: counts["in-progress"], suffix: "条" }
+      ];
+      const html = cards.map((c) => '<div class="stat-card ' + (activeStatus === c.key ? "active" : "") + '" data-status="' + c.key + '"><div class="stat-label">' + c.label + '</div><div class="stat-value">' + c.value + '<span class="stat-suffix">' + c.suffix + '</span></div></div>').join("");
+      $("statRow").innerHTML = html;
+      $("statRow").querySelectorAll(".stat-card").forEach((el) => {
+        el.addEventListener("click", () => { activeStatus = el.getAttribute("data-status"); render(); });
+      });
+    }
+
+    function render() {
+      const all = window.demoApp.getDemands();
+      const curWs = window.demoApp.getCurrentWorkspaceId();
+      let list = activeScope === "current" ? all.filter((d) => d.workspace === curWs) : all;
+      if (activeStatus !== "all") list = list.filter((d) => d.status === activeStatus);
+      if (activeCat) list = list.filter((d) => (d.category || "").indexOf(activeCat) === 0);
+      if (searchKey) {
+        const k = searchKey.toLowerCase();
+        list = list.filter((d) => (d.title || "").toLowerCase().includes(k) || (d.id || "").toLowerCase().includes(k));
+      }
+      $("resultCount").textContent = "共 " + list.length + " 条";
+      const body = $("listBody");
+      if (!list.length) {
+        body.innerHTML = '<div class="empty"><div class="empty-icon">📭</div>没有符合条件的需求<br><a href="demand-publish.html" style="color:#1890ff;text-decoration:none">→ 立即发布一个新需求</a></div>';
+        renderStats();
+        return;
+      }
+      const html = list.map((d) => {
+        const status = STATUS_CONFIG[d.status] || { label: d.status, className: "" };
+        const ws = window.demoApp.WORKSPACES[d.workspace] || { name: d.workspaceName || d.workspace };
+        const wsClass = "ws-pill " + d.workspace;
+        const isHighlight = d.id === highlightId;
+        // 操作按钮
+        let actions = "";
+        if (d.status === "quoting") actions = '<a class="btn-link urgent" href="demand-quote-comparison.html?demandId=' + d.id + '">对比报价 (' + d.quotesCount + ')</a>';
+        else if (d.status === "in-progress") actions = '<a class="btn-link primary" href="project-space.html?orderId=OD-2026042307&demandId=' + d.id + '">查看进度 →</a>';
+        else if (d.status === "matching") actions = '<button class="btn-link" onclick="window.demoToast(\'承制方报价中，请耐心等待\', \'info\')">详情</button>';
+        else if (d.status === "auditing") actions = '<button class="btn-link" onclick="window.demoToast(\'平台正在核定需求\', \'info\')">详情</button>';
+        else actions = '<button class="btn-link" onclick="window.demoToast(\'订单归档详情下版本补齐\', \'info\')">归档</button>';
+        const quoteCell = d.quotesCount > 0 ? '<span class="quotes-count ' + (d.status === "quoting" ? "active" : "") + '">' + d.quotesCount + ' 家</span>' : '<span style="color:#bfbfbf">—</span>';
+        const contractor = d.contractor ? '<div style="font-size:12px;color:#1890ff;margin-top:2px">承制方：' + d.contractor + '</div>' : '';
+        return '<div class="list-row ' + (isHighlight ? "highlight" : "") + '">'
+          + '<div><div class="demand-title">' + d.title + '</div><div class="demand-id">' + d.id + ' · ' + d.createTime + '</div>' + contractor + '</div>'
+          + '<div style="font-size:13px;color:#595959">' + d.category + '</div>'
+          + '<div><span class="' + wsClass + '">' + ws.name + '</span><div style="font-size:11px;color:#8c8c8c;margin-top:2px">扣款：' + (d.payerLabel || "—") + '</div></div>'
+          + '<div><span class="status-badge ' + status.className + '">' + status.label + '</span><div style="font-size:11px;color:#8c8c8c;margin-top:2px">' + status.desc + '</div></div>'
+          + '<div>' + quoteCell + '</div>'
+          + '<div><div style="font-weight:500">' + window.fmtMoney(d.budget) + '</div><div style="font-size:11px;color:#8c8c8c">截止 ' + d.deadline + '</div></div>'
+          + '<div class="row-actions">' + actions + '</div>'
+          + '</div>';
+      }).join("");
+      body.innerHTML = html;
+      renderStats();
+      if (isHighlightInList(list)) {
+        setTimeout(() => {
+          const el = body.querySelector(".list-row.highlight");
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 100);
+      }
+    }
+
+    function isHighlightInList(list) { return highlightId && list.some((d) => d.id === highlightId); }
+
+    $("filterScope").addEventListener("change", (e) => { activeScope = e.target.value; render(); });
+    $("filterCat").addEventListener("change", (e) => { activeCat = e.target.value; render(); });
+    $("searchInput").addEventListener("input", (e) => { searchKey = e.target.value.trim(); render(); });
+
+    window.onWorkspaceChanged = () => render();
+
+    // 提示新提交
+    if (highlightId) {
+      const all = window.demoApp.getDemands();
+      const d = all.find((x) => x.id === highlightId);
+      if (d) {
+        setTimeout(() => window.demoToast("✅ 需求 " + highlightId + " 已提交，预计 24h 内出报价", "ok"), 300);
+      }
+    }
+
+    render();
+  })();
+  </script>
+</body>
+</html>

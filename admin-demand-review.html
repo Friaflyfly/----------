@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>需求核定 - 平台运营后台</title>
+  <link rel="stylesheet" href="_shared.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #262626; }
+    .ops-banner { background: linear-gradient(135deg, #13c2c2, #006d75); color: #fff; font-size: 12px; text-align: center; padding: 6px; position: fixed; top: 56px; left: 0; right: 0; z-index: 190; }
+    .app { display: flex; padding-top: 84px; min-height: 100vh; }
+    .sidebar { width: 200px; background: #fff; box-shadow: 2px 0 8px rgba(0,0,0,.06); position: fixed; top: 84px; left: 0; bottom: 0; padding: 16px 0; overflow-y: auto; }
+    .menu a { display: flex; align-items: center; gap: 10px; padding: 11px 24px; color: #262626; text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
+    .menu a:hover { background: #f0f7ff; color: #1890ff; }
+    .menu a.active { background: #e6fffb; color: #13c2c2; border-left-color: #13c2c2; font-weight: 500; }
+    .menu-icon { width: 18px; text-align: center; }
+    .menu-group { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+    .menu-group-title { padding: 8px 24px; font-size: 11px; color: #8c8c8c; }
+    .main { margin-left: 200px; flex: 1; padding: 24px 28px 60px; }
+    .page-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+    .page-head h1 { margin: 0 0 6px; font-size: 22px; }
+    .page-head .sub { color: #8c8c8c; font-size: 13px; }
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+    .kpi { background: #fff; border-radius: 10px; padding: 16px 18px; box-shadow: 0 2px 6px rgba(0,0,0,.04); }
+    .kpi .label { font-size: 12px; color: #8c8c8c; }
+    .kpi .value { font-size: 26px; font-weight: 700; margin: 6px 0 4px; color: #006d75; }
+    .kpi .note { font-size: 11px; color: #8c8c8c; }
+    .toolbar { background: #fff; border-radius: 10px; padding: 14px 16px; box-shadow: 0 2px 6px rgba(0,0,0,.04); display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+    .tabs { display: flex; gap: 6px; }
+    .tab { border: none; background: #f5f5f5; color: #595959; border-radius: 16px; padding: 6px 14px; cursor: pointer; font-size: 13px; }
+    .tab.active { background: #e6fffb; color: #13c2c2; font-weight: 500; }
+    .search { margin-left: auto; height: 34px; min-width: 260px; border: 1px solid #d9d9d9; border-radius: 6px; padding: 0 12px; font-size: 13px; }
+    .btn { height: 34px; border: 1px solid #d9d9d9; background: #fff; border-radius: 6px; padding: 0 16px; font-size: 13px; color: #595959; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .btn:hover { border-color: #87e8de; color: #13c2c2; }
+    .btn.primary { background: #13c2c2; border-color: #13c2c2; color: #fff; }
+    .btn.primary:hover { background: #36cfc9; }
+    .btn.danger { border-color: #ffccc7; color: #cf1322; }
+    .btn.danger:hover { background: #fff1f0; }
+    .list { display: grid; gap: 12px; }
+    .review-card { background: #fff; border-radius: 10px; padding: 18px 20px; box-shadow: 0 2px 6px rgba(0,0,0,.04); border-left: 4px solid #d9d9d9; transition: all .18s; }
+    .review-card:hover { box-shadow: 0 6px 16px rgba(0,0,0,.08); }
+    .review-card.pending { border-left-color: #faad14; }
+    .review-card.approved { border-left-color: #52c41a; }
+    .review-card.rejected { border-left-color: #ff4d4f; }
+    .rc-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .rc-title { font-size: 16px; font-weight: 700; }
+    .rc-id { font-size: 12px; color: #8c8c8c; font-family: monospace; margin-top: 3px; }
+    .badge { display: inline-block; padding: 3px 9px; border-radius: 11px; font-size: 11px; }
+    .badge.pending { background: #fffbe6; color: #d48806; }
+    .badge.approved { background: #f6ffed; color: #389e0d; }
+    .badge.rejected { background: #fff1f0; color: #cf1322; }
+    .tag { display: inline-block; padding: 2px 8px; background: #f5f5f5; border-radius: 10px; font-size: 11px; color: #595959; margin-right: 4px; }
+    .rc-meta { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 14px 0; margin-top: 12px; border-top: 1px dashed #f0f0f0; }
+    .meta-label { font-size: 11px; color: #8c8c8c; margin-bottom: 3px; }
+    .meta-value { font-size: 13px; font-weight: 500; }
+    .rc-detail { margin-top: 12px; padding: 14px 16px; background: #fafafa; border-radius: 8px; font-size: 13px; line-height: 1.7; color: #595959; display: none; }
+    .rc-detail.open { display: block; }
+    .rc-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; align-items: center; }
+    .rc-toggle { font-size: 12px; color: #13c2c2; cursor: pointer; margin-right: auto; }
+    .modal-mask { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 900; align-items: center; justify-content: center; }
+    .modal-mask.open { display: flex; }
+    .modal { width: min(92vw, 520px); background: #fff; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.22); overflow: hidden; }
+    .modal-head { padding: 18px 22px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+    .modal-head h3 { margin: 0; font-size: 17px; }
+    .modal-close { border: none; background: transparent; font-size: 22px; cursor: pointer; color: #8c8c8c; }
+    .modal-body { padding: 20px 22px; }
+    .modal-foot { padding: 14px 22px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 8px; }
+    .form-row { margin-bottom: 14px; }
+    .form-row label { display: block; font-size: 12px; color: #8c8c8c; margin-bottom: 5px; }
+    .form-row textarea { width: 100%; border: 1px solid #d9d9d9; border-radius: 6px; padding: 8px 10px; font-size: 13px; font-family: inherit; min-height: 60px; }
+    .form-row select { width: 100%; border: 1px solid #d9d9d9; border-radius: 6px; padding: 8px 10px; font-size: 13px; }
+    .toasts { position: fixed; top: 100px; right: 20px; width: min(90vw, 360px); display: grid; gap: 8px; z-index: 1100; }
+    .toast { background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; padding: 10px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.1); animation: slideIn .25s ease-out; }
+    .toast.ok { border-color: #b7eb8f; background: #f6ffed; color: #389e0d; }
+    .toast.info { border-color: #91d5ff; background: #e6f7ff; color: #096dd9; }
+    .toast.warn { border-color: #ffe58f; background: #fffbe6; color: #d48806; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(2, 1fr); } .rc-meta { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding: 16px; } }
+  </style>
+</head>
+<body>
+  <header class="topbar" id="topbar-shared"></header>
+  <div class="ops-banner">🔍 平台运营后台 · 需求核定 · 审核通过后进入承制方匹配</div>
+  <div class="app">
+    <aside class="sidebar">
+      <nav class="menu">
+        <a href="admin-demand-review.html" class="active"><span class="menu-icon">🔍</span> 需求核定</a>
+        <a href="admin-onboarding-review.html"><span class="menu-icon">📋</span> 入驻审核</a>
+        <a href="admin-finance.html"><span class="menu-icon">💰</span> 财务结算</a>
+        <a href="admin-category-config.html"><span class="menu-icon">🏷</span> 类目配置</a>
+        <div class="menu-group">
+          <div class="menu-group-title">跳转</div>
+          <a href="admin-console.html"><span class="menu-icon">👑</span> 管理员后台</a>
+          <a href="platform-home-demander.html"><span class="menu-icon">📥</span> 需求方工作台</a>
+          <a href="demo-index.html"><span class="menu-icon">📋</span> Demo 导航</a>
+        </div>
+      </nav>
+    </aside>
+    <main class="main">
+      <div class="page-head">
+        <div>
+          <h1>需求核定</h1>
+          <div class="sub">需求方发布 → 平台审核 → 通过后进入承制方撮合。驳回附原因后需求方可修改重提。</div>
+        </div>
+      </div>
+      <section class="kpis">
+        <div class="kpi"><div class="label">待审核</div><div class="value" id="kpiPending">0</div><div class="note">应在 24h 内处理</div></div>
+        <div class="kpi"><div class="label">今日已审</div><div class="value" id="kpiToday">0</div><div class="note">通过率 83%</div></div>
+        <div class="kpi"><div class="label">本周驳回</div><div class="value" id="kpiRejected">0</div><div class="note">主因：预算不合理</div></div>
+        <div class="kpi"><div class="label">平均审核时长</div><div class="value">4.2h</div><div class="note">目标 &lt; 12h</div></div>
+      </section>
+      <section class="toolbar">
+        <div class="tabs" id="tabs">
+          <button class="tab active" data-s="all">全部</button>
+          <button class="tab" data-s="pending">待审核</button>
+          <button class="tab" data-s="approved">已通过</button>
+          <button class="tab" data-s="rejected">已驳回</button>
+        </div>
+        <input class="search" id="search" placeholder="搜索需求标题 / 提交方 / ID">
+      </section>
+      <section class="list" id="list"></section>
+    </main>
+  </div>
+
+  <div class="modal-mask" id="rejectModal">
+    <div class="modal">
+      <div class="modal-head"><h3>驳回需求</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+      <div class="modal-body">
+        <div class="form-row"><label>驳回原因</label>
+          <select id="rejectReason">
+            <option>预算不合理（低于类目均价 50%）</option>
+            <option>需求描述不清晰，缺少关键字段</option>
+            <option>涉及违规内容</option>
+            <option>重复提交</option>
+            <option>其他</option>
+          </select>
+        </div>
+        <div class="form-row"><label>补充说明（可选）</label><textarea id="rejectNote" placeholder="给需求方的修改建议..."></textarea></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeModal()">取消</button>
+        <button class="btn danger" onclick="confirmReject()">确认驳回</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastWrap" class="toasts"></div>
+  <script src="_shared.js"></script>
+  <script>
+    SharedHeader.mount({ activeNav: "ops-review", brandHref: "admin-demand-review.html", brandLabel: "🔍 运营后台", brandSub: "骋风天合 · 平台运营" });
+
+    var state = { tab: 'all', q: '', rejectingId: null };
+
+    var reviewQueue = [
+      { id: 'DM-2026042715', title: '短剧《仙途》宣传物料全案', submitter: '骋风天合 · 短剧制作中心', submitterUser: '昭岚', category: '图片设计 / 海报设计', budget: 45000, deadline: '2026-05-15', submitTime: '2026-04-27 08:30', status: 'pending', tags: ['修仙', '海报', '全案'], desc: '需要 5 张横版海报 + 3 张竖版 + 1 套朋友圈九宫格。要求影视质感，参考《庆余年》物料风格。预算含 2 轮修改。', riskFlags: [] },
+      { id: 'DM-2026042714', title: '抖音短视频脚本（搞笑赛道）', submitter: '骋风天合 · 市场宣传组', submitterUser: '陈思齐', category: '文案服务 / 短视频脚本', budget: 2000, deadline: '2026-05-03', submitTime: '2026-04-27 07:45', status: 'pending', tags: ['抖音', '搞笑', '原创'], desc: '10 条 60s 以内的搞笑段子脚本，适合达人口播。需要原创，不能搬运。', riskFlags: ['预算偏低'] },
+      { id: 'DM-2026042512', title: '三集短剧解说视频（修仙题材）', submitter: '骋风天合 · 短剧制作中心', submitterUser: '昭岚', category: '视频制作 / 解说视频', budget: 18000, deadline: '2026-05-08', submitTime: '2026-04-25 15:32', status: 'approved', tags: ['视频制作', '修仙', '解说'], desc: '3 集 × 5min 短剧解说视频，修仙题材，需要原创解说稿 + 配音 + 分镜。', riskFlags: [], reviewNote: '类目匹配、预算合理、描述完整', reviewTime: '2026-04-25 17:10', reviewer: '运营-小王' },
+      { id: 'DM-2026042214', title: '品牌宣传短片脚本', submitter: '骋风天合 · 市场宣传组', submitterUser: '陈思齐', category: '文案服务 / 营销文案', budget: 5000, deadline: '2026-05-02', submitTime: '2026-04-22 09:14', status: 'approved', tags: ['营销文案', '品牌'], desc: '一条 3 分钟品牌宣传片的文案脚本。', riskFlags: [], reviewNote: '通过', reviewTime: '2026-04-22 11:30', reviewer: '运营-小王' },
+      { id: 'DM-2026042713', title: '游戏角色立绘（未提供参考）', submitter: '个人空间', submitterUser: '昭岚', category: '图片设计 / 插画', budget: 500, deadline: '2026-05-01', submitTime: '2026-04-27 06:20', status: 'pending', tags: ['插画', '游戏'], desc: '需要 3 个游戏角色的半身立绘。', riskFlags: ['预算偏低', '描述不清'] },
+      { id: 'DM-2026042601', title: '违规推广软文', submitter: '个人空间', submitterUser: '测试用户', category: '文案服务 / 自媒体文章', budget: 800, deadline: '2026-05-10', submitTime: '2026-04-26 22:15', status: 'rejected', tags: ['软文'], desc: '帮我写一篇推广某减肥产品的软文。', riskFlags: ['涉嫌违规'], rejectReason: '涉及违规内容（虚假宣传类产品推广）', reviewTime: '2026-04-27 00:10', reviewer: '运营-小李' }
+    ];
+
+    function toast(msg, kind) {
+      var wrap = document.getElementById('toastWrap');
+      var t = document.createElement('div');
+      t.className = 'toast ' + (kind || 'ok');
+      t.textContent = msg;
+      wrap.appendChild(t);
+      setTimeout(function () { t.style.opacity = '0'; t.style.transform = 'translateX(20px)'; setTimeout(function () { t.remove(); }, 260); }, 2400);
+    }
+
+    function render() {
+      var q = state.q.toLowerCase();
+      var rows = reviewQueue.filter(function (r) {
+        if (state.tab !== 'all' && r.status !== state.tab) return false;
+        if (q) { var hay = [r.id, r.title, r.submitter].join(' ').toLowerCase(); if (hay.indexOf(q) < 0) return false; }
+        return true;
+      });
+      document.getElementById('kpiPending').textContent = reviewQueue.filter(function (r) { return r.status === 'pending'; }).length;
+      document.getElementById('kpiToday').textContent = reviewQueue.filter(function (r) { return r.status !== 'pending'; }).length;
+      document.getElementById('kpiRejected').textContent = reviewQueue.filter(function (r) { return r.status === 'rejected'; }).length;
+      var list = document.getElementById('list');
+      if (!rows.length) { list.innerHTML = '<div style="text-align:center;padding:60px;background:#fff;border-radius:10px;color:#8c8c8c">没有符合条件的记录</div>'; return; }
+      list.innerHTML = rows.map(function (r, idx) { return cardHtml(r, idx); }).join('');
+    }
+
+    function cardHtml(r, idx) {
+      var statusLabel = { pending: '待审核', approved: '已通过', rejected: '已驳回' };
+      var risks = r.riskFlags.map(function (f) { return '<span class="tag" style="background:#fff1f0;color:#cf1322">' + f + '</span>'; }).join('');
+      var detail = '<strong>需求描述：</strong>' + r.desc;
+      if (r.reviewNote) detail += '<br><strong>审核备注：</strong>' + r.reviewNote;
+      if (r.rejectReason) detail += '<br><strong>驳回原因：</strong>' + r.rejectReason;
+      if (r.reviewTime) detail += '<br><strong>审核时间：</strong>' + r.reviewTime + ' · ' + r.reviewer;
+      return '<article class="review-card ' + r.status + '">'
+        + '<div class="rc-head"><div><div class="rc-title">' + r.title + '</div><div class="rc-id">' + r.id + ' · ' + r.submitter + ' · ' + r.submitterUser + '</div></div>'
+        + '<div style="display:flex;gap:6px;align-items:center"><span class="badge ' + r.status + '">' + statusLabel[r.status] + '</span>' + risks + '</div></div>'
+        + '<div style="margin-top:8px">' + r.tags.map(function (t) { return '<span class="tag">' + t + '</span>'; }).join('') + '</div>'
+        + '<div class="rc-meta">'
+        + '<div><div class="meta-label">类目</div><div class="meta-value">' + r.category + '</div></div>'
+        + '<div><div class="meta-label">预算</div><div class="meta-value">¥' + r.budget.toLocaleString() + '</div></div>'
+        + '<div><div class="meta-label">期望交付</div><div class="meta-value">' + r.deadline + '</div></div>'
+        + '<div><div class="meta-label">提交时间</div><div class="meta-value">' + r.submitTime + '</div></div>'
+        + '<div><div class="meta-label">扣款主体</div><div class="meta-value">' + (r.submitter.indexOf('个人') >= 0 ? '个人账户' : '团队预算') + '</div></div>'
+        + '</div>'
+        + '<div class="rc-detail" id="detail' + idx + '">' + detail + '</div>'
+        + '<div class="rc-actions">'
+        + '<span class="rc-toggle" onclick="toggleDetail(' + idx + ')">展开详情 ▾</span>'
+        + (r.status === 'pending' ? '<button class="btn danger" onclick="openReject(\'' + r.id + '\')">驳回</button><button class="btn primary" onclick="approveItem(\'' + r.id + '\')">✓ 通过</button>' : '')
+        + (r.status === 'rejected' ? '<button class="btn" onclick="toast(\'需求方可在"我的需求"里修改后重新提交\', \'info\')">查看处理结果</button>' : '')
+        + '</div></article>';
+    }
+
+    window.toggleDetail = function (idx) {
+      var el = document.getElementById('detail' + idx);
+      el.classList.toggle('open');
+    };
+
+    window.approveItem = function (id) {
+      reviewQueue.forEach(function (r) {
+        if (r.id === id) {
+          r.status = 'approved';
+          r.reviewNote = '类目匹配、预算合理、描述完整';
+          r.reviewTime = new Date().toISOString().slice(0, 16).replace('T', ' ');
+          r.reviewer = '运营-昭岚';
+        }
+      });
+      render();
+      toast('需求 ' + id + ' 已通过，进入承制方撮合阶段', 'ok');
+    };
+
+    window.openReject = function (id) {
+      state.rejectingId = id;
+      document.getElementById('rejectModal').classList.add('open');
+    };
+    window.closeModal = function () {
+      document.getElementById('rejectModal').classList.remove('open');
+      state.rejectingId = null;
+    };
+    window.confirmReject = function () {
+      var id = state.rejectingId;
+      var reason = document.getElementById('rejectReason').value;
+      var note = document.getElementById('rejectNote').value;
+      reviewQueue.forEach(function (r) {
+        if (r.id === id) {
+          r.status = 'rejected';
+          r.rejectReason = reason + (note ? '（' + note + '）' : '');
+          r.reviewTime = new Date().toISOString().slice(0, 16).replace('T', ' ');
+          r.reviewer = '运营-昭岚';
+        }
+      });
+      closeModal();
+      render();
+      toast('需求 ' + id + ' 已驳回，需求方将收到通知', 'warn');
+    };
+
+    document.getElementById('tabs').addEventListener('click', function (e) {
+      if (!e.target.matches('.tab')) return;
+      document.querySelectorAll('.tab').forEach(function (t) { t.classList.remove('active'); });
+      e.target.classList.add('active');
+      state.tab = e.target.getAttribute('data-s');
+      render();
+    });
+    document.getElementById('search').addEventListener('input', function (e) { state.q = e.target.value; render(); });
+    render();
+  </script>
+</body>
+</html>

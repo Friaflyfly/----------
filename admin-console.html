@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理员后台 - 骋风天合 · 创作门户交易平台</title>
+  <link rel="stylesheet" href="_shared.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #262626; }
+    .admin-banner { background: linear-gradient(135deg, #722ed1, #531dab); color: #fff; font-size: 12px; text-align: center; padding: 6px; position: fixed; top: 56px; left: 0; right: 0; z-index: 190; }
+    .app { display: flex; padding-top: 84px; min-height: 100vh; }
+    .sidebar { width: 200px; background: #fff; box-shadow: 2px 0 8px rgba(0,0,0,.06); position: fixed; top: 84px; left: 0; bottom: 0; padding: 16px 0; overflow-y: auto; }
+    .menu a { display: flex; align-items: center; gap: 10px; padding: 11px 24px; color: #262626; text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
+    .menu a:hover { background: #f0f7ff; color: #1890ff; }
+    .menu a.active { background: #e6f7ff; color: #1890ff; border-left-color: #1890ff; font-weight: 500; }
+    .menu-icon { width: 18px; text-align: center; }
+    .menu-group { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+    .menu-group-title { padding: 8px 24px; font-size: 11px; color: #8c8c8c; }
+    .main { margin-left: 200px; flex: 1; padding: 24px 28px 60px; }
+    .page-head { margin-bottom: 16px; }
+    .page-head h1 { margin: 0 0 6px; font-size: 22px; display: flex; align-items: center; gap: 10px; }
+    .page-head .sub { color: #8c8c8c; font-size: 13px; }
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+    .kpi { background: #fff; border-radius: 10px; padding: 16px 18px; box-shadow: 0 2px 6px rgba(0,0,0,.04); }
+    .kpi .label { font-size: 12px; color: #8c8c8c; }
+    .kpi .value { font-size: 26px; font-weight: 700; margin: 6px 0 4px; }
+    .kpi .note { font-size: 11px; color: #8c8c8c; }
+    .kpi .value.purple { color: #722ed1; }
+    .tabs-bar { display: flex; gap: 0; background: #fff; border-radius: 10px 10px 0 0; box-shadow: 0 2px 6px rgba(0,0,0,.04); overflow: hidden; margin-bottom: 0; }
+    .tab-btn { flex: 1; padding: 14px 10px; border: none; background: transparent; font-size: 14px; cursor: pointer; color: #595959; border-bottom: 3px solid transparent; transition: all .15s; }
+    .tab-btn:hover { background: #f0f7ff; }
+    .tab-btn.active { color: #722ed1; font-weight: 600; border-bottom-color: #722ed1; background: #fff; }
+    .tab-panel { display: none; background: #fff; border-radius: 0 0 10px 10px; box-shadow: 0 2px 6px rgba(0,0,0,.04); padding: 20px 22px; margin-bottom: 16px; }
+    .tab-panel.active { display: block; }
+    .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+    .btn { height: 34px; border: 1px solid #d9d9d9; background: #fff; border-radius: 6px; padding: 0 16px; font-size: 13px; color: #595959; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .btn:hover { border-color: #91d5ff; color: #1890ff; }
+    .btn.primary { background: #722ed1; border-color: #722ed1; color: #fff; }
+    .btn.primary:hover { background: #9254de; border-color: #9254de; }
+    .btn.blue { background: #1890ff; border-color: #1890ff; color: #fff; }
+    .btn.blue:hover { background: #40a9ff; }
+    .btn.success { background: #52c41a; border-color: #52c41a; color: #fff; }
+    .btn.danger { border-color: #ffccc7; color: #cf1322; }
+    .search { height: 34px; min-width: 240px; border: 1px solid #d9d9d9; border-radius: 6px; padding: 0 12px; font-size: 13px; margin-left: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 10px 12px; background: #fafafa; color: #8c8c8c; font-weight: 500; font-size: 12px; border-bottom: 1px solid #f0f0f0; }
+    td { padding: 12px 12px; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
+    tr:hover td { background: #f9f0ff08; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+    .badge.active { background: #f6ffed; color: #389e0d; }
+    .badge.frozen { background: #fff1f0; color: #cf1322; }
+    .badge.admin { background: #f9f0ff; color: #722ed1; }
+    .badge.team { background: #e6f7ff; color: #096dd9; }
+    .badge.personal { background: #fff7e6; color: #d46b08; }
+    .perm-grid { display: flex; flex-wrap: wrap; gap: 4px; }
+    .perm { padding: 2px 7px; background: #f5f5f5; border-radius: 4px; font-size: 11px; color: #595959; }
+    .ws-card { border: 1px solid #f0f0f0; border-radius: 10px; padding: 16px 18px; display: grid; grid-template-columns: 50px 1fr auto; gap: 14px; align-items: center; margin-bottom: 10px; transition: all .18s; }
+    .ws-card:hover { border-color: #d3adf7; box-shadow: 0 4px 12px rgba(114,46,209,.1); }
+    .ws-icon-box { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+    .ws-icon-box.personal { background: #fff7e6; }
+    .ws-icon-box.team { background: #e6f7ff; }
+    .ws-icon-box.admin { background: #f9f0ff; }
+    .ws-name { font-size: 15px; font-weight: 600; }
+    .ws-meta { font-size: 12px; color: #8c8c8c; margin-top: 3px; }
+    .ws-actions { display: flex; gap: 6px; }
+    .budget-bar { height: 8px; background: #f0f0f0; border-radius: 4px; margin-top: 6px; overflow: hidden; }
+    .budget-fill { height: 100%; border-radius: 4px; transition: width .3s; }
+    .budget-fill.ok { background: #52c41a; }
+    .budget-fill.warn { background: #fa8c16; }
+    .budget-fill.danger { background: #ff4d4f; }
+    .fund-row { display: grid; grid-template-columns: 1fr 140px 140px 140px 120px; gap: 10px; align-items: center; padding: 14px 0; border-bottom: 1px dashed #f0f0f0; }
+    .fund-row:last-child { border-bottom: none; }
+    .fund-name { font-weight: 500; }
+    .fund-sub { font-size: 11px; color: #8c8c8c; }
+    .fund-amount { font-size: 15px; font-weight: 600; }
+    .fund-amount.main { color: #722ed1; }
+    .modal-mask { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 900; align-items: center; justify-content: center; }
+    .modal-mask.open { display: flex; }
+    .modal { width: min(92vw, 540px); background: #fff; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.22); overflow: hidden; }
+    .modal-head { padding: 18px 22px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+    .modal-head h3 { margin: 0; font-size: 17px; }
+    .modal-close { border: none; background: transparent; font-size: 22px; cursor: pointer; color: #8c8c8c; }
+    .modal-body { padding: 20px 22px; }
+    .modal-foot { padding: 14px 22px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 8px; }
+    .form-row { margin-bottom: 14px; }
+    .form-row label { display: block; font-size: 12px; color: #8c8c8c; margin-bottom: 5px; }
+    .form-row input, .form-row select, .form-row textarea { width: 100%; border: 1px solid #d9d9d9; border-radius: 6px; padding: 8px 10px; font-size: 13px; font-family: inherit; }
+    .toasts { position: fixed; top: 100px; right: 20px; width: min(90vw, 360px); display: grid; gap: 8px; z-index: 1100; }
+    .toast { background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; padding: 10px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.1); animation: slideIn .25s ease-out; }
+    .toast.ok { border-color: #b7eb8f; background: #f6ffed; color: #389e0d; }
+    .toast.info { border-color: #91d5ff; background: #e6f7ff; color: #096dd9; }
+    .toast.warn { border-color: #ffe58f; background: #fffbe6; color: #d48806; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(2, 1fr); } .fund-row { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding: 16px; } }
+  </style>
+</head>
+<body>
+  <header class="topbar" id="topbar-shared"></header>
+  <div class="admin-banner">👑 企业管理员后台 · 骋风天合 · 当前操作对全企业生效</div>
+  <div class="app">
+    <aside class="sidebar">
+      <nav class="menu">
+        <a href="admin-console.html" class="active"><span class="menu-icon">👑</span> 管理总览</a>
+        <a href="#" onclick="switchTab(0);return false"><span class="menu-icon">👥</span> 成员管理</a>
+        <a href="#" onclick="switchTab(1);return false"><span class="menu-icon">🏢</span> 工作空间</a>
+        <a href="#" onclick="switchTab(2);return false"><span class="menu-icon">🔑</span> 角色与权限</a>
+        <a href="#" onclick="switchTab(3);return false"><span class="menu-icon">💰</span> 资金与预算</a>
+        <div class="menu-group">
+          <div class="menu-group-title">入驻</div>
+          <a href="enterprise-onboarding.html"><span class="menu-icon">🏢</span> 企业入驻流程</a>
+          <a href="enterprise-verification-prototype.html"><span class="menu-icon">📋</span> 企业认证详情</a>
+        </div>
+        <div class="menu-group">
+          <div class="menu-group-title">平台运营</div>
+          <a href="admin-demand-review.html"><span class="menu-icon">🔍</span> 需求核定</a>
+          <a href="admin-onboarding-review.html"><span class="menu-icon">📋</span> 入驻审核</a>
+          <a href="admin-finance.html"><span class="menu-icon">💰</span> 财务结算</a>
+          <a href="admin-category-config.html"><span class="menu-icon">🏷</span> 类目配置</a>
+        </div>
+        <div class="menu-group">
+          <div class="menu-group-title">快捷入口</div>
+          <a href="platform-home-demander.html"><span class="menu-icon">📥</span> 需求方工作台</a>
+          <a href="platform-home-contractor.html"><span class="menu-icon">🛠</span> 承制方工作台</a>
+          <a href="wallet-overview.html"><span class="menu-icon">💳</span> 钱包总览</a>
+          <a href="demo-index.html"><span class="menu-icon">📋</span> Demo 导航</a>
+        </div>
+      </nav>
+    </aside>
+    <main class="main">
+      <div class="page-head">
+        <h1>👑 骋风天合 · 企业管理员后台</h1>
+        <div class="sub">管理成员、工作空间、角色权限与企业资金，所有操作对全企业生效。</div>
+      </div>
+
+      <section class="kpis">
+        <div class="kpi"><div class="label">企业成员</div><div class="value purple" id="kpiMembers">5</div><div class="note">1 人已冻结</div></div>
+        <div class="kpi"><div class="label">工作空间</div><div class="value purple">4</div><div class="note">3 团队 + 1 管理员</div></div>
+        <div class="kpi"><div class="label">企业主账户余额</div><div class="value purple" id="kpiBalance">¥1,250,000</div><div class="note">含已锁定 ¥36,000</div></div>
+        <div class="kpi"><div class="label">本月预算使用率</div><div class="value purple">68%</div><div class="note">短剧组 92% / 市场组 41%</div></div>
+      </section>
+
+      <div class="tabs-bar" id="tabsBar">
+        <button class="tab-btn active" onclick="switchTab(0)">👥 成员管理</button>
+        <button class="tab-btn" onclick="switchTab(1)">🏢 工作空间</button>
+        <button class="tab-btn" onclick="switchTab(2)">🔑 角色与权限</button>
+        <button class="tab-btn" onclick="switchTab(3)">💰 资金与预算</button>
+      </div>
+
+      <!-- Tab 0: 成员管理 -->
+      <div class="tab-panel active" id="panel0">
+        <div class="toolbar">
+          <button class="btn primary" onclick="openModal('inviteModal')">+ 邀请成员</button>
+          <button class="btn" onclick="toast('批量导入功能下版本补齐', 'info')">📥 批量导入</button>
+          <input class="search" placeholder="搜索姓名 / 邮箱 / 角色" id="memberSearch" oninput="renderMembers()">
+        </div>
+        <table>
+          <thead><tr><th>姓名</th><th>邮箱</th><th>角色</th><th>所属空间</th><th>状态</th><th>最后登录</th><th>操作</th></tr></thead>
+          <tbody id="memberBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Tab 1: 工作空间 -->
+      <div class="tab-panel" id="panel1">
+        <div class="toolbar">
+          <button class="btn primary" onclick="openModal('wsModal')">+ 创建工作空间</button>
+          <span style="font-size:12px;color:#8c8c8c">团队空间绑定预算账户，成员在空间内发布需求时扣款走该账户</span>
+        </div>
+        <div id="wsCards"></div>
+      </div>
+
+      <!-- Tab 2: 角色与权限 -->
+      <div class="tab-panel" id="panel2">
+        <div class="toolbar">
+          <button class="btn primary" onclick="toast('自定义角色编辑功能下版本补齐', 'info')">+ 新建角色</button>
+          <span style="font-size:12px;color:#8c8c8c">角色定义操作权限，分配给成员后生效</span>
+        </div>
+        <table>
+          <thead><tr><th>角色名称</th><th>权限</th><th>当前成员数</th><th>操作</th></tr></thead>
+          <tbody id="roleBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Tab 3: 资金与预算 -->
+      <div class="tab-panel" id="panel3">
+        <div class="toolbar">
+          <button class="btn blue" onclick="openModal('allocModal')">💸 划拨预算</button>
+          <button class="btn" onclick="toast('对公充值入口：线下转账后平台财务审核到账', 'info')">📤 企业充值</button>
+          <button class="btn" onclick="toast('开票管理功能下版本补齐', 'info')">🧾 开票管理</button>
+        </div>
+        <div id="fundRows"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 邀请成员 Modal -->
+  <div class="modal-mask" id="inviteModal">
+    <div class="modal">
+      <div class="modal-head"><h3>邀请新成员</h3><button class="modal-close" onclick="closeModal('inviteModal')">×</button></div>
+      <div class="modal-body">
+        <div class="form-row"><label>姓名</label><input id="invName" placeholder="如：张三"></div>
+        <div class="form-row"><label>邮箱</label><input id="invEmail" placeholder="zhangsan@cf.com"></div>
+        <div class="form-row"><label>角色</label>
+          <select id="invRole">
+            <option value="publisher">发布员</option>
+            <option value="production-lead">制作主管</option>
+            <option value="marketing">市场专员</option>
+            <option value="ip-owner">IP 主理人</option>
+            <option value="finance">财务</option>
+          </select>
+        </div>
+        <div class="form-row"><label>分配到空间</label>
+          <select id="invWs">
+            <option value="cf-drama">骋风天合 · 短剧制作中心</option>
+            <option value="cf-marketing">骋风天合 · 市场宣传组</option>
+            <option value="cf-ip">骋风天合 · IP 孵化组</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeModal('inviteModal')">取消</button>
+        <button class="btn primary" onclick="inviteMember()">发送邀请</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 创建空间 Modal -->
+  <div class="modal-mask" id="wsModal">
+    <div class="modal">
+      <div class="modal-head"><h3>创建工作空间</h3><button class="modal-close" onclick="closeModal('wsModal')">×</button></div>
+      <div class="modal-body">
+        <div class="form-row"><label>空间名称</label><input id="wsNewName" placeholder="如：骋风天合 · 新媒体组"></div>
+        <div class="form-row"><label>初始预算（从企业主账户划拨）</label><input id="wsNewBudget" value="50000"></div>
+        <div class="form-row"><label>负责人</label>
+          <select id="wsNewOwner">
+            <option value="U-001">昭岚</option>
+            <option value="U-002">陈思齐</option>
+            <option value="U-003">林子墨</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeModal('wsModal')">取消</button>
+        <button class="btn primary" onclick="createWorkspace()">创建空间</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 划拨预算 Modal -->
+  <div class="modal-mask" id="allocModal">
+    <div class="modal">
+      <div class="modal-head"><h3>划拨预算</h3><button class="modal-close" onclick="closeModal('allocModal')">×</button></div>
+      <div class="modal-body">
+        <div style="padding:10px 12px;background:#f9f0ff;border-radius:6px;font-size:12px;color:#722ed1;margin-bottom:14px">从企业主账户划拨至指定团队预算账户，划拨后立即生效。</div>
+        <div class="form-row"><label>目标空间</label>
+          <select id="allocTarget">
+            <option value="cf-drama">短剧制作中心</option>
+            <option value="cf-marketing">市场宣传组</option>
+            <option value="cf-ip" selected>IP 孵化组（当前无独立预算）</option>
+          </select>
+        </div>
+        <div class="form-row"><label>划拨金额（元）</label><input id="allocAmount" value="100000"></div>
+        <div class="form-row"><label>备注</label><input id="allocNote" value="季度中追加预算"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeModal('allocModal')">取消</button>
+        <button class="btn blue" onclick="doAllocate()">确认划拨</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastWrap" class="toasts"></div>
+  <script src="_shared.js"></script>
+  <script>
+    SharedHeader.mount({ activeNav: "admin", brandHref: "admin-console.html", brandLabel: "👑 管理员后台", brandSub: "骋风天合 · 平台治理" });
+
+    function toast(msg, kind) {
+      var wrap = document.getElementById('toastWrap');
+      var t = document.createElement('div');
+      t.className = 'toast ' + (kind || 'ok');
+      t.textContent = msg;
+      wrap.appendChild(t);
+      setTimeout(function () { t.style.opacity = '0'; t.style.transform = 'translateX(20px)'; setTimeout(function () { t.remove(); }, 260); }, 2400);
+    }
+
+    function switchTab(idx) {
+      document.querySelectorAll('.tab-btn').forEach(function (b, i) { b.classList.toggle('active', i === idx); });
+      document.querySelectorAll('.tab-panel').forEach(function (p, i) { p.classList.toggle('active', i === idx); });
+    }
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+    var members = window.demoApp.getMembers ? window.demoApp.getMembers() : JSON.parse(localStorage.getItem('demoMembers') || '[]');
+    var roles = window.demoApp.getRoles ? window.demoApp.getRoles() : JSON.parse(localStorage.getItem('demoRoles') || '[]');
+    var WORKSPACES = window.demoApp.WORKSPACES;
+
+    var permLabels = {
+      'space.create': '创建空间', 'space.delete': '删除空间', 'member.invite': '邀请成员', 'member.freeze': '冻结成员',
+      'budget.allocate': '预算划拨', 'wallet.recharge': '充值', 'wallet.withdraw': '提现', 'demand.publish': '发布需求',
+      'order.review': '订单审核', 'contractor.invite': '邀请承制方', 'category.config': '类目配置', 'invoice.manage': '开票管理'
+    };
+
+    function renderMembers() {
+      var q = (document.getElementById('memberSearch').value || '').toLowerCase();
+      var body = document.getElementById('memberBody');
+      var html = '';
+      members.forEach(function (m) {
+        var hay = [m.name, m.email, m.roleName].join(' ').toLowerCase();
+        if (q && hay.indexOf(q) < 0) return;
+        var wsNames = (m.workspaces || []).map(function (wid) { return WORKSPACES[wid] ? WORKSPACES[wid].shortName : wid; }).join(', ');
+        html += '<tr>'
+          + '<td><strong>' + m.name + '</strong></td>'
+          + '<td>' + m.email + '</td>'
+          + '<td><span class="badge admin">' + m.roleName + '</span></td>'
+          + '<td style="font-size:12px">' + wsNames + '</td>'
+          + '<td><span class="badge ' + m.status + '">' + (m.status === 'active' ? '正常' : '已冻结') + '</span></td>'
+          + '<td style="font-size:12px;color:#8c8c8c">' + m.lastLogin + '</td>'
+          + '<td>'
+          + (m.status === 'active'
+            ? '<button class="btn danger" style="height:28px;font-size:12px" onclick="freezeMember(\'' + m.id + '\')">冻结</button>'
+            : '<button class="btn success" style="height:28px;font-size:12px" onclick="unfreezeMember(\'' + m.id + '\')">解冻</button>')
+          + '</td>'
+          + '</tr>';
+      });
+      body.innerHTML = html || '<tr><td colspan="7" style="text-align:center;color:#8c8c8c;padding:40px">暂无成员</td></tr>';
+      document.getElementById('kpiMembers').textContent = members.length;
+    }
+
+    window.freezeMember = function (id) {
+      members.forEach(function (m) { if (m.id === id) m.status = 'frozen'; });
+      try { localStorage.setItem('demoMembers', JSON.stringify(members)); } catch (_) {}
+      renderMembers();
+      toast('成员已冻结，将无法登录平台', 'warn');
+    };
+    window.unfreezeMember = function (id) {
+      members.forEach(function (m) { if (m.id === id) m.status = 'active'; });
+      try { localStorage.setItem('demoMembers', JSON.stringify(members)); } catch (_) {}
+      renderMembers();
+      toast('成员已解冻', 'ok');
+    };
+    window.inviteMember = function () {
+      var name = document.getElementById('invName').value.trim();
+      var email = document.getElementById('invEmail').value.trim();
+      if (!name || !email) { toast('请填写姓名和邮箱', 'warn'); return; }
+      var roleId = document.getElementById('invRole').value;
+      var roleName = roles.find(function (r) { return r.id === roleId; });
+      var ws = document.getElementById('invWs').value;
+      members.push({
+        id: 'U-' + Date.now(), name: name, email: email,
+        role: roleId, roleName: roleName ? roleName.name : roleId,
+        workspaces: [ws], status: 'active', lastLogin: '（尚未登录）'
+      });
+      try { localStorage.setItem('demoMembers', JSON.stringify(members)); } catch (_) {}
+      closeModal('inviteModal');
+      renderMembers();
+      toast('已向 ' + email + ' 发送邀请', 'ok');
+    };
+
+    function renderWorkspaces() {
+      var container = document.getElementById('wsCards');
+      var wsIds = ['cf-drama', 'cf-marketing', 'cf-ip', 'cf-admin'];
+      var wallets = window.demoApp.getWallets();
+      var html = '';
+      wsIds.forEach(function (wid) {
+        var ws = WORKSPACES[wid]; if (!ws) return;
+        var wallet = wallets[ws.walletKey];
+        var bal = wallet ? wallet.balance : 0;
+        var alloc = wallet ? (wallet.allocated || bal) : 0;
+        var pct = alloc > 0 ? Math.round(((alloc - bal) / alloc) * 100) : 0;
+        var barCls = pct > 85 ? 'danger' : pct > 60 ? 'warn' : 'ok';
+        var memberCount = members.filter(function (m) { return (m.workspaces || []).indexOf(wid) >= 0; }).length;
+        html += '<div class="ws-card">'
+          + '<div class="ws-icon-box ' + ws.iconClass + '">' + ws.icon + '</div>'
+          + '<div>'
+          +   '<div class="ws-name">' + ws.name + '</div>'
+          +   '<div class="ws-meta">' + ws.roleLabel + ' · ' + memberCount + ' 人 · ' + ws.accountType + '</div>'
+          +   (ws.type === 'team' ? '<div class="ws-meta">预算使用 ' + pct + '% · 余额 ' + window.fmtMoney(bal) + (alloc ? ' / 已划拨 ' + window.fmtMoney(alloc) : '') + '</div><div class="budget-bar"><div class="budget-fill ' + barCls + '" style="width:' + pct + '%"></div></div>' : '')
+          +   (ws.budgetMissing ? '<div class="ws-meta" style="color:#fa8c16">⚠️ 未配置独立预算，下单回退企业主账户</div>' : '')
+          + '</div>'
+          + '<div class="ws-actions">'
+          +   '<button class="btn" style="height:28px;font-size:12px" onclick="toast(\'空间设置编辑功能下版本补齐\', \'info\')">设置</button>'
+          +   (ws.budgetMissing ? '<button class="btn blue" style="height:28px;font-size:12px" onclick="openModal(\'allocModal\')">配置预算</button>' : '')
+          + '</div>'
+          + '</div>';
+      });
+      container.innerHTML = html;
+    }
+
+    function renderRoles() {
+      var body = document.getElementById('roleBody');
+      var html = '';
+      roles.forEach(function (r) {
+        var cnt = members.filter(function (m) { return m.role === r.id; }).length;
+        var permsHtml = r.perms.map(function (p) { return '<span class="perm">' + (permLabels[p] || p) + '</span>'; }).join('');
+        html += '<tr>'
+          + '<td><strong>' + r.name + '</strong></td>'
+          + '<td><div class="perm-grid">' + permsHtml + '</div></td>'
+          + '<td>' + cnt + ' 人</td>'
+          + '<td><button class="btn" style="height:28px;font-size:12px" onclick="toast(\'角色编辑功能下版本补齐\', \'info\')">编辑</button></td>'
+          + '</tr>';
+      });
+      body.innerHTML = html;
+    }
+
+    function renderFunds() {
+      var container = document.getElementById('fundRows');
+      var wallets = window.demoApp.getWallets();
+      var accounts = [
+        { key: 'enterprise-main-cf', icon: '👑', type: 'main' },
+        { key: 'team-budget-cf-drama', icon: '🎬', type: 'team' },
+        { key: 'team-budget-cf-marketing', icon: '📢', type: 'team' },
+        { key: 'personal-account-lixueqin', icon: '👤', type: 'personal' }
+      ];
+      var html = '<div class="fund-row" style="font-weight:500;color:#8c8c8c;font-size:12px;border-bottom:1px solid #f0f0f0">'
+        + '<div>账户</div><div>余额</div><div>已锁定</div><div>已划拨额度</div><div></div></div>';
+      accounts.forEach(function (a) {
+        var w = wallets[a.key];
+        if (!w) return;
+        html += '<div class="fund-row">'
+          + '<div><div class="fund-name">' + a.icon + ' ' + w.name + '</div><div class="fund-sub">' + w.type + '</div></div>'
+          + '<div class="fund-amount' + (a.type === 'main' ? ' main' : '') + '">' + window.fmtMoney(w.balance) + '</div>'
+          + '<div>' + window.fmtMoney(w.lockedAmount || 0) + '</div>'
+          + '<div>' + (w.allocated ? window.fmtMoney(w.allocated) : '-') + '</div>'
+          + '<div>'
+          + (a.type === 'team' ? '<button class="btn blue" style="height:28px;font-size:12px" onclick="openModal(\'allocModal\')">追加</button>' : '')
+          + (a.type === 'main' ? '<button class="btn" style="height:28px;font-size:12px" onclick="toast(\'充值流程：线下对公转账 → 财务审核 → 到账\', \'info\')">充值</button>' : '')
+          + '</div></div>';
+      });
+      container.innerHTML = html;
+    }
+
+    window.doAllocate = function () {
+      var target = document.getElementById('allocTarget').value;
+      var amount = Number(document.getElementById('allocAmount').value);
+      if (!amount || amount <= 0) { toast('请输入有效金额', 'warn'); return; }
+      var ws = WORKSPACES[target];
+      var wallets = window.demoApp.getWallets();
+      var mainKey = 'enterprise-main-cf';
+      if (!wallets[mainKey] || wallets[mainKey].balance < amount) { toast('企业主账户余额不足', 'warn'); return; }
+      wallets[mainKey].balance -= amount;
+      var tgtKey = ws ? ws.walletKey : null;
+      if (tgtKey && wallets[tgtKey]) {
+        wallets[tgtKey].balance += amount;
+        wallets[tgtKey].allocated = (wallets[tgtKey].allocated || 0) + amount;
+      }
+      window.demoApp.setWallets(wallets);
+      var note = document.getElementById('allocNote').value || '';
+      window.demoApp.addFlow({ id: 'F-A' + Date.now(), time: new Date().toISOString().slice(0, 16).replace('T', ' '), type: 'allocate', desc: '管理员划拨预算 → ' + (ws ? ws.shortName : target) + (note ? '（' + note + '）' : ''), account: tgtKey || target, amount: amount, operator: '昭岚（企业管理员）' });
+      window.demoApp.addFlow({ id: 'F-A' + Date.now() + 'o', time: new Date().toISOString().slice(0, 16).replace('T', ' '), type: 'allocate', desc: '从企业主账户划拨至 ' + (ws ? ws.shortName : target), account: mainKey, amount: -amount, operator: '昭岚（企业管理员）' });
+      closeModal('allocModal');
+      renderFunds();
+      renderWorkspaces();
+      document.getElementById('kpiBalance').textContent = window.fmtMoney(wallets[mainKey].balance);
+      toast('已从企业主账户划拨 ' + window.fmtMoney(amount) + ' 至 ' + (ws ? ws.name : target), 'ok');
+    };
+
+    window.createWorkspace = function () {
+      var name = document.getElementById('wsNewName').value.trim();
+      if (!name) { toast('请填写空间名称', 'warn'); return; }
+      closeModal('wsModal');
+      toast('工作空间「' + name + '」已创建（mock），下版本可在空间列表看到', 'ok');
+    };
+
+    renderMembers();
+    renderWorkspaces();
+    renderRoles();
+    renderFunds();
+  </script>
+</body>
+</html>

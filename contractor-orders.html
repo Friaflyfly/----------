@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>承制方订单 - 骋风天合 · 创作门户交易平台</title>
+  <link rel="stylesheet" href="_shared.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #262626; }
+    .app { display: flex; padding-top: 56px; min-height: 100vh; }
+    .sidebar { width: 200px; background: #fff; box-shadow: 2px 0 8px rgba(0,0,0,.06); position: fixed; top: 56px; left: 0; bottom: 0; padding: 16px 0; overflow-y: auto; }
+    .menu a { display: flex; align-items: center; gap: 10px; padding: 11px 24px; color: #262626; text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
+    .menu a:hover { background: #f0f7ff; color: #1890ff; }
+    .menu a.active { background: #e6f7ff; color: #1890ff; border-left-color: #1890ff; font-weight: 500; }
+    .menu-icon { width: 18px; text-align: center; }
+    .menu-group { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+    .menu-group-title { padding: 8px 24px; font-size: 11px; color: #8c8c8c; text-transform: uppercase; letter-spacing: .5px; }
+    .main { margin-left: 200px; flex: 1; padding: 24px 28px 40px; }
+    .page-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+    .page-head h1 { margin: 0 0 6px; font-size: 22px; }
+    .page-head .sub { color: #8c8c8c; font-size: 13px; }
+    .actions { display: flex; gap: 8px; }
+    .btn { height: 34px; border: 1px solid #d9d9d9; background: #fff; border-radius: 6px; padding: 0 14px; font-size: 13px; color: #595959; cursor: pointer; }
+    .btn:hover { border-color: #91d5ff; color: #1890ff; }
+    .btn.primary { background: #1890ff; border-color: #1890ff; color: #fff; }
+    .btn.primary:hover { background: #40a9ff; border-color: #40a9ff; color: #fff; }
+    .btn.danger { border-color: #ffccc7; color: #cf1322; }
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+    .kpi { background: #fff; border-radius: 10px; padding: 16px 18px; box-shadow: 0 2px 6px rgba(0,0,0,.04); }
+    .kpi .label { font-size: 12px; color: #8c8c8c; }
+    .kpi .value { font-size: 26px; font-weight: 700; margin: 6px 0 4px; }
+    .kpi .note { font-size: 11px; color: #8c8c8c; }
+    .toolbar { background: #fff; border-radius: 10px; padding: 14px 16px; box-shadow: 0 2px 6px rgba(0,0,0,.04); display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+    .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tab { border: none; background: #f5f5f5; color: #595959; border-radius: 16px; padding: 6px 14px; cursor: pointer; font-size: 13px; }
+    .tab.active { background: #e6f7ff; color: #1890ff; font-weight: 500; }
+    .search { margin-left: auto; height: 34px; min-width: 260px; border: 1px solid #d9d9d9; border-radius: 6px; padding: 0 12px; font-size: 13px; }
+    .list { display: grid; gap: 12px; }
+    .order-card { background: #fff; border-radius: 10px; padding: 18px 20px; box-shadow: 0 2px 6px rgba(0,0,0,.04); border: 1px solid transparent; }
+    .order-card:hover { border-color: #91d5ff; box-shadow: 0 6px 16px rgba(24,144,255,.1); }
+    .order-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .order-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .order-sub { font-size: 12px; color: #8c8c8c; }
+    .badges { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .badge { display: inline-block; padding: 3px 9px; border-radius: 11px; font-size: 11px; white-space: nowrap; }
+    .badge.to-quote { background: #fff7e6; color: #d46b08; }
+    .badge.quoted { background: #f9f0ff; color: #531dab; }
+    .badge.in-progress { background: #e6f7ff; color: #096dd9; }
+    .badge.review { background: #fff1f0; color: #cf1322; }
+    .badge.completed { background: #f6ffed; color: #389e0d; }
+    .badge.settle { background: #fffbe6; color: #d48806; }
+    .tag { display: inline-block; padding: 2px 8px; background: #f5f5f5; border-radius: 10px; font-size: 11px; color: #595959; margin-right: 4px; }
+    .meta-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 13px 0; margin-top: 12px; border-top: 1px dashed #f0f0f0; border-bottom: 1px dashed #f0f0f0; }
+    .meta-label { font-size: 11px; color: #8c8c8c; margin-bottom: 3px; }
+    .meta-value { font-size: 13px; font-weight: 500; }
+    .progress-line { margin-top: 12px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .step { position: relative; padding-top: 16px; font-size: 11px; color: #8c8c8c; text-align: center; }
+    .step::before { content: ""; position: absolute; left: 0; right: 0; top: 5px; height: 3px; background: #f0f0f0; }
+    .step.done::before { background: #52c41a; }
+    .step.current::before { background: #1890ff; }
+    .order-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+    .empty { text-align: center; padding: 60px 20px; background: #fff; border-radius: 10px; color: #8c8c8c; }
+    .modal-mask { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 900; align-items: center; justify-content: center; }
+    .modal-mask.open { display: flex; }
+    .modal { width: min(92vw, 640px); background: #fff; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.22); overflow: hidden; }
+    .modal-head { padding: 18px 22px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+    .modal-head h3 { margin: 0; font-size: 17px; }
+    .modal-close { border: none; background: transparent; font-size: 22px; cursor: pointer; color: #8c8c8c; }
+    .modal-body { padding: 20px 22px; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .form-item label { display: block; font-size: 12px; color: #8c8c8c; margin-bottom: 5px; }
+    .form-item input, .form-item textarea { width: 100%; border: 1px solid #d9d9d9; border-radius: 6px; padding: 9px 10px; font-size: 13px; font-family: inherit; }
+    .form-item.full { grid-column: 1 / -1; }
+    .modal-foot { padding: 14px 22px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 8px; }
+    .toasts { position: fixed; top: 72px; right: 20px; width: min(90vw, 360px); display: grid; gap: 8px; z-index: 1100; }
+    .toast { background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; padding: 10px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.1); animation: slideIn .25s ease-out; }
+    .toast.ok { border-color: #b7eb8f; background: #f6ffed; color: #389e0d; }
+    .toast.info { border-color: #91d5ff; background: #e6f7ff; color: #096dd9; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(2, 1fr); } .meta-grid { grid-template-columns: repeat(2, 1fr); } .search { margin-left: 0; width: 100%; } }
+    @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding: 16px; } .page-head { display: block; } .actions { margin-top: 10px; } }
+  </style>
+</head>
+<body>
+  <header class="topbar" id="topbar-shared"></header>
+  <div class="app">
+    <aside class="sidebar">
+      <nav class="menu">
+        <a href="platform-home-contractor.html"><span class="menu-icon">🏠</span> 承制方工作台</a>
+        <a href="contractor-demand-hall.html"><span class="menu-icon">📢</span> 接单大厅</a>
+        <a href="contractor-orders.html" class="active"><span class="menu-icon">📋</span> 接单与订单</a>
+        <a href="project-space.html"><span class="menu-icon">🤝</span> 项目协同空间</a>
+        <a href="contractor-profile-edit.html"><span class="menu-icon">🏪</span> 编辑对外主页</a>
+        <a href="wallet-overview.html"><span class="menu-icon">💰</span> 收益中心</a>
+        <div class="menu-group">
+          <div class="menu-group-title">账户</div>
+          <a href="account-basic-info-prototype-platform-style.html"><span class="menu-icon">⚙️</span> 账户中心</a>
+        </div>
+      </nav>
+    </aside>
+    <main class="main">
+      <div class="page-head">
+        <div>
+          <h1>接单与订单</h1>
+          <div class="sub">承制方从「收到邀约 → 提交报价 → 履约协同 → 验收结算」的一站式列表。</div>
+        </div>
+        <div class="actions">
+          <button class="btn" onclick="location.href='platform-home-contractor.html'">返回工作台</button>
+          <button class="btn primary" onclick="location.href='contractor-marketplace.html'">查看对外主页</button>
+        </div>
+      </div>
+      <section class="kpis">
+        <div class="kpi"><div class="label">待处理邀约</div><div class="value" id="kpiInvite">0</div><div class="note">需在截止前提交报价</div></div>
+        <div class="kpi"><div class="label">报价中</div><div class="value" id="kpiQuoted">0</div><div class="note">等待需求方选择</div></div>
+        <div class="kpi"><div class="label">履约中</div><div class="value" id="kpiWork">0</div><div class="note">含待验收版本</div></div>
+        <div class="kpi"><div class="label">待结算金额</div><div class="value">¥26,600</div><div class="note">V3 验收后自动入账</div></div>
+      </section>
+      <section class="toolbar">
+        <div class="tabs" id="tabs">
+          <button class="tab active" data-status="all">全部</button>
+          <button class="tab" data-status="to-quote">待报价</button>
+          <button class="tab" data-status="quoted">已报价</button>
+          <button class="tab" data-status="in-progress">履约中</button>
+          <button class="tab" data-status="review">待验收</button>
+          <button class="tab" data-status="completed">已完成</button>
+        </div>
+        <input class="search" id="search" placeholder="搜索项目名 / 需求方 / 订单号">
+      </section>
+      <section class="list" id="list"></section>
+    </main>
+  </div>
+  <div class="modal-mask" id="quoteModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>提交报价方案</h3>
+        <button class="modal-close" onclick="closeQuoteModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-item">
+            <label>报价金额</label>
+            <input id="quotePrice" value="18000">
+          </div>
+          <div class="form-item">
+            <label>预计交付天数</label>
+            <input id="quoteDays" value="14">
+          </div>
+          <div class="form-item full">
+            <label>方案说明</label>
+            <textarea id="quotePlan" rows="4">5 集 × 5min，原创解说稿 + 磁性男声配音 + 2D 分镜 + 调色，含 2 轮免费修改。</textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeQuoteModal()">取消</button>
+        <button class="btn primary" onclick="submitQuote()">提交报价</button>
+      </div>
+    </div>
+  </div>
+  <div id="toastWrap" class="toasts"></div>
+  <script src="_shared.js"></script>
+  <script>
+    const state = { status: 'all', q: '' };
+    const baseRows = [
+      { id: 'INV-2026042701', title: '三集短剧解说视频（修仙题材）', demander: '骋风天合 · 短剧制作中心', budget: 18000, price: null, deadline: '2026-05-08', status: 'to-quote', tags: ['视频制作', '修仙', '平台邀请'], progress: 0 },
+      { id: 'INV-2026042602', title: '品牌宣传短片脚本', demander: '骋风天合 · 市场宣传组', budget: 5000, price: 4800, deadline: '2026-05-02', status: 'quoted', tags: ['营销文案', '已报价'], progress: 1 },
+      { id: 'OD-2026042307', title: '新剧 IP 海报系列', demander: '骋风天合 · 短剧制作中心', budget: 28000, price: 28000, deadline: '2026-04-30', status: 'review', tags: ['海报设计', 'V3 待验收'], progress: 3 },
+      { id: 'OD-2026042609', title: '品牌宣传短片脚本', demander: '骋风天合 · 市场宣传组', budget: 5000, price: 5000, deadline: '2026-05-02', status: 'in-progress', tags: ['脚本初稿', '制作中'], progress: 2 },
+      { id: 'OD-2026042009', title: '广告片配音', demander: '骋风天合 · 市场宣传组', budget: 8000, price: 8000, deadline: '2026-04-25', status: 'completed', tags: ['配音', '待开票'], progress: 4 }
+    ];
+    const statusMap = {
+      'to-quote': ['待报价', 'to-quote'],
+      quoted: ['已报价', 'quoted'],
+      'in-progress': ['履约中', 'in-progress'],
+      review: ['待验收', 'review'],
+      completed: ['已完成', 'completed']
+    };
+    function toast(msg, kind) {
+      const wrap = document.getElementById('toastWrap');
+      const t = document.createElement('div');
+      t.className = 'toast ' + (kind || 'ok');
+      t.textContent = msg;
+      wrap.appendChild(t);
+      setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(20px)'; setTimeout(() => t.remove(), 260); }, 2400);
+    }
+    function readRows() {
+      try {
+        const extra = JSON.parse(localStorage.getItem('demoContractorInbox') || '[]');
+        return baseRows.map(row => {
+          const match = extra.find(x => x.id === row.id);
+          return match ? Object.assign({}, row, match) : row;
+        });
+      } catch (_) {
+        return baseRows;
+      }
+    }
+    function render() {
+      const q = state.q.trim().toLowerCase();
+      const rows = readRows().filter(row => {
+        const hitStatus = state.status === 'all' || row.status === state.status;
+        const hay = [row.id, row.title, row.demander].join(' ').toLowerCase();
+        return hitStatus && (!q || hay.includes(q));
+      });
+      document.getElementById('kpiInvite').textContent = readRows().filter(x => x.status === 'to-quote').length;
+      document.getElementById('kpiQuoted').textContent = readRows().filter(x => x.status === 'quoted').length;
+      document.getElementById('kpiWork').textContent = readRows().filter(x => ['in-progress', 'review'].includes(x.status)).length;
+      const list = document.getElementById('list');
+      if (!rows.length) {
+        list.innerHTML = '<div class="empty">没有符合条件的订单</div>';
+        return;
+      }
+      list.innerHTML = rows.map(row => cardHtml(row)).join('');
+    }
+    function cardHtml(row) {
+      const status = statusMap[row.status] || ['未知', 'quoted'];
+      const steps = ['报价', '确认', '制作', '验收'].map((name, idx) => {
+        const cls = idx < row.progress ? 'done' : (idx === row.progress ? 'current' : '');
+        return `<div class="step ${cls}">${name}</div>`;
+      }).join('');
+      return `
+        <article class="order-card">
+          <div class="order-head">
+            <div>
+              <div class="order-title">${row.title}</div>
+              <div class="order-sub">${row.id} · ${row.demander}</div>
+            </div>
+            <div class="badges">
+              <span class="badge ${status[1]}">${status[0]}</span>
+              ${row.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+            </div>
+          </div>
+          <div class="meta-grid">
+            <div><div class="meta-label">需求预算</div><div class="meta-value">¥${row.budget.toLocaleString('zh-CN')}</div></div>
+            <div><div class="meta-label">我的报价</div><div class="meta-value">${row.price ? '¥' + row.price.toLocaleString('zh-CN') : '未报价'}</div></div>
+            <div><div class="meta-label">交付截止</div><div class="meta-value">${row.deadline}</div></div>
+            <div><div class="meta-label">需求方</div><div class="meta-value">${row.demander.replace('骋风天合 · ', '')}</div></div>
+            <div><div class="meta-label">收益预估</div><div class="meta-value">${row.price ? '¥' + Math.round(row.price * 0.95).toLocaleString('zh-CN') : '-'}</div></div>
+          </div>
+          <div class="progress-line">${steps}</div>
+          <div class="order-actions">${actionsHtml(row)}</div>
+        </article>
+      `;
+    }
+    function actionsHtml(row) {
+      if (row.status === 'to-quote') return `<button class="btn danger" onclick="declineInvite('${row.id}')">婉拒</button><button class="btn primary" onclick="openQuoteModal('${row.id}')">提交报价</button>`;
+      if (row.status === 'quoted') return `<button class="btn" onclick="toast('已提醒需求方查看报价', 'info')">提醒查看</button><button class="btn primary" onclick="location.href='demand-quote-comparison.html?demandId=${row.demandId || 'DM-2026042512'}'">看需求方视角</button>`;
+      if (row.status === 'review') return `<button class="btn primary" onclick="location.href='project-space.html?orderId=${row.id}'">进入协同空间</button>`;
+      if (row.status === 'in-progress') return `<button class="btn" onclick="toast('版本上传入口下版本补齐', 'info')">上传版本</button><button class="btn primary" onclick="location.href='project-space.html?orderId=${row.id}'">进入协同空间</button>`;
+      return `<button class="btn" onclick="toast('归档详情下版本补齐', 'info')">查看归档</button><button class="btn" onclick="toast('开票申请已记录（mock）', 'ok')">申请开票</button>`;
+    }
+    function openQuoteModal() {
+      document.getElementById('quoteModal').classList.add('open');
+    }
+    function closeQuoteModal() {
+      document.getElementById('quoteModal').classList.remove('open');
+    }
+    function submitQuote() {
+      if (!window.demoApp.requireProfile("quote")) return;
+      const quote = {
+        demandId: 'DM-2026042512',
+        contractor: '星辰创作工作室',
+        price: Number(document.getElementById('quotePrice').value || 18000),
+        days: Number(document.getElementById('quoteDays').value || 14),
+        plan: document.getElementById('quotePlan').value
+      };
+      try { localStorage.setItem('demoContractorQuoteDraft', JSON.stringify(quote)); } catch (_) {}
+      closeQuoteModal();
+      toast('报价已提交，正在切到需求方报价对比页', 'ok');
+      setTimeout(() => location.href = 'demand-quote-comparison.html?demandId=DM-2026042512', 800);
+    }
+    function declineInvite() {
+      toast('已婉拒邀约（mock），需求方会看到承制方不可接单', 'info');
+    }
+    document.getElementById('tabs').addEventListener('click', e => {
+      if (!e.target.matches('.tab')) return;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      e.target.classList.add('active');
+      state.status = e.target.getAttribute('data-status');
+      render();
+    });
+    document.getElementById('search').addEventListener('input', e => {
+      state.q = e.target.value;
+      render();
+    });
+    window.demoApp.setCurrentIdentity('contractor');
+    SharedHeader.mount({ activeNav: 'contractor-orders', identity: 'contractor', brandHref: 'platform-home-contractor.html', brandSub: '承制方工作台' });
+    render();
+  </script>
+</body>
+</html>

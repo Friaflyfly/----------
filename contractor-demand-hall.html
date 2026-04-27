@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>接单大厅 - 承制方 · 创作门户交易平台</title>
+  <link rel="stylesheet" href="_shared.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #262626; }
+    .app { display: flex; padding-top: 56px; min-height: 100vh; }
+    .sidebar { width: 200px; background: #fff; box-shadow: 2px 0 8px rgba(0,0,0,.06); position: fixed; top: 56px; left: 0; bottom: 0; padding: 16px 0; overflow-y: auto; }
+    .menu a { display: flex; align-items: center; gap: 10px; padding: 11px 24px; color: #262626; text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
+    .menu a:hover { background: #f0f7ff; color: #1890ff; }
+    .menu a.active { background: #e6f7ff; color: #1890ff; border-left-color: #1890ff; font-weight: 500; }
+    .menu-icon { width: 18px; text-align: center; }
+    .menu-group { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+    .menu-group-title { padding: 8px 24px; font-size: 11px; color: #8c8c8c; }
+    .main { margin-left: 200px; flex: 1; padding: 24px 28px 60px; }
+
+    .page-head { margin-bottom: 20px; }
+    .page-head h1 { margin: 0 0 6px; font-size: 24px; }
+    .page-head .sub { color: #8c8c8c; font-size: 13px; }
+
+    .filter-bar { background: #fff; border-radius: 12px; padding: 16px 20px; box-shadow: 0 2px 8px rgba(0,0,0,.04); margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .filter-group { display: flex; gap: 6px; align-items: center; }
+    .filter-label { font-size: 12px; color: #8c8c8c; margin-right: 4px; }
+    .chip { padding: 5px 14px; border-radius: 14px; font-size: 12px; border: 1px solid #d9d9d9; background: #fff; cursor: pointer; transition: all .15s; }
+    .chip:hover { border-color: #91d5ff; color: #1890ff; }
+    .chip.active { background: #e6f7ff; border-color: #1890ff; color: #1890ff; font-weight: 500; }
+    .search-input { margin-left: auto; border: 1px solid #d9d9d9; border-radius: 8px; padding: 6px 14px; font-size: 13px; width: 220px; }
+    .search-input:focus { border-color: #1890ff; outline: none; }
+
+    .stats-bar { display: flex; gap: 20px; margin-bottom: 16px; font-size: 13px; color: #8c8c8c; }
+    .stats-bar strong { color: #1890ff; }
+
+    .demand-list { display: flex; flex-direction: column; gap: 12px; }
+    .demand-card { background: #fff; border-radius: 12px; padding: 20px 24px; box-shadow: 0 2px 8px rgba(0,0,0,.04); transition: box-shadow .15s, transform .1s; cursor: pointer; }
+    .demand-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,.1); transform: translateY(-1px); }
+    .dc-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .dc-cat { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; background: #e6f7ff; color: #096dd9; }
+    .dc-title { font-size: 16px; font-weight: 600; flex: 1; }
+    .dc-budget { font-size: 18px; font-weight: 700; color: #722ed1; }
+    .dc-budget .unit { font-size: 12px; font-weight: 400; color: #8c8c8c; }
+    .dc-desc { font-size: 13px; color: #595959; line-height: 1.6; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .dc-meta { display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px; color: #8c8c8c; margin-bottom: 12px; }
+    .dc-meta span { display: flex; align-items: center; gap: 4px; }
+    .dc-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .dc-tag { padding: 2px 8px; border-radius: 10px; font-size: 11px; background: #fafafa; border: 1px solid #f0f0f0; color: #595959; }
+    .dc-bottom { display: flex; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid #f5f5f5; }
+    .dc-demander { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #8c8c8c; }
+    .dc-demander .avatar { width: 24px; height: 24px; border-radius: 50%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+    .dc-actions { display: flex; gap: 8px; }
+    .btn { height: 34px; border: 1px solid #d9d9d9; background: #fff; border-radius: 8px; padding: 0 16px; font-size: 13px; color: #595959; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .btn:hover { border-color: #91d5ff; color: #1890ff; }
+    .btn.primary { background: linear-gradient(135deg, #1890ff, #722ed1); border: none; color: #fff; font-weight: 500; }
+    .btn.primary:hover { opacity: .9; }
+    .badge-hot { padding: 2px 8px; border-radius: 10px; font-size: 10px; background: #fff1f0; color: #cf1322; border: 1px solid #ffa39e; margin-left: 6px; }
+    .badge-new { padding: 2px 8px; border-radius: 10px; font-size: 10px; background: #e6f7ff; color: #096dd9; border: 1px solid #91d5ff; margin-left: 6px; }
+    .badge-match { padding: 2px 8px; border-radius: 10px; font-size: 10px; background: #f6ffed; color: #389e0d; border: 1px solid #b7eb8f; margin-left: 6px; }
+
+    .empty { text-align: center; padding: 60px 20px; color: #8c8c8c; font-size: 14px; }
+    .modal-mask { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 900; align-items: center; justify-content: center; }
+    .modal-mask.open { display: flex; }
+    .modal { width: min(92vw, 560px); background: #fff; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.22); overflow: hidden; }
+    .modal-head { padding: 18px 22px; border-bottom: 1px solid #f0f0f0; }
+    .modal-head h3 { margin: 0; font-size: 17px; }
+    .modal-head p { margin: 4px 0 0; font-size: 12px; color: #8c8c8c; }
+    .modal-body { padding: 20px 22px; max-height: 60vh; overflow-y: auto; }
+    .modal-foot { padding: 14px 22px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 8px; }
+    .form-row { margin-bottom: 14px; }
+    .form-row label { display: block; font-size: 12px; color: #8c8c8c; margin-bottom: 5px; }
+    .form-row input, .form-row textarea, .form-row select { width: 100%; border: 1px solid #d9d9d9; border-radius: 6px; padding: 8px 10px; font-size: 13px; font-family: inherit; }
+    .form-row textarea { min-height: 80px; }
+    .toasts { position: fixed; top: 72px; right: 20px; width: min(90vw, 360px); display: grid; gap: 8px; z-index: 1100; }
+    .toast { background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; padding: 10px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.1); animation: slideIn .25s ease-out; }
+    .toast.ok { border-color: #b7eb8f; background: #f6ffed; color: #389e0d; }
+    .toast.info { border-color: #91d5ff; background: #e6f7ff; color: #096dd9; }
+    .toast.warn { border-color: #ffe58f; background: #fffbe6; color: #d48806; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding: 16px; } .dc-budget { font-size: 15px; } }
+  </style>
+</head>
+<body>
+  <header class="topbar" id="topbar-shared"></header>
+  <div class="app">
+    <aside class="sidebar">
+      <nav class="menu">
+        <a href="platform-home-contractor.html"><span class="menu-icon">🏠</span> 承制方工作台</a>
+        <a href="contractor-demand-hall.html" class="active"><span class="menu-icon">📢</span> 接单大厅</a>
+        <a href="contractor-orders.html"><span class="menu-icon">📬</span> 接单与订单</a>
+        <a href="project-space.html"><span class="menu-icon">🤝</span> 项目协同空间</a>
+        <a href="contractor-profile-edit.html"><span class="menu-icon">🏪</span> 编辑对外主页</a>
+        <a href="wallet-overview.html"><span class="menu-icon">💰</span> 收益中心</a>
+        <div class="menu-group">
+          <div class="menu-group-title">账户</div>
+          <a href="account-basic-info-prototype-platform-style.html"><span class="menu-icon">⚙️</span> 账户中心</a>
+        </div>
+      </nav>
+    </aside>
+    <main class="main">
+      <div class="page-head">
+        <h1>📢 接单大厅</h1>
+        <div class="sub">浏览需求方发布的公开需求，找到匹配自己能力的项目主动报价。标有「推荐」的需求与你的服务类目高度匹配。</div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-group">
+          <span class="filter-label">类目</span>
+          <span class="chip active" data-cat="all" onclick="filterCat('all')">全部</span>
+          <span class="chip" data-cat="video" onclick="filterCat('video')">视频制作</span>
+          <span class="chip" data-cat="image" onclick="filterCat('image')">图片设计</span>
+          <span class="chip" data-cat="copy" onclick="filterCat('copy')">文案服务</span>
+          <span class="chip" data-cat="content" onclick="filterCat('content')">内容创作</span>
+        </div>
+        <input class="search-input" id="searchBox" placeholder="搜索需求标题…" oninput="renderList()">
+      </div>
+
+      <div class="stats-bar" id="statsBar"></div>
+      <div class="demand-list" id="demandList"></div>
+    </main>
+  </div>
+
+  <div class="modal-mask" id="quoteModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3 id="qmTitle">提交报价</h3>
+        <p id="qmSub"></p>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <label>报价金额（元）</label>
+          <input type="number" id="quoteAmount" placeholder="请输入报价金额">
+        </div>
+        <div class="form-row">
+          <label>预计工期（天）</label>
+          <input type="number" id="quoteDays" placeholder="如 15" value="12">
+        </div>
+        <div class="form-row">
+          <label>报价方案说明</label>
+          <textarea id="quoteNote" placeholder="介绍你的方案优势、团队配置、交付节点…">星辰创作工作室将安排 3 人团队全程跟进，分阶段交付：
+- 第 1-3 天：需求拆解 + 风格定稿
+- 第 4-10 天：主体制作
+- 第 11-12 天：修改 + 终稿交付
+
+质保：终稿交付后提供 2 轮免费修改。</textarea>
+        </div>
+        <div class="form-row">
+          <label>附加案例（选填）</label>
+          <select>
+            <option>「修仙爽剧解说系列」- 全网播放 500W+</option>
+            <option>「国潮品牌 TVC」- 获金奖</option>
+            <option>不附加案例</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="document.getElementById('quoteModal').classList.remove('open')">取消</button>
+        <button class="btn primary" onclick="submitQuote()">📤 提交报价</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastWrap" class="toasts"></div>
+
+  <script src="_shared.js"></script>
+  <script>
+    SharedHeader.mount({ activeNav: "" });
+
+    function toast(msg, kind) {
+      var w = document.getElementById("toastWrap"), t = document.createElement("div");
+      t.className = "toast " + (kind || "ok"); t.textContent = msg; w.appendChild(t);
+      setTimeout(function () { t.style.opacity = "0"; t.style.transform = "translateX(20px)"; setTimeout(function () { t.remove(); }, 260); }, 2400);
+    }
+
+    var demands = [
+      {
+        id: "DM-2026042701", title: "品牌宣传短片（30秒 TVC）", cat: "video", catName: "视频制作",
+        desc: "为新品上市制作 30 秒品牌 TVC，需要实拍 + 后期合成，风格偏高级质感。需在 5 月 15 日前交付成片。",
+        budget: 35000, deadline: "2026-05-15", level: "专业级",
+        tags: ["品牌片", "TVC", "实拍+后期", "高级质感"],
+        demander: "骋风天合 · 市场宣传组", demanderIcon: "🏢",
+        time: "2026-04-27 09:00", quotesCount: 2, badge: "new", match: true
+      },
+      {
+        id: "DM-2026042512", title: "三集短剧解说视频（修仙题材）", cat: "video", catName: "视频制作",
+        desc: "将 3 集短剧内容进行解说视频制作，每集 8-12 分钟。需要有解说配音、字幕、特效剪辑。修仙玄幻题材，需了解相关梗和表达方式。",
+        budget: 18000, deadline: "2026-05-08", level: "标准级",
+        tags: ["短剧解说", "修仙题材", "配音", "字幕"],
+        demander: "骋风天合 · 短剧制作中心", demanderIcon: "🏢",
+        time: "2026-04-25 15:32", quotesCount: 4, badge: "hot", match: true
+      },
+      {
+        id: "DM-2026042602", title: "618 大促活动海报系列（6 张）", cat: "image", catName: "图片设计",
+        desc: "618 年中大促系列海报设计，共 6 张（主 KV 1张 + 品类分 KV 5张），需配合品牌调性，交付 PSD + PNG。",
+        budget: 12000, deadline: "2026-05-20", level: "标准级",
+        tags: ["海报设计", "电商", "618", "品牌调性"],
+        demander: "某电商品牌方", demanderIcon: "🛍",
+        time: "2026-04-26 11:40", quotesCount: 1, badge: "new", match: true
+      },
+      {
+        id: "DM-2026042403", title: "品牌宣传短片脚本", cat: "copy", catName: "文案服务",
+        desc: "需要一份品牌宣传短片的脚本文案，包含旁白、分镜描述、字幕文案。品牌定位：高端、科技感、年轻化。",
+        budget: 5000, deadline: "2026-05-02", level: "标准级",
+        tags: ["脚本", "品牌文案", "分镜"],
+        demander: "骋风天合 · 市场宣传组", demanderIcon: "🏢",
+        time: "2026-04-24 09:14", quotesCount: 0, badge: "", match: false
+      },
+      {
+        id: "DM-2026042304", title: "游戏角色立绘（5 个角色）", cat: "image", catName: "图片设计",
+        desc: "手游项目需要 5 个主角色的全身立绘，二次元风格，含三视图和表情差分。每个角色需要 2 套服装。",
+        budget: 25000, deadline: "2026-05-25", level: "专业级",
+        tags: ["角色设计", "立绘", "二次元", "游戏"],
+        demander: "某游戏公司", demanderIcon: "🎮",
+        time: "2026-04-23 16:00", quotesCount: 6, badge: "hot", match: false
+      },
+      {
+        id: "DM-2026042205", title: "有声书录制 · 玄幻小说（20集）", cat: "content", catName: "内容创作",
+        desc: "玄幻题材网络小说有声书录制，共 20 集，每集约 30 分钟。需要男声配音，声线偏少年感。需自备录音设备。",
+        budget: 16000, deadline: "2026-06-01", level: "标准级",
+        tags: ["有声书", "配音", "玄幻", "男声"],
+        demander: "某出版社", demanderIcon: "📚",
+        time: "2026-04-22 14:30", quotesCount: 3, badge: "", match: false
+      },
+      {
+        id: "DM-2026042106", title: "公众号封面图月度包（30 张）", cat: "image", catName: "图片设计",
+        desc: "每日 1 张公众号首图设计，符合品牌色和风格指南。提供文案，设计师按风格自由发挥。长期合作优先。",
+        budget: 6000, deadline: "2026-05-01", level: "基础级",
+        tags: ["封面图", "公众号", "月度包", "长期合作"],
+        demander: "某自媒体工作室", demanderIcon: "📱",
+        time: "2026-04-21 10:00", quotesCount: 8, badge: "", match: true
+      }
+    ];
+
+    var currentCat = "all";
+    var quotedSet = new Set();
+    var quoteTargetId = null;
+
+    function filterCat(cat) {
+      currentCat = cat;
+      document.querySelectorAll(".chip[data-cat]").forEach(function (c) { c.classList.toggle("active", c.getAttribute("data-cat") === cat); });
+      renderList();
+    }
+
+    function renderList() {
+      var q = document.getElementById("searchBox").value.toLowerCase();
+      var filtered = demands.filter(function (d) {
+        if (currentCat !== "all" && d.cat !== currentCat) return false;
+        if (q && d.title.toLowerCase().indexOf(q) === -1) return false;
+        return true;
+      });
+
+      document.getElementById("statsBar").innerHTML =
+        "共 <strong>" + filtered.length + "</strong> 条需求" +
+        " · 匹配你的类目 <strong>" + filtered.filter(function (d) { return d.match; }).length + "</strong> 条" +
+        " · 已报价 <strong>" + quotedSet.size + "</strong> 条";
+
+      if (filtered.length === 0) {
+        document.getElementById("demandList").innerHTML = '<div class="empty">暂无匹配的需求，试试切换类目或清空搜索</div>';
+        return;
+      }
+
+      document.getElementById("demandList").innerHTML = filtered.map(function (d) {
+        var badgeHtml = "";
+        if (d.badge === "hot") badgeHtml = '<span class="badge-hot">🔥 热门</span>';
+        else if (d.badge === "new") badgeHtml = '<span class="badge-new">✨ 新</span>';
+        if (d.match) badgeHtml += '<span class="badge-match">💡 推荐</span>';
+
+        var isQuoted = quotedSet.has(d.id);
+
+        return '<div class="demand-card">'
+          + '<div class="dc-top">'
+            + '<span class="dc-cat">' + d.catName + '</span>'
+            + '<span class="dc-title">' + d.title + badgeHtml + '</span>'
+            + '<span class="dc-budget">¥' + d.budget.toLocaleString() + ' <span class="unit">预算</span></span>'
+          + '</div>'
+          + '<div class="dc-desc">' + d.desc + '</div>'
+          + '<div class="dc-tags">' + d.tags.map(function (t) { return '<span class="dc-tag">' + t + '</span>'; }).join("") + '</div>'
+          + '<div class="dc-meta">'
+            + '<span>📅 截止 ' + d.deadline + '</span>'
+            + '<span>⭐ ' + d.level + '</span>'
+            + '<span>📝 已有 ' + d.quotesCount + ' 份报价</span>'
+            + '<span>🕐 发布于 ' + d.time + '</span>'
+          + '</div>'
+          + '<div class="dc-bottom">'
+            + '<div class="dc-demander"><span class="avatar">' + d.demanderIcon + '</span> ' + d.demander + '</div>'
+            + '<div class="dc-actions">'
+              + (isQuoted
+                ? '<button class="btn" disabled style="opacity:.5">✅ 已报价</button>'
+                : '<button class="btn primary" onclick="openQuote(\'' + d.id + '\')">📤 我要报价</button>')
+              + '<button class="btn" onclick="toast(\'需求详情页开发中\', \'info\')">查看详情</button>'
+            + '</div>'
+          + '</div>'
+        + '</div>';
+      }).join("");
+    }
+
+    window.openQuote = function (id) {
+      var d = demands.find(function (x) { return x.id === id; });
+      if (!d) return;
+      quoteTargetId = id;
+      document.getElementById("qmTitle").textContent = "提交报价 · " + d.title;
+      document.getElementById("qmSub").textContent = d.catName + " · 预算 ¥" + d.budget.toLocaleString() + " · 截止 " + d.deadline;
+      document.getElementById("quoteAmount").value = Math.round(d.budget * 0.85);
+      document.getElementById("quoteModal").classList.add("open");
+    };
+
+    window.submitQuote = function () {
+      if (!window.demoApp.requireProfile("quote")) return;
+      var amt = Number(document.getElementById("quoteAmount").value);
+      if (!amt || amt < 100) { toast("请输入有效报价金额", "warn"); return; }
+      var note = document.getElementById("quoteNote").value;
+      if (!note.trim()) { toast("请填写报价方案说明", "warn"); return; }
+      quotedSet.add(quoteTargetId);
+      document.getElementById("quoteModal").classList.remove("open");
+      toast("✅ 报价已提交！需求方将在 1-3 个工作日内查看并决定", "ok");
+      renderList();
+    };
+
+    renderList();
+  </script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>类目配置 - 平台运营后台</title>
+  <link rel="stylesheet" href="_shared.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #262626; }
+    .ops-banner { background: linear-gradient(135deg, #13c2c2, #006d75); color: #fff; font-size: 12px; text-align: center; padding: 6px; position: fixed; top: 56px; left: 0; right: 0; z-index: 190; }
+    .app { display: flex; padding-top: 84px; min-height: 100vh; }
+    .sidebar { width: 200px; background: #fff; box-shadow: 2px 0 8px rgba(0,0,0,.06); position: fixed; top: 84px; left: 0; bottom: 0; padding: 16px 0; overflow-y: auto; }
+    .menu a { display: flex; align-items: center; gap: 10px; padding: 11px 24px; color: #262626; text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
+    .menu a:hover { background: #f0f7ff; color: #1890ff; }
+    .menu a.active { background: #e6fffb; color: #13c2c2; border-left-color: #13c2c2; font-weight: 500; }
+    .menu-icon { width: 18px; text-align: center; }
+    .menu-group { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+    .menu-group-title { padding: 8px 24px; font-size: 11px; color: #8c8c8c; }
+    .main { margin-left: 200px; flex: 1; padding: 24px 28px 60px; }
+    .page-head { margin-bottom: 16px; }
+    .page-head h1 { margin: 0 0 6px; font-size: 22px; }
+    .page-head .sub { color: #8c8c8c; font-size: 13px; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; gap: 16px; }
+    .panel { background: #fff; border-radius: 10px; padding: 18px 20px; box-shadow: 0 2px 6px rgba(0,0,0,.04); margin-bottom: 16px; }
+    .panel h2 { margin: 0 0 4px; font-size: 16px; }
+    .panel .desc { font-size: 12px; color: #8c8c8c; margin: 0 0 14px; }
+    .btn { height: 34px; border: 1px solid #d9d9d9; background: #fff; border-radius: 6px; padding: 0 14px; font-size: 13px; color: #595959; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .btn:hover { border-color: #87e8de; color: #13c2c2; }
+    .btn.primary { background: #13c2c2; border-color: #13c2c2; color: #fff; }
+    .btn.primary:hover { background: #36cfc9; }
+    .cat-tree { list-style: none; padding: 0; margin: 0; }
+    .cat-l1 { padding: 10px 12px; border-radius: 8px; cursor: pointer; margin-bottom: 4px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: all .15s; }
+    .cat-l1:hover { background: #e6fffb; }
+    .cat-l1.active { background: #e6fffb; color: #006d75; border-left: 3px solid #13c2c2; padding-left: 9px; }
+    .cat-l1 .icon { font-size: 16px; }
+    .cat-l1 .count { margin-left: auto; font-size: 11px; color: #8c8c8c; font-weight: 400; }
+    .cat-l2-list { padding-left: 16px; margin: 0 0 6px; }
+    .cat-l2 { padding: 6px 12px; font-size: 13px; color: #595959; border-radius: 6px; cursor: pointer; margin-bottom: 2px; display: flex; align-items: center; gap: 6px; }
+    .cat-l2:hover { background: #f0f7ff; }
+    .cat-l2.active { background: #e6fffb; color: #13c2c2; font-weight: 500; }
+    .detail-section { margin-bottom: 20px; }
+    .detail-section h3 { margin: 0 0 10px; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 10px 12px; background: #fafafa; color: #8c8c8c; font-weight: 500; font-size: 12px; border-bottom: 1px solid #f0f0f0; }
+    td { padding: 10px 12px; border-bottom: 1px solid #f5f5f5; }
+    .tag-chip { display: inline-block; padding: 3px 10px; border-radius: 14px; font-size: 12px; margin: 2px; cursor: pointer; border: 1px solid transparent; transition: all .15s; }
+    .tag-chip.active { background: #e6fffb; border-color: #87e8de; color: #006d75; }
+    .tag-chip.inactive { background: #f5f5f5; color: #8c8c8c; }
+    .field-row { display: grid; grid-template-columns: 140px 120px 100px 1fr 80px; gap: 8px; align-items: center; padding: 10px 0; border-bottom: 1px dashed #f0f0f0; font-size: 13px; }
+    .field-row:last-child { border-bottom: none; }
+    .badge { display: inline-block; padding: 2px 7px; border-radius: 8px; font-size: 11px; }
+    .badge.required { background: #fff1f0; color: #cf1322; }
+    .badge.optional { background: #f6ffed; color: #389e0d; }
+    .level-card { border: 1px solid #f0f0f0; border-radius: 8px; padding: 14px 16px; margin-bottom: 8px; display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
+    .level-name { font-weight: 600; font-size: 14px; }
+    .level-desc { font-size: 12px; color: #8c8c8c; margin-top: 3px; }
+    .level-price { font-size: 14px; font-weight: 600; color: #006d75; }
+    .toasts { position: fixed; top: 100px; right: 20px; width: min(90vw, 360px); display: grid; gap: 8px; z-index: 1100; }
+    .toast { background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; padding: 10px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.1); animation: slideIn .25s ease-out; }
+    .toast.ok { border-color: #b7eb8f; background: #f6ffed; color: #389e0d; }
+    .toast.info { border-color: #91d5ff; background: #e6f7ff; color: #096dd9; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    @media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding: 16px; } }
+  </style>
+</head>
+<body>
+  <header class="topbar" id="topbar-shared"></header>
+  <div class="ops-banner">🏷 平台运营后台 · 类目 / 标签 / 服务等级 / 动态字段 Schema 配置</div>
+  <div class="app">
+    <aside class="sidebar">
+      <nav class="menu">
+        <a href="admin-demand-review.html"><span class="menu-icon">🔍</span> 需求核定</a>
+        <a href="admin-onboarding-review.html"><span class="menu-icon">📋</span> 入驻审核</a>
+        <a href="admin-finance.html"><span class="menu-icon">💰</span> 财务结算</a>
+        <a href="admin-category-config.html" class="active"><span class="menu-icon">🏷</span> 类目配置</a>
+        <div class="menu-group">
+          <div class="menu-group-title">跳转</div>
+          <a href="admin-console.html"><span class="menu-icon">👑</span> 管理员后台</a>
+          <a href="platform-home-demander.html"><span class="menu-icon">📥</span> 需求方工作台</a>
+          <a href="demo-index.html"><span class="menu-icon">📋</span> Demo 导航</a>
+        </div>
+      </nav>
+    </aside>
+    <main class="main">
+      <div class="page-head">
+        <h1>类目 / 标签 / 服务等级配置</h1>
+        <div class="sub">配置需求发布时的类目体系、标签、动态字段 Schema 和服务等级。修改即时生效，影响发布表单和承制方匹配。</div>
+      </div>
+      <div class="layout">
+        <div>
+          <div class="panel">
+            <h2>📂 类目体系</h2>
+            <p class="desc">左侧选择一级类目，展开二级</p>
+            <ul class="cat-tree" id="catTree"></ul>
+            <button class="btn primary" style="margin-top:10px;width:100%" onclick="toast('新建一级类目功能下版本补齐', 'info')">+ 新建一级类目</button>
+          </div>
+        </div>
+        <div id="detailArea">
+          <div class="panel" style="text-align:center;padding:60px 20px;color:#8c8c8c">
+            ← 请在左侧选择一个类目查看详情
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div id="toastWrap" class="toasts"></div>
+  <script src="_shared.js"></script>
+  <script>
+    SharedHeader.mount({ activeNav: "ops-category", brandHref: "admin-demand-review.html", brandLabel: "🔍 运营后台", brandSub: "骋风天合 · 平台运营" });
+
+    function toast(msg, kind) {
+      var wrap = document.getElementById('toastWrap');
+      var t = document.createElement('div');
+      t.className = 'toast ' + (kind || 'ok');
+      t.textContent = msg;
+      wrap.appendChild(t);
+      setTimeout(function () { t.style.opacity = '0'; t.style.transform = 'translateX(20px)'; setTimeout(function () { t.remove(); }, 260); }, 2400);
+    }
+
+    var categories = {
+      video: { name: '视频制作', icon: '🎬', sub: { 'drama-explain': '短剧解说', 'promo-video': '宣传片', 'ecommerce-video': '电商视频', 'animation': '动画/MG' },
+        tags: ['修仙', '古风', '都市', '搞笑', '治愈', '3D', '实拍', '混剪'],
+        levels: [{ name: '标准级', desc: '模板化，1080p，2 轮修改', price: '¥3,000-8,000' }, { name: '影视级', desc: '原创分镜，4K，无限修改', price: '¥8,000-50,000' }, { name: '院线级', desc: '专业团队，HDR，含调色', price: '¥50,000+' }],
+        fields: [
+          { name: '视频时长', type: 'number', unit: '分钟', required: true },
+          { name: '集数', type: 'number', unit: '集', required: true },
+          { name: '分辨率', type: 'select', options: '1080p / 2K / 4K', required: true },
+          { name: '配音要求', type: 'select', options: '无 / AI配音 / 真人配音', required: false },
+          { name: '字幕', type: 'select', options: '无 / 中文 / 中英双语', required: false }
+        ]
+      },
+      image: { name: '图片设计', icon: '🎨', sub: { poster: '海报设计', cover: '封面/缩略图', illustration: '插画', 'brand-vi': '品牌 VI' },
+        tags: ['国风', '极简', '赛博朋克', '写实', '水墨', '扁平', '3D渲染'],
+        levels: [{ name: '基础版', desc: '模板改稿', price: '¥500-2,000' }, { name: '定制版', desc: '原创设计，含源文件', price: '¥2,000-15,000' }, { name: '高端定制', desc: '资深设计师，品牌调性匹配', price: '¥15,000+' }],
+        fields: [
+          { name: '尺寸规格', type: 'text', unit: '', required: true },
+          { name: '张数', type: 'number', unit: '张', required: true },
+          { name: '文件格式', type: 'select', options: 'PSD / AI / PNG / JPG', required: true },
+          { name: '是否含源文件', type: 'select', options: '是 / 否', required: false }
+        ]
+      },
+      copy: { name: '文案服务', icon: '✍️', sub: { 'marketing-copy': '营销文案', 'script': '短视频脚本', 'article': '自媒体文章', 'brand-story': '品牌故事' },
+        tags: ['种草', '卖点提炼', '故事型', '数据型', 'SEO'],
+        levels: [{ name: '标准', desc: 'AI 辅助 + 人工润色', price: '¥500-2,000' }, { name: '资深', desc: '5 年+ 文案师原创', price: '¥2,000-8,000' }],
+        fields: [
+          { name: '字数要求', type: 'number', unit: '字', required: true },
+          { name: '篇数', type: 'number', unit: '篇', required: true },
+          { name: '投放平台', type: 'text', unit: '', required: false }
+        ]
+      },
+      content: { name: '内容创作', icon: '🎤', sub: { voice: '配音', music: '原创音乐', 'live-host': '直播代运营' },
+        tags: ['男声', '女声', '磁性', '童声', '电子', '国风', '流行'],
+        levels: [{ name: 'AI 级', desc: 'AI 生成 + 人工微调', price: '¥200-1,000' }, { name: '专业级', desc: '真人录制', price: '¥1,000-10,000' }],
+        fields: [
+          { name: '时长', type: 'number', unit: '分钟', required: true },
+          { name: '语种', type: 'select', options: '中文 / 英文 / 日语 / 粤语', required: true }
+        ]
+      },
+      license: { name: '资质服务', icon: '📜', sub: { broadcast: '广播电视节目制作许可证', icp: 'ICP 备案', copyright: '版权登记' },
+        tags: ['加急', '全国', '地方'],
+        levels: [{ name: '常规', desc: '30 个工作日', price: '¥5,000-12,000' }, { name: '加急', desc: '15 个工作日', price: '¥12,000-25,000' }],
+        fields: [
+          { name: '办理地区', type: 'text', unit: '', required: true },
+          { name: '公司名称', type: 'text', unit: '', required: true },
+          { name: '是否加急', type: 'select', options: '否 / 是', required: false }
+        ]
+      }
+    };
+
+    var activeCat = null;
+
+    function renderTree() {
+      var tree = document.getElementById('catTree');
+      var html = '';
+      Object.keys(categories).forEach(function (key) {
+        var cat = categories[key];
+        var subCount = Object.keys(cat.sub).length;
+        var isActive = activeCat === key;
+        html += '<li class="cat-l1 ' + (isActive ? 'active' : '') + '" onclick="selectCat(\'' + key + '\')">'
+          + '<span class="icon">' + cat.icon + '</span>' + cat.name
+          + '<span class="count">' + subCount + ' 个二级</span></li>';
+        if (isActive) {
+          html += '<ul class="cat-l2-list">';
+          Object.keys(cat.sub).forEach(function (sk) {
+            html += '<li class="cat-l2" onclick="event.stopPropagation();toast(\'二级类目详情编辑功能下版本补齐\', \'info\')">' + cat.sub[sk] + '</li>';
+          });
+          html += '<li class="cat-l2" style="color:#13c2c2;cursor:pointer" onclick="event.stopPropagation();toast(\'新建二级类目功能下版本补齐\', \'info\')">+ 新建二级类目</li>';
+          html += '</ul>';
+        }
+      });
+      tree.innerHTML = html;
+    }
+
+    window.selectCat = function (key) {
+      activeCat = key;
+      renderTree();
+      renderDetail(key);
+    };
+
+    function renderDetail(key) {
+      var cat = categories[key];
+      var area = document.getElementById('detailArea');
+
+      var tagsHtml = cat.tags.map(function (t) {
+        return '<span class="tag-chip active">' + t + '</span>';
+      }).join('') + '<span class="tag-chip inactive" onclick="toast(\'新建标签功能下版本补齐\', \'info\')">+ 新标签</span>';
+
+      var levelsHtml = cat.levels.map(function (l) {
+        return '<div class="level-card"><div><div class="level-name">' + l.name + '</div><div class="level-desc">' + l.desc + '</div></div><div class="level-price">' + l.price + '</div></div>';
+      }).join('');
+
+      var fieldsHtml = '<div class="field-row" style="font-weight:500;color:#8c8c8c;font-size:12px"><div>字段名</div><div>类型</div><div>必填</div><div>选项/单位</div><div></div></div>';
+      cat.fields.forEach(function (f) {
+        fieldsHtml += '<div class="field-row">'
+          + '<div>' + f.name + '</div>'
+          + '<div><span class="badge" style="background:#f5f5f5;color:#595959">' + f.type + '</span></div>'
+          + '<div><span class="badge ' + (f.required ? 'required' : 'optional') + '">' + (f.required ? '必填' : '选填') + '</span></div>'
+          + '<div style="font-size:12px;color:#8c8c8c">' + (f.options || f.unit || '-') + '</div>'
+          + '<div><button class="btn" style="height:26px;font-size:11px" onclick="toast(\'字段编辑功能下版本补齐\', \'info\')">编辑</button></div>'
+          + '</div>';
+      });
+
+      var subHtml = '';
+      Object.keys(cat.sub).forEach(function (sk) {
+        subHtml += '<tr><td>' + cat.sub[sk] + '</td><td><code style="font-size:11px;color:#8c8c8c">' + sk + '</code></td><td><span class="badge" style="background:#f6ffed;color:#389e0d">启用</span></td><td><button class="btn" style="height:26px;font-size:11px" onclick="toast(\'编辑二级类目功能下版本补齐\', \'info\')">编辑</button></td></tr>';
+      });
+
+      area.innerHTML =
+        '<div class="panel"><div class="detail-section">'
+        + '<h3>' + cat.icon + ' ' + cat.name + ' · 二级类目</h3>'
+        + '<table><thead><tr><th>名称</th><th>标识</th><th>状态</th><th>操作</th></tr></thead><tbody>' + subHtml + '</tbody></table>'
+        + '<button class="btn" style="margin-top:10px" onclick="toast(\'新建二级类目功能下版本补齐\', \'info\')">+ 新建二级类目</button>'
+        + '</div></div>'
+
+        + '<div class="panel"><div class="detail-section">'
+        + '<h3>🏷 标签池</h3>'
+        + '<div>' + tagsHtml + '</div>'
+        + '</div></div>'
+
+        + '<div class="panel"><div class="detail-section">'
+        + '<h3>⭐ 服务等级</h3>'
+        + '<p class="desc">不同等级影响价格区间和匹配的承制方池</p>'
+        + levelsHtml
+        + '<button class="btn" style="margin-top:8px" onclick="toast(\'新建服务等级功能下版本补齐\', \'info\')">+ 新建等级</button>'
+        + '</div></div>'
+
+        + '<div class="panel"><div class="detail-section">'
+        + '<h3>📝 动态字段 Schema</h3>'
+        + '<p class="desc">需求方发布该类目需求时，表单中展示的动态字段</p>'
+        + fieldsHtml
+        + '<button class="btn" style="margin-top:8px" onclick="toast(\'新建字段功能下版本补齐\', \'info\')">+ 新建字段</button>'
+        + '</div></div>';
+    }
+
+    renderTree();
+    selectCat('video');
+  </script>
+</body>
+</html>

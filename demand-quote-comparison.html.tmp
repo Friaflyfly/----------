@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>承制方报价对比 - 骋风天合 · 创作门户交易平台</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #262626; }
+
+    .topbar { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.06); z-index: 200; display: flex; align-items: center; padding: 0 20px; gap: 16px; }
+    .topbar .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 16px; color: #1890ff; text-decoration: none; min-width: 220px; }
+    .topbar .brand-sub { color: #8c8c8c; font-weight: 400; font-size: 12px; margin-left: 4px; }
+    .ws-switcher { position: relative; }
+    .ws-trigger { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid #e8e8e8; border-radius: 6px; background: #fafafa; cursor: pointer; font-size: 13px; min-width: 240px; }
+    .ws-trigger:hover { border-color: #1890ff; background: #e6f7ff; }
+    .ws-trigger .ws-name { font-weight: 500; color: #262626; flex: 1; }
+    .ws-trigger .ws-arrow { color: #8c8c8c; font-size: 10px; }
+    .ws-dropdown { display: none; position: absolute; top: calc(100% + 6px); left: 0; min-width: 320px; background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,.12); padding: 8px; z-index: 300; }
+    .ws-dropdown.open { display: block; }
+    .ws-group-label { font-size: 12px; color: #8c8c8c; padding: 6px 10px; }
+    .ws-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+    .ws-item:hover { background: #f0f7ff; }
+    .ws-item.active { background: #e6f7ff; }
+    .ws-item .ws-item-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .ws-item .ws-item-icon.personal { background: #fff7e6; color: #fa8c16; }
+    .ws-item .ws-item-icon.team { background: #e6f7ff; color: #1890ff; }
+    .ws-item .ws-item-icon.admin { background: #f9f0ff; color: #722ed1; }
+    .ws-item .ws-item-main { flex: 1; min-width: 0; }
+    .ws-item .ws-item-name { font-weight: 500; color: #262626; }
+    .ws-item .ws-item-desc { font-size: 12px; color: #8c8c8c; margin-top: 2px; }
+    .ws-item .ws-item-check { color: #1890ff; font-size: 14px; }
+    .identity-switch { display: flex; gap: 4px; background: #f0f0f0; border-radius: 18px; padding: 3px; }
+    .identity-switch button { border: none; background: transparent; padding: 5px 14px; border-radius: 16px; font-size: 13px; color: #595959; cursor: pointer; }
+    .identity-switch button.active { background: #fff; color: #1890ff; box-shadow: 0 1px 2px rgba(0,0,0,.06); font-weight: 500; }
+    .wallet-chip { display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: linear-gradient(135deg, #fff7e6, #fff1d6); border: 1px solid #ffd591; border-radius: 18px; cursor: pointer; font-size: 13px; color: #d46b08; text-decoration: none; }
+    .wallet-chip:hover { border-color: #fa8c16; }
+    .wallet-chip .wallet-amount { font-weight: 600; font-size: 14px; }
+    .wallet-chip .wallet-account { font-size: 11px; opacity: .85; }
+    .avatar-wrap { position: relative; margin-left: auto; }
+    .avatar-trigger { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px 8px; border-radius: 18px; }
+    .avatar-trigger:hover { background: #f5f5f5; }
+    .avatar-trigger img { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #f0f0f0; }
+    .avatar-trigger .avatar-name { font-size: 13px; color: #262626; }
+    .avatar-dropdown { display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 220px; background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,.12); padding: 8px; z-index: 300; }
+    .avatar-dropdown.open { display: block; }
+    .avatar-dropdown a { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 6px; color: #262626; text-decoration: none; font-size: 13px; }
+    .avatar-dropdown a:hover { background: #f0f7ff; color: #1890ff; }
+    .avatar-dropdown .divider { height: 1px; background: #f0f0f0; margin: 6px 4px; }
+
+    /* 布局 */
+    .app { display: flex; padding-top: 56px; min-height: 100vh; }
+    .sidebar { width: 200px; background: #fff; box-shadow: 2px 0 8px rgba(0,0,0,.06); position: fixed; top: 56px; left: 0; bottom: 0; padding: 16px 0; overflow-y: auto; }
+    .menu a { display: flex; align-items: center; gap: 10px; padding: 11px 24px; color: #262626; text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
+    .menu a:hover { background: #f0f7ff; color: #1890ff; }
+    .menu a.active { background: #e6f7ff; color: #1890ff; border-left-color: #1890ff; font-weight: 500; }
+    .menu-icon { width: 18px; text-align: center; }
+    .menu-group { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+    .menu-group-title { padding: 8px 24px; font-size: 11px; color: #8c8c8c; text-transform: uppercase; letter-spacing: .5px; }
+    .main { margin-left: 200px; flex: 1; padding: 24px 28px; }
+
+    /* 面包屑 */
+    .breadcrumb { font-size: 13px; margin-bottom: 12px; }
+    .breadcrumb a { color: #1890ff; text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .breadcrumb span { color: #bfbfbf; margin: 0 6px; }
+
+    /* 需求摘要 */
+    .demand-summary { background: #fff; border-radius: 8px; padding: 20px 24px; margin-bottom: 16px; }
+    .demand-summary .ds-head { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+    .demand-summary h1 { margin: 0; font-size: 20px; font-weight: 600; }
+    .demand-summary .ds-id { font-family: monospace; font-size: 12px; color: #8c8c8c; padding: 3px 8px; background: #f5f5f5; border-radius: 4px; }
+    .demand-summary .ds-status { padding: 4px 12px; background: #fff1f0; color: #cf1322; border-radius: 12px; font-size: 12px; font-weight: 500; }
+    .demand-summary .ds-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+    .demand-summary .ds-item .ds-label { font-size: 12px; color: #8c8c8c; margin-bottom: 4px; }
+    .demand-summary .ds-item .ds-value { font-size: 14px; color: #262626; font-weight: 500; }
+    .demand-summary .ds-tags { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+    .demand-summary .ds-tag { padding: 2px 10px; background: #e6f7ff; color: #096dd9; border-radius: 10px; font-size: 11px; }
+
+    /* 推荐理由条 */
+    .recommend-bar { background: linear-gradient(135deg, #f6ffed, #f0f9ff); border: 1px solid #b7eb8f; border-radius: 8px; padding: 12px 18px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; font-size: 13px; }
+    .recommend-bar .rec-icon { font-size: 18px; }
+    .recommend-bar strong { color: #389e0d; }
+
+    /* 报价对比 */
+    .compare-area { background: #fff; border-radius: 8px; padding: 20px 24px; margin-bottom: 16px; }
+    .compare-area h2 { margin: 0 0 4px; font-size: 16px; }
+    .compare-area .ca-desc { color: #8c8c8c; font-size: 12px; margin-bottom: 14px; }
+
+    .quote-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .quote-card { border: 2px solid #f0f0f0; border-radius: 10px; padding: 16px; cursor: pointer; transition: all .2s; position: relative; background: #fff; }
+    .quote-card:hover { border-color: #91d5ff; box-shadow: 0 4px 12px rgba(24,144,255,.1); transform: translateY(-2px); }
+    .quote-card.selected { border-color: #1890ff; background: #f0f7ff; box-shadow: 0 4px 16px rgba(24,144,255,.18); }
+    .quote-card.recommended::before { content: "⭐ 平台推荐"; position: absolute; top: -10px; right: 12px; background: #fa8c16; color: #fff; padding: 2px 10px; border-radius: 10px; font-size: 11px; }
+    .quote-card.cheapest::after { content: "💰 最低价"; position: absolute; top: -10px; left: 12px; background: #52c41a; color: #fff; padding: 2px 10px; border-radius: 10px; font-size: 11px; }
+    .quote-card.fastest::after { content: "⚡ 最快交付"; position: absolute; top: -10px; left: 12px; background: #1890ff; color: #fff; padding: 2px 10px; border-radius: 10px; font-size: 11px; }
+
+    .qc-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .qc-avatar { width: 40px; height: 40px; border-radius: 8px; background: #e6f7ff; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .qc-name { font-weight: 600; font-size: 14px; }
+    .qc-rating { font-size: 11px; color: #8c8c8c; margin-top: 1px; }
+    .qc-rating .star { color: #fa8c16; }
+
+    .qc-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
+    .qc-tag { padding: 2px 8px; background: #f0f0f0; color: #595959; border-radius: 4px; font-size: 11px; }
+    .qc-tag.highlight { background: #fff7e6; color: #d46b08; }
+
+    .qc-key-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #f0f0f0; font-size: 12px; }
+    .qc-key-row:last-of-type { border-bottom: none; }
+    .qc-key-label { color: #8c8c8c; }
+    .qc-key-value { color: #262626; font-weight: 500; }
+    .qc-key-value.price { color: #cf1322; font-size: 16px; font-weight: 700; }
+    .qc-key-value.price.lowest { color: #389e0d; }
+    .qc-key-value.days { font-size: 14px; font-weight: 600; }
+    .qc-key-value.days.fastest { color: #1890ff; }
+
+    .qc-plan { background: #fafafa; border-radius: 6px; padding: 8px 10px; font-size: 11px; color: #595959; margin: 8px 0; line-height: 1.5; }
+    .qc-plan strong { color: #262626; }
+
+    .qc-actions { display: flex; gap: 6px; margin-top: 10px; }
+    .qc-actions button { flex: 1; height: 32px; border: 1px solid #d9d9d9; border-radius: 6px; background: #fff; font-size: 12px; cursor: pointer; }
+    .qc-actions button:hover { border-color: #91d5ff; color: #1890ff; }
+    .qc-actions button.primary { background: #1890ff; border-color: #1890ff; color: #fff; }
+    .qc-actions button.primary:hover { background: #40a9ff; border-color: #40a9ff; color: #fff; }
+    .qc-actions button.selected { background: #52c41a; border-color: #52c41a; color: #fff; }
+
+    /* 详细对比表 */
+    .compare-table { background: #fff; border-radius: 8px; padding: 20px 24px; margin-bottom: 16px; overflow-x: auto; }
+    .compare-table h2 { margin: 0 0 4px; font-size: 16px; }
+    .compare-table .ct-desc { color: #8c8c8c; font-size: 12px; margin-bottom: 14px; }
+    .compare-table table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 720px; }
+    .compare-table th, .compare-table td { padding: 12px 14px; border-bottom: 1px solid #f0f0f0; text-align: left; }
+    .compare-table th { background: #fafafa; color: #595959; font-weight: 500; font-size: 12px; }
+    .compare-table tr.row-best td { background: #f6ffed; }
+    .compare-table tr.row-selected td { background: #f0f7ff; }
+    .compare-table .cell-price { color: #cf1322; font-weight: 600; }
+    .compare-table .cell-price.lowest { color: #389e0d; }
+    .compare-table .cell-fastest { color: #1890ff; font-weight: 600; }
+
+    /* 底部操作栏 */
+    .footer-bar { background: #fff; border-radius: 8px; padding: 14px 24px; display: flex; justify-content: flex-end; gap: 10px; align-items: center; position: sticky; bottom: 16px; box-shadow: 0 -2px 12px rgba(0,0,0,.06); }
+    .footer-bar .selection-info { margin-right: auto; font-size: 13px; }
+    .footer-bar .selection-info strong { color: #1890ff; }
+
+    .btn { height: 36px; border: 1px solid #d9d9d9; background: #fff; border-radius: 6px; padding: 0 18px; font-size: 14px; color: #595959; cursor: pointer; }
+    .btn:hover { border-color: #91d5ff; color: #1890ff; }
+    .btn.primary { background: #1890ff; border-color: #1890ff; color: #fff; font-weight: 500; }
+    .btn.primary:hover { background: #40a9ff; border-color: #40a9ff; color: #fff; }
+    .btn.primary:disabled { background: #bfbfbf; border-color: #bfbfbf; cursor: not-allowed; }
+    .btn.large { height: 40px; padding: 0 28px; }
+
+    /* ===== 下单确认 modal（杀手锏） ===== */
+    .modal-mask { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 999; align-items: center; justify-content: center; padding: 20px; }
+    .modal-mask.open { display: flex; }
+    .modal { width: 100%; max-width: 580px; background: #fff; border-radius: 12px; box-shadow: 0 12px 36px rgba(0,0,0,.25); overflow: hidden; max-height: 92vh; display: flex; flex-direction: column; }
+    .modal-head { padding: 18px 24px; background: linear-gradient(135deg, #1890ff, #2f54eb); color: #fff; }
+    .modal-head h3 { margin: 0; font-size: 18px; }
+    .modal-head p { margin: 4px 0 0; font-size: 12px; opacity: .85; }
+    .modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
+
+    .order-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid #f0f0f0; }
+    .order-summary .os-item .os-label { font-size: 11px; color: #8c8c8c; margin-bottom: 3px; }
+    .order-summary .os-item .os-value { font-size: 14px; color: #262626; font-weight: 500; }
+
+    /* 扣款主体 badge ⭐ 核心 */
+    .payer-badge { background: linear-gradient(135deg, #fffbe6, #fff7e6); border: 2px solid #ffd591; border-radius: 10px; padding: 16px 18px; margin-bottom: 16px; position: relative; }
+    .payer-badge.team-budget { background: linear-gradient(135deg, #e6f7ff, #d6e4ff); border-color: #91d5ff; }
+    .payer-badge.enterprise-main { background: linear-gradient(135deg, #f9f0ff, #efdbff); border-color: #d3adf7; }
+    .payer-badge.personal { background: linear-gradient(135deg, #fff7e6, #ffe7ba); border-color: #ffd591; }
+    .payer-badge .pb-title { font-size: 11px; color: #8c8c8c; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .payer-badge .pb-title::before { content: ""; width: 4px; height: 12px; background: currentColor; border-radius: 2px; opacity: .5; }
+    .payer-badge .pb-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; }
+    .payer-badge .pb-row .pb-key { color: #595959; }
+    .payer-badge .pb-row .pb-val { color: #262626; font-weight: 500; }
+    .payer-badge .pb-divider { height: 1px; background: rgba(0,0,0,.06); margin: 6px 0; }
+    .payer-badge .pb-amount { font-size: 22px; font-weight: 700; color: #cf1322; }
+    .payer-badge .pb-amount.team-budget { color: #096dd9; }
+    .payer-badge .pb-amount.enterprise-main { color: #531dab; }
+    .payer-badge .pb-amount.personal { color: #d46b08; }
+    .payer-badge .pb-balance-after { font-size: 16px; color: #389e0d; font-weight: 600; }
+    .payer-badge .pb-balance-after.warn { color: #cf1322; }
+    .payer-badge .pb-warn { font-size: 12px; color: #cf1322; margin-top: 8px; padding: 8px 10px; background: #fff1f0; border-radius: 6px; }
+    .payer-badge .pb-fallback { font-size: 12px; color: #d46b08; margin-top: 8px; padding: 8px 10px; background: #fff7e6; border-radius: 6px; }
+
+    .switch-tip { font-size: 12px; color: #8c8c8c; padding: 10px 14px; background: #fafafa; border-radius: 6px; margin-bottom: 12px; line-height: 1.6; }
+    .switch-tip strong { color: #262626; }
+
+    .agree-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #595959; margin-top: 12px; }
+    .agree-row input { margin: 0; }
+    .agree-row a { color: #1890ff; text-decoration: none; }
+
+    .modal-foot { padding: 14px 24px; background: #fafafa; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 10px; }
+
+    /* Toast */
+    .toasts { position: fixed; top: 72px; right: 20px; width: min(90vw, 360px); display: grid; gap: 8px; z-index: 1100; }
+    .toast { background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; padding: 10px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.1); animation: slideIn .25s ease-out; }
+    .toast.ok { border-color: #b7eb8f; background: #f6ffed; color: #389e0d; }
+    .toast.err { border-color: #ffccc7; background: #fff2f0; color: #cf1322; }
+    .toast.warn { border-color: #ffe58f; background: #fffbe6; color: #d48806; }
+    .toast.info { border-color: #91d5ff; background: #e6f7ff; color: #096dd9; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+    @media (max-width: 1100px) {
+      .quote-cards { grid-template-columns: repeat(2, 1fr); }
+      .demand-summary .ds-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 16px; }
+      .quote-cards { grid-template-columns: 1fr; }
+      .ws-trigger { min-width: auto; }
+      .topbar .brand-sub { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a href="platform-home-demander.html" class="brand">🎬 骋风天合<span class="brand-sub">创作门户交易平台</span></a>
+    <div class="ws-switcher">
+      <button class="ws-trigger" id="wsTrigger">
+        <span id="wsIcon">🏢</span>
+        <span class="ws-name" id="wsName">骋风天合 · 短剧制作中心</span>
+        <span class="ws-arrow">▼</span>
+      </button>
+      <div class="ws-dropdown" id="wsDropdown"></div>
+    </div>
+    <div class="identity-switch" id="identitySwitch">
+      <button data-identity="demander" class="active">📥 需求方</button>
+      <button data-identity="contractor">🛠 承制方</button>
+    </div>
+    <a href="wallet-overview.html" class="wallet-chip" id="walletChip">
+      <span>💰</span>
+      <span>
+        <span class="wallet-amount" id="walletAmount">¥185,000</span>
+        <span class="wallet-account" id="walletAccount">团队预算账户</span>
+      </span>
+    </a>
+    <div class="avatar-wrap">
+      <div class="avatar-trigger" id="avatarTrigger">
+        <img src="https://api.dicebear.com/9.x/lorelei/svg?seed=account" alt="头像">
+        <span class="avatar-name">昭岚</span>
+        <span class="ws-arrow">▼</span>
+      </div>
+      <div class="avatar-dropdown" id="avatarDropdown">
+        <a href="account-basic-info-prototype-platform-style.html"><span>👤</span> 账户基础信息</a>
+        <a href="enterprise-verification-prototype.html"><span>🏢</span> 企业认证</a>
+        <a href="account-security-prototype.html"><span>🔐</span> 账号安全</a>
+        <a href="wallet-overview.html"><span>💰</span> 我的钱包</a>
+        <div class="divider"></div>
+        <a href="#" onclick="event.preventDefault(); window.demoToast('演示环境，未实现退出', 'warn')"><span>🚪</span> 退出登录</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="app">
+    <aside class="sidebar">
+      <nav class="menu">
+        <a href="platform-home-demander.html"><span class="menu-icon">🏠</span> 工作台</a>
+        <a href="demand-publish.html"><span class="menu-icon">📤</span> 发布需求</a>
+        <a href="demand-list.html" class="active"><span class="menu-icon">📋</span> 我的需求</a>
+        <a href="contractor-marketplace.html"><span class="menu-icon">🏪</span> 承制方广场</a>
+        <a href="project-space.html"><span class="menu-icon">🤝</span> 项目协同空间</a>
+        <a href="wallet-overview.html"><span class="menu-icon">💰</span> 钱包与结算</a>
+        <div class="menu-group">
+          <div class="menu-group-title">账户</div>
+          <a href="account-basic-info-prototype-platform-style.html"><span class="menu-icon">⚙️</span> 账户中心</a>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <div class="breadcrumb">
+        <a href="platform-home-demander.html">工作台</a><span>/</span>
+        <a href="demand-list.html">我的需求</a><span>/</span>
+        <span style="color:#262626">承制方报价对比</span>
+      </div>
+
+      <!-- 需求摘要 -->
+      <section class="demand-summary">
+        <div class="ds-head">
+          <h1 id="demandTitle">三集短剧解说视频（修仙题材）</h1>
+          <span class="ds-id" id="demandId">DM-2026042512</span>
+          <span class="ds-status">💬 待选承制方</span>
+        </div>
+        <div class="ds-grid">
+          <div class="ds-item"><div class="ds-label">服务类目</div><div class="ds-value" id="demandCategory">视频制作 / 短剧解说</div></div>
+          <div class="ds-item"><div class="ds-label">预算</div><div class="ds-value" id="demandBudget">¥18,000</div></div>
+          <div class="ds-item"><div class="ds-label">期望交付</div><div class="ds-value" id="demandDeadline">2026-05-08</div></div>
+          <div class="ds-item"><div class="ds-label">归属空间</div><div class="ds-value" id="demandWorkspace">骋风天合 · 短剧制作中心</div></div>
+        </div>
+        <div class="ds-tags" id="demandTags"></div>
+      </section>
+
+      <!-- 平台推荐说明 -->
+      <div class="recommend-bar">
+        <span class="rec-icon">🎯</span>
+        <div>
+          平台已根据「<strong id="recCat">短剧解说</strong>」类目和「<strong id="recTags">修仙、古风、抖音</strong>」标签，从 <strong>238 家</strong>入驻承制方中匹配并邀请了 <strong>4 家</strong>报价。
+          报价已陆续到达，建议在 <strong style="color:#cf1322">3 天内</strong>完成选定以保证交付时间。
+        </div>
+      </div>
+
+      <!-- 报价卡片 -->
+      <section class="compare-area">
+        <h2>📋 4 家承制方报价</h2>
+        <p class="ca-desc">点击卡片选定承制方；选定后将进入下单确认环节，平台从当前空间对应账户锁定预算。</p>
+        <div class="quote-cards" id="quoteCards"></div>
+      </section>
+
+      <!-- 详细对比表 -->
+      <section class="compare-table">
+        <h2>📊 详细对比</h2>
+        <p class="ct-desc">同步展示能力、合作历史、方案差异，便于多人决策。</p>
+        <table>
+          <thead>
+            <tr>
+              <th>承制方</th>
+              <th>报价</th>
+              <th>交期</th>
+              <th>方案要点</th>
+              <th>历史好评</th>
+              <th>合作过</th>
+              <th>能力标签</th>
+            </tr>
+          </thead>
+          <tbody id="compareTbody"></tbody>
+        </table>
+      </section>
+
+      <!-- 底部操作栏 -->
+      <div class="footer-bar">
+        <div class="selection-info" id="selectionInfo">
+          请选择一家承制方进入下单确认
+        </div>
+        <button class="btn" onclick="location.href='demand-list.html'">取消</button>
+        <button class="btn primary large" id="confirmBtn" disabled>下一步：下单确认 →</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- ===== 下单确认 modal（杀手锏：扣款主体识别） ===== -->
+  <div class="modal-mask" id="orderModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>📋 下单确认 · 扣款主体识别</h3>
+        <p>下单后，平台将从你「当前工作空间」对应的资金账户锁定预算。订单完成验收后正式结算。</p>
+      </div>
+      <div class="modal-body">
+        <!-- 订单摘要 -->
+        <div class="order-summary">
+          <div class="os-item"><div class="os-label">订单项目</div><div class="os-value" id="modalProjectName">三集短剧解说视频</div></div>
+          <div class="os-item"><div class="os-label">合作承制方</div><div class="os-value" id="modalContractor">星辰创作工作室</div></div>
+          <div class="os-item"><div class="os-label">订单金额</div><div class="os-value" id="modalAmount" style="color:#cf1322">¥18,000</div></div>
+          <div class="os-item"><div class="os-label">交付日期</div><div class="os-value" id="modalDeadline">2026-05-08（14 天）</div></div>
+        </div>
+
+        <!-- 切空间提示 -->
+        <div class="switch-tip">
+          💡 <strong>提示</strong>：下方「扣款主体」会随你切换的工作空间实时变化。可在顶部空间切换器试试切到不同空间，观察扣款账户和余额变化。
+        </div>
+
+        <!-- ⭐ 扣款主体 badge ⭐ -->
+        <div class="payer-badge" id="payerBadge">
+          <div class="pb-title" id="pbTitle">本次扣款主体</div>
+          <div class="pb-row">
+            <span class="pb-key">当前工作空间</span>
+            <span class="pb-val" id="pbWorkspace">骋风天合 · 短剧制作中心</span>
+          </div>
+          <div class="pb-row">
+            <span class="pb-key">扣款账户类型</span>
+            <span class="pb-val" id="pbAccountType">团队预算账户</span>
+          </div>
+          <div class="pb-row">
+            <span class="pb-key">扣款账户名称</span>
+            <span class="pb-val" id="pbAccountName">短剧制作中心 - 团队预算账户</span>
+          </div>
+          <div class="pb-divider"></div>
+          <div class="pb-row">
+            <span class="pb-key">账户当前可用</span>
+            <span class="pb-val" id="pbBalance">¥185,000</span>
+          </div>
+          <div class="pb-row">
+            <span class="pb-key">本次锁定预算</span>
+            <span class="pb-amount" id="pbLockAmount">¥18,000</span>
+          </div>
+          <div class="pb-row">
+            <span class="pb-key">锁定后余额</span>
+            <span class="pb-balance-after" id="pbBalanceAfter">¥167,000</span>
+          </div>
+          <div class="pb-fallback" id="pbFallback" style="display:none">
+            ⚠️ 当前空间「骋风天合 · IP 孵化组」<strong>未配置团队预算账户</strong>，平台规则：<strong>回退至企业主账户</strong>（骋风天合 - 企业主账户）。订单创建仍以"由 IP 孵化组发起"记录，但实际扣款主体为企业主账户。
+          </div>
+          <div class="pb-warn" id="pbWarn" style="display:none">
+            ❌ 余额不足，无法完成锁定。请先充值或申请预算划拨。
+          </div>
+        </div>
+
+        <div class="agree-row">
+          <input type="checkbox" id="agreeCheck" checked>
+          <label for="agreeCheck">已阅读并同意《骋风天合创作门户交易服务协议》</label>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" id="modalCancelBtn">取消</button>
+        <button class="btn primary" id="modalConfirmBtn">确认下单（锁定预算）</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastWrap" class="toasts"></div>
+
+  <!-- 共享底座 -->
+  <script src="_shared.js"></script>
+  <script>SharedHeader.mount({ activeNav: "my-demands" });</script>
+
+
+  <!-- 主交互 -->
+  <script>
+  (function () {
+    const $ = (id) => document.getElementById(id);
+
+    // 4 家承制方 mock
+    const QUOTES = [
+      {
+        id: "c-xingchen", name: "星辰创作工作室", avatar: "🌟", recommended: true,
+        rating: 4.9, reviewCount: 86, completedCount: 85,
+        cooperatedCount: 3, foundYear: 2019,
+        tags: ["短剧专精", "影视级", "原创解说"],
+        price: 18000, days: 14,
+        plan: "5 集 × 5min，原创解说稿 + 磁性男声配音 + 2D 分镜 + 调色，含 2 轮免费修改",
+        diffPlan: "原创度高、可控性最强；包含调色"
+      },
+      {
+        id: "c-yinhe", name: "银河剪辑社", avatar: "🌌",
+        cheapest: true,
+        rating: 4.6, reviewCount: 312, completedCount: 320,
+        cooperatedCount: 1, foundYear: 2022,
+        tags: ["AI 高效", "性价比", "通用模板"],
+        price: 12500, days: 10,
+        plan: "5 集 × 4min，模板化解说 + AI 配音 + 简化分镜，1 轮修改",
+        diffPlan: "成本最低、出片快；模板感重，原创度稍弱"
+      },
+      {
+        id: "c-jinli", name: "锦鲤创意", avatar: "🎨",
+        rating: 5.0, reviewCount: 38, completedCount: 42,
+        cooperatedCount: 0, foundYear: 2017,
+        tags: ["影视级", "电影感", "重度调色"],
+        price: 28000, days: 21,
+        plan: "5 集 × 6min，分镜手绘 + 实拍合成 + 电影级调色 + 配乐定制 + 3 轮修改",
+        diffPlan: "成片质感最高；交期与预算最高"
+      },
+      {
+        id: "c-yicheng", name: "翼程文化", avatar: "🚀",
+        fastest: false,
+        rating: 4.7, reviewCount: 142, completedCount: 156,
+        cooperatedCount: 0, foundYear: 2021,
+        tags: ["节奏紧凑", "性价比", "新合作"],
+        price: 16000, days: 12,
+        plan: "5 集 × 5min，紧凑节奏解说 + 中等分镜 + AI 配音 + 1 轮修改",
+        diffPlan: "中庸选项；交期适中、价格适中"
+      }
+    ];
+    // 计算最低价
+    const minPrice = Math.min.apply(null, QUOTES.map(q => q.price));
+    const minDays = Math.min.apply(null, QUOTES.map(q => q.days));
+    QUOTES.forEach(q => { q.isLowest = q.price === minPrice; q.isFastest = q.days === minDays; });
+
+    let selectedId = null;
+    const params = new URLSearchParams(location.search);
+    const demandId = params.get("demandId") || "DM-2026042512";
+
+    // 加载需求摘要
+    const demand = window.demoApp.getDemands().find(d => d.id === demandId) || {
+      id: "DM-2026042512", title: "三集短剧解说视频（修仙题材）", category: "视频制作 / 解说视频",
+      budget: 18000, deadline: "2026-05-08", workspace: "cf-drama", workspaceName: "骋风天合 · 短剧制作中心",
+      tags: ["修仙", "古风", "抖音"], payerLabel: "本团队预算账户"
+    };
+    $("demandId").textContent = demand.id;
+    $("demandTitle").textContent = demand.title;
+    $("demandCategory").textContent = demand.category || "视频制作";
+    $("demandBudget").textContent = window.fmtMoney(demand.budget);
+    $("demandDeadline").textContent = demand.deadline;
+    $("demandWorkspace").textContent = demand.workspaceName;
+    if (demand.tags && demand.tags.length) {
+      $("demandTags").innerHTML = demand.tags.map(t => '<span class="ds-tag">#' + t + '</span>').join("");
+      $("recTags").textContent = demand.tags.join("、");
+    }
+
+    // 渲染卡片
+    function renderQuoteCards() {
+      const html = QUOTES.map(q => {
+        const cls = "quote-card" + (selectedId === q.id ? " selected" : "") + (q.recommended ? " recommended" : "") + (q.isLowest && !q.recommended ? " cheapest" : "") + (q.isFastest && !q.recommended && !q.isLowest ? " fastest" : "");
+        return '<div class="' + cls + '" data-id="' + q.id + '">'
+          + '<div class="qc-head">'
+            + '<div class="qc-avatar">' + q.avatar + '</div>'
+            + '<div><div class="qc-name">' + q.name + '</div><div class="qc-rating"><span class="star">★ ' + q.rating + '</span> · ' + q.reviewCount + ' 评 · ' + q.completedCount + ' 单</div></div>'
+          + '</div>'
+          + '<div class="qc-tags">' + q.tags.map(t => '<span class="qc-tag">' + t + '</span>').join("") + '</div>'
+          + '<div class="qc-key-row"><span class="qc-key-label">报价</span><span class="qc-key-value price ' + (q.isLowest ? "lowest" : "") + '">' + window.fmtMoney(q.price) + '</span></div>'
+          + '<div class="qc-key-row"><span class="qc-key-label">交期</span><span class="qc-key-value days ' + (q.isFastest ? "fastest" : "") + '">' + q.days + ' 天' + (q.isFastest ? " ⚡" : "") + '</span></div>'
+          + '<div class="qc-key-row"><span class="qc-key-label">合作过</span><span class="qc-key-value">' + (q.cooperatedCount > 0 ? q.cooperatedCount + " 次 ✓" : "首次合作") + '</span></div>'
+          + '<div class="qc-plan"><strong>方案：</strong>' + q.plan + '</div>'
+          + '<div class="qc-actions">'
+            + '<button onclick="window.demoToast(\'承制方主页 demo 暂未做\', \'info\')">查看主页</button>'
+            + '<button class="' + (selectedId === q.id ? "selected" : "primary") + '" onclick="window.selectQuote(\'' + q.id + '\')">' + (selectedId === q.id ? "✓ 已选定" : "选定该方") + '</button>'
+          + '</div>'
+        + '</div>';
+      }).join("");
+      $("quoteCards").innerHTML = html;
+    }
+
+    function renderCompareTable() {
+      const html = QUOTES.map(q => {
+        const rowCls = selectedId === q.id ? "row-selected" : "";
+        return '<tr class="' + rowCls + '">'
+          + '<td><strong>' + q.name + '</strong> ' + (q.recommended ? "<span style=\"color:#fa8c16;font-size:11px\">⭐ 推荐</span>" : "") + '<div style="font-size:11px;color:#8c8c8c">★ ' + q.rating + ' · ' + q.completedCount + ' 单</div></td>'
+          + '<td><span class="cell-price ' + (q.isLowest ? "lowest" : "") + '">' + window.fmtMoney(q.price) + '</span>' + (q.isLowest ? '<div style="font-size:11px;color:#389e0d">最低价</div>' : '') + '</td>'
+          + '<td><span class="' + (q.isFastest ? "cell-fastest" : "") + '">' + q.days + ' 天</span>' + (q.isFastest ? '<div style="font-size:11px;color:#1890ff">最快</div>' : '') + '</td>'
+          + '<td style="font-size:12px;color:#595959">' + q.diffPlan + '</td>'
+          + '<td>' + q.rating + ' / 5.0<div style="font-size:11px;color:#8c8c8c">' + q.reviewCount + ' 评价</div></td>'
+          + '<td>' + (q.cooperatedCount > 0 ? '<span style="color:#389e0d">' + q.cooperatedCount + ' 次 ✓</span>' : '<span style="color:#8c8c8c">未合作</span>') + '</td>'
+          + '<td><div style="display:flex;flex-wrap:wrap;gap:4px">' + q.tags.map(t => '<span style="background:#f5f5f5;padding:1px 8px;border-radius:4px;font-size:11px;color:#595959">' + t + '</span>').join("") + '</div></td>'
+          + '</tr>';
+      }).join("");
+      $("compareTbody").innerHTML = html;
+    }
+
+    function refreshSelection() {
+      const q = QUOTES.find(x => x.id === selectedId);
+      if (!q) {
+        $("selectionInfo").innerHTML = "请选择一家承制方进入下单确认";
+        $("confirmBtn").disabled = true;
+      } else {
+        $("selectionInfo").innerHTML = "已选定 <strong>" + q.name + "</strong>，订单金额 <strong>" + window.fmtMoney(q.price) + "</strong>，交期 <strong>" + q.days + " 天</strong>";
+        $("confirmBtn").disabled = false;
+      }
+    }
+
+    window.selectQuote = function (id) {
+      selectedId = id;
+      renderQuoteCards();
+      renderCompareTable();
+      refreshSelection();
+      const q = QUOTES.find(x => x.id === id);
+      window.demoToast("已选定「" + q.name + "」，请确认下单", "info");
+    };
+
+    // ============================================================
+    // 下单 modal（杀手锏：扣款主体识别）
+    // ============================================================
+    function refreshPayerBadge() {
+      const q = QUOTES.find(x => x.id === selectedId); if (!q) return;
+      const ws = window.demoApp.getCurrentWorkspace();
+      const wallets = window.demoApp.getWallets();
+      const walletKey = ws.walletKey;
+      const wallet = wallets[walletKey];
+      const balance = wallet ? wallet.balance : 0;
+      const after = balance - q.price;
+      const badge = $("payerBadge");
+      // 颜色主题
+      ["personal", "team-budget", "enterprise-main"].forEach(c => badge.classList.remove(c));
+      ["personal", "team-budget", "enterprise-main"].forEach(c => $("pbLockAmount").classList.remove(c));
+      const cls = ws.payer.type;
+      badge.classList.add(cls);
+      $("pbLockAmount").classList.add(cls);
+      // 内容
+      $("pbWorkspace").textContent = ws.name;
+      $("pbAccountType").textContent = ws.budgetMissing ? "团队预算账户（未配 → 回退企业主账户）" : ws.accountType;
+      $("pbAccountName").textContent = wallet ? wallet.name : ws.payer.name;
+      $("pbBalance").textContent = window.fmtMoney(balance);
+      $("pbLockAmount").textContent = "− " + window.fmtMoney(q.price);
+      $("pbBalanceAfter").textContent = window.fmtMoney(after);
+      $("pbBalanceAfter").classList.toggle("warn", after < 0);
+      // 警示
+      $("pbFallback").style.display = ws.budgetMissing ? "block" : "none";
+      $("pbWarn").style.display = after < 0 ? "block" : "none";
+      $("modalConfirmBtn").disabled = after < 0;
+
+      // 订单摘要
+      $("modalProjectName").textContent = demand.title;
+      $("modalContractor").textContent = q.name;
+      $("modalAmount").textContent = window.fmtMoney(q.price);
+      $("modalDeadline").textContent = demand.deadline + "（" + q.days + " 天）";
+    }
+
+    $("confirmBtn").addEventListener("click", () => {
+      if (!selectedId) return;
+      refreshPayerBadge();
+      $("orderModal").classList.add("open");
+    });
+    $("modalCancelBtn").addEventListener("click", () => $("orderModal").classList.remove("open"));
+    $("modalConfirmBtn").addEventListener("click", () => {
+      if (!$("agreeCheck").checked) { window.demoToast("请先勾选同意服务协议", "err"); return; }
+      const q = QUOTES.find(x => x.id === selectedId); if (!q) return;
+      const ws = window.demoApp.getCurrentWorkspace();
+      const ok = window.demoApp.lockBudget(ws.walletKey, q.price);
+      if (!ok) { window.demoToast("余额不足，锁定失败", "err"); return; }
+      // 创建订单
+      const ts = new Date();
+      const orderId = "OD-" + ts.getFullYear() + String(ts.getMonth() + 1).padStart(2, "0") + String(ts.getDate()).padStart(2, "0") + String(Math.floor(Math.random() * 90 + 10));
+      const wallets = window.demoApp.getWallets();
+      const wallet = wallets[ws.walletKey];
+      window.demoApp.addOrder({
+        id: orderId, demandId: demand.id, projectName: demand.title,
+        contractor: q.name, contractorId: q.id,
+        workspace: ws.id, workspaceName: ws.name,
+        payerType: ws.payer.type, payerName: wallet ? wallet.name : ws.payer.name, payerWalletKey: ws.walletKey,
+        amount: q.price, status: "in-progress",
+        createTime: ts.getFullYear() + "-" + String(ts.getMonth() + 1).padStart(2, "0") + "-" + String(ts.getDate()).padStart(2, "0") + " " + String(ts.getHours()).padStart(2, "0") + ":" + String(ts.getMinutes()).padStart(2, "0")
+      });
+      // 更新需求
+      window.demoApp.updateDemand(demand.id, { status: "in-progress", contractor: q.name });
+      $("orderModal").classList.remove("open");
+      window.demoToast("✅ 下单成功！订单 " + orderId + "，" + window.fmtMoney(q.price) + " 已从 " + (wallet ? wallet.name : ws.payer.name) + " 锁定", "ok");
+      // 跳钱包让用户看变化
+      setTimeout(() => {
+        window.demoToast("提示：可前往「钱包」查看锁定记录", "info");
+        setTimeout(() => location.href = "wallet-overview.html", 2000);
+      }, 1500);
+    });
+
+    window.onWorkspaceChanged = () => {
+      // 切换工作空间后立刻刷新 modal 内的扣款主体（如果 modal 打开）
+      if ($("orderModal").classList.contains("open") && selectedId) refreshPayerBadge();
+    };
+
+    renderQuoteCards();
+    renderCompareTable();
+    refreshSelection();
+  })();
+  </script>
+</body>
+</html>

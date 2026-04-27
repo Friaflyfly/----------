@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo 导航 - 骋风天合 · 创作门户交易平台</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 40px 20px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: linear-gradient(135deg, #f5f5f5 0%, #e6f7ff 100%); color: #262626; min-height: 100vh; }
+    .wrap { max-width: 980px; margin: 0 auto; }
+    .head { text-align: center; margin-bottom: 32px; }
+    .head h1 { margin: 0 0 8px; font-size: 32px; font-weight: 700; }
+    .head .badge { display: inline-block; padding: 4px 14px; background: #1890ff; color: #fff; border-radius: 12px; font-size: 12px; font-weight: 500; margin-bottom: 14px; letter-spacing: 1px; }
+    .head .sub { color: #595959; font-size: 14px; max-width: 720px; margin: 0 auto; line-height: 1.7; }
+    .head .meta { margin-top: 14px; font-size: 12px; color: #8c8c8c; }
+    .head .meta span { margin: 0 8px; }
+
+    .quick-actions { display: flex; gap: 10px; justify-content: center; margin-bottom: 32px; flex-wrap: wrap; }
+    .quick-btn { padding: 10px 22px; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 500; transition: all .2s; }
+    .quick-btn.primary { background: #1890ff; color: #fff; }
+    .quick-btn.primary:hover { background: #40a9ff; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(24,144,255,.3); }
+    .quick-btn.danger { background: #fff; color: #cf1322; border: 1px solid #ffccc7; }
+    .quick-btn.danger:hover { background: #fff1f0; }
+    .quick-btn.ghost { background: #fff; color: #595959; border: 1px solid #d9d9d9; }
+    .quick-btn.ghost:hover { border-color: #1890ff; color: #1890ff; }
+
+    .timeline { display: grid; gap: 14px; }
+    .step { display: grid; grid-template-columns: 80px 1fr 140px; gap: 16px; background: #fff; border-radius: 12px; padding: 22px 24px; box-shadow: 0 4px 12px rgba(0,0,0,.06); transition: all .2s; align-items: center; cursor: pointer; text-decoration: none; color: inherit; border: 2px solid transparent; }
+    .step:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(24,144,255,.12); border-color: #91d5ff; }
+    .step.killer { border-color: #fa8c16; background: linear-gradient(135deg, #fff, #fff7e6); }
+    .step.killer:hover { box-shadow: 0 8px 24px rgba(250,140,22,.18); }
+
+    .step-num { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #1890ff, #2f54eb); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; flex-shrink: 0; }
+    .step.killer .step-num { background: linear-gradient(135deg, #fa8c16, #d4380d); }
+
+    .step-content h3 { margin: 0 0 6px; font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .step-content .killer-tag { background: #fa8c16; color: #fff; padding: 2px 8px; border-radius: 8px; font-size: 11px; font-weight: 500; }
+    .step-content .file { font-size: 12px; color: #8c8c8c; font-family: monospace; margin-bottom: 8px; }
+    .step-content .desc { font-size: 13px; color: #595959; line-height: 1.6; margin: 0 0 8px; }
+    .step-content .key-points { display: flex; gap: 6px; flex-wrap: wrap; }
+    .step-content .kp { padding: 2px 8px; background: #e6f7ff; color: #096dd9; border-radius: 4px; font-size: 11px; }
+    .step-content .kp.warn { background: #fff7e6; color: #d46b08; }
+
+    .step-meta { text-align: right; }
+    .step-meta .duration { font-size: 13px; color: #1890ff; font-weight: 600; }
+    .step-meta .arrow { display: inline-block; padding: 8px 16px; background: #1890ff; color: #fff; border-radius: 6px; font-size: 13px; margin-top: 8px; }
+    .step.killer .step-meta .arrow { background: #fa8c16; }
+
+    .footer { margin-top: 32px; padding: 18px 24px; background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,.06); }
+    .footer h3 { margin: 0 0 10px; font-size: 14px; }
+    .footer .tip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; font-size: 12px; color: #595959; line-height: 1.7; }
+    .footer .tip-grid div::before { content: "✓"; color: #52c41a; margin-right: 6px; font-weight: 700; }
+    .footer .console-box { background: #f5f5f5; padding: 10px 14px; border-radius: 6px; font-family: monospace; font-size: 12px; color: #595959; margin-top: 10px; }
+
+    .toast-wrap { position: fixed; top: 20px; right: 20px; z-index: 1000; }
+    .toast { background: #fff; border: 1px solid #b7eb8f; background: #f6ffed; color: #389e0d; padding: 12px 18px; border-radius: 8px; box-shadow: 0 3px 12px rgba(0,0,0,.1); font-size: 14px; }
+
+    @media (max-width: 768px) {
+      .step { grid-template-columns: 60px 1fr; }
+      .step-meta { grid-column: 1 / -1; text-align: left; padding-left: 76px; margin-top: 8px; }
+      .footer .tip-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="head">
+      <span class="badge">DEMO 导航</span>
+      <h1>骋风天合 · 创作门户交易平台</h1>
+      <div class="sub">基于 PDF 七层架构的端到端可点击 demo，用于"展示新方向"。建议按下方顺序演示，总时长 <strong>25-30 分钟</strong>。需求方 → 承制方 → 企业管理员 → 平台运营四视角完整闭环。</div>
+      <div class="meta">
+        <span>📅 更新于 <span id="updateDate"></span></span>
+        <span>·</span>
+        <span>👤 演示角色：昭岚（骋风天合 · 短剧制作中心 · 制作主管）</span>
+      </div>
+    </div>
+
+    <div class="quick-actions">
+      <button class="quick-btn primary" onclick="location.href='platform-home-demander.html'">🚀 直接开始演示（从 P1 进）</button>
+      <button class="quick-btn ghost" onclick="location.href='enterprise-onboarding.html'">🏢 企业入驻流程</button>
+      <button class="quick-btn ghost" onclick="location.href='platform-home-contractor.html'">🛠 查看承制方工作台</button>
+      <button class="quick-btn ghost" onclick="window.open('demo-script.md', '_blank')">📋 查看演示稿</button>
+      <button class="quick-btn danger" onclick="resetDemo()">🔄 重置 mock 数据</button>
+    </div>
+
+    <div class="timeline">
+      <a class="step" href="enterprise-onboarding.html">
+        <div class="step-num">0</div>
+        <div class="step-content">
+          <h3>企业入驻流程（前置）</h3>
+          <div class="file">enterprise-onboarding.html</div>
+          <p class="desc">入驻全流程引导：选择入驻类型（企业/团队/个人/承制方）→ 填写资料 → 上传材料 → 提交审核 → 模拟秒过 → 自动开通管理员账号 + 3 个工作空间。可作为 demo 开场前置环节，也可跳过。</p>
+          <div class="key-points">
+            <span class="kp">入驻引导</span>
+            <span class="kp">多类型</span>
+            <span class="kp">审核模拟</span>
+            <span class="kp">自动开通</span>
+          </div>
+        </div>
+        <div class="step-meta">
+          <div class="duration">⏱ 2 分钟</div>
+          <span class="arrow">进入 →</span>
+        </div>
+      </a>
+
+      <a class="step" href="platform-home-demander.html">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>工作台首页</h3>
+          <div class="file">platform-home-demander.html</div>
+          <p class="desc">立"统一账号 + 多工作空间"招牌。顶部空间切换器（5 个空间）+ 身份切换器（需求方/承制方）+ 钱包 chip + 4 个业务入口卡片 + 近期动态 / 待办。</p>
+          <div class="key-points">
+            <span class="kp">空间切换器</span>
+            <span class="kp">身份切换</span>
+            <span class="kp">余额联动</span>
+          </div>
+        </div>
+        <div class="step-meta">
+          <div class="duration">⏱ 2 分钟</div>
+          <span class="arrow">进入 →</span>
+        </div>
+      </a>
+
+      <a class="step" href="demand-publish.html">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>发布需求（多类目版）</h3>
+          <div class="file">demand-publish.html</div>
+          <p class="desc">立"多类目可撮合"招牌。5 大一级类目 + 19 个二级类目 + 5 组标签 + 服务等级 × 制作方式 + 动态字段（不同二级类目对应不同字段 schema）。</p>
+          <div class="key-points">
+            <span class="kp">类目体系</span>
+            <span class="kp">标签</span>
+            <span class="kp">动态字段</span>
+            <span class="kp warn">空间提示</span>
+          </div>
+        </div>
+        <div class="step-meta">
+          <div class="duration">⏱ 3 分钟</div>
+          <span class="arrow">进入 →</span>
+        </div>
+      </a>
+
+      <a class="step" href="demand-list.html">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>我的需求列表</h3>
+          <div class="file">demand-list.html</div>
+          <p class="desc">所有空间下的需求/订单聚合。状态筛选（审核中/撮合中/待选承制方/进行中/完成）+ 类目筛选 + 当前空间筛选。"待选承制方" 状态可点进对比。</p>
+          <div class="key-points">
+            <span class="kp">状态聚合</span>
+            <span class="kp">空间归属</span>
+          </div>
+        </div>
+        <div class="step-meta">
+          <div class="duration">⏱ 1 分钟</div>
+          <span class="arrow">进入 →</span>
+        </div>
+      </a>
+
+      <a class="step killer" href="demand-quote-comparison.html?demandId=DM-2026042512">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h3>报价对比 + 下单确认 <span class="killer-tag">⭐ 杀手锏</span></h3>
+          <div class="file">demand-quote-comparison.html</div>
+          <p class="desc">4 家承制方报价卡片 + 详细对比表 + <strong>下单确认 modal 含"扣款主体识别"</strong>。在 modal 不关闭的前提下切顶部空间，badge 实时变化（团队预算 / 个人 / 企业主回退 / 余额不足拦截）。</p>
+          <div class="key-points">
+            <span class="kp">平台撮合</span>
+            <span class="kp">报价对比</span>
+            <span class="kp warn">扣款主体识别</span>
+            <span class="kp warn">回退兜底</span>
+          </div>
+        </div>
+        <div class="step-meta">
+          <div class="duration">⏱ 5 分钟</div>
+          <span class="arrow">进入 →</span>
+        </div>
+      </a>
+
+      <a class="step killer" href="project-space.html?orderId=OD-2026042307">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h3>项目协同空间 + 验收分账 <span class="killer-tag">⭐ 杀手锏</span></h3>
+          <div class="file">project-space.html</div>
+          <p class="desc">订单成立后履约的全过程：5 步进度条 + 4 个 tab（需求/素材/<strong>版本时间线</strong>/沟通/验收记录）+ 多轮修改的版本对比。验收时弹 modal <strong>动画演示 ¥28,000 锁定金额释放分账</strong>：承制方实收 ¥26,600 + 平台服务费 ¥1,400（5%），三步走完直接跳钱包看流水。</p>
+          <div class="key-points">
+            <span class="kp">订单履约</span>
+            <span class="kp">版本时间线</span>
+            <span class="kp warn">验收分账动画</span>
+            <span class="kp warn">服务费分账</span>
+          </div>
+        </div>
+        <div class="step-meta">
+          <div class="duration">⏱ 5 分钟</div>
+          <span class="arrow">进入 →</span>
+        </div>
+      </a>
+
+      <a class="step killer" href="wallet-overview.html">
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <h3>钱包总览 + 团队预算划拨 <span class="killer-tag">⭐ 杀手锏</span></h3>
+          <div class="file">wallet-overview.html</div>
+          <p class="desc">当前空间绑定账户大卡（颜色随账户类型变）+ 全部资金账户矩阵（个人/团队/企业主）+ 流水记录。切到企业管理员视角可演示<strong>从企业主账户向团队划拨预算</strong>，给 IP 孵化组配置预算后空间从"回退"变"独立账户"。</p>
+          <div class="key-points">
+            <span class="kp">分层账户</span>
+            <span class="kp">充值（在线/对公）</span>
+            <span class="kp warn">企业管理员视角</span>
+            <span class="kp warn">预算划拨</span>
+          </div>
+        </div>
+        <div class="step-meta">
+          <div class="duration">⏱ 4 分钟</div>
+          <span class="arrow">进入 →</span>
+        </div>
+      </a>
+
+      <a class="step" href="contractor-marketplace.html">
+        <div class="step-num">7</div>
+        <div class="step-content">
+          <h3>承制方广场（备用）</h3>
+          <div class="file">contractor-marketplace.html</div>
+          <p class="desc">238 家承制方卡片网格 + 类目/标签筛选 + 排序 + 承制方主页抽屉（简介 / 报价区间 / 案例 / 历史合作）+ 主动邀请报价。是双边平台 narrative 的另一半，时间够再演。</p>
+          <div class="key-points">
+            <span class="kp">承制方门户</span>
+            <span class="kp">主动邀请</span>
+          </div>
+        </div>
+        <div class="step-meta">
+          <div class="duration">⏱ 2 分钟</div>
+          <span class="arrow">进入 →</span>
+        </div>
+      </a>
+
+      <a class="step" href="platform-home-contractor.html">
+        <div class="step-num">8</div>
+        <div class="step-content">
+          <h3>承制方工作台（补充视角）</h3>
+          <div class="file">platform-home-contractor.html</div>
+          <p class="desc">切到承制方身份后看到的首页：待报价邀约、进行中订单、对外主页状态、收益概览与今日待办。可从待报价需求生成报价，并回到需求方报价对比页，补齐双边交易闭环。</p>
+          <div class="key-points">
+            <span class="kp">身份切换落地页</span>
+            <span class="kp">邀约报价</span>
+            <span class="kp">履约待办</span>
+            <span class="kp">收益概览</span>
+          </div>
+        </div>
+        <div class="step-meta">
+          <div class="duration">⏱ 2 分钟</div>
+          <span class="arrow">进入 →</span>
+        </div>
+      </a>
+
+      <a class="step" href="contractor-demand-hall.html">
+        <div class="step-num">9</div>
+        <div class="step-content">
+          <h3>承制方 · 接单大厅</h3>
+          <div class="file">contractor-demand-hall.html</div>
+          <p class="desc">承制方主动浏览需求方发布的公开需求，按类目筛选，查看预算/截止日/服务等级，标有「推荐」的需求与承制方类目匹配。点击「我要报价」弹出报价方案表单（金额/工期/方案说明/附加案例）。</p>
+          <div class="key-points">
+            <span class="kp">需求浏览</span>
+            <span class="kp">类目匹配推荐</span>
+            <span class="kp">主动报价</span>
+            <span class="kp">报价方案</span>
+          </div>
+        </div>
+        <div class="step-meta">
+          <div class="duration">⏱ 2 分钟</div>
+          <span class="arrow">进入 →</span>
+        </div>
+      </a>
+
+      <a class="step" href="contractor-orders.html">
+        <div class="step-num">10</div>
+        <div class="step-content">
+          <h3>承制方 · 接单与订单</h3>
+          <div class="file">contractor-orders.html</div>
+          <p class="desc">承制方视角的一站式列表：待报价邀约、已报价、履约中、待验收、已完成。可提交报价并跳回需求方报价对比页，展示平台撮合不是单向列表，而是双方工作流。</p>
+          <div class="key-points">
+            <span class="kp">邀约管理</span>
+            <span class="kp">报价提交</span>
+            <span class="kp">履约状态</span>
+            <span class="kp">结算预估</span>
+          </div>
+        </div>
+        <div class="step-meta">
+          <div class="duration">⏱ 2 分钟</div>
+          <span class="arrow">进入 →</span>
+        </div>
+      </a>
+
+      <a class="step" href="contractor-profile-edit.html">
+        <div class="step-num">11</div>
+        <div class="step-content">
+          <h3>承制方主页编辑</h3>
+          <div class="file">contractor-profile-edit.html</div>
+          <p class="desc">承制方自助编辑对外展示主页：名称、Logo、简介、服务类目/标签、代表案例管理。右侧实时预览"需求方在广场看到的效果"，保存后 localStorage 同步到承制方广场。</p>
+          <div class="key-points">
+            <span class="kp">主页编辑</span>
+            <span class="kp">实时预览</span>
+            <span class="kp">案例管理</span>
+            <span class="kp">标签选择</span>
+          </div>
+        </div>
+        <div class="step-meta">
+          <div class="duration">⏱ 1 分钟</div>
+          <span class="arrow">进入 →</span>
+        </div>
+      </a>
+
+      <a class="step killer" href="admin-console.html">
+        <div class="step-num">12</div>
+        <div class="step-content">
+          <h3>企业管理员后台 <span class="killer-tag">⭐ 杀手锏</span></h3>
+          <div class="file">admin-console.html</div>
+          <p class="desc">企业管理员视角的治理中枢：4 个 Tab —— <strong>成员管理</strong>（邀请/冻结/解冻）、<strong>工作空间管理</strong>（含预算使用率进度条）、<strong>角色与权限矩阵</strong>、<strong>资金与预算</strong>（实时划拨到团队账户，写入流水）。演示"给 IP 孵化组划拨预算"后，回钱包页可看到该团队从"回退"变为独立账户。</p>
+          <div class="key-points">
+            <span class="kp warn">成员管理</span>
+            <span class="kp warn">预算划拨</span>
+            <span class="kp">角色权限</span>
+            <span class="kp">空间治理</span>
+          </div>
+        </div>
+        <div class="step-meta">
+          <div class="duration">⏱ 3 分钟</div>
+          <span class="arrow">进入 →</span>
+        </div>
+      </a>
+
+      <a class="step" href="admin-demand-review.html">
+        <div class="step-num">13</div>
+        <div class="step-content">
+          <h3>平台运营 · 需求核定</h3>
+          <div class="file">admin-demand-review.html</div>
+          <p class="desc">平台员工视角的需求审核队列：待审核 / 已通过 / 已驳回筛选，展开查看需求描述与风险标记（预算偏低、描述不清、涉嫌违规），支持通过/驳回（含原因选择）。审核通过后需求进入承制方撮合。</p>
+          <div class="key-points">
+            <span class="kp">审核队列</span>
+            <span class="kp">风险标记</span>
+            <span class="kp">通过/驳回</span>
+          </div>
+        </div>
+        <div class="step-meta">
+          <div class="duration">⏱ 2 分钟</div>
+          <span class="arrow">进入 →</span>
+        </div>
+      </a>
+
+      <a class="step" href="admin-finance.html">
+        <div class="step-num">14</div>
+        <div class="step-content">
+          <h3>平台运营 · 财务结算</h3>
+          <div class="file">admin-finance.html</div>
+          <p class="desc">平台资金全景：5 大 KPI（已结算/服务费收入/待结算/待审核提现/待对账充值）+ 5 个 tab（资金概览含趋势图和托管账户余额、订单结算记录含分账明细、提现审核含通过/拒绝、充值对账含人工确认、发票管理含开具邮寄）。</p>
+          <div class="key-points">
+            <span class="kp">资金趋势</span>
+            <span class="kp">订单分账</span>
+            <span class="kp">提现审核</span>
+            <span class="kp">充值对账</span>
+            <span class="kp">发票管理</span>
+          </div>
+        </div>
+        <div class="step-meta">
+          <div class="duration">⏱ 3 分钟</div>
+          <span class="arrow">进入 →</span>
+        </div>
+      </a>
+
+      <a class="step" href="admin-onboarding-review.html">
+        <div class="step-num">15</div>
+        <div class="step-content">
+          <h3>平台运营 · 入驻审核</h3>
+          <div class="file">admin-onboarding-review.html</div>
+          <p class="desc">平台员工视角的入驻申请审核队列：企业/团队/个人三种主体类型，展开查看资质材料、风险标记（信用代码验证、作品集评分、材料完整性），支持通过/驳回（含原因）/要求补充材料。审核通过后自动开通账号和工作空间。</p>
+          <div class="key-points">
+            <span class="kp">入驻审核队列</span>
+            <span class="kp">资质材料查看</span>
+            <span class="kp">风险标记</span>
+            <span class="kp">通过/驳回</span>
+          </div>
+        </div>
+        <div class="step-meta">
+          <div class="duration">⏱ 2 分钟</div>
+          <span class="arrow">进入 →</span>
+        </div>
+      </a>
+
+      <a class="step" href="admin-category-config.html">
+        <div class="step-num">16</div>
+        <div class="step-content">
+          <h3>平台运营 · 类目配置</h3>
+          <div class="file">admin-category-config.html</div>
+          <p class="desc">平台类目体系的可视化管理：5 大一级类目 × 二级类目树形导航，点选后右侧展示该类目的标签池、服务等级（含价格区间）、动态字段 Schema（字段名/类型/必填/选项）。对应发布需求页的表单生成逻辑。</p>
+          <div class="key-points">
+            <span class="kp">类目树</span>
+            <span class="kp">标签池</span>
+            <span class="kp">服务等级</span>
+            <span class="kp">Schema 配置</span>
+          </div>
+        </div>
+        <div class="step-meta">
+          <div class="duration">⏱ 2 分钟</div>
+          <span class="arrow">进入 →</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="footer">
+      <h3>🎯 演示要点（一图看完）</h3>
+      <div class="tip-grid">
+        <div>统一账号 + 5 个工作空间 + 多身份切换</div>
+        <div>5 大类目 × 19 个二级类目，动态字段 schema</div>
+        <div>平台撮合（指定/推荐/报价对比），区别于抢单</div>
+        <div><strong>扣款主体识别 = PDF 4.2 节核心卖点</strong></div>
+        <div>分层资金账户：企业主 → 团队预算 → 个人</div>
+        <div>团队无预算自动回退企业主账户兜底</div>
+        <div><strong>管理员后台：成员 / 空间 / 角色 / 预算划拨</strong></div>
+        <div>承制方双边闭环：接单 / 报价 / 主页编辑</div>
+      </div>
+      <h3 style="margin-top: 16px;">💻 演示中可用的 console 命令</h3>
+      <div class="console-box">
+        demoApp.reset();　&nbsp;&nbsp; // 重置所有 mock 数据回默认值<br>
+        demoApp.setCurrentWorkspace("cf-drama");　&nbsp;&nbsp; // 强制切空间<br>
+        demoApp.getDemands();　&nbsp;&nbsp; // 看所有需求<br>
+        demoApp.getWallets();　&nbsp;&nbsp; // 看所有账户余额
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-wrap" id="toastWrap"></div>
+
+  <script>
+    document.getElementById("updateDate").textContent = "2026-04-27";
+
+    function resetDemo() {
+      const keys = ["demoCurrentWorkspace", "demoCurrentIdentity", "demoDemands", "demoOrders", "demoWallets", "demoFlows", "demoDemandDraft", "demoContractorProfile", "demoContractorInbox", "demoContractorQuoteDraft", "demoProfileComplete"];
+      keys.forEach(k => localStorage.removeItem(k));
+      const t = document.createElement("div");
+      t.className = "toast";
+      t.textContent = "✅ 所有 demo 数据已重置";
+      document.getElementById("toastWrap").appendChild(t);
+      setTimeout(() => t.remove(), 2000);
+    }
+  </script>
+</body>
+</html>

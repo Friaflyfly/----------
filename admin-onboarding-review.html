@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>入驻审核 - 平台运营后台</title>
+  <link rel="stylesheet" href="_shared.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #262626; }
+    .ops-banner { background: linear-gradient(135deg, #13c2c2, #006d75); color: #fff; font-size: 12px; text-align: center; padding: 6px; position: fixed; top: 56px; left: 0; right: 0; z-index: 190; }
+    .app { display: flex; padding-top: 84px; min-height: 100vh; }
+    .sidebar { width: 200px; background: #fff; box-shadow: 2px 0 8px rgba(0,0,0,.06); position: fixed; top: 84px; left: 0; bottom: 0; padding: 16px 0; overflow-y: auto; }
+    .menu a { display: flex; align-items: center; gap: 10px; padding: 11px 24px; color: #262626; text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
+    .menu a:hover { background: #f0f7ff; color: #1890ff; }
+    .menu a.active { background: #e6fffb; color: #13c2c2; border-left-color: #13c2c2; font-weight: 500; }
+    .menu-icon { width: 18px; text-align: center; }
+    .menu-group { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+    .menu-group-title { padding: 8px 24px; font-size: 11px; color: #8c8c8c; }
+    .main { margin-left: 200px; flex: 1; padding: 24px 28px 60px; }
+    .page-head { margin-bottom: 16px; }
+    .page-head h1 { margin: 0 0 6px; font-size: 22px; }
+    .page-head .sub { color: #8c8c8c; font-size: 13px; }
+
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+    .kpi { background: #fff; border-radius: 10px; padding: 16px 18px; box-shadow: 0 2px 6px rgba(0,0,0,.04); }
+    .kpi .label { font-size: 12px; color: #8c8c8c; }
+    .kpi .value { font-size: 26px; font-weight: 700; margin: 6px 0 4px; color: #006d75; }
+    .kpi .note { font-size: 11px; color: #8c8c8c; }
+
+    .toolbar { background: #fff; border-radius: 10px; padding: 14px 16px; box-shadow: 0 2px 6px rgba(0,0,0,.04); display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+    .tabs { display: flex; gap: 6px; }
+    .tab { border: 1px solid #d9d9d9; border-radius: 6px; padding: 5px 14px; font-size: 13px; background: #fff; cursor: pointer; }
+    .tab:hover { border-color: #87e8de; color: #13c2c2; }
+    .tab.active { background: #e6fffb; border-color: #13c2c2; color: #006d75; font-weight: 500; }
+    .search-box { margin-left: auto; border: 1px solid #d9d9d9; border-radius: 6px; padding: 5px 12px; font-size: 13px; width: 200px; }
+    .search-box:focus { border-color: #13c2c2; outline: none; }
+
+    .card { background: #fff; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,.04); margin-bottom: 12px; overflow: hidden; transition: box-shadow .15s; }
+    .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+    .card-head { padding: 16px 20px; display: flex; align-items: center; gap: 14px; cursor: pointer; }
+    .card-head .type-badge { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; flex-shrink: 0; }
+    .type-enterprise { background: #e6f7ff; color: #096dd9; }
+    .type-team { background: #f9f0ff; color: #531dab; }
+    .type-personal { background: #fff7e6; color: #d48806; }
+    .card-head .name { font-size: 15px; font-weight: 600; }
+    .card-head .meta { font-size: 12px; color: #8c8c8c; margin-left: 8px; }
+    .card-head .status { margin-left: auto; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; flex-shrink: 0; }
+    .status-pending { background: #fffbe6; color: #d48806; }
+    .status-approved { background: #f6ffed; color: #389e0d; }
+    .status-rejected { background: #fff1f0; color: #cf1322; }
+    .card-head .toggle { color: #8c8c8c; font-size: 16px; transition: transform .2s; }
+    .card.expanded .toggle { transform: rotate(90deg); }
+
+    .card-detail { display: none; padding: 0 20px 18px; border-top: 1px dashed #f0f0f0; }
+    .card.expanded .card-detail { display: block; }
+    .detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+    .detail-item { font-size: 12px; }
+    .detail-item .dl { color: #8c8c8c; margin-bottom: 2px; }
+    .detail-item .dv { font-weight: 500; }
+    .uploads-row { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+    .upload-thumb { width: 72px; height: 72px; border-radius: 6px; background: #fafafa; border: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+    .risk-tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+    .risk-tag { padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+    .risk-tag.warn { background: #fffbe6; color: #d48806; border: 1px solid #ffe58f; }
+    .risk-tag.ok { background: #f6ffed; color: #389e0d; border: 1px solid #b7eb8f; }
+
+    .card-actions { display: flex; gap: 8px; margin-top: 14px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+    .btn { height: 34px; border: 1px solid #d9d9d9; background: #fff; border-radius: 6px; padding: 0 14px; font-size: 13px; color: #595959; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .btn:hover { border-color: #87e8de; color: #13c2c2; }
+    .btn.primary { background: #13c2c2; border-color: #13c2c2; color: #fff; }
+    .btn.danger { background: #fff1f0; border-color: #ffa39e; color: #cf1322; }
+    .btn.primary:hover { background: #006d75; }
+    .btn.danger:hover { background: #cf1322; color: #fff; }
+
+    .modal-mask { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 900; align-items: center; justify-content: center; }
+    .modal-mask.open { display: flex; }
+    .modal { width: min(92vw, 520px); background: #fff; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.22); overflow: hidden; }
+    .modal-head { padding: 18px 22px; border-bottom: 1px solid #f0f0f0; }
+    .modal-head h3 { margin: 0; font-size: 17px; }
+    .modal-body { padding: 20px 22px; }
+    .modal-foot { padding: 14px 22px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 8px; }
+    .form-row { margin-bottom: 14px; }
+    .form-row label { display: block; font-size: 12px; color: #8c8c8c; margin-bottom: 5px; }
+    .form-row textarea { width: 100%; border: 1px solid #d9d9d9; border-radius: 6px; padding: 8px 10px; font-size: 13px; font-family: inherit; min-height: 60px; }
+    .form-row select { width: 100%; border: 1px solid #d9d9d9; border-radius: 6px; padding: 8px 10px; font-size: 13px; }
+
+    .empty { text-align: center; padding: 60px 20px; color: #8c8c8c; font-size: 14px; }
+    .toasts { position: fixed; top: 100px; right: 20px; width: min(90vw, 360px); display: grid; gap: 8px; z-index: 1100; }
+    .toast { background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; padding: 10px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.1); animation: slideIn .25s ease-out; }
+    .toast.ok { border-color: #b7eb8f; background: #f6ffed; color: #389e0d; }
+    .toast.info { border-color: #91d5ff; background: #e6f7ff; color: #096dd9; }
+    .toast.warn { border-color: #ffe58f; background: #fffbe6; color: #d48806; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(2, 1fr); } .detail-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding: 16px; } }
+  </style>
+</head>
+<body>
+  <header class="topbar" id="topbar-shared"></header>
+  <div class="ops-banner">📋 平台运营后台 · 入驻审核 · 审核通过后为申请方开通账号与工作空间</div>
+  <div class="app">
+    <aside class="sidebar">
+      <nav class="menu">
+        <a href="admin-demand-review.html"><span class="menu-icon">🔍</span> 需求核定</a>
+        <a href="admin-onboarding-review.html" class="active"><span class="menu-icon">📋</span> 入驻审核</a>
+        <a href="admin-finance.html"><span class="menu-icon">💰</span> 财务结算</a>
+        <a href="admin-category-config.html"><span class="menu-icon">🏷</span> 类目配置</a>
+        <div class="menu-group">
+          <div class="menu-group-title">跳转</div>
+          <a href="admin-console.html"><span class="menu-icon">👑</span> 管理员后台</a>
+          <a href="platform-home-demander.html"><span class="menu-icon">📥</span> 需求方工作台</a>
+          <a href="demo-index.html"><span class="menu-icon">📋</span> Demo 导航</a>
+        </div>
+      </nav>
+    </aside>
+    <main class="main">
+      <div class="page-head">
+        <h1>入驻审核</h1>
+        <div class="sub">企业 / 团队 / 个人提交入驻申请 → 平台审核资质材料 → 通过后自动开通账号、工作空间和资金账户。</div>
+      </div>
+
+      <section class="kpis">
+        <div class="kpi"><div class="label">待审核</div><div class="value" id="kpiPending">0</div><div class="note">应在 48h 内处理</div></div>
+        <div class="kpi"><div class="label">本月已审</div><div class="value" id="kpiMonth">0</div><div class="note">通过率 92%</div></div>
+        <div class="kpi"><div class="label">本月驳回</div><div class="value" id="kpiRejected">0</div><div class="note">主因：材料不全</div></div>
+        <div class="kpi"><div class="label">累计入驻主体</div><div class="value" id="kpiTotal">0</div><div class="note">企业 + 团队 + 个人</div></div>
+      </section>
+
+      <div class="toolbar">
+        <div class="tabs" id="tabs">
+          <span class="tab active" data-status="all" onclick="filterStatus('all')">全部</span>
+          <span class="tab" data-status="pending" onclick="filterStatus('pending')">待审核</span>
+          <span class="tab" data-status="approved" onclick="filterStatus('approved')">已通过</span>
+          <span class="tab" data-status="rejected" onclick="filterStatus('rejected')">已驳回</span>
+        </div>
+        <input class="search-box" id="searchBox" placeholder="搜索企业/团队/个人名称…" oninput="renderList()">
+      </div>
+
+      <div id="listArea"></div>
+    </main>
+  </div>
+
+  <div class="modal-mask" id="rejectModal">
+    <div class="modal">
+      <div class="modal-head"><h3>驳回入驻申请</h3></div>
+      <div class="modal-body">
+        <div class="form-row">
+          <label>驳回原因分类</label>
+          <select id="rejectReason">
+            <option>材料不完整</option>
+            <option>营业执照信息与填写不符</option>
+            <option>身份证照片模糊/缺失</option>
+            <option>作品集不符合平台要求</option>
+            <option>涉嫌虚假信息</option>
+            <option>其他</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>补充说明（选填）</label>
+          <textarea id="rejectNote" placeholder="告诉申请方需要补充什么材料…"></textarea>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="document.getElementById('rejectModal').classList.remove('open')">取消</button>
+        <button class="btn danger" onclick="confirmReject()">确认驳回</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastWrap" class="toasts"></div>
+
+  <script src="_shared.js"></script>
+  <script>
+    SharedHeader.mount({ activeNav: "" });
+
+    function toast(msg, kind) {
+      var w = document.getElementById("toastWrap"), t = document.createElement("div");
+      t.className = "toast " + (kind || "ok"); t.textContent = msg; w.appendChild(t);
+      setTimeout(function () { t.style.opacity = "0"; t.style.transform = "translateX(20px)"; setTimeout(function () { t.remove(); }, 260); }, 2400);
+    }
+
+    var applications = [
+      {
+        id: "ENT-20260426001", name: "骋风天合文化传媒有限公司", type: "enterprise", typeName: "企业",
+        contact: "昭岚", phone: "138****6789", email: "zhaolan@cf.com",
+        identity: "需求方 + 承制方", workspaces: 3, creditCode: "91110105MA0XXXXX9X",
+        legalPerson: "周总", address: "北京市朝阳区建国路 88 号",
+        intro: "专注于短剧、品牌影视、IP 孵化等领域的创作与投资。",
+        uploads: ["📄 营业执照", "🪪 法人身份证正面", "🪪 法人身份证反面", "🎨 企业作品集"],
+        risks: [{ text: "信用代码已验证", cls: "ok" }, { text: "行业匹配度高", cls: "ok" }],
+        bizCats: ["视频制作", "图片设计", "IP 孵化"],
+        submitTime: "2026-04-26 10:30", status: "pending"
+      },
+      {
+        id: "TEAM-20260425002", name: "星辰创作工作室", type: "team", typeName: "团队",
+        contact: "陈星辰", phone: "139****2345", email: "star@starlight.com",
+        identity: "需求方 + 承制方", workspaces: 1, creditCode: "",
+        legalPerson: "", address: "",
+        intro: "8 年短视频 / 短剧 / 海报设计经验，擅长奇幻、修仙、玄幻题材。",
+        uploads: ["🪪 负责人身份证正面", "🪪 负责人身份证反面", "🎨 团队作品集"],
+        risks: [{ text: "团队协议未上传", cls: "warn" }, { text: "作品集已审核", cls: "ok" }],
+        bizCats: ["视频制作", "图片设计"],
+        submitTime: "2026-04-25 14:20", status: "pending"
+      },
+      {
+        id: "PSN-20260424003", name: "林小雅", type: "personal", typeName: "个人",
+        contact: "林小雅", phone: "136****7890", email: "xiaoya@qq.com",
+        identity: "仅承制方", workspaces: 1, creditCode: "",
+        legalPerson: "", address: "",
+        intro: "自由插画师，擅长二次元、国风角色设计，多次为短剧项目绘制海报。",
+        uploads: ["🪪 身份证正面", "🪪 身份证反面", "🎨 个人作品集"],
+        risks: [{ text: "作品集质量评分 A", cls: "ok" }, { text: "首次入驻", cls: "warn" }],
+        bizCats: ["图片设计"],
+        submitTime: "2026-04-24 09:15", status: "pending"
+      },
+      {
+        id: "ENT-20260420004", name: "声海传媒科技有限公司", type: "enterprise", typeName: "企业",
+        contact: "张海", phone: "137****5678", email: "zhanghai@soundsea.cn",
+        identity: "仅承制方", workspaces: 1, creditCode: "91310115MA1YYYYY3B",
+        legalPerson: "张海", address: "上海市浦东新区张江路 200 号",
+        intro: "专业配音公司，拥有自建录音棚，服务品牌广告片、有声书、游戏配音等。",
+        uploads: ["📄 营业执照", "🪪 法人身份证正面", "🪪 法人身份证反面", "🎨 作品集", "📜 广播许可证"],
+        risks: [{ text: "信用代码已验证", cls: "ok" }, { text: "资质证书完整", cls: "ok" }, { text: "行业匹配度高", cls: "ok" }],
+        bizCats: ["内容创作", "视频制作"],
+        submitTime: "2026-04-20 11:00", status: "approved"
+      },
+      {
+        id: "PSN-20260418005", name: "色彩工坊 · 李文", type: "personal", typeName: "个人",
+        contact: "李文", phone: "135****4321", email: "liwen@design.me",
+        identity: "需求方 + 承制方", workspaces: 1, creditCode: "",
+        legalPerson: "", address: "",
+        intro: "10 年平面设计经验，擅长品牌 VI、海报、封面等视觉设计。",
+        uploads: ["🪪 身份证正面", "🪪 身份证反面", "🎨 作品集"],
+        risks: [{ text: "作品集质量评分 S", cls: "ok" }],
+        bizCats: ["图片设计"],
+        submitTime: "2026-04-18 16:30", status: "approved"
+      },
+      {
+        id: "TEAM-20260415006", name: "XX影视文化工作室", type: "team", typeName: "团队",
+        contact: "王某某", phone: "133****0000", email: "wx@xx.com",
+        identity: "仅需求方", workspaces: 1, creditCode: "",
+        legalPerson: "", address: "",
+        intro: "短视频MCN团队",
+        uploads: ["🪪 负责人身份证正面", "🪪 负责人身份证反面"],
+        risks: [{ text: "简介过于简短", cls: "warn" }, { text: "未提供作品集", cls: "warn" }, { text: "手机号归属地异常", cls: "warn" }],
+        bizCats: ["视频制作"],
+        submitTime: "2026-04-15 08:00", status: "rejected",
+        rejectReason: "材料不完整 — 团队协议和作品集均未提供，简介信息过少"
+      }
+    ];
+
+    var currentFilter = "all";
+    var rejectTargetId = null;
+
+    function renderKPIs() {
+      var pending = 0, approved = 0, rejected = 0;
+      applications.forEach(function (a) {
+        if (a.status === "pending") pending++;
+        else if (a.status === "approved") approved++;
+        else if (a.status === "rejected") rejected++;
+      });
+      document.getElementById("kpiPending").textContent = pending;
+      document.getElementById("kpiMonth").textContent = approved + rejected;
+      document.getElementById("kpiRejected").textContent = rejected;
+      document.getElementById("kpiTotal").textContent = approved;
+    }
+
+    function filterStatus(s) {
+      currentFilter = s;
+      document.querySelectorAll(".tab").forEach(function (t) { t.classList.toggle("active", t.getAttribute("data-status") === s); });
+      renderList();
+    }
+
+    function renderList() {
+      var q = document.getElementById("searchBox").value.toLowerCase();
+      var filtered = applications.filter(function (a) {
+        if (currentFilter !== "all" && a.status !== currentFilter) return false;
+        if (q && a.name.toLowerCase().indexOf(q) === -1 && a.contact.toLowerCase().indexOf(q) === -1) return false;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        document.getElementById("listArea").innerHTML = '<div class="empty">暂无匹配的入驻申请</div>';
+        return;
+      }
+
+      document.getElementById("listArea").innerHTML = filtered.map(function (a) {
+        var statusLabel = a.status === "pending" ? "待审核" : a.status === "approved" ? "已通过" : "已驳回";
+        var statusCls = "status-" + a.status;
+
+        var detailFields = [
+          { l: "联系人", v: a.contact },
+          { l: "手机号", v: a.phone },
+          { l: "邮箱", v: a.email },
+          { l: "入驻身份", v: a.identity },
+          { l: "工作空间", v: a.workspaces + " 个" },
+          { l: "服务类目", v: a.bizCats.join("、") }
+        ];
+        if (a.creditCode) detailFields.push({ l: "信用代码", v: a.creditCode });
+        if (a.legalPerson) detailFields.push({ l: "法定代表人", v: a.legalPerson });
+        if (a.address) detailFields.push({ l: "注册地址", v: a.address });
+
+        var risksHtml = a.risks.map(function (r) { return '<span class="risk-tag ' + r.cls + '">' + (r.cls === "ok" ? "✅ " : "⚠️ ") + r.text + '</span>'; }).join("");
+        var uploadsHtml = a.uploads.map(function (u) { return '<div class="upload-thumb">' + u.split(" ")[0] + '</div>'; }).join("");
+
+        var actionsHtml = "";
+        if (a.status === "pending") {
+          actionsHtml = '<div class="card-actions">'
+            + '<button class="btn primary" onclick="approveApp(\'' + a.id + '\')">✅ 通过</button>'
+            + '<button class="btn danger" onclick="openReject(\'' + a.id + '\')">❌ 驳回</button>'
+            + '<button class="btn" onclick="toast(\'已发送补充材料通知\', \'info\')">📩 要求补充材料</button>'
+            + '</div>';
+        } else if (a.status === "rejected") {
+          actionsHtml = '<div class="card-actions"><div style="font-size:12px;color:#cf1322;background:#fff1f0;padding:8px 12px;border-radius:6px;width:100%">驳回原因：' + (a.rejectReason || "未填写") + '</div></div>';
+        } else {
+          actionsHtml = '<div class="card-actions"><div style="font-size:12px;color:#389e0d;background:#f6ffed;padding:8px 12px;border-radius:6px;width:100%">✅ 已通过审核，账号已自动开通</div></div>';
+        }
+
+        return '<div class="card" id="card-' + a.id + '">'
+          + '<div class="card-head" onclick="toggleCard(\'' + a.id + '\')">'
+            + '<span class="type-badge type-' + a.type + '">' + a.typeName + '</span>'
+            + '<span class="name">' + a.name + '</span>'
+            + '<span class="meta">' + a.submitTime + '</span>'
+            + '<span class="status ' + statusCls + '">' + statusLabel + '</span>'
+            + '<span class="toggle">▸</span>'
+          + '</div>'
+          + '<div class="card-detail">'
+            + '<div style="font-size:13px;color:#595959;margin-top:14px">' + a.intro + '</div>'
+            + '<div class="detail-grid">' + detailFields.map(function (f) { return '<div class="detail-item"><div class="dl">' + f.l + '</div><div class="dv">' + f.v + '</div></div>'; }).join("") + '</div>'
+            + '<div style="margin-top:12px;font-size:12px;color:#8c8c8c">上传材料：</div>'
+            + '<div class="uploads-row">' + uploadsHtml + '</div>'
+            + '<div class="risk-tags">' + risksHtml + '</div>'
+            + actionsHtml
+          + '</div>'
+          + '</div>';
+      }).join("");
+    }
+
+    window.toggleCard = function (id) {
+      document.getElementById("card-" + id).classList.toggle("expanded");
+    };
+
+    window.approveApp = function (id) {
+      var app = applications.find(function (a) { return a.id === id; });
+      if (!app) return;
+      app.status = "approved";
+      renderKPIs();
+      renderList();
+      toast("✅ " + app.name + " 入驻审核通过！已自动开通账号和工作空间", "ok");
+    };
+
+    window.openReject = function (id) {
+      rejectTargetId = id;
+      document.getElementById("rejectReason").selectedIndex = 0;
+      document.getElementById("rejectNote").value = "";
+      document.getElementById("rejectModal").classList.add("open");
+    };
+
+    window.confirmReject = function () {
+      var app = applications.find(function (a) { return a.id === rejectTargetId; });
+      if (!app) return;
+      var reason = document.getElementById("rejectReason").value;
+      var note = document.getElementById("rejectNote").value;
+      app.status = "rejected";
+      app.rejectReason = reason + (note ? " — " + note : "");
+      document.getElementById("rejectModal").classList.remove("open");
+      renderKPIs();
+      renderList();
+      toast("已驳回 " + app.name + " 的入驻申请", "warn");
+    };
+
+    renderKPIs();
+    renderList();
+  </script>
+</body>
+</html>

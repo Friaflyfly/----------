@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>平台入驻 - 骋风天合 · 创作门户交易平台</title>
+  <link rel="stylesheet" href="_shared.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #262626; }
+    .topbar-onboard { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.06); z-index: 200; display: flex; align-items: center; padding: 0 24px; gap: 16px; }
+    .topbar-onboard .brand { font-weight: 600; font-size: 16px; color: #1890ff; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .topbar-onboard .brand-sub { color: #8c8c8c; font-size: 12px; font-weight: 400; }
+    .topbar-onboard .right { margin-left: auto; display: flex; align-items: center; gap: 12px; font-size: 13px; color: #8c8c8c; }
+    .topbar-onboard .right a { color: #1890ff; text-decoration: none; }
+
+    .wrap { max-width: 880px; margin: 0 auto; padding: 80px 20px 60px; }
+
+    .hero { background: linear-gradient(135deg, #1890ff 0%, #722ed1 100%); border-radius: 16px; padding: 36px 40px; color: #fff; margin-bottom: 24px; position: relative; overflow: hidden; }
+    .hero::after { content: ""; position: absolute; right: -60px; top: -60px; width: 240px; height: 240px; background: rgba(255,255,255,.08); border-radius: 50%; }
+    .hero h1 { margin: 0 0 8px; font-size: 28px; font-weight: 700; }
+    .hero .sub { font-size: 14px; opacity: .92; line-height: 1.7; max-width: 600px; }
+    .hero .types { display: flex; gap: 12px; margin-top: 20px; }
+    .hero .type-chip { padding: 8px 18px; border-radius: 20px; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3); font-size: 13px; cursor: pointer; transition: all .15s; }
+    .hero .type-chip:hover, .hero .type-chip.active { background: #fff; color: #722ed1; border-color: #fff; font-weight: 600; }
+
+    .steps-bar { display: flex; align-items: center; gap: 0; margin-bottom: 28px; background: #fff; border-radius: 12px; padding: 18px 24px; box-shadow: 0 2px 8px rgba(0,0,0,.04); }
+    .step-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; position: relative; }
+    .step-item::after { content: ""; position: absolute; top: 16px; left: 55%; width: 90%; height: 2px; background: #f0f0f0; }
+    .step-item:last-child::after { display: none; }
+    .step-item.done::after { background: #52c41a; }
+    .step-item.current::after { background: linear-gradient(90deg, #1890ff 50%, #f0f0f0 50%); }
+    .step-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; z-index: 2; border: 2px solid #f0f0f0; background: #fff; color: #8c8c8c; }
+    .step-item.done .step-dot { background: #52c41a; border-color: #52c41a; color: #fff; }
+    .step-item.current .step-dot { background: #1890ff; border-color: #1890ff; color: #fff; }
+    .step-label { font-size: 12px; color: #8c8c8c; }
+    .step-item.done .step-label { color: #389e0d; }
+    .step-item.current .step-label { color: #1890ff; font-weight: 500; }
+
+    .panel { background: #fff; border-radius: 12px; padding: 24px 28px; box-shadow: 0 2px 8px rgba(0,0,0,.04); margin-bottom: 16px; }
+    .panel h2 { margin: 0 0 4px; font-size: 18px; }
+    .panel .desc { font-size: 13px; color: #8c8c8c; margin: 0 0 18px; }
+
+    .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .form-item { display: flex; flex-direction: column; gap: 5px; }
+    .form-item.full { grid-column: 1 / -1; }
+    .form-item label { font-size: 12px; color: #8c8c8c; }
+    .form-item label .req { color: #ff4d4f; }
+    .form-item input, .form-item select, .form-item textarea {
+      border: 1px solid #d9d9d9; border-radius: 6px; padding: 9px 10px; font-size: 13px; font-family: inherit; transition: border .2s;
+    }
+    .form-item input:focus, .form-item select:focus, .form-item textarea:focus { border-color: #1890ff; outline: none; box-shadow: 0 0 0 2px rgba(24,144,255,.1); }
+
+    .upload-zone { border: 2px dashed #d9d9d9; border-radius: 8px; padding: 24px; text-align: center; color: #8c8c8c; font-size: 13px; cursor: pointer; transition: all .15s; }
+    .upload-zone:hover { border-color: #1890ff; color: #1890ff; }
+    .upload-zone .icon { font-size: 32px; margin-bottom: 6px; }
+
+    .checklist { margin: 0; padding: 0; list-style: none; }
+    .checklist li { padding: 10px 0; border-bottom: 1px dashed #f0f0f0; display: flex; align-items: center; gap: 10px; font-size: 13px; }
+    .checklist li:last-child { border-bottom: none; }
+    .check-mark { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #d9d9d9; display: flex; align-items: center; justify-content: center; font-size: 12px; color: transparent; flex-shrink: 0; cursor: pointer; transition: all .15s; }
+    .check-mark.done { background: #52c41a; border-color: #52c41a; color: #fff; }
+
+    .actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+    .btn { height: 38px; border: 1px solid #d9d9d9; background: #fff; border-radius: 8px; padding: 0 22px; font-size: 14px; color: #595959; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .btn:hover { border-color: #91d5ff; color: #1890ff; }
+    .btn.primary { background: linear-gradient(135deg, #1890ff, #722ed1); border: none; color: #fff; font-weight: 500; }
+    .btn.primary:hover { opacity: .9; }
+    .btn.success { background: #52c41a; border-color: #52c41a; color: #fff; }
+
+    .result-box { text-align: center; padding: 40px 20px; }
+    .result-icon { font-size: 56px; margin-bottom: 12px; }
+    .result-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .result-desc { font-size: 14px; color: #8c8c8c; line-height: 1.7; margin-bottom: 20px; }
+
+    .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .info-card { background: #fafafa; border-radius: 8px; padding: 14px; text-align: center; }
+    .info-card .val { font-size: 22px; font-weight: 700; color: #722ed1; }
+    .info-card .lbl { font-size: 11px; color: #8c8c8c; margin-top: 3px; }
+
+    .toasts { position: fixed; top: 72px; right: 20px; width: min(90vw, 360px); display: grid; gap: 8px; z-index: 1100; }
+    .toast { background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; padding: 10px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.1); animation: slideIn .25s ease-out; }
+    .toast.ok { border-color: #b7eb8f; background: #f6ffed; color: #389e0d; }
+    .toast.info { border-color: #91d5ff; background: #e6f7ff; color: #096dd9; }
+    .toast.warn { border-color: #ffe58f; background: #fffbe6; color: #d48806; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    .diff-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; border-radius: 8px; overflow: hidden; }
+    .diff-table th, .diff-table td { padding: 8px 12px; text-align: center; border: 1px solid rgba(255,255,255,.15); }
+    .diff-table thead th { background: rgba(0,0,0,.15); color: #fff; font-weight: 600; }
+    .diff-table thead th:first-child { background: rgba(0,0,0,.2); }
+    .diff-table tbody td { background: rgba(255,255,255,.1); color: rgba(255,255,255,.92); }
+    .diff-table tbody td:first-child { text-align: left; font-weight: 500; background: rgba(0,0,0,.1); }
+    .diff-table .hl-enterprise { border-bottom: 3px solid #fff; }
+    .diff-table .hl-team { border-bottom: 3px solid rgba(255,255,255,.5); }
+    .diff-table .hl-personal { border-bottom: 3px solid rgba(255,255,255,.5); }
+
+    @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } .info-grid { grid-template-columns: 1fr; } .hero .types { flex-wrap: wrap; } .diff-table { font-size: 11px; } .diff-table th, .diff-table td { padding: 6px 8px; } }
+  </style>
+</head>
+<body>
+  <div class="topbar-onboard">
+    <a href="demo-index.html" class="brand">🎬 骋风天合<span class="brand-sub">· 创作门户交易平台</span></a>
+    <div class="right">
+      <span>已有账号？</span>
+      <a href="platform-home-demander.html">直接登录 →</a>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <section class="hero">
+      <h1>入驻 · 创作门户交易平台</h1>
+      <div class="sub">
+        选择主体类型完成入驻，入驻后可选择需求方、承制方或双重身份。<br>
+        所有主体均支持：发布需求 + 接受撮合 + 分层资金账户。
+      </div>
+      <div class="types" id="typeChips">
+        <span class="type-chip active" data-type="enterprise" onclick="switchType('enterprise')">🏢 企业入驻</span>
+        <span class="type-chip" data-type="team" onclick="switchType('team')">👥 团队入驻</span>
+        <span class="type-chip" data-type="personal" onclick="switchType('personal')">👤 个人入驻</span>
+      </div>
+      <table class="diff-table">
+        <thead><tr><th>对比维度</th><th>🏢 企业</th><th>👥 团队</th><th>👤 个人</th></tr></thead>
+        <tbody>
+          <tr><td>主体要求</td><td>公司法人（营业执照）</td><td>非法人团体（无需执照）</td><td>自然人（身份证）</td></tr>
+          <tr><td>可选身份</td><td>需求方 / 承制方 / 双重</td><td>需求方 / 承制方 / 双重</td><td>需求方 / 承制方 / 双重</td></tr>
+          <tr><td>资金体系</td><td>企业主账户 → 可划拨团队预算</td><td>单一团队账户</td><td>个人账户</td></tr>
+          <tr><td>工作空间</td><td>多个（按部门拆分）</td><td>1 个（不可拆分）</td><td>1 个（个人空间）</td></tr>
+          <tr><td>管理后台</td><td>完整（成员/角色/预算）</td><td>简化（仅成员管理）</td><td>无</td></tr>
+          <tr><td>承制方选项</td><td>需上传企业资质 + 作品集</td><td>需上传团队作品集</td><td>需上传个人作品集</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="steps-bar" id="stepsBar">
+      <div class="step-item done"><div class="step-dot">✓</div><div class="step-label">选择类型</div></div>
+      <div class="step-item current"><div class="step-dot">2</div><div class="step-label">填写资料</div></div>
+      <div class="step-item"><div class="step-dot">3</div><div class="step-label">上传材料</div></div>
+      <div class="step-item"><div class="step-dot">4</div><div class="step-label">平台审核</div></div>
+      <div class="step-item"><div class="step-dot">5</div><div class="step-label">开通成功</div></div>
+    </section>
+
+    <div id="formArea"></div>
+
+    <div id="resultArea" style="display:none">
+      <section class="panel">
+        <div class="result-box" id="resultBox"></div>
+      </section>
+    </div>
+  </div>
+
+  <div id="toastWrap" class="toasts"></div>
+  <script>
+    var curType = 'enterprise';
+
+    function toast(msg, kind) {
+      var w = document.getElementById('toastWrap'), t = document.createElement('div');
+      t.className = 'toast ' + (kind || 'ok'); t.textContent = msg; w.appendChild(t);
+      setTimeout(function () { t.style.opacity = '0'; t.style.transform = 'translateX(20px)'; setTimeout(function () { t.remove(); }, 260); }, 2400);
+    }
+    window.markUpload = function (el) {
+      el.innerHTML = '<div class="icon" style="color:#52c41a">✅</div>已上传（mock）<br><span style="font-size:11px;color:#52c41a">点击可替换</span>';
+      el.style.borderColor = '#52c41a'; el.style.background = '#f6ffed';
+    };
+    window.toggleCheck = function (el) { el.classList.toggle('done'); };
+
+    function setStep(n) {
+      document.querySelectorAll('.step-item').forEach(function (el, idx) {
+        el.className = 'step-item' + (idx < n ? ' done' : '') + (idx === n ? ' current' : '');
+        if (idx < n) el.querySelector('.step-dot').textContent = '✓';
+      });
+    }
+
+    var IDENTITY_OPTIONS = '<option>仅需求方（发布需求、采购服务）</option><option selected>需求方 + 承制方（双重身份）</option><option>仅承制方（接单、提供服务）</option>';
+
+    var CFG = {
+      enterprise: {
+        label: '企业入驻', infoTitle: '📝 企业基本信息', infoDesc: '填写营业执照上的信息，需与上传的证件一致',
+        fields: [
+          ['企业全称', '骋风天合文化传媒有限公司', true],
+          ['统一社会信用代码', '91110105MA0XXXXX9X', true],
+          ['法定代表人', '周总', true],
+          ['注册地址', '北京市朝阳区建国路 88 号', false],
+          ['企业管理员姓名', '昭岚', true],
+          ['管理员手机号', '138****6789', true],
+          ['管理员邮箱', 'zhaolan@cf.com', true]
+        ],
+        typeSelect: '<div class="form-item"><label>企业类型</label><select><option>有限责任公司</option><option>股份有限公司</option><option>个体工商户</option></select></div>',
+        introLabel: '企业简介', introDefault: '骋风天合文化传媒有限公司，专注于短剧、品牌影视、IP 孵化等领域的创作与投资。',
+        configTitle: '🏢 入驻配置', configDesc: '选择入驻身份和初始工作空间',
+        wsOptions: '<option>1 个（可后续追加）</option><option selected>3 个（推荐中型企业）</option><option>5 个（大型企业）</option>',
+        baseUploads: [
+          ['营业执照副本', '📄', true], ['法人身份证正面', '🪪', true], ['法人身份证反面', '🪪', true]
+        ],
+        contractorUpload: ['企业资质 + 作品集', '🎨', true],
+        uploadDesc: '上传营业执照副本、法人身份证正反面',
+        baseChecklist: ['企业名称、信用代码信息准确无误', '管理员联系方式可接收验证短信', '营业执照副本已上传且清晰可辨', '法人身份证正反面已上传'],
+        resultCards: function (id) { return [['骋风天合', '入驻企业'], ['3 个', '初始工作空间'], [id, '入驻身份']]; },
+        approveCards: [['👑 昭岚', '企业管理员'], ['3 个空间', '短剧组 / 市场组 / IP 组'], ['¥0', '企业主账户（待充值）']],
+        approveHint: function (id) {
+          var h = '1. 进入管理员后台 → 邀请团队成员、分配角色<br>2. 充值企业主账户 → 给各团队划拨预算<br>3. 进入需求方工作台 → 发布第一个需求';
+          if (id !== '仅需求方') h += '<br>4. 编辑对外承制方主页 → 等待邀约';
+          return h;
+        },
+        approveButtons: function (id) {
+          var b = '<button class="btn primary" onclick="location.href=\'admin-console.html\'">👑 进入管理员后台</button><button class="btn" onclick="location.href=\'platform-home-demander.html\'" style="border-color:#1890ff;color:#1890ff">📥 需求方工作台</button>';
+          if (id !== '仅需求方') b += '<button class="btn" onclick="location.href=\'platform-home-contractor.html\'" style="border-color:#722ed1;color:#722ed1">🛠 承制方工作台</button>';
+          return b;
+        },
+        approveName: '骋风天合文化传媒有限公司'
+      },
+      team: {
+        label: '团队入驻', infoTitle: '📝 团队基本信息', infoDesc: '适用于非法人团体（工作室、创作社团等），无需营业执照',
+        fields: [
+          ['团队名称', '星辰创作工作室', true],
+          ['团队负责人姓名', '昭岚', true],
+          ['负责人身份证号', '110105********1234', true],
+          ['负责人手机号', '138****6789', true],
+          ['负责人邮箱', 'zhaolan@starlight.com', true]
+        ],
+        typeSelect: '',
+        introLabel: '团队简介', introDefault: '8 年短视频 / 短剧 / 海报设计经验，擅长奇幻、修仙、玄幻题材。',
+        configTitle: '🤝 入驻配置', configDesc: '团队入驻默认开通 1 个工作空间，含单一团队账户（不可向下级划拨）',
+        wsOptions: '<option selected>1 个（团队空间）</option>',
+        baseUploads: [['负责人身份证正面', '🪪', true], ['负责人身份证反面', '🪪', true], ['团队合作协议（选填）', '📄', false]],
+        contractorUpload: ['团队代表作品集', '🎨', true],
+        uploadDesc: '上传团队负责人身份证正反面（无需营业执照）',
+        baseChecklist: ['团队名称及负责人信息准确', '负责人手机可接收验证短信', '身份证照片已上传'],
+        resultCards: function (id) { return [['星辰创作工作室', '入驻团队'], ['1 个', '团队工作空间'], [id, '入驻身份']]; },
+        approveCards: [['昭岚', '团队负责人/管理员'], ['1 个空间', '星辰创作工作室'], ['¥0', '团队账户（待充值）']],
+        approveHint: function (id) {
+          var h = '1. 充值团队账户 → 发布第一个需求<br>2. 邀请团队成员加入（简化版成员管理）';
+          if (id !== '仅需求方') h += '<br>3. 编辑对外主页 → 等待平台推荐邀约';
+          return h;
+        },
+        approveButtons: function (id) {
+          var b = '<button class="btn primary" onclick="location.href=\'platform-home-demander.html\'">📥 需求方工作台</button>';
+          if (id !== '仅需求方') b += '<button class="btn" onclick="location.href=\'platform-home-contractor.html\'" style="border-color:#722ed1;color:#722ed1">🛠 承制方工作台</button>';
+          return b;
+        },
+        approveName: '星辰创作工作室'
+      },
+      personal: {
+        label: '个人入驻', infoTitle: '👤 个人基本信息', infoDesc: '填写本人真实信息，用于实名认证',
+        fields: [
+          ['姓名', '昭岚', true],
+          ['身份证号', '110105********1234', true],
+          ['手机号', '138****6789', true],
+          ['邮箱', 'zhaolan@qq.com', true]
+        ],
+        typeSelect: '',
+        introLabel: '个人简介', introDefault: '自由创作者，擅长短视频解说、海报设计。',
+        configTitle: '⚙️ 入驻配置', configDesc: '个人入驻开通 1 个个人空间 + 个人账户',
+        wsOptions: null,
+        baseUploads: [['身份证正面', '🪪', true], ['身份证反面', '🪪', true]],
+        contractorUpload: ['个人代表作品集', '🎨', true],
+        uploadDesc: '上传身份证正反面',
+        baseChecklist: ['姓名和联系方式准确', '身份证照片已上传'],
+        resultCards: function (id) { return [['昭岚', '个人账号'], ['1 个', '个人空间'], [id, '入驻身份']]; },
+        approveCards: [['昭岚', '账号持有人'], ['个人空间', '已开通'], ['¥0', '个人账户（待充值）']],
+        approveHint: function (id) {
+          if (id === '仅需求方') return '1. 充值个人账户 → 发布第一个需求<br>2. 浏览承制方广场 → 寻找合适的服务提供者';
+          if (id === '仅承制方') return '1. 编辑对外主页 → 完善案例和标签<br>2. 等待平台推荐邀约或需求方主动邀请<br>3. 收到邀约后提交报价方案';
+          return '1. 充值个人账户 → 发布第一个需求<br>2. 编辑对外主页 → 完善案例等待邀约<br>3. 在需求方/承制方之间自由切换';
+        },
+        approveButtons: function (id) {
+          var b = '';
+          if (id !== '仅承制方') b += '<button class="btn primary" onclick="location.href=\'platform-home-demander.html\'">📥 需求方工作台</button>';
+          if (id !== '仅需求方') b += '<button class="btn" onclick="location.href=\'platform-home-contractor.html\'" style="border-color:#722ed1;color:#722ed1">🛠 承制方工作台</button><button class="btn" onclick="location.href=\'contractor-profile-edit.html\'">🏪 编辑对外主页</button>';
+          return b;
+        },
+        approveName: '昭岚'
+      }
+    };
+
+    var bizCats = ['视频制作', '图片设计', '文案服务', '内容创作', '资质服务', '直播运营', 'IP 孵化', '短剧投资'];
+    var selectedBiz = new Set(['视频制作', '图片设计', 'IP 孵化']);
+    var chosenIdentity = '需求方 + 承制方';
+
+    function needsContractor() {
+      return chosenIdentity.indexOf('承制方') !== -1;
+    }
+
+    function renderForm() {
+      var c = CFG[curType];
+      var fieldsHtml = c.fields.map(function (f) {
+        return '<div class="form-item"><label>' + f[0] + (f[2] ? ' <span class="req">*</span>' : '') + '</label><input value="' + f[1] + '"></div>';
+      }).join('') + c.typeSelect;
+      fieldsHtml += '<div class="form-item full"><label>' + c.introLabel + '</label><textarea rows="3">' + c.introDefault + '</textarea></div>';
+
+      var configHtml = '<div class="form-item"><label>入驻身份 <span class="req">*</span></label><select id="identitySelect" onchange="onIdentityChange(this.value)">' + IDENTITY_OPTIONS + '</select></div>';
+      if (c.wsOptions) configHtml += '<div class="form-item"><label>工作空间数量</label><select>' + c.wsOptions + '</select></div>';
+      configHtml += '<div class="form-item full"><label>服务类目（可多选）</label><div id="bizCats" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px"></div></div>';
+
+      var uploads = c.baseUploads.slice();
+      if (needsContractor()) uploads.push(c.contractorUpload);
+      var uploadsHtml = uploads.map(function (u) {
+        return '<div class="form-item"><label>' + u[0] + (u[2] ? ' <span class="req">*</span>' : '') + '</label><div class="upload-zone" onclick="markUpload(this)"><div class="icon">' + u[1] + '</div>点击上传</div></div>';
+      }).join('');
+      var uploadNote = c.uploadDesc + (needsContractor() ? '；选择承制方身份，还需上传作品集' : '');
+
+      var checks = c.baseChecklist.slice();
+      if (needsContractor()) checks.push('承制方作品集已上传');
+      checks.push('已阅读并同意《平台入驻协议》和《服务条款》');
+      var checkHtml = checks.map(function (txt, i) {
+        return '<li><span class="check-mark' + (i < 2 ? ' done' : '') + '" onclick="toggleCheck(this)">✓</span> ' + txt + '</li>';
+      }).join('');
+
+      document.getElementById('formArea').innerHTML =
+        '<section class="panel"><h2>' + c.infoTitle + '</h2><p class="desc">' + c.infoDesc + '</p><div class="form-grid">' + fieldsHtml + '</div></section>'
+        + '<section class="panel"><h2>' + c.configTitle + '</h2><p class="desc">' + c.configDesc + '</p><div class="form-grid">' + configHtml + '</div></section>'
+        + '<section class="panel" id="uploadPanel"><h2>📎 上传认证材料</h2><p class="desc">' + uploadNote + '</p><div class="form-grid">' + uploadsHtml + '</div></section>'
+        + '<section class="panel"><h2>✅ 入驻确认清单</h2><ul class="checklist">' + checkHtml + '</ul></section>'
+        + '<div class="actions"><button class="btn" onclick="toast(\'草稿已保存\', \'info\')">💾 保存草稿</button><button class="btn" onclick="skipOnboarding()" style="border-color:#faad14;color:#d48806">⏭ 跳过，稍后完善</button><button class="btn primary" onclick="submitOnboarding()">🚀 提交入驻申请</button></div>';
+
+      renderBizCats();
+      var sel = document.getElementById('identitySelect');
+      if (sel) {
+        for (var i = 0; i < sel.options.length; i++) {
+          if (sel.options[i].text.indexOf(chosenIdentity.substring(0, 4)) !== -1) { sel.selectedIndex = i; break; }
+        }
+      }
+    }
+
+    window.onIdentityChange = function (val) {
+      chosenIdentity = val.replace(/（.*?）/g, '');
+      renderForm();
+      toast('身份切换为「' + chosenIdentity + '」，材料要求已更新', 'info');
+    };
+
+    function renderBizCats() {
+      var el = document.getElementById('bizCats'); if (!el) return;
+      el.innerHTML = bizCats.map(function (c) {
+        var s = selectedBiz.has(c);
+        return '<span style="padding:5px 12px;border-radius:14px;font-size:12px;cursor:pointer;border:1px solid ' + (s ? '#1890ff' : '#d9d9d9') + ';background:' + (s ? '#e6f7ff' : '#fff') + ';color:' + (s ? '#1890ff' : '#595959') + '" onclick="toggleBiz(\'' + c + '\')">' + c + '</span>';
+      }).join('');
+    }
+    window.toggleBiz = function (c) {
+      if (selectedBiz.has(c)) selectedBiz.delete(c); else selectedBiz.add(c);
+      renderBizCats();
+    };
+
+    window.switchType = function (type) {
+      curType = type;
+      chosenIdentity = '需求方 + 承制方';
+      document.querySelectorAll('.type-chip').forEach(function (el) {
+        el.classList.toggle('active', el.getAttribute('data-type') === type);
+      });
+      document.getElementById('formArea').style.display = '';
+      document.getElementById('resultArea').style.display = 'none';
+      setStep(1);
+      renderForm();
+      highlightDiffCol(type);
+      toast('已切换至「' + CFG[type].label + '」模式', 'info');
+    };
+
+    window.skipOnboarding = function () {
+      if (typeof window.demoApp !== 'undefined') window.demoApp.setProfileComplete(false);
+      toast('已跳过入驻材料提交，您可以先浏览平台。发布需求或提交报价时会提示完善资料。', 'info');
+      setTimeout(function () { location.href = 'platform-home-demander.html'; }, 1200);
+    };
+
+    window.submitOnboarding = function () {
+      var total = document.querySelectorAll('.check-mark').length;
+      var done = document.querySelectorAll('.check-mark.done').length;
+      if (done < total) { toast('请先完成确认清单中的所有项', 'warn'); return; }
+      var c = CFG[curType]; var idLabel = chosenIdentity;
+      if (typeof window.demoApp !== 'undefined') window.demoApp.setProfileComplete(true);
+      document.getElementById('formArea').style.display = 'none';
+      document.getElementById('resultArea').style.display = 'block';
+      setStep(3);
+      var cards = c.resultCards(idLabel).map(function (r) { return '<div class="info-card"><div class="val">' + r[0] + '</div><div class="lbl">' + r[1] + '</div></div>'; }).join('');
+      document.getElementById('resultBox').innerHTML =
+        '<div class="result-icon">🎉</div><div class="result-title">入驻申请已提交！</div>'
+        + '<div class="result-desc">平台将在 <strong>1-3 个工作日</strong>内完成审核。</div>'
+        + '<div class="info-grid" style="margin-bottom:20px">' + cards + '</div>'
+        + '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="btn" onclick="simulateApprove()">⏩ 模拟审核通过（demo）</button><button class="btn" onclick="location.href=\'admin-onboarding-review.html\'" style="border-color:#13c2c2;color:#13c2c2">📋 查看平台审核后台</button><button class="btn" onclick="location.href=\'demo-index.html\'">返回 Demo 导航</button></div>';
+    };
+
+    window.simulateApprove = function () {
+      setStep(4);
+      var c = CFG[curType]; var idLabel = chosenIdentity;
+      var cards = c.approveCards.map(function (r) { return '<div class="info-card"><div class="val">' + r[0] + '</div><div class="lbl">' + r[1] + '</div></div>'; }).join('');
+      document.getElementById('resultBox').innerHTML =
+        '<div class="result-icon">✅</div><div class="result-title">入驻审核通过！</div>'
+        + '<div class="result-desc">恭喜！' + c.approveName + ' 已正式入驻创作门户交易平台。</div>'
+        + '<div class="info-grid" style="margin-bottom:20px">' + cards + '</div>'
+        + '<div style="padding:14px 16px;background:#f9f0ff;border-radius:8px;font-size:13px;color:#531dab;margin-bottom:20px;text-align:left"><strong>下一步建议：</strong><br>' + c.approveHint(idLabel) + '</div>'
+        + '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">' + c.approveButtons(idLabel) + '</div>';
+      toast('审核通过，' + c.label + '成功', 'ok');
+    };
+
+    function highlightDiffCol(type) {
+      var colMap = { enterprise: 1, team: 2, personal: 3 };
+      var idx = colMap[type] || 0;
+      document.querySelectorAll('.diff-table thead th').forEach(function (th, i) {
+        th.style.borderBottom = i === idx ? '3px solid #fff' : '3px solid rgba(255,255,255,.3)';
+        th.style.opacity = (i === 0 || i === idx) ? '1' : '.6';
+      });
+      document.querySelectorAll('.diff-table tbody tr').forEach(function (tr) {
+        var tds = tr.querySelectorAll('td');
+        tds.forEach(function (td, i) {
+          if (i === 0) return;
+          td.style.opacity = i === idx ? '1' : '.5';
+          td.style.fontWeight = i === idx ? '600' : '400';
+        });
+      });
+    }
+    renderForm();
+    highlightDiffCol('enterprise');
+  </script>
+</body>
+</html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>承制方工作台 - 骋风天合 · 创作门户交易平台</title>
+  <link rel="stylesheet" href="_shared.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #262626; }
+    .topbar { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.06); z-index: 200; display: flex; align-items: center; padding: 0 20px; gap: 16px; }
+    .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 16px; color: #1890ff; text-decoration: none; min-width: 220px; }
+    .brand-sub { color: #8c8c8c; font-weight: 400; font-size: 12px; margin-left: 4px; }
+    .identity-switch { display: flex; gap: 4px; background: #f0f0f0; border-radius: 18px; padding: 3px; }
+    .identity-switch button { border: none; background: transparent; padding: 5px 14px; border-radius: 16px; font-size: 13px; color: #595959; cursor: pointer; }
+    .identity-switch button.active { background: #fff; color: #1890ff; box-shadow: 0 1px 2px rgba(0,0,0,.06); font-weight: 500; }
+    .profile-chip { display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: #f9f0ff; border: 1px solid #d3adf7; border-radius: 18px; font-size: 13px; color: #531dab; }
+    .wallet-chip { display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: linear-gradient(135deg, #fff7e6, #fff1d6); border: 1px solid #ffd591; border-radius: 18px; cursor: pointer; font-size: 13px; color: #d46b08; text-decoration: none; }
+    .wallet-chip strong { font-size: 14px; }
+    .avatar-wrap { position: relative; margin-left: auto; }
+    .avatar-trigger { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px 8px; border-radius: 18px; }
+    .avatar-trigger:hover { background: #f5f5f5; }
+    .avatar-trigger img { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #f0f0f0; }
+    .avatar-name { font-size: 13px; color: #262626; }
+    .app { display: flex; padding-top: 56px; min-height: 100vh; }
+    .sidebar { width: 200px; background: #fff; box-shadow: 2px 0 8px rgba(0,0,0,.06); position: fixed; top: 56px; left: 0; bottom: 0; padding: 16px 0; overflow-y: auto; }
+    .menu a { display: flex; align-items: center; gap: 10px; padding: 11px 24px; color: #262626; text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
+    .menu a:hover { background: #f0f7ff; color: #1890ff; }
+    .menu a.active { background: #e6f7ff; color: #1890ff; border-left-color: #1890ff; font-weight: 500; }
+    .menu-icon { width: 18px; text-align: center; }
+    .menu-group { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+    .menu-group-title { padding: 8px 24px; font-size: 11px; color: #8c8c8c; text-transform: uppercase; letter-spacing: .5px; }
+    .main { margin-left: 200px; flex: 1; padding: 24px 28px 40px; }
+    .hero { background: linear-gradient(135deg, #722ed1, #1890ff); color: #fff; border-radius: 12px; padding: 26px 30px; margin-bottom: 16px; position: relative; overflow: hidden; }
+    .hero::after { content: ""; position: absolute; right: -50px; top: -50px; width: 220px; height: 220px; background: rgba(255,255,255,.08); border-radius: 50%; }
+    .hero h1 { margin: 0 0 8px; font-size: 24px; }
+    .hero .sub { opacity: .9; font-size: 13px; max-width: 720px; line-height: 1.7; }
+    .hero-meta { display: flex; gap: 24px; margin-top: 16px; flex-wrap: wrap; }
+    .hero-meta .hm-label { font-size: 11px; opacity: .72; }
+    .hero-meta .hm-value { font-size: 14px; font-weight: 600; margin-top: 2px; }
+    .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+    .kpi-card { background: #fff; border-radius: 8px; padding: 16px 18px; box-shadow: 0 2px 6px rgba(0,0,0,.04); }
+    .kpi-label { font-size: 12px; color: #8c8c8c; }
+    .kpi-value { font-size: 26px; font-weight: 700; color: #262626; margin: 6px 0 4px; }
+    .kpi-trend { font-size: 11px; color: #8c8c8c; }
+    .kpi-trend .up { color: #389e0d; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(340px, .65fr); gap: 14px; }
+    .panel { background: #fff; border-radius: 8px; padding: 18px 20px; box-shadow: 0 2px 6px rgba(0,0,0,.04); margin-bottom: 14px; }
+    .panel h2 { margin: 0 0 4px; font-size: 16px; }
+    .panel .desc { margin: 0 0 14px; font-size: 12px; color: #8c8c8c; }
+    .demand-card { border: 1px solid #f0f0f0; border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; transition: all .18s; }
+    .demand-card:hover { border-color: #91d5ff; box-shadow: 0 4px 12px rgba(24,144,255,.12); transform: translateY(-1px); }
+    .demand-head { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+    .demand-title { font-size: 15px; font-weight: 600; }
+    .demand-id { font-family: monospace; font-size: 11px; color: #8c8c8c; margin-top: 2px; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-right: 4px; background: #f5f5f5; color: #595959; }
+    .tag.blue { background: #e6f7ff; color: #096dd9; }
+    .tag.orange { background: #fff7e6; color: #d46b08; }
+    .tag.green { background: #f6ffed; color: #389e0d; }
+    .tag.purple { background: #f9f0ff; color: #531dab; }
+    .demand-meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed #f0f0f0; }
+    .dm-label { font-size: 11px; color: #8c8c8c; }
+    .dm-value { font-size: 13px; font-weight: 500; margin-top: 2px; }
+    .card-actions { display: flex; gap: 8px; margin-top: 12px; }
+    .btn { height: 32px; border: 1px solid #d9d9d9; background: #fff; border-radius: 6px; padding: 0 14px; font-size: 13px; color: #595959; cursor: pointer; }
+    .btn:hover { border-color: #91d5ff; color: #1890ff; }
+    .btn.primary { background: #1890ff; border-color: #1890ff; color: #fff; }
+    .btn.primary:hover { background: #40a9ff; border-color: #40a9ff; color: #fff; }
+    .btn.success { background: #52c41a; border-color: #52c41a; color: #fff; }
+    .order-row { display: grid; grid-template-columns: 1fr 90px 90px 90px; gap: 10px; align-items: center; padding: 11px 0; border-bottom: 1px dashed #f0f0f0; font-size: 13px; }
+    .order-row:last-child { border-bottom: none; }
+    .order-name { font-weight: 500; }
+    .order-sub { font-size: 11px; color: #8c8c8c; margin-top: 2px; }
+    .status { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+    .status.work { background: #e6f7ff; color: #096dd9; }
+    .status.wait { background: #fff7e6; color: #d46b08; }
+    .status.done { background: #f6ffed; color: #389e0d; }
+    .notice { padding: 10px 12px; background: #fff7e6; border-left: 3px solid #fa8c16; border-radius: 4px; font-size: 12px; color: #d46b08; line-height: 1.6; margin-bottom: 12px; }
+    .profile-card { display: flex; gap: 14px; align-items: center; padding: 14px; background: #fafafa; border-radius: 8px; margin-bottom: 12px; }
+    .profile-logo { width: 54px; height: 54px; border-radius: 12px; background: linear-gradient(135deg,#ffd6e7,#adc6ff); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+    .profile-name { font-size: 16px; font-weight: 700; }
+    .profile-sub { font-size: 12px; color: #8c8c8c; margin-top: 2px; }
+    .capability-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .cap-item { padding: 10px 12px; border: 1px solid #f0f0f0; border-radius: 6px; font-size: 12px; }
+    .cap-item strong { display: block; font-size: 14px; color: #262626; margin-bottom: 3px; }
+    .todo-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px dashed #f0f0f0; font-size: 13px; }
+    .todo-item:last-child { border-bottom: none; }
+    .todo-mark { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #e6f7ff; color: #1890ff; flex-shrink: 0; }
+    .todo-text { flex: 1; }
+    .todo-action { color: #1890ff; font-size: 12px; cursor: pointer; }
+    .toasts { position: fixed; top: 72px; right: 20px; width: min(90vw, 360px); display: grid; gap: 8px; z-index: 1100; }
+    .toast { background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; padding: 10px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.1); animation: slideIn .25s ease-out; }
+    .toast.ok { border-color: #b7eb8f; background: #f6ffed; color: #389e0d; }
+    .toast.warn { border-color: #ffe58f; background: #fffbe6; color: #d48806; }
+    .toast.info { border-color: #91d5ff; background: #e6f7ff; color: #096dd9; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    @media (max-width: 1100px) { .kpi-row { grid-template-columns: repeat(2, 1fr); } .layout { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding: 16px; } .demand-meta { grid-template-columns: repeat(2, 1fr); } }
+  </style>
+</head>
+<body>
+  <header class="topbar" id="topbar-shared"></header>
+  <div class="app">
+    <aside class="sidebar">
+      <nav class="menu">
+        <a href="platform-home-contractor.html" class="active"><span class="menu-icon">🏠</span> 承制方工作台</a>
+        <a href="contractor-demand-hall.html"><span class="menu-icon">📢</span> 接单大厅</a>
+        <a href="contractor-orders.html"><span class="menu-icon">📬</span> 接单与订单</a>
+        <a href="project-space.html"><span class="menu-icon">🤝</span> 项目协同空间</a>
+        <a href="contractor-profile-edit.html"><span class="menu-icon">🏪</span> 编辑对外主页</a>
+        <a href="wallet-overview.html"><span class="menu-icon">💰</span> 收益中心</a>
+        <div class="menu-group">
+          <div class="menu-group-title">账户</div>
+          <a href="account-basic-info-prototype-platform-style.html"><span class="menu-icon">⚙️</span> 账户中心</a>
+        </div>
+      </nav>
+    </aside>
+    <main class="main">
+      <section class="hero">
+        <h1>星辰创作工作室 · 承制方工作台</h1>
+        <div class="sub">承接平台撮合需求、提交报价方案、管理履约订单、沉淀作品与收益。当前账号同时具备需求方与承制方身份，可在顶部切换。</div>
+        <div class="hero-meta">
+          <div><div class="hm-label">服务评分</div><div class="hm-value">★ 4.9 / 5.0</div></div>
+          <div><div class="hm-label">入驻时间</div><div class="hm-value">2019 年</div></div>
+          <div><div class="hm-label">累计完成</div><div class="hm-value">85 单</div></div>
+          <div><div class="hm-label">擅长类目</div><div class="hm-value">短剧解说 / 海报设计 / 品牌片</div></div>
+        </div>
+      </section>
+      <section class="kpi-row">
+        <div class="kpi-card"><div class="kpi-label">本月收到邀约</div><div class="kpi-value">18</div><div class="kpi-trend"><span class="up">↑ 24%</span> vs 上月</div></div>
+        <div class="kpi-card"><div class="kpi-label">待报价需求</div><div class="kpi-value">4</div><div class="kpi-trend">其中 2 个来自骋风天合</div></div>
+        <div class="kpi-card"><div class="kpi-label">进行中订单</div><div class="kpi-value">6</div><div class="kpi-trend">2 个今日需更新版本</div></div>
+        <div class="kpi-card"><div class="kpi-label">本月预估收益</div><div class="kpi-value">¥126,400</div><div class="kpi-trend"><span class="up">↑ 16%</span>，已结算 ¥92,640</div></div>
+      </section>
+      <div class="layout">
+        <div>
+          <section class="panel" id="demandPool">
+            <h2>📬 待报价邀约</h2>
+            <p class="desc">平台根据承制方能力标签推送需求；提交报价后进入需求方报价对比页。</p>
+            <div class="demand-card">
+              <div class="demand-head">
+                <div>
+                  <div class="demand-title">三集短剧解说视频（修仙题材）</div>
+                  <div class="demand-id">DM-2026042512 · 骋风天合 · 短剧制作中心</div>
+                </div>
+                <div><span class="tag orange">高匹配</span><span class="tag blue">邀请报价</span></div>
+              </div>
+              <div style="margin-top:8px"><span class="tag">视频制作</span><span class="tag">修仙</span><span class="tag">古风</span><span class="tag">抖音</span></div>
+              <div class="demand-meta">
+                <div><div class="dm-label">需求预算</div><div class="dm-value">¥18,000</div></div>
+                <div><div class="dm-label">交付期望</div><div class="dm-value">14 天</div></div>
+                <div><div class="dm-label">候选承制方</div><div class="dm-value">4 家</div></div>
+                <div><div class="dm-label">截止报价</div><div class="dm-value">明天 18:00</div></div>
+              </div>
+              <div class="card-actions">
+                <button class="btn primary" onclick="openQuoteModal()">提交报价</button>
+                <button class="btn" onclick="toast('已加入稍后处理', 'info')">稍后处理</button>
+                <button class="btn" onclick="toast('演示环境，需求详情抽屉未做', 'info')">查看需求</button>
+              </div>
+            </div>
+            <div class="demand-card">
+              <div class="demand-head">
+                <div>
+                  <div class="demand-title">新剧广电备案许可证办理</div>
+                  <div class="demand-id">DM-2026041602 · 骋风天合 · IP 孵化组</div>
+                </div>
+                <div><span class="tag purple">资质服务</span></div>
+              </div>
+              <div class="demand-meta">
+                <div><div class="dm-label">需求预算</div><div class="dm-value">¥12,000</div></div>
+                <div><div class="dm-label">交付期望</div><div class="dm-value">30 天</div></div>
+                <div><div class="dm-label">匹配度</div><div class="dm-value">72%</div></div>
+                <div><div class="dm-label">截止报价</div><div class="dm-value">2 天后</div></div>
+              </div>
+              <div class="card-actions">
+                <button class="btn" onclick="toast('该类目不是当前主攻方向，建议放弃', 'warn')">放弃邀约</button>
+                <button class="btn" onclick="toast('演示环境，需求详情抽屉未做', 'info')">查看需求</button>
+              </div>
+            </div>
+          </section>
+          <section class="panel" id="orders">
+            <h2>🛠 进行中订单</h2>
+            <p class="desc">承制方侧按交期和版本状态管理履约。</p>
+            <div class="order-row">
+              <div><div class="order-name">新剧 IP 海报系列</div><div class="order-sub">OD-2026042307 · 骋风天合 · V3 待验收</div></div>
+              <div><span class="status wait">待验收</span></div>
+              <div>¥28,000</div>
+              <div><button class="btn primary" onclick="location.href='project-space.html?orderId=OD-2026042307'">进入</button></div>
+            </div>
+            <div class="order-row">
+              <div><div class="order-name">品牌宣传短片脚本</div><div class="order-sub">OD-2026042609 · 市场宣传组 · 初稿中</div></div>
+              <div><span class="status work">制作中</span></div>
+              <div>¥5,000</div>
+              <div><button class="btn" onclick="toast('演示环境，仅主订单可进入', 'info')">进入</button></div>
+            </div>
+            <div class="order-row">
+              <div><div class="order-name">广告片配音</div><div class="order-sub">OD-2026042009 · 已完成 · 待开票</div></div>
+              <div><span class="status done">已完成</span></div>
+              <div>¥8,000</div>
+              <div><button class="btn" onclick="toast('订单归档详情下版本补齐', 'info')">归档</button></div>
+            </div>
+          </section>
+        </div>
+        <div>
+          <section class="panel">
+            <h2>🏪 对外主页状态</h2>
+            <p class="desc">需求方在承制方广场看到的展示信息。</p>
+            <div class="profile-card">
+              <div class="profile-logo">🌟</div>
+              <div>
+                <div class="profile-name">星辰创作工作室</div>
+                <div class="profile-sub">短剧专精 · 影视级 · 原创解说 · ★4.9</div>
+              </div>
+            </div>
+            <div class="capability-grid">
+              <div class="cap-item"><strong>85 单</strong>累计完成</div>
+              <div class="cap-item"><strong>98%</strong>按时交付率</div>
+              <div class="cap-item"><strong>3 次</strong>骋风天合合作</div>
+              <div class="cap-item"><strong>4 个</strong>服务类目</div>
+            </div>
+            <div class="card-actions">
+              <button class="btn primary" onclick="location.href='contractor-marketplace.html'">查看对外主页</button>
+              <button class="btn" onclick="location.href='contractor-profile-edit.html'">编辑主页</button>
+            </div>
+          </section>
+          <section class="panel" id="earnings">
+            <h2>💰 收益概览</h2>
+            <p class="desc">承制方收益在验收结算后入账，可提现或申请开票。</p>
+            <div class="notice">新剧 IP 海报系列若通过验收，将入账 ¥26,600，平台服务费 ¥1,400。</div>
+            <div class="kpi-card" style="box-shadow:none;border:1px solid #f0f0f0;margin-bottom:10px">
+              <div class="kpi-label">可提现收益</div>
+              <div class="kpi-value">¥92,640</div>
+              <div class="kpi-trend">含本月已结算 4 单</div>
+            </div>
+            <button class="btn primary" onclick="toast('提现申请已提交（mock）', 'ok')">申请提现</button>
+            <button class="btn" onclick="toast('开票入口下版本补齐', 'info')">申请开票</button>
+          </section>
+          <section class="panel">
+            <h2>📌 今日待办</h2>
+            <div class="todo-item">
+              <div class="todo-mark">1</div>
+              <div class="todo-text">三集短剧解说视频需在明日 18:00 前报价</div>
+              <div class="todo-action" onclick="openQuoteModal()">去报价</div>
+            </div>
+            <div class="todo-item">
+              <div class="todo-mark">2</div>
+              <div class="todo-text">新剧 IP 海报系列 V3 等待需求方验收</div>
+              <div class="todo-action" onclick="location.href='project-space.html'">查看</div>
+            </div>
+            <div class="todo-item">
+              <div class="todo-mark">3</div>
+              <div class="todo-text">完善对外主页：补充 2 个代表案例</div>
+              <div class="todo-action" onclick="location.href='contractor-profile-edit.html'">编辑</div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div id="toastWrap" class="toasts"></div>
+  <script src="_shared.js"></script>
+  <script>
+    window.demoApp.setCurrentIdentity('contractor');
+    SharedHeader.mount({ activeNav: 'contractor-home', identity: 'contractor', brandHref: 'platform-home-contractor.html', brandSub: '承制方工作台' });
+
+    function toast(msg, kind) {
+      const wrap = document.getElementById('toastWrap');
+      const t = document.createElement('div');
+      t.className = 'toast ' + (kind || 'ok');
+      t.textContent = msg;
+      wrap.appendChild(t);
+      setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(20px)'; setTimeout(() => t.remove(), 260); }, 2400);
+    }
+    function openQuoteModal() {
+      const quote = {
+        demandId: 'DM-2026042512',
+        contractor: '星辰创作工作室',
+        price: 18000,
+        days: 14,
+        plan: '5 集 × 5min，原创解说稿 + 磁性男声配音 + 2D 分镜 + 调色，含 2 轮免费修改'
+      };
+      try {
+        localStorage.setItem('demoContractorQuoteDraft', JSON.stringify(quote));
+      } catch (_) {}
+      toast('报价方案已生成：¥18,000 / 14 天。需求方将在报价对比页看到该报价。', 'ok');
+      setTimeout(() => location.href = 'demand-quote-comparison.html?demandId=DM-2026042512', 900);
+    }
+  </script>
+</body>
+</html>

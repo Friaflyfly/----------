@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>财务结算 - 平台运营后台</title>
+  <link rel="stylesheet" href="_shared.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #262626; }
+    .ops-banner { background: linear-gradient(135deg, #13c2c2, #006d75); color: #fff; font-size: 12px; text-align: center; padding: 6px; position: fixed; top: 56px; left: 0; right: 0; z-index: 190; }
+    .app { display: flex; padding-top: 84px; min-height: 100vh; }
+    .sidebar { width: 200px; background: #fff; box-shadow: 2px 0 8px rgba(0,0,0,.06); position: fixed; top: 84px; left: 0; bottom: 0; padding: 16px 0; overflow-y: auto; }
+    .menu a { display: flex; align-items: center; gap: 10px; padding: 11px 24px; color: #262626; text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
+    .menu a:hover { background: #f0f7ff; color: #1890ff; }
+    .menu a.active { background: #e6fffb; color: #13c2c2; border-left-color: #13c2c2; font-weight: 500; }
+    .menu-icon { width: 18px; text-align: center; }
+    .menu-group { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+    .menu-group-title { padding: 8px 24px; font-size: 11px; color: #8c8c8c; }
+    .main { margin-left: 200px; flex: 1; padding: 24px 28px 60px; }
+    .page-head { margin-bottom: 20px; }
+    .page-head h1 { margin: 0 0 6px; font-size: 22px; }
+    .page-head .sub { color: #8c8c8c; font-size: 13px; }
+
+    .kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+    .kpi { background: #fff; border-radius: 10px; padding: 16px 18px; box-shadow: 0 2px 6px rgba(0,0,0,.04); }
+    .kpi .label { font-size: 12px; color: #8c8c8c; }
+    .kpi .value { font-size: 24px; font-weight: 700; margin: 6px 0 4px; color: #006d75; }
+    .kpi .note { font-size: 11px; color: #8c8c8c; }
+    .kpi.alert .value { color: #cf1322; }
+    .kpi.warn .value { color: #d48806; }
+
+    .tabs { display: flex; gap: 6px; margin-bottom: 16px; }
+    .tab { border: 1px solid #d9d9d9; border-radius: 6px; padding: 6px 16px; font-size: 13px; background: #fff; cursor: pointer; }
+    .tab:hover { border-color: #87e8de; color: #13c2c2; }
+    .tab.active { background: #e6fffb; border-color: #13c2c2; color: #006d75; font-weight: 500; }
+
+    .panel { background: #fff; border-radius: 10px; padding: 20px 24px; box-shadow: 0 2px 6px rgba(0,0,0,.04); margin-bottom: 16px; }
+    .panel h2 { margin: 0 0 4px; font-size: 16px; }
+    .panel .desc { font-size: 12px; color: #8c8c8c; margin: 0 0 14px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 10px 12px; background: #fafafa; border-bottom: 2px solid #f0f0f0; font-weight: 500; color: #8c8c8c; font-size: 12px; }
+    td { padding: 10px 12px; border-bottom: 1px solid #f5f5f5; }
+    tr:hover td { background: #f9f9f9; }
+    .amt-in { color: #389e0d; font-weight: 600; }
+    .amt-out { color: #cf1322; font-weight: 600; }
+    .amt-lock { color: #d48806; font-weight: 600; }
+    .status-tag { padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+    .st-pending { background: #fffbe6; color: #d48806; }
+    .st-done { background: #f6ffed; color: #389e0d; }
+    .st-review { background: #e6f7ff; color: #096dd9; }
+    .st-failed { background: #fff1f0; color: #cf1322; }
+
+    .btn { height: 32px; border: 1px solid #d9d9d9; background: #fff; border-radius: 6px; padding: 0 12px; font-size: 12px; color: #595959; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+    .btn:hover { border-color: #87e8de; color: #13c2c2; }
+    .btn.primary { background: #13c2c2; border-color: #13c2c2; color: #fff; }
+    .btn.danger { background: #fff1f0; border-color: #ffa39e; color: #cf1322; }
+
+    .chart-bar { display: flex; align-items: flex-end; gap: 6px; height: 120px; margin: 16px 0; }
+    .chart-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .chart-fill { width: 100%; border-radius: 4px 4px 0 0; min-height: 2px; transition: height .3s; }
+    .chart-fill.income { background: linear-gradient(180deg, #13c2c2, #87e8de); }
+    .chart-fill.expense { background: linear-gradient(180deg, #722ed1, #d3adf7); }
+    .chart-label { font-size: 10px; color: #8c8c8c; }
+    .chart-val { font-size: 10px; color: #262626; font-weight: 500; }
+
+    .legend { display: flex; gap: 16px; font-size: 12px; color: #8c8c8c; margin-bottom: 8px; }
+    .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+    .legend .l-in::before { background: #13c2c2; }
+    .legend .l-out::before { background: #722ed1; }
+
+    .toasts { position: fixed; top: 100px; right: 20px; width: min(90vw, 360px); display: grid; gap: 8px; z-index: 1100; }
+    .toast { background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; padding: 10px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.1); animation: slideIn .25s ease-out; }
+    .toast.ok { border-color: #b7eb8f; background: #f6ffed; color: #389e0d; }
+    .toast.info { border-color: #91d5ff; background: #e6f7ff; color: #096dd9; }
+    .toast.warn { border-color: #ffe58f; background: #fffbe6; color: #d48806; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    @media (max-width: 1200px) { .kpis { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding: 16px; } .kpis { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+  <header class="topbar" id="topbar-shared"></header>
+  <div class="ops-banner">💰 平台运营后台 · 财务结算 · 资金归集、分账、提现审核、对账</div>
+  <div class="app">
+    <aside class="sidebar">
+      <nav class="menu">
+        <a href="admin-demand-review.html"><span class="menu-icon">🔍</span> 需求核定</a>
+        <a href="admin-onboarding-review.html"><span class="menu-icon">📋</span> 入驻审核</a>
+        <a href="admin-finance.html" class="active"><span class="menu-icon">💰</span> 财务结算</a>
+        <a href="admin-category-config.html"><span class="menu-icon">🏷</span> 类目配置</a>
+        <div class="menu-group">
+          <div class="menu-group-title">跳转</div>
+          <a href="admin-console.html"><span class="menu-icon">👑</span> 管理员后台</a>
+          <a href="platform-home-demander.html"><span class="menu-icon">📥</span> 需求方工作台</a>
+          <a href="demo-index.html"><span class="menu-icon">📋</span> Demo 导航</a>
+        </div>
+      </nav>
+    </aside>
+    <main class="main">
+      <div class="page-head">
+        <h1>财务结算</h1>
+        <div class="sub">平台资金归集、订单分账、提现审核、充值对账、发票管理。所有资金流转均记录审计日志。</div>
+      </div>
+
+      <section class="kpis" id="kpis"></section>
+
+      <div class="tabs" id="mainTabs">
+        <span class="tab active" data-tab="overview" onclick="switchTab('overview')">📊 资金概览</span>
+        <span class="tab" data-tab="settlements" onclick="switchTab('settlements')">✅ 订单结算</span>
+        <span class="tab" data-tab="withdrawals" onclick="switchTab('withdrawals')">💸 提现审核</span>
+        <span class="tab" data-tab="recharges" onclick="switchTab('recharges')">💳 充值对账</span>
+        <span class="tab" data-tab="invoices" onclick="switchTab('invoices')">🧾 发票管理</span>
+      </div>
+
+      <div id="tabContent"></div>
+    </main>
+  </div>
+
+  <div id="toastWrap" class="toasts"></div>
+
+  <script src="_shared.js"></script>
+  <script>
+    SharedHeader.mount({ activeNav: "" });
+
+    function toast(msg, kind) {
+      var w = document.getElementById("toastWrap"), t = document.createElement("div");
+      t.className = "toast " + (kind || "ok"); t.textContent = msg; w.appendChild(t);
+      setTimeout(function () { t.style.opacity = "0"; t.style.transform = "translateX(20px)"; setTimeout(function () { t.remove(); }, 260); }, 2400);
+    }
+
+    function fmt(n) { return "¥" + n.toLocaleString(); }
+
+    var monthlyData = [
+      { month: "11月", income: 320000, expense: 285000 },
+      { month: "12月", income: 410000, expense: 368000 },
+      { month: "1月", income: 280000, expense: 245000 },
+      { month: "2月", income: 195000, expense: 178000 },
+      { month: "3月", income: 520000, expense: 412000 },
+      { month: "4月", income: 480000, expense: 328500 }
+    ];
+
+    var settlements = [
+      { id: "SET-20260426001", order: "OD-2026042009", project: "广告片配音", demander: "骋风天合·市场宣传组", contractor: "声海传媒", amount: 8000, platformFee: 400, contractorPay: 7600, status: "done", time: "2026-04-26 10:00" },
+      { id: "SET-20260425002", order: "OD-2026042307", project: "新剧 IP 海报系列", demander: "骋风天合·短剧制作中心", contractor: "星辰创作工作室", amount: 28000, platformFee: 1400, contractorPay: 26600, status: "pending", time: "2026-04-25 15:30" },
+      { id: "SET-20260420003", order: "OD-2026031505", project: "品牌 VI 设计", demander: "骋风天合·市场宣传组", contractor: "色彩工坊", amount: 15000, platformFee: 750, contractorPay: 14250, status: "done", time: "2026-04-20 09:00" },
+      { id: "SET-20260415004", order: "OD-2026041501", project: "公众号头图设计", demander: "昭岚（个人）", contractor: "色彩工坊", amount: 800, platformFee: 40, contractorPay: 760, status: "done", time: "2026-04-15 16:40" }
+    ];
+
+    var withdrawals = [
+      { id: "WD-20260427001", applicant: "声海传媒", type: "承制方", amount: 7600, bank: "招商银行 *5523", status: "review", time: "2026-04-27 08:30" },
+      { id: "WD-20260426002", applicant: "星辰创作工作室", type: "承制方", amount: 14250, bank: "工商银行 *3301", status: "review", time: "2026-04-26 17:00" },
+      { id: "WD-20260422003", applicant: "昭岚", type: "个人", amount: 800, bank: "建设银行 *8826", status: "done", time: "2026-04-22 18:20" },
+      { id: "WD-20260415004", applicant: "昭岚", type: "个人", amount: 1200, bank: "建设银行 *8826", status: "done", time: "2026-04-15 10:05" }
+    ];
+
+    var recharges = [
+      { id: "RC-20260426001", enterprise: "骋风天合", method: "对公转账", amount: 50000, status: "review", time: "2026-04-26 16:45", verifiedBy: "" },
+      { id: "RC-20260425002", enterprise: "骋风天合", method: "支付宝", amount: 20000, status: "done", time: "2026-04-25 11:20", verifiedBy: "系统自动" },
+      { id: "RC-20260420003", enterprise: "骋风天合", method: "对公转账", amount: 120000, status: "done", time: "2026-04-20 09:30", verifiedBy: "财务张" },
+      { id: "RC-20260410004", enterprise: "昭岚（个人）", method: "微信", amount: 1000, status: "done", time: "2026-04-10 22:15", verifiedBy: "系统自动" }
+    ];
+
+    var invoices = [
+      { id: "INV-20260426001", enterprise: "骋风天合", type: "增值税专用发票", amount: 8000, items: "广告片配音", status: "pending", time: "2026-04-26 14:00" },
+      { id: "INV-20260420002", enterprise: "骋风天合", type: "增值税专用发票", amount: 15000, items: "品牌 VI 设计", status: "mailed", time: "2026-04-20 10:00", tracking: "SF1234567890" },
+      { id: "INV-20260415003", enterprise: "昭岚（个人）", type: "增值税普通发票", amount: 800, items: "公众号头图设计", status: "pending", time: "2026-04-15 17:00" }
+    ];
+
+    function renderKPIs() {
+      var totalSettled = 0, platformRevenue = 0, pendingSettle = 0, pendingWithdraw = 0, pendingRecharge = 0;
+      settlements.forEach(function (s) {
+        if (s.status === "done") { totalSettled += s.amount; platformRevenue += s.platformFee; }
+        else pendingSettle += s.amount;
+      });
+      withdrawals.forEach(function (w) { if (w.status === "review") pendingWithdraw += w.amount; });
+      recharges.forEach(function (r) { if (r.status === "review") pendingRecharge += r.amount; });
+
+      document.getElementById("kpis").innerHTML = [
+        { icon: "✅", label: "本月已结算", value: fmt(totalSettled), note: settlements.filter(function (s) { return s.status === "done"; }).length + " 笔订单", cls: "" },
+        { icon: "💎", label: "平台服务费收入", value: fmt(platformRevenue), note: "费率 5%", cls: "" },
+        { icon: "⏳", label: "待结算", value: fmt(pendingSettle), note: "验收通过后自动结算", cls: pendingSettle > 0 ? "warn" : "" },
+        { icon: "💸", label: "待审核提现", value: fmt(pendingWithdraw), note: withdrawals.filter(function (w) { return w.status === "review"; }).length + " 笔申请", cls: pendingWithdraw > 0 ? "alert" : "" },
+        { icon: "💳", label: "待对账充值", value: fmt(pendingRecharge), note: "对公转账需人工确认", cls: pendingRecharge > 0 ? "warn" : "" }
+      ].map(function (k) {
+        return '<div class="kpi ' + k.cls + '"><div class="label">' + k.icon + ' ' + k.label + '</div><div class="value">' + k.value + '</div><div class="note">' + k.note + '</div></div>';
+      }).join("");
+    }
+
+    var currentTab = "overview";
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll(".tab").forEach(function (t) { t.classList.toggle("active", t.getAttribute("data-tab") === tab); });
+      renderTab();
+    }
+
+    function renderTab() {
+      var el = document.getElementById("tabContent");
+      switch (currentTab) {
+        case "overview": renderOverview(el); break;
+        case "settlements": renderSettlements(el); break;
+        case "withdrawals": renderWithdrawals(el); break;
+        case "recharges": renderRecharges(el); break;
+        case "invoices": renderInvoices(el); break;
+      }
+    }
+
+    function renderOverview(el) {
+      var maxVal = Math.max.apply(null, monthlyData.map(function (d) { return Math.max(d.income, d.expense); }));
+      var barsHtml = monthlyData.map(function (d) {
+        var hIn = Math.round(d.income / maxVal * 100);
+        var hOut = Math.round(d.expense / maxVal * 100);
+        return '<div class="chart-col">'
+          + '<div class="chart-val">' + (d.income / 10000).toFixed(0) + 'W</div>'
+          + '<div class="chart-fill income" style="height:' + hIn + 'px"></div>'
+          + '<div class="chart-fill expense" style="height:' + hOut + 'px;margin-top:2px"></div>'
+          + '<div class="chart-label">' + d.month + '</div>'
+          + '</div>';
+      }).join("");
+
+      var totalIncome = monthlyData.reduce(function (s, d) { return s + d.income; }, 0);
+      var totalExpense = monthlyData.reduce(function (s, d) { return s + d.expense; }, 0);
+
+      el.innerHTML = '<div class="panel"><h2>📊 近 6 个月资金流水趋势</h2><p class="desc">平台归集资金（充值）vs 支出资金（结算+提现）</p>'
+        + '<div class="legend"><span class="l-in">归集（充值）</span><span class="l-out">支出（结算）</span></div>'
+        + '<div class="chart-bar">' + barsHtml + '</div>'
+        + '<div style="display:flex;gap:24px;font-size:13px;color:#8c8c8c;margin-top:8px">'
+        + '<div>近半年归集 <strong style="color:#13c2c2">' + fmt(totalIncome) + '</strong></div>'
+        + '<div>近半年支出 <strong style="color:#722ed1">' + fmt(totalExpense) + '</strong></div>'
+        + '<div>资金沉淀 <strong style="color:#006d75">' + fmt(totalIncome - totalExpense) + '</strong></div>'
+        + '</div></div>'
+        + '<div class="panel"><h2>🏦 平台托管账户余额</h2><p class="desc">各类资金账户当前状态</p>'
+        + '<table><thead><tr><th>账户类型</th><th>账户数</th><th>总余额</th><th>已锁定</th><th>可用</th></tr></thead><tbody>'
+        + '<tr><td>🏢 企业主账户</td><td>1</td><td>' + fmt(1250000) + '</td><td>' + fmt(0) + '</td><td>' + fmt(1250000) + '</td></tr>'
+        + '<tr><td>👥 团队预算账户</td><td>3</td><td>' + fmt(247000) + '</td><td>' + fmt(36000) + '</td><td>' + fmt(211000) + '</td></tr>'
+        + '<tr><td>👤 个人账户</td><td>1</td><td>' + fmt(3200) + '</td><td>' + fmt(0) + '</td><td>' + fmt(3200) + '</td></tr>'
+        + '<tr><td>🛠 承制方收益账户</td><td>3</td><td>' + fmt(48610) + '</td><td>' + fmt(0) + '</td><td>' + fmt(48610) + '</td></tr>'
+        + '<tr style="font-weight:600;background:#f0f7ff"><td>合计</td><td>8</td><td>' + fmt(1548810) + '</td><td>' + fmt(36000) + '</td><td>' + fmt(1512810) + '</td></tr>'
+        + '</tbody></table></div>';
+    }
+
+    function renderSettlements(el) {
+      el.innerHTML = '<div class="panel"><h2>✅ 订单结算记录</h2><p class="desc">验收通过 → 解锁资金 → 扣除平台服务费（5%） → 划转至承制方收益账户</p>'
+        + '<table><thead><tr><th>结算单号</th><th>项目</th><th>需求方</th><th>承制方</th><th>订单金额</th><th>服务费</th><th>承制方到账</th><th>状态</th><th>时间</th></tr></thead><tbody>'
+        + settlements.map(function (s) {
+          var stCls = s.status === "done" ? "st-done" : "st-pending";
+          var stLabel = s.status === "done" ? "已结算" : "待结算";
+          return '<tr><td>' + s.id + '</td><td>' + s.project + '</td><td style="font-size:12px">' + s.demander + '</td><td>' + s.contractor + '</td>'
+            + '<td>' + fmt(s.amount) + '</td><td class="amt-out">-' + fmt(s.platformFee) + '</td><td class="amt-in">' + fmt(s.contractorPay) + '</td>'
+            + '<td><span class="status-tag ' + stCls + '">' + stLabel + '</span></td><td style="font-size:12px">' + s.time + '</td></tr>';
+        }).join("")
+        + '</tbody></table></div>';
+    }
+
+    function renderWithdrawals(el) {
+      el.innerHTML = '<div class="panel"><h2>💸 提现审核</h2><p class="desc">承制方/个人收益提现 → 风控审核 → 银行打款（1-3 个工作日到账）</p>'
+        + '<table><thead><tr><th>申请单号</th><th>申请方</th><th>类型</th><th>金额</th><th>到账银行卡</th><th>状态</th><th>申请时间</th><th>操作</th></tr></thead><tbody>'
+        + withdrawals.map(function (w) {
+          var stCls = w.status === "done" ? "st-done" : "st-review";
+          var stLabel = w.status === "done" ? "已打款" : "待审核";
+          var actions = w.status === "review"
+            ? '<button class="btn primary" onclick="approveWithdraw(\'' + w.id + '\')">✅ 通过</button> <button class="btn danger" onclick="rejectWithdraw(\'' + w.id + '\')">❌ 拒绝</button>'
+            : '<span style="color:#8c8c8c;font-size:12px">—</span>';
+          return '<tr id="wd-' + w.id + '"><td>' + w.id + '</td><td>' + w.applicant + '</td><td>' + w.type + '</td>'
+            + '<td class="amt-out">' + fmt(w.amount) + '</td><td style="font-size:12px">' + w.bank + '</td>'
+            + '<td><span class="status-tag ' + stCls + '">' + stLabel + '</span></td><td style="font-size:12px">' + w.time + '</td><td>' + actions + '</td></tr>';
+        }).join("")
+        + '</tbody></table></div>';
+    }
+
+    function renderRecharges(el) {
+      el.innerHTML = '<div class="panel"><h2>💳 充值对账</h2><p class="desc">在线支付自动到账；对公转账需人工核验银行流水后确认到账</p>'
+        + '<table><thead><tr><th>充值单号</th><th>企业/个人</th><th>方式</th><th>金额</th><th>状态</th><th>时间</th><th>核验人</th><th>操作</th></tr></thead><tbody>'
+        + recharges.map(function (r) {
+          var stCls = r.status === "done" ? "st-done" : "st-review";
+          var stLabel = r.status === "done" ? "已到账" : "待核验";
+          var actions = r.status === "review"
+            ? '<button class="btn primary" onclick="confirmRecharge(\'' + r.id + '\')">✅ 确认到账</button>'
+            : '<span style="color:#8c8c8c;font-size:12px">—</span>';
+          return '<tr id="rc-' + r.id + '"><td>' + r.id + '</td><td>' + r.enterprise + '</td><td>' + r.method + '</td>'
+            + '<td class="amt-in">+' + fmt(r.amount) + '</td>'
+            + '<td><span class="status-tag ' + stCls + '">' + stLabel + '</span></td><td style="font-size:12px">' + r.time + '</td>'
+            + '<td>' + (r.verifiedBy || '—') + '</td><td>' + actions + '</td></tr>';
+        }).join("")
+        + '</tbody></table></div>';
+    }
+
+    function renderInvoices(el) {
+      el.innerHTML = '<div class="panel"><h2>🧾 发票管理</h2><p class="desc">需求方申请开票 → 平台审核 → 开具并邮寄</p>'
+        + '<table><thead><tr><th>发票号</th><th>申请方</th><th>类型</th><th>金额</th><th>开票内容</th><th>状态</th><th>申请时间</th><th>操作</th></tr></thead><tbody>'
+        + invoices.map(function (inv) {
+          var stCls = inv.status === "pending" ? "st-pending" : "st-done";
+          var stLabel = inv.status === "pending" ? "待开具" : "已邮寄";
+          var actions = inv.status === "pending"
+            ? '<button class="btn primary" onclick="issueInvoice(\'' + inv.id + '\')">📨 开具并邮寄</button>'
+            : '<span style="font-size:12px;color:#8c8c8c">快递 ' + (inv.tracking || '') + '</span>';
+          return '<tr id="inv-' + inv.id + '"><td>' + inv.id + '</td><td>' + inv.enterprise + '</td><td style="font-size:12px">' + inv.type + '</td>'
+            + '<td>' + fmt(inv.amount) + '</td><td>' + inv.items + '</td>'
+            + '<td><span class="status-tag ' + stCls + '">' + stLabel + '</span></td><td style="font-size:12px">' + inv.time + '</td><td>' + actions + '</td></tr>';
+        }).join("")
+        + '</tbody></table></div>';
+    }
+
+    window.approveWithdraw = function (id) {
+      var w = withdrawals.find(function (x) { return x.id === id; });
+      if (w) { w.status = "done"; renderKPIs(); renderTab(); toast("✅ 提现 " + fmt(w.amount) + " 已审核通过，银行打款中", "ok"); }
+    };
+    window.rejectWithdraw = function (id) {
+      var w = withdrawals.find(function (x) { return x.id === id; });
+      if (w) { w.status = "failed"; renderKPIs(); renderTab(); toast("已拒绝 " + w.applicant + " 的提现申请", "warn"); }
+    };
+    window.confirmRecharge = function (id) {
+      var r = recharges.find(function (x) { return x.id === id; });
+      if (r) { r.status = "done"; r.verifiedBy = "运营员"; renderKPIs(); renderTab(); toast("✅ 对公转账 " + fmt(r.amount) + " 已确认到账", "ok"); }
+    };
+    window.issueInvoice = function (id) {
+      var inv = invoices.find(function (x) { return x.id === id; });
+      if (inv) { inv.status = "mailed"; inv.tracking = "SF" + Date.now().toString().slice(-10); renderKPIs(); renderTab(); toast("📨 发票已开具并邮寄，快递单号 " + inv.tracking, "ok"); }
+    };
+
+    renderKPIs();
+    renderTab();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>项目协同空间 - 骋风天合 · 创作门户交易平台</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #262626; }
+
+    /* 顶部全局栏 */
+    .topbar { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.06); z-index: 200; display: flex; align-items: center; padding: 0 20px; gap: 16px; }
+    .topbar .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 16px; color: #1890ff; text-decoration: none; min-width: 220px; }
+    .topbar .brand-sub { color: #8c8c8c; font-weight: 400; font-size: 12px; margin-left: 4px; }
+    .ws-switcher { position: relative; }
+    .ws-trigger { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid #e8e8e8; border-radius: 6px; background: #fafafa; cursor: pointer; font-size: 13px; min-width: 240px; }
+    .ws-trigger:hover { border-color: #1890ff; background: #e6f7ff; }
+    .ws-trigger .ws-name { font-weight: 500; color: #262626; flex: 1; }
+    .ws-trigger .ws-arrow { color: #8c8c8c; font-size: 10px; }
+    .ws-dropdown { display: none; position: absolute; top: calc(100% + 6px); left: 0; min-width: 320px; background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,.12); padding: 8px; z-index: 300; }
+    .ws-dropdown.open { display: block; }
+    .ws-group-label { font-size: 12px; color: #8c8c8c; padding: 6px 10px; }
+    .ws-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+    .ws-item:hover { background: #f0f7ff; }
+    .ws-item.active { background: #e6f7ff; }
+    .ws-item .ws-item-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .ws-item .ws-item-icon.personal { background: #fff7e6; color: #fa8c16; }
+    .ws-item .ws-item-icon.team { background: #e6f7ff; color: #1890ff; }
+    .ws-item .ws-item-icon.admin { background: #f9f0ff; color: #722ed1; }
+    .ws-item .ws-item-main { flex: 1; min-width: 0; }
+    .ws-item .ws-item-name { font-weight: 500; color: #262626; }
+    .ws-item .ws-item-desc { font-size: 12px; color: #8c8c8c; margin-top: 2px; }
+    .ws-item .ws-item-check { color: #1890ff; font-size: 14px; }
+    .identity-switch { display: flex; gap: 4px; background: #f0f0f0; border-radius: 18px; padding: 3px; }
+    .identity-switch button { border: none; background: transparent; padding: 5px 14px; border-radius: 16px; font-size: 13px; color: #595959; cursor: pointer; }
+    .identity-switch button.active { background: #fff; color: #1890ff; box-shadow: 0 1px 2px rgba(0,0,0,.06); font-weight: 500; }
+    .wallet-chip { display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: linear-gradient(135deg, #fff7e6, #fff1d6); border: 1px solid #ffd591; border-radius: 18px; cursor: pointer; font-size: 13px; color: #d46b08; text-decoration: none; }
+    .wallet-chip:hover { border-color: #fa8c16; }
+    .wallet-chip .wallet-amount { font-weight: 600; font-size: 14px; }
+    .wallet-chip .wallet-account { font-size: 11px; opacity: .85; }
+    .avatar-wrap { position: relative; margin-left: auto; }
+    .avatar-trigger { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px 8px; border-radius: 18px; }
+    .avatar-trigger:hover { background: #f5f5f5; }
+    .avatar-trigger img { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #f0f0f0; }
+    .avatar-trigger .avatar-name { font-size: 13px; color: #262626; }
+    .avatar-dropdown { display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 220px; background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,.12); padding: 8px; z-index: 300; }
+    .avatar-dropdown.open { display: block; }
+    .avatar-dropdown a { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 6px; color: #262626; text-decoration: none; font-size: 13px; }
+    .avatar-dropdown a:hover { background: #f0f7ff; color: #1890ff; }
+    .avatar-dropdown .divider { height: 1px; background: #f0f0f0; margin: 6px 4px; }
+
+    /* 布局 */
+    .app { display: flex; padding-top: 56px; min-height: 100vh; }
+    .sidebar { width: 200px; background: #fff; box-shadow: 2px 0 8px rgba(0,0,0,.06); position: fixed; top: 56px; left: 0; bottom: 0; padding: 16px 0; overflow-y: auto; }
+    .menu a { display: flex; align-items: center; gap: 10px; padding: 11px 24px; color: #262626; text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
+    .menu a:hover { background: #f0f7ff; color: #1890ff; }
+    .menu a.active { background: #e6f7ff; color: #1890ff; border-left-color: #1890ff; font-weight: 500; }
+    .menu-icon { width: 18px; text-align: center; }
+    .menu-group { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+    .menu-group-title { padding: 8px 24px; font-size: 11px; color: #8c8c8c; text-transform: uppercase; letter-spacing: .5px; }
+    .main { margin-left: 200px; flex: 1; padding: 22px 28px 100px; }
+
+    /* 项目切换器 */
+    .project-switcher { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 2px; }
+    .project-card { flex-shrink: 0; background: #fff; border: 2px solid #f0f0f0; border-radius: 10px; padding: 12px 16px; cursor: pointer; min-width: 200px; max-width: 280px; transition: all .15s; }
+    .project-card:hover { border-color: #91d5ff; box-shadow: 0 2px 8px rgba(24,144,255,.1); }
+    .project-card.active { border-color: #1890ff; background: #e6f7ff; box-shadow: 0 2px 8px rgba(24,144,255,.15); }
+    .project-card .pc-name { font-size: 13px; font-weight: 600; color: #262626; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .project-card .pc-id { font-size: 11px; color: #8c8c8c; font-family: monospace; }
+    .project-card .pc-meta { display: flex; gap: 10px; margin-top: 6px; font-size: 11px; color: #8c8c8c; }
+    .project-card .pc-status { padding: 1px 8px; border-radius: 8px; font-size: 11px; font-weight: 500; }
+    .pc-status.in-progress { background: #e6f7ff; color: #096dd9; }
+    .pc-status.completed { background: #f6ffed; color: #389e0d; }
+    .pc-status.review { background: #fff7e6; color: #d48806; }
+
+    /* 面包屑 */
+    .breadcrumb { font-size: 13px; margin-bottom: 12px; }
+    .breadcrumb a { color: #1890ff; text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .breadcrumb span { color: #bfbfbf; margin: 0 6px; }
+
+    /* 订单概览 banner */
+    .order-banner { background: linear-gradient(135deg, #1890ff 0%, #2f54eb 100%); border-radius: 12px; padding: 22px 26px; color: #fff; margin-bottom: 14px; position: relative; overflow: hidden; }
+    .order-banner::after { content: ""; position: absolute; right: -40px; top: -40px; width: 200px; height: 200px; background: rgba(255,255,255,.08); border-radius: 50%; }
+    .order-banner.completed { background: linear-gradient(135deg, #52c41a, #389e0d); }
+    .order-banner h1 { margin: 0 0 6px; font-size: 22px; font-weight: 600; position: relative; z-index: 2; }
+    .order-banner .ob-id { font-size: 12px; opacity: .85; font-family: monospace; padding: 2px 10px; background: rgba(255,255,255,.15); border-radius: 10px; display: inline-block; margin-right: 8px; }
+    .order-banner .ob-cat { font-size: 12px; opacity: .85; }
+    .order-banner .ob-meta { display: flex; gap: 28px; margin-top: 14px; flex-wrap: wrap; position: relative; z-index: 2; }
+    .order-banner .ob-meta-item .ob-meta-label { font-size: 11px; opacity: .75; }
+    .order-banner .ob-meta-item .ob-meta-val { font-size: 14px; font-weight: 500; margin-top: 2px; }
+
+    /* 进度条 */
+    .progress-bar { background: #fff; border-radius: 8px; padding: 18px 24px; margin-bottom: 14px; }
+    .progress-steps { display: grid; grid-template-columns: repeat(5, 1fr); position: relative; }
+    .progress-step { display: flex; flex-direction: column; align-items: center; position: relative; }
+    .progress-step:not(:last-child)::after { content: ""; position: absolute; top: 14px; right: -50%; width: 100%; height: 2px; background: #f0f0f0; z-index: 0; }
+    .progress-step.done:not(:last-child)::after { background: #52c41a; }
+    .progress-step.current:not(:last-child)::after { background: linear-gradient(90deg, #52c41a 50%, #f0f0f0 50%); }
+    .progress-step .ps-icon { width: 30px; height: 30px; border-radius: 50%; background: #f0f0f0; color: #8c8c8c; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; z-index: 1; position: relative; }
+    .progress-step.done .ps-icon { background: #52c41a; color: #fff; }
+    .progress-step.current .ps-icon { background: #1890ff; color: #fff; box-shadow: 0 0 0 4px rgba(24,144,255,.18); }
+    .progress-step .ps-name { font-size: 12px; color: #8c8c8c; margin-top: 6px; text-align: center; }
+    .progress-step.done .ps-name { color: #389e0d; }
+    .progress-step.current .ps-name { color: #1890ff; font-weight: 500; }
+    .progress-step .ps-time { font-size: 10px; color: #bfbfbf; margin-top: 2px; }
+
+    /* 关键指标小条 */
+    .key-info { background: #fff; border-radius: 8px; padding: 14px 22px; margin-bottom: 14px; display: flex; gap: 24px; flex-wrap: wrap; align-items: center; }
+    .key-info .ki-item { font-size: 12px; }
+    .key-info .ki-label { color: #8c8c8c; }
+    .key-info .ki-val { color: #262626; font-weight: 500; margin-left: 6px; }
+    .key-info .ki-val.urgent { color: #cf1322; }
+    .key-info .ki-val.warn { color: #d46b08; }
+    .key-info .ki-val.amount { color: #1890ff; font-weight: 600; font-size: 14px; }
+    .key-info .ki-divider { width: 1px; height: 16px; background: #f0f0f0; }
+
+    /* Tab */
+    .tab-bar { background: #fff; border-radius: 8px 8px 0 0; padding: 0 22px; display: flex; gap: 0; border-bottom: 1px solid #f0f0f0; }
+    .tab-item { padding: 14px 18px; cursor: pointer; font-size: 14px; color: #595959; border-bottom: 2px solid transparent; transition: all .15s; }
+    .tab-item:hover { color: #1890ff; }
+    .tab-item.active { color: #1890ff; border-bottom-color: #1890ff; font-weight: 500; }
+    .tab-item .tab-badge { display: inline-block; background: #ff4d4f; color: #fff; font-size: 11px; padding: 1px 6px; border-radius: 8px; margin-left: 4px; font-weight: 400; }
+
+    .tab-content { background: #fff; border-radius: 0 0 8px 8px; padding: 20px 24px; min-height: 400px; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    /* === 需求详情 tab === */
+    .demand-section { margin-bottom: 18px; }
+    .demand-section h3 { margin: 0 0 8px; font-size: 14px; color: #595959; font-weight: 500; }
+    .demand-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; padding: 14px 18px; background: #fafafa; border-radius: 6px; }
+    .demand-grid .dg-item { font-size: 13px; }
+    .demand-grid .dg-label { color: #8c8c8c; font-size: 12px; margin-bottom: 2px; }
+    .demand-grid .dg-val { color: #262626; font-weight: 500; }
+    .demand-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .demand-tag { padding: 2px 10px; background: #e6f7ff; color: #096dd9; border-radius: 10px; font-size: 11px; }
+    .demand-desc { padding: 12px 14px; background: #fafafa; border-radius: 6px; font-size: 13px; line-height: 1.7; color: #595959; white-space: pre-wrap; }
+
+    /* === 素材包 tab === */
+    .file-list .file-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid #f0f0f0; border-radius: 6px; margin-bottom: 8px; transition: all .15s; }
+    .file-list .file-item:hover { border-color: #91d5ff; background: #fafafa; }
+    .file-icon { width: 38px; height: 38px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .file-icon.img { background: linear-gradient(135deg, #ffd6e7, #ffadd2); }
+    .file-icon.psd { background: linear-gradient(135deg, #d3adf7, #b37feb); color: #fff; font-weight: 600; font-size: 12px; }
+    .file-icon.doc { background: linear-gradient(135deg, #b7eb8f, #95de64); }
+    .file-icon.video { background: linear-gradient(135deg, #ffe7ba, #ffd591); }
+    .file-icon.zip { background: linear-gradient(135deg, #87e8de, #5cdbd3); }
+    .file-info { flex: 1; }
+    .file-name { font-size: 14px; font-weight: 500; }
+    .file-meta { font-size: 12px; color: #8c8c8c; margin-top: 2px; }
+    .file-actions button { height: 28px; padding: 0 12px; border: 1px solid #d9d9d9; background: #fff; border-radius: 4px; font-size: 12px; cursor: pointer; margin-left: 4px; }
+    .file-actions button:hover { border-color: #1890ff; color: #1890ff; }
+
+    /* === 交付与版本 tab === */
+    .version-timeline { position: relative; padding-left: 32px; }
+    .version-timeline::before { content: ""; position: absolute; left: 12px; top: 12px; bottom: 12px; width: 2px; background: #f0f0f0; }
+    .version-card { background: #fff; border: 1px solid #f0f0f0; border-radius: 10px; padding: 16px 18px; margin-bottom: 14px; position: relative; }
+    .version-card::before { content: ""; position: absolute; left: -27px; top: 22px; width: 14px; height: 14px; border-radius: 50%; background: #d9d9d9; border: 3px solid #fff; box-shadow: 0 0 0 2px #d9d9d9; }
+    .version-card.approved::before { background: #52c41a; box-shadow: 0 0 0 2px #52c41a; }
+    .version-card.rejected::before { background: #ff4d4f; box-shadow: 0 0 0 2px #ff4d4f; }
+    .version-card.current::before { background: #1890ff; box-shadow: 0 0 0 2px #1890ff; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 2px #1890ff; } 50% { box-shadow: 0 0 0 6px rgba(24,144,255,.3); } }
+    .version-card.current { border-color: #1890ff; background: linear-gradient(180deg, #fff, #f0f7ff); }
+    .version-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+    .version-tag { padding: 3px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+    .version-tag.v1 { background: #f9f0ff; color: #531dab; }
+    .version-tag.v2 { background: #fff7e6; color: #d46b08; }
+    .version-tag.v3 { background: #e6f7ff; color: #096dd9; }
+    .version-tag.v4 { background: #f6ffed; color: #389e0d; }
+    .version-status { font-size: 11px; padding: 2px 8px; border-radius: 8px; }
+    .version-status.approved { background: #f6ffed; color: #389e0d; }
+    .version-status.rejected { background: #fff1f0; color: #cf1322; }
+    .version-status.pending { background: #e6f7ff; color: #1890ff; font-weight: 500; }
+    .version-time { font-size: 12px; color: #8c8c8c; }
+    .version-uploader { font-size: 12px; color: #8c8c8c; }
+    .version-files { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+    .version-file-pill { padding: 4px 10px; background: #fafafa; border: 1px solid #f0f0f0; border-radius: 4px; font-size: 12px; color: #595959; cursor: pointer; }
+    .version-file-pill:hover { border-color: #1890ff; color: #1890ff; }
+    .version-note { font-size: 13px; color: #595959; padding: 10px 14px; background: #fafafa; border-radius: 6px; margin-top: 8px; }
+    .version-note.reject { background: #fff1f0; color: #cf1322; border-left: 3px solid #ff4d4f; }
+    .version-note .vn-title { font-weight: 500; margin-bottom: 4px; font-size: 12px; color: #8c8c8c; }
+    .version-note ul { margin: 4px 0 0; padding-left: 20px; }
+    .version-preview { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+    .version-preview-item { aspect-ratio: 16/10; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 500; padding: 8px; text-align: center; }
+    .version-actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed #f0f0f0; }
+
+    /* === 沟通 tab === */
+    .chat-area { display: flex; flex-direction: column; gap: 12px; }
+    .chat-msg { display: flex; gap: 10px; max-width: 70%; }
+    .chat-msg.demander { align-self: flex-start; }
+    .chat-msg.contractor { align-self: flex-end; flex-direction: row-reverse; }
+    .chat-msg.system { align-self: center; max-width: 80%; }
+    .chat-avatar { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .chat-avatar.contractor { background: linear-gradient(135deg, #ffd6e7, #ffadd2); }
+    .chat-bubble { padding: 9px 14px; border-radius: 10px; font-size: 13px; line-height: 1.6; }
+    .chat-msg.demander .chat-bubble { background: #f0f0f0; }
+    .chat-msg.contractor .chat-bubble { background: #1890ff; color: #fff; }
+    .chat-msg.system .chat-bubble { background: #fff7e6; color: #d46b08; font-size: 12px; padding: 6px 12px; border-radius: 12px; }
+    .chat-meta { font-size: 11px; color: #8c8c8c; margin-top: 4px; }
+    .chat-msg.contractor .chat-meta { text-align: right; }
+    .chat-input-row { margin-top: 16px; padding-top: 14px; border-top: 1px solid #f0f0f0; display: flex; gap: 8px; }
+    .chat-input-row textarea { flex: 1; height: 60px; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 6px; resize: none; font-family: inherit; font-size: 13px; outline: none; }
+    .chat-input-row textarea:focus { border-color: #40a9ff; }
+
+    /* === 验收记录 tab === */
+    .review-history-card { background: #fafafa; border-radius: 8px; padding: 14px 18px; margin-bottom: 10px; border-left: 3px solid #ffa940; }
+    .review-history-card.approved { border-left-color: #52c41a; }
+    .review-history-card .rh-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+    .review-history-card .rh-action { font-size: 13px; font-weight: 500; }
+    .review-history-card .rh-action.approved { color: #389e0d; }
+    .review-history-card .rh-action.rejected { color: #cf1322; }
+    .review-history-card .rh-time { font-size: 12px; color: #8c8c8c; }
+    .review-history-card .rh-reason { font-size: 13px; color: #595959; line-height: 1.6; }
+    .review-history-card .rh-changes { margin-top: 8px; padding: 8px 12px; background: #fff; border-radius: 4px; font-size: 12px; }
+    .review-history-card .rh-changes ul { margin: 4px 0 0; padding-left: 18px; color: #595959; }
+
+    /* 底部固定操作条 */
+    .footer-bar { position: fixed; bottom: 0; left: 200px; right: 0; background: #fff; border-top: 1px solid #f0f0f0; padding: 14px 28px; display: flex; gap: 10px; align-items: center; z-index: 100; }
+    .footer-bar .fb-info { font-size: 13px; color: #595959; margin-right: auto; }
+    .footer-bar .fb-info strong { color: #1890ff; }
+    .btn { height: 36px; border: 1px solid #d9d9d9; background: #fff; border-radius: 6px; padding: 0 18px; font-size: 14px; color: #595959; cursor: pointer; }
+    .btn:hover { border-color: #91d5ff; color: #1890ff; }
+    .btn.primary { background: #1890ff; border-color: #1890ff; color: #fff; font-weight: 500; }
+    .btn.primary:hover { background: #40a9ff; border-color: #40a9ff; color: #fff; }
+    .btn.success { background: #52c41a; border-color: #52c41a; color: #fff; font-weight: 500; }
+    .btn.success:hover { background: #73d13d; border-color: #73d13d; }
+    .btn.danger { color: #cf1322; border-color: #ffccc7; }
+    .btn.danger:hover { color: #ff4d4f; border-color: #ff4d4f; background: #fff1f0; }
+    .btn.large { height: 40px; padding: 0 24px; }
+    .btn:disabled { color: #bfbfbf; border-color: #f0f0f0; background: #fafafa; cursor: not-allowed; }
+
+    /* === 验收 + 分账 modal === */
+    .modal-mask { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 999; align-items: center; justify-content: center; padding: 20px; }
+    .modal-mask.open { display: flex; }
+    .modal-large { width: 100%; max-width: 720px; max-height: 92vh; background: #fff; border-radius: 12px; box-shadow: 0 12px 36px rgba(0,0,0,.25); overflow: hidden; display: flex; flex-direction: column; }
+    .modal-large .ml-head { padding: 18px 24px; background: linear-gradient(135deg, #52c41a, #389e0d); color: #fff; }
+    .modal-large .ml-head h3 { margin: 0; font-size: 18px; }
+    .modal-large .ml-head p { margin: 4px 0 0; font-size: 12px; opacity: .9; }
+    .modal-large .ml-body { padding: 22px 26px; overflow-y: auto; flex: 1; }
+    .modal-large .ml-foot { padding: 14px 26px; background: #fafafa; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 10px; }
+
+    .review-step { display: none; }
+    .review-step.active { display: block; }
+    .review-step h4 { margin: 0 0 12px; font-size: 15px; }
+
+    /* 步骤 1：评分反馈 */
+    .rate-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #f0f0f0; }
+    .rate-row:last-child { border-bottom: none; }
+    .rate-label { font-size: 13px; color: #595959; }
+    .rate-stars { display: flex; gap: 4px; }
+    .rate-stars .star { font-size: 22px; color: #f0f0f0; cursor: pointer; transition: color .15s; }
+    .rate-stars .star.filled { color: #fa8c16; }
+    .rate-stars .star:hover { color: #ffa940; }
+    .feedback-textarea { width: 100%; min-height: 80px; border: 1px solid #d9d9d9; border-radius: 6px; padding: 10px; font-family: inherit; font-size: 13px; resize: vertical; outline: none; margin-top: 8px; }
+
+    /* 步骤 2：分账动画 */
+    .settle-animation { padding: 20px 0; }
+    .settle-source { background: linear-gradient(135deg, #fff7e6, #fff1d6); border: 2px solid #ffd591; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 0; transition: all .6s; }
+    .settle-source .ss-label { font-size: 12px; color: #d46b08; }
+    .settle-source .ss-amount { font-size: 36px; font-weight: 700; color: #d46b08; margin-top: 4px; }
+    .settle-source .ss-account { font-size: 12px; color: #d46b08; margin-top: 4px; opacity: .8; }
+    .settle-source.released { opacity: .4; transform: scale(.95); }
+
+    .settle-arrow { text-align: center; padding: 14px 0; color: #1890ff; font-size: 28px; transition: opacity .4s; opacity: 0; }
+    .settle-arrow.show { opacity: 1; }
+
+    .settle-targets { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .settle-target { border: 2px solid #f0f0f0; border-radius: 12px; padding: 16px 18px; opacity: 0; transform: translateY(20px); transition: all .5s; }
+    .settle-target.show { opacity: 1; transform: translateY(0); }
+    .settle-target.contractor { border-color: #b7eb8f; background: linear-gradient(135deg, #f6ffed, #d9f7be); }
+    .settle-target.platform { border-color: #91d5ff; background: linear-gradient(135deg, #e6f7ff, #bae7ff); }
+    .settle-target .st-label { font-size: 11px; color: #8c8c8c; margin-bottom: 4px; }
+    .settle-target.contractor .st-label { color: #389e0d; }
+    .settle-target.platform .st-label { color: #096dd9; }
+    .settle-target .st-name { font-size: 13px; font-weight: 500; color: #262626; margin-bottom: 6px; }
+    .settle-target .st-amount { font-size: 22px; font-weight: 700; }
+    .settle-target.contractor .st-amount { color: #389e0d; }
+    .settle-target.platform .st-amount { color: #096dd9; }
+    .settle-target .st-pct { font-size: 11px; color: #8c8c8c; margin-top: 2px; }
+    .settle-target .st-detail { font-size: 11px; color: #8c8c8c; margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(0,0,0,.06); line-height: 1.6; }
+
+    /* 步骤 3：完成 */
+    .step3-success { text-align: center; padding: 30px 20px; }
+    .step3-icon { font-size: 64px; margin-bottom: 12px; }
+    .step3-title { font-size: 22px; font-weight: 700; color: #389e0d; margin-bottom: 8px; }
+    .step3-desc { font-size: 13px; color: #595959; margin-bottom: 18px; }
+    .step3-summary { background: #f6ffed; border-radius: 8px; padding: 14px 18px; max-width: 460px; margin: 0 auto; text-align: left; font-size: 13px; line-height: 2; }
+    .step3-summary .ss-row { display: flex; justify-content: space-between; }
+    .step3-summary .ss-row .ss-label { color: #8c8c8c; }
+    .step3-summary .ss-row .ss-val { color: #262626; font-weight: 500; }
+
+    /* Toast */
+    .toasts { position: fixed; top: 72px; right: 20px; width: min(90vw, 360px); display: grid; gap: 8px; z-index: 1100; }
+    .toast { background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; padding: 10px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.1); animation: slideIn .25s ease-out; }
+    .toast.ok { border-color: #b7eb8f; background: #f6ffed; color: #389e0d; }
+    .toast.err { border-color: #ffccc7; background: #fff2f0; color: #cf1322; }
+    .toast.warn { border-color: #ffe58f; background: #fffbe6; color: #d48806; }
+    .toast.info { border-color: #91d5ff; background: #e6f7ff; color: #096dd9; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+    @media (max-width: 1100px) {
+      .progress-steps { grid-template-columns: repeat(5, 1fr); font-size: 11px; }
+      .demand-grid { grid-template-columns: 1fr; }
+      .settle-targets { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 16px 16px 100px; }
+      .footer-bar { left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a href="platform-home-demander.html" class="brand">🎬 骋风天合<span class="brand-sub">创作门户交易平台</span></a>
+    <div class="ws-switcher">
+      <button class="ws-trigger" id="wsTrigger">
+        <span id="wsIcon">🏢</span>
+        <span class="ws-name" id="wsName">骋风天合 · 短剧制作中心</span>
+        <span class="ws-arrow">▼</span>
+      </button>
+      <div class="ws-dropdown" id="wsDropdown"></div>
+    </div>
+    <div class="identity-switch" id="identitySwitch">
+      <button data-identity="demander" class="active">📥 需求方</button>
+      <button data-identity="contractor">🛠 承制方</button>
+    </div>
+    <a href="wallet-overview.html" class="wallet-chip" id="walletChip">
+      <span>💰</span>
+      <span>
+        <span class="wallet-amount" id="walletAmount">¥185,000</span>
+        <span class="wallet-account" id="walletAccount">团队预算账户</span>
+      </span>
+    </a>
+    <div class="avatar-wrap">
+      <div class="avatar-trigger" id="avatarTrigger">
+        <img src="https://api.dicebear.com/9.x/lorelei/svg?seed=account" alt="头像">
+        <span class="avatar-name">昭岚</span>
+        <span class="ws-arrow">▼</span>
+      </div>
+      <div class="avatar-dropdown" id="avatarDropdown">
+        <a href="account-basic-info-prototype-platform-style.html"><span>👤</span> 账户基础信息</a>
+        <a href="enterprise-verification-prototype.html"><span>🏢</span> 企业认证</a>
+        <a href="account-security-prototype.html"><span>🔐</span> 账号安全</a>
+        <a href="wallet-overview.html"><span>💰</span> 我的钱包</a>
+        <div class="divider"></div>
+        <a href="#" onclick="event.preventDefault(); window.demoToast('演示环境，未实现退出', 'warn')"><span>🚪</span> 退出登录</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="app">
+    <aside class="sidebar">
+      <nav class="menu">
+        <a href="platform-home-demander.html"><span class="menu-icon">🏠</span> 工作台</a>
+        <a href="demand-publish.html"><span class="menu-icon">📤</span> 发布需求</a>
+        <a href="demand-list.html"><span class="menu-icon">📋</span> 我的需求</a>
+        <a href="contractor-marketplace.html"><span class="menu-icon">🏪</span> 承制方广场</a>
+        <a href="project-space.html" class="active"><span class="menu-icon">🤝</span> 项目协同空间</a>
+        <a href="wallet-overview.html"><span class="menu-icon">💰</span> 钱包与结算</a>
+        <div class="menu-group">
+          <div class="menu-group-title">账户</div>
+          <a href="account-basic-info-prototype-platform-style.html"><span class="menu-icon">⚙️</span> 账户中心</a>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <div class="breadcrumb">
+        <a href="platform-home-demander.html">工作台</a><span>/</span>
+        <a href="demand-list.html">我的需求</a><span>/</span>
+        <span style="color:#262626">项目协同空间</span>
+      </div>
+
+      <!-- 项目切换器 -->
+      <section class="project-switcher" id="projectSwitcher"></section>
+
+      <!-- 订单概览 banner -->
+      <section class="order-banner" id="orderBanner">
+        <div>
+          <span class="ob-id" id="obOrderId">OD-2026042307</span>
+          <span class="ob-cat" id="obCat">图片设计 / 海报设计</span>
+        </div>
+        <h1 id="obProjectName">新剧 IP 海报系列</h1>
+        <div class="ob-meta">
+          <div class="ob-meta-item"><div class="ob-meta-label">承制方</div><div class="ob-meta-val" id="obContractor">⭐ 星辰创作工作室</div></div>
+          <div class="ob-meta-item"><div class="ob-meta-label">订单金额（已锁定）</div><div class="ob-meta-val" id="obAmount">¥28,000</div></div>
+          <div class="ob-meta-item"><div class="ob-meta-label">扣款主体</div><div class="ob-meta-val" id="obPayer">短剧制作中心 · 团队预算账户</div></div>
+          <div class="ob-meta-item"><div class="ob-meta-label">交付截止</div><div class="ob-meta-val" id="obDeadline">2026-04-30 · 剩 3 天</div></div>
+          <div class="ob-meta-item"><div class="ob-meta-label">当前阶段</div><div class="ob-meta-val" id="obStage">⏳ 待验收（V3）</div></div>
+        </div>
+      </section>
+
+      <!-- 进度条 -->
+      <section class="progress-bar">
+        <div class="progress-steps" id="progressSteps">
+          <div class="progress-step done" data-step="1">
+            <div class="ps-icon">✓</div>
+            <div class="ps-name">已下单</div>
+            <div class="ps-time">04-23 10:00</div>
+          </div>
+          <div class="progress-step done" data-step="2">
+            <div class="ps-icon">✓</div>
+            <div class="ps-name">承制方接单</div>
+            <div class="ps-time">04-23 11:14</div>
+          </div>
+          <div class="progress-step current" data-step="3">
+            <div class="ps-icon">3</div>
+            <div class="ps-name">制作 / 多轮修改</div>
+            <div class="ps-time">已交付 V3</div>
+          </div>
+          <div class="progress-step" data-step="4">
+            <div class="ps-icon">4</div>
+            <div class="ps-name">验收</div>
+            <div class="ps-time">待执行</div>
+          </div>
+          <div class="progress-step" data-step="5">
+            <div class="ps-icon">5</div>
+            <div class="ps-name">结算入账</div>
+            <div class="ps-time">—</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 关键指标小条 -->
+      <section class="key-info">
+        <div class="ki-item"><span class="ki-label">需求号：</span><a href="demand-list.html?highlight=DM-2026042103" class="ki-val" style="color:#1890ff;text-decoration:none">DM-2026042103</a></div>
+        <div class="ki-divider"></div>
+        <div class="ki-item"><span class="ki-label">已交付版本：</span><span class="ki-val">V3</span></div>
+        <div class="ki-divider"></div>
+        <div class="ki-item"><span class="ki-label">修改轮次：</span><span class="ki-val">2 轮</span></div>
+        <div class="ki-divider"></div>
+        <div class="ki-item"><span class="ki-label">距离截止：</span><span class="ki-val urgent" id="daysRemain">3 天</span></div>
+        <div class="ki-divider"></div>
+        <div class="ki-item"><span class="ki-label">已锁定预算：</span><span class="ki-val amount">¥28,000</span></div>
+        <div class="ki-divider"></div>
+        <div class="ki-item"><span class="ki-label">协作成员：</span><span class="ki-val">3 人（昭岚 / 王编辑 / 李设计）</span></div>
+      </section>
+
+      <!-- Tab -->
+      <section class="tab-bar" id="tabBar">
+        <div class="tab-item" data-tab="demand">📋 需求详情</div>
+        <div class="tab-item" data-tab="materials">📎 素材包</div>
+        <div class="tab-item active" data-tab="versions">🎨 交付与版本 <span class="tab-badge">V3 待验收</span></div>
+        <div class="tab-item" data-tab="chat">💬 沟通 <span class="tab-badge">2</span></div>
+        <div class="tab-item" data-tab="reviews">📝 验收记录</div>
+      </section>
+      <div class="tab-content">
+        <!-- 需求详情 -->
+        <div class="tab-pane" data-pane="demand">
+          <div class="demand-section">
+            <h3>基本信息</h3>
+            <div class="demand-grid">
+              <div class="dg-item"><div class="dg-label">服务类目</div><div class="dg-val">图片设计 / 海报设计</div></div>
+              <div class="dg-item"><div class="dg-label">服务等级 / 制作方式</div><div class="dg-val">高品质 / 重点 CG 特效</div></div>
+              <div class="dg-item"><div class="dg-label">需求方</div><div class="dg-val">骋风天合 · 短剧制作中心</div></div>
+              <div class="dg-item"><div class="dg-label">预算</div><div class="dg-val">¥28,000</div></div>
+              <div class="dg-item"><div class="dg-label">期望交付</div><div class="dg-val">2026-04-30</div></div>
+              <div class="dg-item"><div class="dg-label">承制方报价交期</div><div class="dg-val">14 天（4 月 23 日 - 5 月 7 日，含 3 轮修改）</div></div>
+            </div>
+          </div>
+          <div class="demand-section">
+            <h3>需求标签</h3>
+            <div class="demand-tags">
+              <span class="demand-tag">#内容 IP</span>
+              <span class="demand-tag">#古风</span>
+              <span class="demand-tag">#修仙</span>
+              <span class="demand-tag">#2D 插画</span>
+              <span class="demand-tag">#抖音渠道</span>
+              <span class="demand-tag">#视频号</span>
+            </div>
+          </div>
+          <div class="demand-section">
+            <h3>动态字段（图片设计 · 海报设计）</h3>
+            <div class="demand-grid">
+              <div class="dg-item"><div class="dg-label">尺寸</div><div class="dg-val">竖版 1080×1920（抖音）+ 横版 1920×1080（视频号）</div></div>
+              <div class="dg-item"><div class="dg-label">用途</div><div class="dg-val">线上推广（短剧上线物料）</div></div>
+              <div class="dg-item"><div class="dg-label">交付格式</div><div class="dg-val">PSD 源文件 + PNG 成品（含分图层）</div></div>
+              <div class="dg-item"><div class="dg-label">海报数量</div><div class="dg-val">5 张主视觉 + 3 张衍生</div></div>
+            </div>
+          </div>
+          <div class="demand-section">
+            <h3>需求详细描述</h3>
+            <div class="demand-desc">短剧《重生之大圣归来》5 集主视觉海报系列，需要体现修仙古风氛围。
+
+主角设定：年轻男主，玉冠束发，眉宇英气，配有龙形 IP 元素。
+风格参考：参见素材包中的「古风视觉参考-V2.pdf」。
+色调要求：以墨黑、朱红、金为主，避免过于鲜艳。
+关键元素：龙、云海、剑、月。
+不能出现：现代元素、过于卡通的画风。
+
+请承制方在每个版本中提供 3 张备选稿，并附带创作思路说明。</div>
+          </div>
+          <div class="demand-section">
+            <h3>原始需求附件</h3>
+            <div class="file-list">
+              <div class="file-item">
+                <div class="file-icon doc">📄</div>
+                <div class="file-info">
+                  <div class="file-name">需求文档_新剧IP海报系列_V1.docx</div>
+                  <div class="file-meta">3.2 MB · 上传于 2026-04-21 · 上传者：昭岚</div>
+                </div>
+                <div class="file-actions"><button onclick="window.demoToast('演示环境，文件下载未接通', 'info')">下载</button></div>
+              </div>
+              <div class="file-item">
+                <div class="file-icon img">🖼</div>
+                <div class="file-info">
+                  <div class="file-name">古风视觉参考-V2.pdf</div>
+                  <div class="file-meta">12.6 MB · 上传于 2026-04-21 · 上传者：昭岚</div>
+                </div>
+                <div class="file-actions"><button onclick="window.demoToast('演示环境，文件下载未接通', 'info')">下载</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 素材包 -->
+        <div class="tab-pane" data-pane="materials">
+          <div style="margin-bottom:14px;font-size:13px;color:#8c8c8c">承制方可下载需求方提供的素材包；交付物上传到「交付与版本」tab。</div>
+          <div class="file-list">
+            <div class="file-item">
+              <div class="file-icon zip">📦</div>
+              <div class="file-info">
+                <div class="file-name">主角设定参考集.zip</div>
+                <div class="file-meta">145 MB · 含 23 张参考图、人物三视图 · 上传者：昭岚</div>
+              </div>
+              <div class="file-actions"><button onclick="window.demoToast('演示环境，文件下载未接通', 'info')">下载</button></div>
+            </div>
+            <div class="file-item">
+              <div class="file-icon img">🖼</div>
+              <div class="file-info">
+                <div class="file-name">龙_IP形象矢量图.ai</div>
+                <div class="file-meta">8.4 MB · 由 IP 孵化组提供 · 含 PSD 分层</div>
+              </div>
+              <div class="file-actions"><button onclick="window.demoToast('演示环境，文件下载未接通', 'info')">下载</button></div>
+            </div>
+            <div class="file-item">
+              <div class="file-icon img">🖼</div>
+              <div class="file-info">
+                <div class="file-name">古风视觉参考-V2.pdf</div>
+                <div class="file-meta">12.6 MB · 上传者：昭岚</div>
+              </div>
+              <div class="file-actions"><button onclick="window.demoToast('演示环境，文件下载未接通', 'info')">下载</button></div>
+            </div>
+            <div class="file-item">
+              <div class="file-icon doc">🎨</div>
+              <div class="file-info">
+                <div class="file-name">骋风天合品牌色板.ase</div>
+                <div class="file-meta">12 KB · 企业品牌资产 · 仅本团队可下载</div>
+              </div>
+              <div class="file-actions"><button onclick="window.demoToast('演示环境，文件下载未接通', 'info')">下载</button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 交付与版本 -->
+        <div class="tab-pane active" data-pane="versions">
+          <div style="margin-bottom:14px;font-size:13px;color:#595959;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+            <span>共 <strong style="color:#262626">3 个版本</strong>，最新版本 V3 待验收。</span>
+            <select id="versionFilter" style="height:28px;border:1px solid #d9d9d9;border-radius:4px;padding:0 22px 0 8px;font-size:12px;outline:none">
+              <option value="all">全部版本</option>
+              <option value="latest">仅最新</option>
+              <option value="rejected">仅退回的</option>
+            </select>
+          </div>
+
+          <div class="version-timeline">
+            <!-- V3 当前版本 -->
+            <div class="version-card current" data-version="V3">
+              <div class="version-head">
+                <span class="version-tag v3">V3</span>
+                <span class="version-status pending">⏳ 待验收</span>
+                <span class="version-time">2026-04-26 18:45 上传</span>
+                <span class="version-uploader">· 由 王编辑（星辰创作）上传</span>
+              </div>
+              <div class="version-files">
+                <span class="version-file-pill" onclick="window.demoToast('演示环境，预览未接通', 'info')">📄 主视觉_V3.psd · 285 MB</span>
+                <span class="version-file-pill" onclick="window.demoToast('演示环境，预览未接通', 'info')">🖼 封面_01_final.png · 8.2 MB</span>
+                <span class="version-file-pill" onclick="window.demoToast('演示环境，预览未接通', 'info')">🖼 封面_02_final.png · 7.8 MB</span>
+                <span class="version-file-pill" onclick="window.demoToast('演示环境，预览未接通', 'info')">🖼 衍生_朱雀.png · 6.1 MB</span>
+                <span class="version-file-pill" onclick="window.demoToast('演示环境，预览未接通', 'info')">🖼 衍生_玄武.png · 6.4 MB</span>
+              </div>
+              <div class="version-preview">
+                <div class="version-preview-item" style="background:linear-gradient(135deg,#722ed1,#13c2c2)">主视觉 V3 · 主角玉冠束发</div>
+                <div class="version-preview-item" style="background:linear-gradient(135deg,#f5222d,#fa541c)">封面 V3 · 龙腾云海</div>
+                <div class="version-preview-item" style="background:linear-gradient(135deg,#fadb14,#fa8c16)">衍生 · 朱雀</div>
+              </div>
+              <div class="version-note">
+                <div class="vn-title">承制方说明</div>
+                根据 V2 反馈调整：1）主角表情自然化，嘴角微调 5°；2）增加 2 张衍生稿（朱雀 / 玄武）作为短剧片头切换；3）所有图层已重新命名整理。请审阅，期待通过 ✨
+              </div>
+              <div class="version-actions">
+                <button class="btn success" id="approveVersionBtn">✅ 通过验收（结算）</button>
+                <button class="btn danger" id="rejectVersionBtn">↩️ 驳回（要求修改）</button>
+                <button class="btn" onclick="window.demoToast('演示环境，下载未接通', 'info')">⬇️ 下载全部文件</button>
+              </div>
+            </div>
+
+            <!-- V2 -->
+            <div class="version-card rejected" data-version="V2">
+              <div class="version-head">
+                <span class="version-tag v2">V2</span>
+                <span class="version-status rejected">↩️ 已退回修改</span>
+                <span class="version-time">2026-04-26 11:00 上传</span>
+                <span class="version-uploader">· 由 王编辑（星辰创作）上传</span>
+              </div>
+              <div class="version-files">
+                <span class="version-file-pill">📄 主视觉_V2.psd · 268 MB</span>
+                <span class="version-file-pill">🖼 封面_01_revised.png · 7.4 MB</span>
+              </div>
+              <div class="version-preview">
+                <div class="version-preview-item" style="background:linear-gradient(135deg,#9254de,#5cdbd3)">主视觉 V2 · 调亮版</div>
+                <div class="version-preview-item" style="background:linear-gradient(135deg,#ff7875,#ffa39e)">封面 V2 · 主角表情待调</div>
+              </div>
+              <div class="version-note reject">
+                <div class="vn-title">需求方驳回原因（昭岚 · 04-26 11:30）</div>
+                色调没问题了，但主角表情有点僵硬，眼神不够锋利，建议参考素材包里的"主角_表情参考_03.png"。
+                <div class="vn-title" style="margin-top:8px">具体修改点</div>
+                <ul>
+                  <li>主角眉宇间英气需更明显</li>
+                  <li>嘴角弧度微调（参考表情 03）</li>
+                  <li>眼神锐度提升</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- V1 -->
+            <div class="version-card rejected" data-version="V1">
+              <div class="version-head">
+                <span class="version-tag v1">V1</span>
+                <span class="version-status rejected">↩️ 已退回修改</span>
+                <span class="version-time">2026-04-25 14:30 上传</span>
+                <span class="version-uploader">· 由 王编辑（星辰创作）上传</span>
+              </div>
+              <div class="version-files">
+                <span class="version-file-pill">📄 主视觉_V1.psd · 240 MB</span>
+                <span class="version-file-pill">🖼 封面_01.png · 6.8 MB</span>
+              </div>
+              <div class="version-preview">
+                <div class="version-preview-item" style="background:linear-gradient(135deg,#262626,#595959)">主视觉 V1 · 偏暗</div>
+                <div class="version-preview-item" style="background:linear-gradient(135deg,#434343,#262626)">封面 V1 · 整体暗调</div>
+              </div>
+              <div class="version-note reject">
+                <div class="vn-title">需求方驳回原因（昭岚 · 04-25 16:00）</div>
+                整体风格偏暗，希望主色调更明快一些，朱红和金色应该更突出。修仙感不一定要靠暗调来表达。
+                <div class="vn-title" style="margin-top:8px">具体修改点</div>
+                <ul>
+                  <li>整体色调调亮（明度 +30%）</li>
+                  <li>朱红和金色对比度提升</li>
+                  <li>主视觉调到 50% 以上明度</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 沟通 -->
+        <div class="tab-pane" data-pane="chat">
+          <div class="chat-area" id="chatArea">
+            <div class="chat-msg system">
+              <div class="chat-bubble">📌 项目协同空间已创建，订单 OD-2026042307 进入履约。截止 2026-04-30。</div>
+              <div class="chat-meta" style="text-align:center">2026-04-23 10:00</div>
+            </div>
+            <div class="chat-msg demander">
+              <div class="chat-avatar">🌸</div>
+              <div>
+                <div class="chat-bubble">你好王编辑！项目正式启动。需求文档和参考素材已上传到「素材包」tab，麻烦先过一遍～</div>
+                <div class="chat-meta">昭岚 · 2026-04-23 10:15</div>
+              </div>
+            </div>
+            <div class="chat-msg contractor">
+              <div class="chat-avatar contractor">🌟</div>
+              <div>
+                <div class="chat-bubble">收到～素材已下载，参考已看完。我们会按 5 主视觉 + 3 衍生的清单走，明天先出 V1。</div>
+                <div class="chat-meta">王编辑（星辰创作） · 2026-04-23 10:30</div>
+              </div>
+            </div>
+            <div class="chat-msg system">
+              <div class="chat-bubble">📤 V1 版本已上传 · 04-25 14:30</div>
+            </div>
+            <div class="chat-msg demander">
+              <div class="chat-avatar">🌸</div>
+              <div>
+                <div class="chat-bubble">V1 整体感觉偏暗了，朱红和金色应该更突出一些。我们想要"明快但有质感"的感觉，参考下我之前发的"古风视觉参考-V2.pdf"</div>
+                <div class="chat-meta">昭岚 · 2026-04-25 16:00</div>
+              </div>
+            </div>
+            <div class="chat-msg contractor">
+              <div class="chat-avatar contractor">🌟</div>
+              <div>
+                <div class="chat-bubble">明白，我们调一版亮的。明天 V2 给您。</div>
+                <div class="chat-meta">王编辑（星辰创作） · 2026-04-25 16:32</div>
+              </div>
+            </div>
+            <div class="chat-msg system">
+              <div class="chat-bubble">📤 V2 版本已上传 · 04-26 11:00</div>
+            </div>
+            <div class="chat-msg demander">
+              <div class="chat-avatar">🌸</div>
+              <div>
+                <div class="chat-bubble">V2 调色 OK 了！但主角表情僵硬，眼神不够锋利。能不能再过一版表情？参考素材包里"主角_表情参考_03.png"</div>
+                <div class="chat-meta">昭岚 · 2026-04-26 11:30</div>
+              </div>
+            </div>
+            <div class="chat-msg contractor">
+              <div class="chat-avatar contractor">🌟</div>
+              <div>
+                <div class="chat-bubble">好的，我们今天加班调一版。还顺便加 2 张衍生稿（朱雀和玄武）作为片头切换。</div>
+                <div class="chat-meta">王编辑（星辰创作） · 2026-04-26 12:08</div>
+              </div>
+            </div>
+            <div class="chat-msg system">
+              <div class="chat-bubble">📤 V3 版本已上传 · 04-26 18:45</div>
+            </div>
+            <div class="chat-msg contractor">
+              <div class="chat-avatar contractor">🌟</div>
+              <div>
+                <div class="chat-bubble">V3 已交付！按反馈调了表情，附带朱雀玄武 2 张衍生稿。期待您的验收 🤞</div>
+                <div class="chat-meta">王编辑（星辰创作） · 2026-04-26 18:48</div>
+              </div>
+            </div>
+          </div>
+          <div class="chat-input-row">
+            <textarea id="chatInput" placeholder="输入沟通内容，按 Cmd+Enter 发送（演示环境）"></textarea>
+            <button class="btn primary" id="sendChatBtn" style="align-self:flex-end">发送</button>
+          </div>
+        </div>
+
+        <!-- 验收记录 -->
+        <div class="tab-pane" data-pane="reviews">
+          <div style="margin-bottom:14px;font-size:13px;color:#595959">已发生 <strong>2 轮验收驳回</strong>，最新版本 V3 待验收。</div>
+
+          <div class="review-history-card">
+            <div class="rh-head">
+              <span class="rh-action rejected">↩️ V2 驳回修改</span>
+              <span class="rh-time">2026-04-26 11:30</span>
+              <span class="rh-time">· 验收人：昭岚</span>
+            </div>
+            <div class="rh-reason">色调没问题了，但主角表情有点僵硬，眼神不够锋利，建议参考素材包里的"主角_表情参考_03.png"。</div>
+            <div class="rh-changes">
+              <div style="font-size:11px;color:#8c8c8c">具体修改点：</div>
+              <ul>
+                <li>主角眉宇间英气需更明显</li>
+                <li>嘴角弧度微调（参考表情 03）</li>
+                <li>眼神锐度提升</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="review-history-card">
+            <div class="rh-head">
+              <span class="rh-action rejected">↩️ V1 驳回修改</span>
+              <span class="rh-time">2026-04-25 16:00</span>
+              <span class="rh-time">· 验收人：昭岚</span>
+            </div>
+            <div class="rh-reason">整体风格偏暗，希望主色调更明快一些，朱红和金色应该更突出。修仙感不一定要靠暗调来表达。</div>
+            <div class="rh-changes">
+              <div style="font-size:11px;color:#8c8c8c">具体修改点：</div>
+              <ul>
+                <li>整体色调调亮（明度 +30%）</li>
+                <li>朱红和金色对比度提升</li>
+                <li>主视觉调到 50% 以上明度</li>
+              </ul>
+            </div>
+          </div>
+
+          <div style="text-align:center;color:#8c8c8c;font-size:12px;padding:20px 0">— 以上为完整验收记录 —</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 底部操作栏 -->
+  <div class="footer-bar">
+    <div class="fb-info">
+      ✨ V3 已交付待验收。验收通过后，平台将从「短剧制作中心 · 团队预算账户」锁定的 <strong>¥28,000</strong> 中分账给承制方与平台。
+    </div>
+    <button class="btn" onclick="window.demoToast('演示环境，沟通侧栏未做', 'info')">💬 联系承制方</button>
+    <button class="btn danger large" id="footerRejectBtn">↩️ 驳回当前版本</button>
+    <button class="btn success large" id="footerApproveBtn">✅ 通过验收（结算）</button>
+  </div>
+
+  <!-- 验收 + 分账 modal -->
+  <div class="modal-mask" id="reviewModal">
+    <div class="modal-large">
+      <div class="ml-head">
+        <h3>✅ 订单验收 + 资金结算</h3>
+        <p>验收通过后，平台将自动执行分账（承制方收益 + 平台服务费 + 必要的部分退款），订单进入"已完成"状态。</p>
+      </div>
+      <div class="ml-body">
+        <!-- 步骤 1：评分反馈 -->
+        <div class="review-step active" data-step="1">
+          <h4>1️⃣ 验收评分（匿名汇总，影响承制方综合评分）</h4>
+          <div style="background:#fafafa;border-radius:8px;padding:14px 18px;">
+            <div class="rate-row">
+              <span class="rate-label">⭐ 创意 / 艺术质感</span>
+              <div class="rate-stars" data-rate-key="creativity">
+                <span class="star" data-v="1">★</span><span class="star" data-v="2">★</span><span class="star" data-v="3">★</span><span class="star" data-v="4">★</span><span class="star" data-v="5">★</span>
+              </div>
+            </div>
+            <div class="rate-row">
+              <span class="rate-label">🎯 还原需求精准度</span>
+              <div class="rate-stars" data-rate-key="accuracy">
+                <span class="star" data-v="1">★</span><span class="star" data-v="2">★</span><span class="star" data-v="3">★</span><span class="star" data-v="4">★</span><span class="star" data-v="5">★</span>
+              </div>
+            </div>
+            <div class="rate-row">
+              <span class="rate-label">⚡ 沟通响应速度</span>
+              <div class="rate-stars" data-rate-key="response">
+                <span class="star" data-v="1">★</span><span class="star" data-v="2">★</span><span class="star" data-v="3">★</span><span class="star" data-v="4">★</span><span class="star" data-v="5">★</span>
+              </div>
+            </div>
+            <div class="rate-row">
+              <span class="rate-label">📅 按时交付</span>
+              <div class="rate-stars" data-rate-key="ontime">
+                <span class="star" data-v="1">★</span><span class="star" data-v="2">★</span><span class="star" data-v="3">★</span><span class="star" data-v="4">★</span><span class="star" data-v="5">★</span>
+              </div>
+            </div>
+          </div>
+          <h4 style="margin-top:18px">📝 验收反馈（选填）</h4>
+          <textarea class="feedback-textarea" id="reviewFeedback" placeholder="例如：对承制方的整体评价、印象深刻的亮点、希望保持的服务细节...">交付质量很好，最后一版主角表情非常到位，朱雀玄武衍生稿是惊喜，下次还会找星辰合作！</textarea>
+          <div style="background:#fff7e6;border:1px solid #ffd591;border-radius:6px;padding:10px 14px;margin-top:12px;font-size:12px;color:#d46b08;line-height:1.6">
+            ⚠️ <strong>提醒</strong>：验收通过后将正式触发结算分账，操作不可撤销。如对当前版本仍有意见，请先「驳回」要求修改。
+          </div>
+        </div>
+
+        <!-- 步骤 2：分账动画 -->
+        <div class="review-step" data-step="2">
+          <h4>2️⃣ 资金结算分账（自动执行）</h4>
+          <div class="settle-animation">
+            <div class="settle-source" id="settleSource">
+              <div class="ss-label">🔒 锁定金额</div>
+              <div class="ss-amount">¥28,000</div>
+              <div class="ss-account">短剧制作中心 · 团队预算账户</div>
+            </div>
+            <div class="settle-arrow" id="settleArrow">↓ 释放并分账</div>
+            <div class="settle-targets">
+              <div class="settle-target contractor" id="settleContractor">
+                <div class="st-label">⭐ 承制方收益（实际入账）</div>
+                <div class="st-name">星辰创作工作室 · 收益账户</div>
+                <div class="st-amount" id="settleContractorAmt">¥26,600</div>
+                <div class="st-pct">95% · 订单金额</div>
+                <div class="st-detail">
+                  <div>原报价：¥28,000</div>
+                  <div>平台服务费：−¥1,400 (5%)</div>
+                  <div>实际入账：¥26,600</div>
+                </div>
+              </div>
+              <div class="settle-target platform" id="settlePlatform">
+                <div class="st-label">🏛 平台服务费</div>
+                <div class="st-name">骋风天合 · 平台服务费账户</div>
+                <div class="st-amount" id="settlePlatformAmt">¥1,400</div>
+                <div class="st-pct">5% · 订单金额</div>
+                <div class="st-detail">
+                  <div>用于支撑：撮合 / 资金托管 / 风控 / 售后服务等</div>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:14px;padding:10px 14px;background:#f0f7ff;border-radius:6px;font-size:12px;color:#096dd9;line-height:1.6;display:none" id="settleNote">
+              💡 <strong>结算说明</strong>：本订单全额验收通过，未触发"部分退款"分支。如有部分退款，承制方实际入账会按比例减少，剩余金额退回团队预算账户。
+            </div>
+          </div>
+        </div>
+
+        <!-- 步骤 3：完成 -->
+        <div class="review-step" data-step="3">
+          <div class="step3-success">
+            <div class="step3-icon">🎉</div>
+            <div class="step3-title">订单结算完成</div>
+            <div class="step3-desc">订单 OD-2026042307「新剧 IP 海报系列」已验收通过并完成分账。</div>
+            <div class="step3-summary">
+              <div class="ss-row"><span class="ss-label">订单状态</span><span class="ss-val" style="color:#389e0d">✅ 已结算</span></div>
+              <div class="ss-row"><span class="ss-label">订单金额</span><span class="ss-val">¥28,000</span></div>
+              <div class="ss-row"><span class="ss-label">承制方实收</span><span class="ss-val" style="color:#389e0d">¥26,600</span></div>
+              <div class="ss-row"><span class="ss-label">平台服务费</span><span class="ss-val" style="color:#096dd9">¥1,400</span></div>
+              <div class="ss-row"><span class="ss-label">扣款主体</span><span class="ss-val">短剧制作中心 · 团队预算账户</span></div>
+              <div class="ss-row"><span class="ss-label">完成时间</span><span class="ss-val" id="step3Time">刚刚</span></div>
+            </div>
+            <div style="margin-top:18px;font-size:12px;color:#8c8c8c">
+              资产已沉淀：5 张主视觉 + 3 张衍生稿、PSD 源文件、版权信息已归档至「数字资产管理」<br>
+              账单可在「钱包 → 资金流水」查看；如需开发票，可在订单详情发起申请
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ml-foot" id="modalFoot">
+        <button class="btn" id="modalCancelBtn">取消</button>
+        <button class="btn primary large" id="modalNextBtn">下一步：执行分账 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 驳回 modal -->
+  <div class="modal-mask" id="rejectModal">
+    <div class="modal-large" style="max-width:520px">
+      <div class="ml-head" style="background:linear-gradient(135deg,#ff4d4f,#cf1322)">
+        <h3>↩️ 驳回当前版本</h3>
+        <p>填写驳回原因和具体修改点；承制方收到通知后会进入下一轮修改。</p>
+      </div>
+      <div class="ml-body">
+        <div class="form-field" style="margin-bottom:14px">
+          <label style="display:block;font-size:13px;color:#595959;margin-bottom:6px">驳回原因（必填）</label>
+          <textarea class="feedback-textarea" id="rejectReason" placeholder="例如：色调没问题了，但主角表情..." style="min-height:60px"></textarea>
+        </div>
+        <div class="form-field">
+          <label style="display:block;font-size:13px;color:#595959;margin-bottom:6px">具体修改点（每行一条）</label>
+          <textarea class="feedback-textarea" id="rejectChanges" placeholder="例如：&#10;主角表情自然化&#10;眼神锐度提升" style="min-height:80px"></textarea>
+        </div>
+      </div>
+      <div class="ml-foot">
+        <button class="btn" onclick="document.getElementById('rejectModal').classList.remove('open')">取消</button>
+        <button class="btn danger large" id="confirmRejectBtn">确认驳回</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastWrap" class="toasts"></div>
+
+  <!-- 共享底座 -->
+  <script src="_shared.js"></script>
+  <script>SharedHeader.mount({ activeNav: "project-space" });</script>
+
+  <!-- 项目列表 + 切换 -->
+  <script>
+  (function () {
+    var PROJECTS = [
+      { id: "OD-2026042307", demandId: "DM-2026042103", name: "新剧 IP 海报系列", cat: "图片设计 / 海报设计", contractor: "星辰创作工作室", amount: 28000, payer: "短剧制作中心 · 团队预算账户", deadline: "2026-04-30", daysLeft: 3, version: "V3", stage: "待验收", stageIcon: "⏳", status: "in-progress", statusLabel: "制作中", progress: 3, members: "昭岚 / 王编辑 / 李设计", revisions: 2 },
+      { id: "OD-2026042009", demandId: "DM-2026041807", name: "广告片配音", cat: "内容创作 / 配音", contractor: "声海传媒", amount: 8000, payer: "市场宣传组 · 团队预算账户", deadline: "2026-04-25", daysLeft: 0, version: "V1", stage: "已完成", stageIcon: "✅", status: "completed", statusLabel: "已完成", progress: 5, members: "陈思齐 / 声优A", revisions: 0 },
+      { id: "OD-2026041401", demandId: "DM-2026041302", name: "IP 形象设计", cat: "图片设计 / IP 形象", contractor: "色彩工坊", amount: 15000, payer: "短剧制作中心 · 团队预算账户", deadline: "2026-04-22", daysLeft: 0, version: "V2", stage: "已完成", stageIcon: "✅", status: "completed", statusLabel: "已完成", progress: 5, members: "昭岚 / 李设计", revisions: 1 }
+    ];
+
+    var urlParams = new URLSearchParams(location.search);
+    var currentProjectId = urlParams.get("orderId") || PROJECTS[0].id;
+
+    function renderSwitcher() {
+      var el = document.getElementById("projectSwitcher");
+      el.innerHTML = PROJECTS.map(function (p) {
+        var stCls = p.status === "completed" ? "completed" : (p.stage.indexOf("验收") >= 0 ? "review" : "in-progress");
+        return '<div class="project-card ' + (p.id === currentProjectId ? "active" : "") + '" data-pid="' + p.id + '">'
+          + '<div class="pc-name">' + p.name + '</div>'
+          + '<div class="pc-id">' + p.id + ' · ' + p.contractor + '</div>'
+          + '<div class="pc-meta"><span class="pc-status ' + stCls + '">' + p.stageIcon + ' ' + p.stage + '</span><span>' + window.fmtMoney(p.amount) + '</span></div>'
+          + '</div>';
+      }).join("");
+
+      el.querySelectorAll(".project-card").forEach(function (card) {
+        card.addEventListener("click", function () {
+          currentProjectId = card.getAttribute("data-pid");
+          renderSwitcher();
+          renderBanner();
+        });
+      });
+    }
+
+    function renderBanner() {
+      var p = PROJECTS.find(function (x) { return x.id === currentProjectId; });
+      if (!p) return;
+
+      var banner = document.getElementById("orderBanner");
+      banner.className = "order-banner" + (p.status === "completed" ? " completed" : "");
+      document.getElementById("obOrderId").textContent = p.id;
+      document.getElementById("obCat").textContent = p.cat;
+      document.getElementById("obProjectName").textContent = p.name;
+      document.getElementById("obContractor").textContent = "⭐ " + p.contractor;
+      document.getElementById("obAmount").textContent = window.fmtMoney(p.amount);
+      document.getElementById("obPayer").textContent = p.payer;
+      document.getElementById("obDeadline").textContent = p.deadline + (p.daysLeft > 0 ? " · 剩 " + p.daysLeft + " 天" : "");
+      document.getElementById("obStage").textContent = p.stageIcon + " " + p.stage;
+
+      var steps = document.querySelectorAll(".progress-step");
+      steps.forEach(function (s, i) {
+        var step = i + 1;
+        s.className = "progress-step" + (step < p.progress ? " done" : "") + (step === p.progress ? " current" : "");
+        s.querySelector(".ps-icon").textContent = step < p.progress ? "✓" : String(step);
+      });
+      if (p.status === "completed") {
+        steps.forEach(function (s) { s.className = "progress-step done"; s.querySelector(".ps-icon").textContent = "✓"; });
+      }
+
+      document.getElementById("daysRemain").textContent = p.daysLeft > 0 ? p.daysLeft + " 天" : "已到期";
+      document.getElementById("daysRemain").className = "ki-val" + (p.daysLeft > 0 && p.daysLeft <= 3 ? " urgent" : "");
+
+      var isCompleted = p.status === "completed";
+      var footerBar = document.querySelector(".footer-bar");
+      if (footerBar) footerBar.style.display = isCompleted ? "none" : "";
+    }
+
+    renderSwitcher();
+    renderBanner();
+  })();
+  </script>
+
+  <!-- Tab 切换 -->
+  <script>
+  (function () {
+    document.querySelectorAll(".tab-item").forEach(el => {
+      el.addEventListener("click", () => {
+        const target = el.getAttribute("data-tab");
+        document.querySelectorAll(".tab-item").forEach(x => x.classList.remove("active"));
+        document.querySelectorAll(".tab-pane").forEach(x => x.classList.remove("active"));
+        el.classList.add("active");
+        document.querySelector('.tab-pane[data-pane="' + target + '"]').classList.add("active");
+      });
+    });
+  })();
+  </script>
+
+  <!-- 验收 + 分账 modal -->
+  <script>
+  (function () {
+    const $ = (id) => document.getElementById(id);
+    const modal = $("reviewModal");
+    let currentStep = 1;
+    const orderId = "OD-2026042307";
+    const orderAmount = 28000;
+    const platformFeeRate = 0.05;
+    const platformFee = orderAmount * platformFeeRate;
+    const contractorIncome = orderAmount - platformFee;
+
+    // 评分交互
+    const ratings = {};
+    document.querySelectorAll(".rate-stars").forEach(group => {
+      const key = group.getAttribute("data-rate-key");
+      ratings[key] = 5; // 默认全 5 星
+      group.querySelectorAll(".star").forEach((s, i) => {
+        if (i < ratings[key]) s.classList.add("filled");
+        s.addEventListener("click", () => {
+          ratings[key] = Number(s.getAttribute("data-v"));
+          group.querySelectorAll(".star").forEach((x, ii) => x.classList.toggle("filled", ii < ratings[key]));
+        });
+      });
+    });
+
+    function openModal() {
+      currentStep = 1;
+      showStep(1);
+      modal.classList.add("open");
+    }
+    function closeModal() { modal.classList.remove("open"); }
+    function showStep(n) {
+      document.querySelectorAll(".review-step").forEach(s => s.classList.remove("active"));
+      document.querySelector('.review-step[data-step="' + n + '"]').classList.add("active");
+      const foot = $("modalFoot");
+      const cancelBtn = $("modalCancelBtn");
+      const nextBtn = $("modalNextBtn");
+      if (n === 1) {
+        cancelBtn.style.display = "";
+        nextBtn.style.display = "";
+        nextBtn.textContent = "下一步：执行分账 →";
+        nextBtn.className = "btn primary large";
+      } else if (n === 2) {
+        cancelBtn.style.display = "none";
+        nextBtn.style.display = "";
+        nextBtn.textContent = "完成 ✓";
+        nextBtn.className = "btn success large";
+        nextBtn.disabled = true;
+        // 触发分账动画
+        playSettlementAnimation();
+      } else if (n === 3) {
+        cancelBtn.style.display = "none";
+        nextBtn.style.display = "";
+        nextBtn.textContent = "查看资金流水 →";
+        nextBtn.className = "btn primary large";
+        nextBtn.disabled = false;
+      }
+    }
+    function playSettlementAnimation() {
+      const source = $("settleSource");
+      const arrow = $("settleArrow");
+      const contractor = $("settleContractor");
+      const platform = $("settlePlatform");
+      const note = $("settleNote");
+      // 动画序列
+      setTimeout(() => arrow.classList.add("show"), 400);
+      setTimeout(() => source.classList.add("released"), 900);
+      setTimeout(() => contractor.classList.add("show"), 1200);
+      setTimeout(() => platform.classList.add("show"), 1500);
+      setTimeout(() => { note.style.display = "block"; $("modalNextBtn").disabled = false; }, 2000);
+    }
+
+    function executeSettlement() {
+      // 真实更新 mock 数据：释放锁定金额、写流水、更新订单状态
+      const orders = window.demoApp.getOrders();
+      const o = orders.find(x => x.id === orderId);
+      if (o) {
+        const wallets = window.demoApp.getWallets();
+        if (wallets[o.payerWalletKey || "team-budget-cf-drama"]) {
+          const w = wallets[o.payerWalletKey || "team-budget-cf-drama"];
+          w.lockedAmount = Math.max(0, (w.lockedAmount || 0) - orderAmount);
+          window.demoApp.setWallets(wallets);
+        }
+        window.demoApp.updateOrder(orderId, { status: "completed", completedTime: new Date().toLocaleString("zh-CN") });
+        window.demoApp.updateDemand(o.demandId || "DM-2026042103", { status: "completed" });
+      }
+      const now = new Date();
+      const tStr = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0") + " " + String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
+      window.demoApp.addFlow({ id: "F-S" + Date.now(), time: tStr, type: "settle", desc: "订单结算分账 - " + orderId + "「新剧 IP 海报系列」", account: "team-budget-cf-drama", amount: -orderAmount, operator: "系统" });
+      window.demoApp.addFlow({ id: "F-S" + Date.now() + "c", time: tStr, type: "settle", desc: "承制方实际入账（订单 " + orderId + "）", account: "team-budget-cf-drama", amount: 0, lockedNote: "→ 星辰创作 " + window.fmtMoney(contractorIncome), operator: "系统" });
+      window.demoApp.addFlow({ id: "F-S" + Date.now() + "p", time: tStr, type: "settle", desc: "平台服务费 5% - " + orderId, account: "enterprise-main-cf", amount: 0, lockedNote: "→ 平台服务费 " + window.fmtMoney(platformFee), operator: "系统" });
+      $("step3Time").textContent = tStr;
+    }
+
+    $("modalNextBtn").addEventListener("click", () => {
+      if (currentStep === 1) { currentStep = 2; showStep(2); }
+      else if (currentStep === 2) { executeSettlement(); currentStep = 3; showStep(3); }
+      else if (currentStep === 3) { closeModal(); window.demoToast("已结算 · 即将跳转钱包", "ok"); setTimeout(() => location.href = "wallet-overview.html", 800); }
+    });
+    $("modalCancelBtn").addEventListener("click", closeModal);
+
+    $("approveVersionBtn").addEventListener("click", openModal);
+    $("footerApproveBtn").addEventListener("click", openModal);
+
+    // 驳回 modal
+    $("rejectVersionBtn").addEventListener("click", () => $("rejectModal").classList.add("open"));
+    $("footerRejectBtn").addEventListener("click", () => $("rejectModal").classList.add("open"));
+    $("confirmRejectBtn").addEventListener("click", () => {
+      const reason = $("rejectReason").value.trim();
+      if (!reason) { window.demoToast("请填写驳回原因", "err"); return; }
+      $("rejectModal").classList.remove("open");
+      window.demoToast("✅ 已驳回 V3，承制方将收到通知（模拟下版本）", "ok");
+    });
+
+    // 沟通发送
+    $("sendChatBtn").addEventListener("click", () => {
+      const v = $("chatInput").value.trim();
+      if (!v) return;
+      const area = $("chatArea");
+      const div = document.createElement("div");
+      div.className = "chat-msg demander";
+      div.innerHTML = '<div class="chat-avatar">🌸</div><div><div class="chat-bubble">' + v.replace(/</g, "&lt;") + '</div><div class="chat-meta">昭岚 · 刚刚</div></div>';
+      area.appendChild(div);
+      $("chatInput").value = "";
+      area.scrollTop = area.scrollHeight;
+      window.demoToast("已发送（mock）", "info");
+    });
+
+    // 版本筛选
+    $("versionFilter").addEventListener("change", e => {
+      const val = e.target.value;
+      document.querySelectorAll(".version-card").forEach(c => {
+        if (val === "all") c.style.display = "";
+        else if (val === "latest") c.style.display = c.classList.contains("current") ? "" : "none";
+        else if (val === "rejected") c.style.display = c.classList.contains("rejected") ? "" : "none";
+      });
+    });
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>创作门户首页（需求方）- 骋风天合 · 创作门户交易平台</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #262626; }
+
+    /* ===== 顶部全局栏 ===== */
+    .topbar { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.06); z-index: 200; display: flex; align-items: center; padding: 0 20px; gap: 16px; }
+    .topbar .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 16px; color: #1890ff; text-decoration: none; min-width: 220px; }
+    .topbar .brand-sub { color: #8c8c8c; font-weight: 400; font-size: 12px; margin-left: 4px; }
+
+    /* 空间切换器 */
+    .ws-switcher { position: relative; }
+    .ws-trigger { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid #e8e8e8; border-radius: 6px; background: #fafafa; cursor: pointer; font-size: 13px; min-width: 240px; }
+    .ws-trigger:hover { border-color: #1890ff; background: #e6f7ff; }
+    .ws-trigger .ws-icon { font-size: 14px; }
+    .ws-trigger .ws-name { font-weight: 500; color: #262626; flex: 1; }
+    .ws-trigger .ws-arrow { color: #8c8c8c; font-size: 10px; }
+    .ws-dropdown { display: none; position: absolute; top: calc(100% + 6px); left: 0; min-width: 320px; background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,.12); padding: 8px; z-index: 300; }
+    .ws-dropdown.open { display: block; }
+    .ws-group-label { font-size: 12px; color: #8c8c8c; padding: 6px 10px; }
+    .ws-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+    .ws-item:hover { background: #f0f7ff; }
+    .ws-item.active { background: #e6f7ff; }
+    .ws-item .ws-item-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .ws-item .ws-item-icon.personal { background: #fff7e6; color: #fa8c16; }
+    .ws-item .ws-item-icon.team { background: #e6f7ff; color: #1890ff; }
+    .ws-item .ws-item-icon.admin { background: #f9f0ff; color: #722ed1; }
+    .ws-item .ws-item-main { flex: 1; min-width: 0; }
+    .ws-item .ws-item-name { font-weight: 500; color: #262626; }
+    .ws-item .ws-item-desc { font-size: 12px; color: #8c8c8c; margin-top: 2px; }
+    .ws-item .ws-item-check { color: #1890ff; font-size: 14px; }
+
+    /* 身份切换 */
+    .identity-switch { display: flex; gap: 4px; background: #f0f0f0; border-radius: 18px; padding: 3px; }
+    .identity-switch button { border: none; background: transparent; padding: 5px 14px; border-radius: 16px; font-size: 13px; color: #595959; cursor: pointer; }
+    .identity-switch button.active { background: #fff; color: #1890ff; box-shadow: 0 1px 2px rgba(0,0,0,.06); font-weight: 500; }
+
+    /* 钱包 chip */
+    .wallet-chip { display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: linear-gradient(135deg, #fff7e6, #fff1d6); border: 1px solid #ffd591; border-radius: 18px; cursor: pointer; font-size: 13px; color: #d46b08; text-decoration: none; }
+    .wallet-chip:hover { border-color: #fa8c16; box-shadow: 0 2px 6px rgba(250,140,22,.18); }
+    .wallet-chip .wallet-amount { font-weight: 600; font-size: 14px; }
+    .wallet-chip .wallet-account { font-size: 11px; opacity: .85; }
+
+    /* 头像下拉 */
+    .avatar-wrap { position: relative; margin-left: auto; }
+    .avatar-trigger { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px 8px; border-radius: 18px; }
+    .avatar-trigger:hover { background: #f5f5f5; }
+    .avatar-trigger img { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #f0f0f0; }
+    .avatar-trigger .avatar-name { font-size: 13px; color: #262626; }
+    .avatar-dropdown { display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 220px; background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,.12); padding: 8px; z-index: 300; }
+    .avatar-dropdown.open { display: block; }
+    .avatar-dropdown a { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 6px; color: #262626; text-decoration: none; font-size: 13px; }
+    .avatar-dropdown a:hover { background: #f0f7ff; color: #1890ff; }
+    .avatar-dropdown .divider { height: 1px; background: #f0f0f0; margin: 6px 4px; }
+
+    /* ===== 布局 ===== */
+    .app { display: flex; padding-top: 56px; min-height: 100vh; }
+    .sidebar { width: 200px; background: #fff; box-shadow: 2px 0 8px rgba(0,0,0,.06); position: fixed; top: 56px; left: 0; bottom: 0; padding: 16px 0; overflow-y: auto; }
+    .menu a { display: flex; align-items: center; gap: 10px; padding: 11px 24px; color: #262626; text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
+    .menu a:hover { background: #f0f7ff; color: #1890ff; }
+    .menu a.active { background: #e6f7ff; color: #1890ff; border-left-color: #1890ff; font-weight: 500; }
+    .menu-icon { width: 18px; text-align: center; }
+    .menu-group { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+    .menu-group-title { padding: 8px 24px; font-size: 11px; color: #8c8c8c; text-transform: uppercase; letter-spacing: .5px; }
+
+    .main { margin-left: 200px; flex: 1; padding: 24px 28px; }
+
+    /* ===== 欢迎区 ===== */
+    .welcome { background: linear-gradient(135deg, #1890ff 0%, #2f54eb 100%); border-radius: 12px; padding: 28px 32px; color: #fff; margin-bottom: 20px; position: relative; overflow: hidden; }
+    .welcome::after { content: ""; position: absolute; right: -40px; top: -40px; width: 200px; height: 200px; background: rgba(255,255,255,.08); border-radius: 50%; }
+    .welcome::before { content: ""; position: absolute; right: 60px; bottom: -60px; width: 140px; height: 140px; background: rgba(255,255,255,.06); border-radius: 50%; }
+    .welcome h1 { margin: 0 0 6px; font-size: 22px; font-weight: 600; position: relative; z-index: 2; }
+    .welcome .welcome-sub { font-size: 13px; opacity: .9; position: relative; z-index: 2; }
+    .welcome .ws-info-strip { margin-top: 14px; display: flex; gap: 24px; position: relative; z-index: 2; flex-wrap: wrap; }
+    .welcome .ws-info { display: flex; align-items: center; gap: 6px; font-size: 13px; opacity: .92; }
+    .welcome .ws-info-label { opacity: .75; }
+    .welcome .ws-info-value { font-weight: 500; }
+
+    /* ===== 入口卡片 ===== */
+    .section-title { font-size: 14px; color: #8c8c8c; margin: 8px 0 12px; padding: 0 4px; display: flex; align-items: center; gap: 8px; }
+    .section-title::before { content: ""; width: 3px; height: 14px; background: #1890ff; border-radius: 2px; }
+    .entry-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+    .entry-card { background: #fff; border-radius: 12px; padding: 22px; cursor: pointer; transition: all .2s; border: 1px solid transparent; box-shadow: 0 2px 6px rgba(0,0,0,.04); position: relative; overflow: hidden; }
+    .entry-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(24,144,255,.15); border-color: #91d5ff; }
+    .entry-card .entry-icon { font-size: 30px; margin-bottom: 10px; display: block; }
+    .entry-card .entry-name { font-size: 16px; font-weight: 600; color: #262626; margin-bottom: 4px; }
+    .entry-card .entry-desc { font-size: 12px; color: #8c8c8c; line-height: 1.6; }
+    .entry-card .entry-stat { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #f0f0f0; display: flex; justify-content: space-between; font-size: 12px; }
+    .entry-card .entry-stat .stat-label { color: #8c8c8c; }
+    .entry-card .entry-stat .stat-value { color: #1890ff; font-weight: 600; }
+    .entry-card.publish { background: linear-gradient(135deg, #fff, #fff7e6); }
+    .entry-card.mine { background: linear-gradient(135deg, #fff, #f6ffed); }
+    .entry-card.market { background: linear-gradient(135deg, #fff, #fff0f6); }
+    .entry-card.collab { background: linear-gradient(135deg, #fff, #f9f0ff); }
+
+    /* ===== 信息双列 ===== */
+    .info-row { display: grid; grid-template-columns: 1.4fr 1fr; gap: 14px; }
+    .panel { background: #fff; border-radius: 8px; padding: 18px 20px; box-shadow: 0 2px 6px rgba(0,0,0,.04); }
+    .panel h3 { margin: 0 0 12px; font-size: 15px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+    .panel h3 a { font-size: 12px; color: #1890ff; text-decoration: none; font-weight: 400; }
+    .panel h3 a:hover { text-decoration: underline; }
+    .timeline { position: relative; padding-left: 18px; }
+    .timeline::before { content: ""; position: absolute; left: 5px; top: 6px; bottom: 6px; width: 2px; background: #f0f0f0; }
+    .timeline-item { position: relative; padding: 10px 0 10px 8px; font-size: 13px; }
+    .timeline-item::before { content: ""; position: absolute; left: -16px; top: 14px; width: 8px; height: 8px; border-radius: 50%; background: #1890ff; box-shadow: 0 0 0 3px #fff; }
+    .timeline-item.warn::before { background: #fa8c16; }
+    .timeline-item.ok::before { background: #52c41a; }
+    .timeline-item .ti-title { color: #262626; }
+    .timeline-item .ti-time { color: #8c8c8c; font-size: 12px; margin-left: 6px; }
+    .timeline-item .ti-desc { font-size: 12px; color: #8c8c8c; margin-top: 2px; }
+
+    .todo-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px dashed #f0f0f0; font-size: 13px; }
+    .todo-item:last-child { border-bottom: none; }
+    .todo-tag { font-size: 11px; padding: 2px 8px; border-radius: 4px; flex-shrink: 0; }
+    .todo-tag.urgent { background: #fff1f0; color: #cf1322; }
+    .todo-tag.normal { background: #e6f7ff; color: #1890ff; }
+    .todo-tag.review { background: #fff7e6; color: #d46b08; }
+    .todo-item .todo-text { flex: 1; }
+    .todo-item .todo-action { font-size: 12px; color: #1890ff; cursor: pointer; }
+    .todo-item .todo-action:hover { text-decoration: underline; }
+
+    /* ===== Toast ===== */
+    .toasts { position: fixed; top: 72px; right: 20px; width: min(90vw, 360px); display: grid; gap: 8px; z-index: 500; }
+    .toast { background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; padding: 10px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.1); animation: slideIn .25s ease-out; }
+    .toast.ok { border-color: #b7eb8f; background: #f6ffed; color: #389e0d; }
+    .toast.err { border-color: #ffccc7; background: #fff2f0; color: #cf1322; }
+    .toast.warn { border-color: #ffe58f; background: #fffbe6; color: #d48806; }
+    .toast.info { border-color: #91d5ff; background: #e6f7ff; color: #096dd9; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+    /* ===== 响应式 ===== */
+    @media (max-width: 1100px) {
+      .entry-grid { grid-template-columns: repeat(2, 1fr); }
+      .info-row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .ws-trigger { min-width: auto; }
+      .topbar .brand-sub { display: none; }
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 16px; }
+      .entry-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- ===== 顶部全局栏（由 _shared.js 注入） ===== -->
+  <header class="topbar" id="topbar-shared"></header>
+
+  <div class="app">
+    <!-- ===== 侧边栏 ===== -->
+    <aside class="sidebar" id="sidebar">
+      <nav class="menu" id="menu">
+        <a href="platform-home-demander.html" class="active"><span class="menu-icon">🏠</span> 工作台</a>
+        <a href="demand-publish.html"><span class="menu-icon">📤</span> 发布需求</a>
+        <a href="demand-list.html"><span class="menu-icon">📋</span> 我的需求</a>
+        <a href="contractor-marketplace.html"><span class="menu-icon">🏪</span> 承制方广场</a>
+        <a href="project-space.html"><span class="menu-icon">🤝</span> 项目协同空间</a>
+        <a href="wallet-overview.html"><span class="menu-icon">💰</span> 钱包与结算</a>
+        <div class="menu-group">
+          <div class="menu-group-title">账户</div>
+          <a href="account-basic-info-prototype-platform-style.html"><span class="menu-icon">⚙️</span> 账户中心</a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- ===== 主内容 ===== -->
+    <main class="main">
+      <!-- 欢迎区 -->
+      <section class="welcome">
+        <h1 id="welcomeTitle">欢迎回来，昭岚 👋</h1>
+        <div class="welcome-sub" id="welcomeSub">骋风天合 · 短剧制作中心 · 制作主管</div>
+        <div class="ws-info-strip">
+          <div class="ws-info">
+            <span class="ws-info-label">当前空间</span>
+            <span class="ws-info-value" id="welcomeWs">骋风天合 · 短剧制作中心</span>
+          </div>
+          <div class="ws-info">
+            <span class="ws-info-label">绑定账户</span>
+            <span class="ws-info-value" id="welcomeAccount">团队预算账户 ¥185,000</span>
+          </div>
+          <div class="ws-info">
+            <span class="ws-info-label">下单后扣款主体</span>
+            <span class="ws-info-value" id="welcomePayer">本团队预算账户</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 入口卡片 -->
+      <div class="section-title">业务入口</div>
+      <div class="entry-grid">
+        <div class="entry-card publish" onclick="location.href='demand-publish.html'">
+          <span class="entry-icon">📤</span>
+          <div class="entry-name">发布需求</div>
+          <div class="entry-desc">视频 / 文案 / 图片 / 资质 / 内容创作，全类目可选</div>
+          <div class="entry-stat">
+            <span class="stat-label">本月已发布</span>
+            <span class="stat-value" id="statPublished">5 单</span>
+          </div>
+        </div>
+        <div class="entry-card mine" onclick="location.href='demand-list.html'">
+          <span class="entry-icon">📋</span>
+          <div class="entry-name">我的需求</div>
+          <div class="entry-desc">需求审核 · 报价对比 · 订单履约 · 验收结算 全程可见</div>
+          <div class="entry-stat">
+            <span class="stat-label">进行中</span>
+            <span class="stat-value" id="statOngoing">3 单</span>
+          </div>
+        </div>
+        <div class="entry-card market" onclick="location.href='contractor-marketplace.html'">
+          <span class="entry-icon">🏪</span>
+          <div class="entry-name">承制方广场</div>
+          <div class="entry-desc">浏览入驻承制方能力、案例、报价区间，主动邀请合作</div>
+          <div class="entry-stat">
+            <span class="stat-label">入驻承制方</span>
+            <span class="stat-value">238 家</span>
+          </div>
+        </div>
+        <div class="entry-card collab" onclick="location.href='project-space.html'">
+          <span class="entry-icon">🤝</span>
+          <div class="entry-name">项目协同空间</div>
+          <div class="entry-desc">订单成立后进入：需求 / 素材 / 版本 / 沟通 / 验收 一条龙</div>
+          <div class="entry-stat">
+            <span class="stat-label">进行中空间</span>
+            <span class="stat-value">3 个</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 信息双列 -->
+      <div class="info-row">
+        <section class="panel">
+          <h3>近期动态 <a href="demand-list.html">查看全部 →</a></h3>
+          <div class="timeline" id="timelineList">
+            <div class="timeline-item ok">
+              <div class="ti-title">需求 #DM-2026042512「3 集短剧解说视频」已撮合 4 家承制方报价<span class="ti-time">12 分钟前</span></div>
+              <div class="ti-desc">建议尽快进入「报价对比」选定合作方</div>
+            </div>
+            <div class="timeline-item warn">
+              <div class="ti-title">订单 #OD-2026042307 进入 V3 版本待验收<span class="ti-time">2 小时前</span></div>
+              <div class="ti-desc">承制方：星辰创作工作室</div>
+            </div>
+            <div class="timeline-item">
+              <div class="ti-title">需求 #DM-2026042214 已通过平台核定<span class="ti-time">昨天 18:30</span></div>
+              <div class="ti-desc">已进入推荐承制方阶段，预计 24h 内出报价</div>
+            </div>
+            <div class="timeline-item">
+              <div class="ti-title">骋风天合 · 短剧制作中心 团队预算 +¥50,000<span class="ti-time">昨天 14:20</span></div>
+              <div class="ti-desc">由「企业管理员」从企业主账户划拨</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h3>待办事项 <span style="font-size:12px;color:#8c8c8c;font-weight:400" id="todoCount">3 项</span></h3>
+          <div id="todoList">
+            <div class="todo-item">
+              <span class="todo-tag urgent">紧急</span>
+              <span class="todo-text">4 家承制方报价已到，请尽快选定</span>
+              <span class="todo-action" onclick="location.href='demand-quote-comparison.html'">去对比 →</span>
+            </div>
+            <div class="todo-item">
+              <span class="todo-tag review">待验收</span>
+              <span class="todo-text">订单 OD-2026042307 V3 待验收</span>
+              <span class="todo-action" onclick="location.href='project-space.html?orderId=OD-2026042307'">去查看 →</span>
+            </div>
+            <div class="todo-item">
+              <span class="todo-tag normal">提示</span>
+              <span class="todo-text">IP 孵化组 暂未配置预算账户</span>
+              <span class="todo-action" onclick="location.href='wallet-overview.html'">去配置 →</span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div id="toastWrap" class="toasts"></div>
+
+  <!-- ===== 共享底座 ===== -->
+  <script src="_shared.js"></script>
+
+  <!-- ===== 旧的内联 mock + helpers 已迁移到 _shared.js，下面这段是历史保留，无影响 ===== -->
+  <script>
+  (function () {
+    "use strict";
+    if (true) return; // 跳过旧内联块（保留供 git diff 时对照）
+    const WORKSPACES = {
+      "personal": {
+        id: "personal",
+        name: "个人空间",
+        shortName: "个人空间",
+        type: "personal",
+        icon: "👤",
+        iconClass: "personal",
+        accountType: "个人账户",
+        accountBalance: 3200,
+        payerLabel: "个人账户",
+        roleLabel: "个人创作者",
+        canPublish: true,
+        canViewMarket: true,
+        // 这个空间下下单时，扣款主体
+        payer: { type: "personal", name: "个人账户", balance: 3200 }
+      },
+      "cf-drama": {
+        id: "cf-drama",
+        name: "骋风天合 · 短剧制作中心",
+        shortName: "骋风天合·短剧组",
+        type: "team",
+        icon: "🎬",
+        iconClass: "team",
+        accountType: "团队预算账户",
+        accountBalance: 185000,
+        payerLabel: "本团队预算账户",
+        roleLabel: "制作主管",
+        enterpriseName: "骋风天合",
+        canPublish: true,
+        canViewMarket: true,
+        payer: { type: "team-budget", name: "短剧制作中心 - 团队预算账户", balance: 185000 }
+      },
+      "cf-marketing": {
+        id: "cf-marketing",
+        name: "骋风天合 · 市场宣传组",
+        shortName: "骋风天合·市场组",
+        type: "team",
+        icon: "📢",
+        iconClass: "team",
+        accountType: "团队预算账户",
+        accountBalance: 62000,
+        payerLabel: "本团队预算账户",
+        roleLabel: "市场专员",
+        enterpriseName: "骋风天合",
+        canPublish: true,
+        canViewMarket: true,
+        payer: { type: "team-budget", name: "市场宣传组 - 团队预算账户", balance: 62000 }
+      },
+      "cf-ip": {
+        id: "cf-ip",
+        name: "骋风天合 · IP 孵化组",
+        shortName: "骋风天合·IP 组",
+        type: "team",
+        icon: "💎",
+        iconClass: "team",
+        accountType: "（未配置 → 走企业主账户）",
+        accountBalance: 1250000,
+        payerLabel: "回退至企业主账户",
+        roleLabel: "IP 主理人",
+        enterpriseName: "骋风天合",
+        canPublish: true,
+        canViewMarket: true,
+        budgetMissing: true,
+        payer: { type: "enterprise-main", name: "骋风天合 - 企业主账户（团队未配预算回退）", balance: 1250000 }
+      },
+      "cf-admin": {
+        id: "cf-admin",
+        name: "骋风天合 · 企业管理员视角",
+        shortName: "骋风天合·管理员",
+        type: "admin",
+        icon: "👑",
+        iconClass: "admin",
+        accountType: "企业主账户",
+        accountBalance: 1250000,
+        payerLabel: "企业主账户",
+        roleLabel: "企业管理员",
+        enterpriseName: "骋风天合",
+        canPublish: false,
+        canViewMarket: true,
+        canAllocateBudget: true,
+        payer: { type: "enterprise-main", name: "骋风天合 - 企业主账户", balance: 1250000 }
+      }
+    };
+
+    // ============================================================
+    // 默认 mock 数据
+    // ============================================================
+    const defaultDemands = [
+      { id: "DM-2026042512", title: "三集短剧解说视频（修仙题材）", category: "视频制作 / 解说视频", workspace: "cf-drama", status: "quoting", quotesCount: 4, budget: 18000, createTime: "2026-04-25 15:32", deadline: "2026-05-08" },
+      { id: "DM-2026042214", title: "品牌宣传短片脚本", category: "文案服务 / 营销文案", workspace: "cf-marketing", status: "matching", quotesCount: 0, budget: 5000, createTime: "2026-04-22 09:14", deadline: "2026-05-02" },
+      { id: "DM-2026042103", title: "新剧 IP 海报系列", category: "图片设计 / 海报", workspace: "cf-drama", status: "in-progress", quotesCount: 5, budget: 28000, contractor: "星辰创作工作室", createTime: "2026-04-21 11:00", deadline: "2026-04-30" },
+      { id: "DM-2026041807", title: "广告片配音", category: "内容创作 / 配音", workspace: "cf-marketing", status: "completed", quotesCount: 3, budget: 8000, contractor: "声海传媒", createTime: "2026-04-18 16:20", deadline: "2026-04-25" }
+    ];
+
+    const defaultOrders = [
+      { id: "OD-2026042307", demandId: "DM-2026042103", projectName: "新剧 IP 海报系列", contractor: "星辰创作工作室", workspace: "cf-drama", payerType: "team-budget", payerName: "短剧制作中心 - 团队预算账户", amount: 28000, status: "review-v3", createTime: "2026-04-23 10:00" },
+      { id: "OD-2026042009", demandId: "DM-2026041807", projectName: "广告片配音", contractor: "声海传媒", workspace: "cf-marketing", payerType: "team-budget", payerName: "市场宣传组 - 团队预算账户", amount: 8000, status: "completed", createTime: "2026-04-20 14:30" }
+    ];
+
+    // 钱包余额（按账户类型，不是按空间——空间引用账户）
+    const defaultWallets = {
+      "personal-account-lixueqin": { type: "personal", name: "昭岚 - 个人账户", balance: 3200, lockedAmount: 0 },
+      "team-budget-cf-drama": { type: "team-budget", name: "短剧制作中心 - 团队预算账户", balance: 185000, lockedAmount: 28000, allocated: 200000 },
+      "team-budget-cf-marketing": { type: "team-budget", name: "市场宣传组 - 团队预算账户", balance: 62000, lockedAmount: 8000, allocated: 70000 },
+      "enterprise-main-cf": { type: "enterprise-main", name: "骋风天合 - 企业主账户", balance: 1250000, lockedAmount: 0 }
+    };
+
+    // ============================================================
+    // 持久化
+    // ============================================================
+    const KEY = {
+      ws: "demoCurrentWorkspace",
+      identity: "demoCurrentIdentity",
+      demands: "demoDemands",
+      orders: "demoOrders",
+      wallets: "demoWallets"
+    };
+
+    function readJson(k, fallback) {
+      try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fallback; }
+      catch (_) { return fallback; }
+    }
+    function writeJson(k, v) {
+      try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) {}
+    }
+
+    function initDemoState() {
+      if (!localStorage.getItem(KEY.ws)) localStorage.setItem(KEY.ws, "cf-drama");
+      if (!localStorage.getItem(KEY.identity)) localStorage.setItem(KEY.identity, "demander");
+      if (!localStorage.getItem(KEY.demands)) writeJson(KEY.demands, defaultDemands);
+      if (!localStorage.getItem(KEY.orders)) writeJson(KEY.orders, defaultOrders);
+      if (!localStorage.getItem(KEY.wallets)) writeJson(KEY.wallets, defaultWallets);
+    }
+
+    // ============================================================
+    // 全局 demoApp 接口（其他页面也用这一份）
+    // ============================================================
+    window.demoApp = {
+      WORKSPACES,
+      KEY,
+      initDemoState,
+      getCurrentWorkspaceId: () => localStorage.getItem(KEY.ws) || "cf-drama",
+      getCurrentWorkspace: () => WORKSPACES[localStorage.getItem(KEY.ws) || "cf-drama"],
+      setCurrentWorkspace: (id) => { localStorage.setItem(KEY.ws, id); },
+      getCurrentIdentity: () => localStorage.getItem(KEY.identity) || "demander",
+      setCurrentIdentity: (v) => { localStorage.setItem(KEY.identity, v); },
+      getDemands: () => readJson(KEY.demands, []),
+      setDemands: (v) => writeJson(KEY.demands, v),
+      addDemand: (d) => { const list = readJson(KEY.demands, []); list.unshift(d); writeJson(KEY.demands, list); },
+      getOrders: () => readJson(KEY.orders, []),
+      setOrders: (v) => writeJson(KEY.orders, v),
+      addOrder: (o) => { const list = readJson(KEY.orders, []); list.unshift(o); writeJson(KEY.orders, list); },
+      getWallets: () => readJson(KEY.wallets, defaultWallets),
+      setWallets: (v) => writeJson(KEY.wallets, v),
+      // 重置 demo（在控制台 demoApp.reset() 即可）
+      reset: () => { Object.values(KEY).forEach((k) => localStorage.removeItem(k)); initDemoState(); location.reload(); }
+    };
+
+    // ============================================================
+    // Toast
+    // ============================================================
+    window.demoToast = function (msg, kind = "ok") {
+      const wrap = document.getElementById("toastWrap");
+      if (!wrap) { console.log("[toast]", kind, msg); return; }
+      const t = document.createElement("div");
+      t.className = "toast " + kind;
+      t.textContent = msg;
+      wrap.appendChild(t);
+      setTimeout(() => { t.style.opacity = "0"; t.style.transform = "translateX(20px)"; setTimeout(() => t.remove(), 280); }, 2400);
+    };
+
+    // ============================================================
+    // 数字格式化
+    // ============================================================
+    window.fmtMoney = function (n) {
+      if (n == null || isNaN(n)) return "¥0";
+      return "¥" + Number(n).toLocaleString("zh-CN", { maximumFractionDigits: 2 });
+    };
+
+    initDemoState();
+  })();
+  </script>
+
+  <!-- ===== 本页交互 ===== -->
+  <script>
+  (function () {
+    const $ = (id) => document.getElementById(id);
+
+    // ---- 工作空间切换器 ----
+    const wsTrigger = $("wsTrigger");
+    const wsDropdown = $("wsDropdown");
+    const wsName = $("wsName");
+    const wsIcon = $("wsIcon");
+
+    function refreshWsDisplay() {
+      const ws = window.demoApp.getCurrentWorkspace();
+      wsName.textContent = ws.name;
+      wsIcon.textContent = ws.icon;
+      // 钱包 chip
+      $("walletAmount").textContent = window.fmtMoney(ws.accountBalance);
+      $("walletAccount").textContent = ws.accountType;
+      // 欢迎区
+      $("welcomeWs").textContent = ws.name;
+      $("welcomeAccount").textContent = ws.accountType + " " + window.fmtMoney(ws.accountBalance);
+      $("welcomePayer").textContent = ws.payerLabel + (ws.budgetMissing ? "（团队未配预算回退）" : "");
+      $("welcomeSub").textContent = ws.name + " · " + ws.roleLabel;
+      // 选中态
+      document.querySelectorAll(".ws-item").forEach((el) => {
+        const isActive = el.getAttribute("data-ws") === ws.id;
+        el.classList.toggle("active", isActive);
+        const check = el.querySelector(".ws-item-check");
+        if (check) check.textContent = isActive ? "✓" : "";
+      });
+    }
+
+    wsTrigger.addEventListener("click", (e) => {
+      e.stopPropagation();
+      wsDropdown.classList.toggle("open");
+      $("avatarDropdown").classList.remove("open");
+    });
+    document.querySelectorAll(".ws-item").forEach((el) => {
+      el.addEventListener("click", () => {
+        const id = el.getAttribute("data-ws");
+        const ws = window.demoApp.WORKSPACES[id];
+        if (!ws) return;
+        window.demoApp.setCurrentWorkspace(id);
+        refreshWsDisplay();
+        wsDropdown.classList.remove("open");
+        window.demoToast("已切换到「" + ws.name + "」", "info");
+        if (ws.budgetMissing) {
+          setTimeout(() => window.demoToast("提示：该空间未配置预算，下单将回退至企业主账户", "warn"), 600);
+        }
+      });
+    });
+    document.addEventListener("click", () => {
+      wsDropdown.classList.remove("open");
+      $("avatarDropdown").classList.remove("open");
+    });
+
+    // ---- 身份切换 ----
+    const identitySwitch = $("identitySwitch");
+    function refreshIdentityDisplay() {
+      const id = window.demoApp.getCurrentIdentity();
+      identitySwitch.querySelectorAll("button").forEach((b) => {
+        b.classList.toggle("active", b.getAttribute("data-identity") === id);
+      });
+    }
+    identitySwitch.querySelectorAll("button").forEach((b) => {
+      b.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const next = b.getAttribute("data-identity");
+        const cur = window.demoApp.getCurrentIdentity();
+        if (next === cur) return;
+        window.demoApp.setCurrentIdentity(next);
+        refreshIdentityDisplay();
+        if (next === "contractor") {
+          window.demoToast("已切换为承制方，3 秒后跳转至承制方工作台...", "info");
+          setTimeout(() => window.demoToast("演示阶段承制方工作台未做，已重置为需求方", "warn"), 1800);
+          setTimeout(() => { window.demoApp.setCurrentIdentity("demander"); refreshIdentityDisplay(); }, 2400);
+        } else {
+          window.demoToast("已切换为需求方", "ok");
+        }
+      });
+    });
+
+    // ---- 头像下拉 ----
+    $("avatarTrigger").addEventListener("click", (e) => {
+      e.stopPropagation();
+      $("avatarDropdown").classList.toggle("open");
+      wsDropdown.classList.remove("open");
+    });
+
+    refreshWsDisplay();
+    refreshIdentityDisplay();
+  })();
+  </script>
+</body>
+</html>
