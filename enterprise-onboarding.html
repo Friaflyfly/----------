@@ -50,6 +50,8 @@
       border: 1px solid #d9d9d9; border-radius: 6px; padding: 9px 10px; font-size: 13px; font-family: inherit; transition: border .2s;
     }
     .form-item input:focus, .form-item select:focus, .form-item textarea:focus { border-color: #1890ff; outline: none; box-shadow: 0 0 0 2px rgba(24,144,255,.1); }
+    .sms-code-wrap { display: grid; grid-template-columns: 1fr 130px; gap: 8px; }
+    .sms-code-wrap .btn { height: 38px; justify-content: center; padding: 0 10px; }
 
     .upload-zone { border: 2px dashed #d9d9d9; border-radius: 8px; padding: 24px; text-align: center; color: #8c8c8c; font-size: 13px; cursor: pointer; transition: all .15s; }
     .upload-zone:hover { border-color: #1890ff; color: #1890ff; }
@@ -181,7 +183,7 @@
           ['法定代表人', '周总', true],
           ['注册地址', '北京市朝阳区建国路 88 号', false],
           ['企业管理员姓名', '昭岚', true],
-          ['管理员手机号', '138****6789', true],
+          ['管理员手机号', '13800138000', true],
           ['管理员邮箱', 'zhaolan@cf.com', true]
         ],
         typeSelect: '<div class="form-item"><label>企业类型</label><select><option>有限责任公司</option><option>股份有限公司</option><option>个体工商户</option></select></div>',
@@ -214,7 +216,7 @@
           ['团队名称', '星辰创作工作室', true],
           ['团队负责人姓名', '昭岚', true],
           ['负责人身份证号', '110105********1234', true],
-          ['负责人手机号', '138****6789', true],
+          ['负责人手机号', '13800138000', true],
           ['负责人邮箱', 'zhaolan@starlight.com', true]
         ],
         typeSelect: '',
@@ -244,7 +246,7 @@
         fields: [
           ['姓名', '昭岚', true],
           ['身份证号', '110105********1234', true],
-          ['手机号', '138****6789', true],
+          ['手机号', '13800138000', true],
           ['邮箱', 'zhaolan@qq.com', true]
         ],
         typeSelect: '',
@@ -275,15 +277,78 @@
     var bizCats = ['视频制作', '图片设计', '文案服务', '内容创作', '资质服务', '直播运营', 'IP 孵化', '短剧投资'];
     var selectedBiz = new Set(['视频制作', '图片设计', 'IP 孵化']);
     var chosenIdentity = '需求方 + 承制方';
+    var smsState = { code: '', expireAt: 0, timer: null, cooldown: 0 };
 
     function needsContractor() {
       return chosenIdentity.indexOf('承制方') !== -1;
     }
 
+    function normalizePhone(v) {
+      return String(v || '').replace(/\D/g, '');
+    }
+
+    function getPhoneInput() {
+      return document.querySelector('[data-field-role="phone"]');
+    }
+
+    function resetSmsState() {
+      if (smsState.timer) {
+        clearInterval(smsState.timer);
+        smsState.timer = null;
+      }
+      smsState.code = '';
+      smsState.expireAt = 0;
+      smsState.cooldown = 0;
+    }
+
+    function updateSmsButton() {
+      var btn = document.getElementById('smsCodeBtn');
+      if (!btn) return;
+      if (smsState.cooldown > 0) {
+        btn.disabled = true;
+        btn.textContent = '重新获取(' + smsState.cooldown + 's)';
+      } else {
+        btn.disabled = false;
+        btn.textContent = '获取验证码';
+      }
+    }
+
+    window.sendSmsCode = function () {
+      var phoneInput = getPhoneInput();
+      var phone = normalizePhone(phoneInput && phoneInput.value);
+      if (!/^1\d{10}$/.test(phone)) {
+        toast('请先输入有效的 11 位手机号', 'warn');
+        if (phoneInput) phoneInput.focus();
+        return;
+      }
+      smsState.code = String(Math.floor(100000 + Math.random() * 900000));
+      smsState.expireAt = Date.now() + 5 * 60 * 1000;
+      smsState.cooldown = 60;
+      updateSmsButton();
+      if (smsState.timer) clearInterval(smsState.timer);
+      smsState.timer = setInterval(function () {
+        smsState.cooldown -= 1;
+        if (smsState.cooldown <= 0) {
+          clearInterval(smsState.timer);
+          smsState.timer = null;
+          smsState.cooldown = 0;
+        }
+        updateSmsButton();
+      }, 1000);
+      toast('验证码已发送（demo：' + smsState.code + '）', 'info');
+    };
+
     function renderForm() {
       var c = CFG[curType];
+      resetSmsState();
       var fieldsHtml = c.fields.map(function (f) {
-        return '<div class="form-item"><label>' + f[0] + (f[2] ? ' <span class="req">*</span>' : '') + '</label><input value="' + f[1] + '"></div>';
+        var isPhone = f[0].indexOf('手机号') !== -1;
+        var inputHtml = '<input value="' + f[1] + '"' + (isPhone ? ' data-field-role="phone" placeholder="请输入手机号"' : '') + '>';
+        var html = '<div class="form-item"><label>' + f[0] + (f[2] ? ' <span class="req">*</span>' : '') + '</label>' + inputHtml + '</div>';
+        if (isPhone) {
+          html += '<div class="form-item"><label>短信验证码 <span class="req">*</span></label><div class="sms-code-wrap"><input id="smsCodeInput" placeholder="请输入验证码"><button type="button" class="btn" id="smsCodeBtn" onclick="sendSmsCode()">获取验证码</button></div></div>';
+        }
+        return html;
       }).join('') + c.typeSelect;
       fieldsHtml += '<div class="form-item full"><label>' + c.introLabel + '</label><textarea rows="3">' + c.introDefault + '</textarea></div>';
 
@@ -313,6 +378,7 @@
         + '<div class="actions"><button class="btn" onclick="toast(\'草稿已保存\', \'info\')">💾 保存草稿</button><button class="btn" onclick="skipOnboarding()" style="border-color:#faad14;color:#d48806">⏭ 跳过，稍后完善</button><button class="btn primary" onclick="submitOnboarding()">🚀 提交入驻申请</button></div>';
 
       renderBizCats();
+      updateSmsButton();
       var sel = document.getElementById('identitySelect');
       if (sel) {
         for (var i = 0; i < sel.options.length; i++) {
@@ -360,6 +426,16 @@
     };
 
     window.submitOnboarding = function () {
+      var phoneInput = getPhoneInput();
+      var phone = normalizePhone(phoneInput && phoneInput.value);
+      var codeInput = document.getElementById('smsCodeInput');
+      var code = codeInput ? String(codeInput.value || '').trim() : '';
+      if (!/^1\d{10}$/.test(phone)) { toast('请填写有效手机号', 'warn'); return; }
+      if (!smsState.code) { toast('请先获取短信验证码', 'warn'); return; }
+      if (Date.now() > smsState.expireAt) { toast('验证码已过期，请重新获取', 'warn'); return; }
+      if (!/^\d{6}$/.test(code)) { toast('请输入 6 位短信验证码', 'warn'); return; }
+      if (code !== smsState.code) { toast('短信验证码不正确', 'warn'); return; }
+
       var total = document.querySelectorAll('.check-mark').length;
       var done = document.querySelectorAll('.check-mark.done').length;
       if (done < total) { toast('请先完成确认清单中的所有项', 'warn'); return; }
