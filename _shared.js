@@ -74,7 +74,7 @@
       accountType: "企业主账户", accountBalance: 1250000,
       payerLabel: "企业主账户", roleLabel: "企业管理员",
       enterpriseName: "骋风天合",
-      canPublish: false, canViewMarket: true, canAllocateBudget: true,
+      canPublish: true, canViewMarket: true, canAllocateBudget: true,
       walletKey: "enterprise-main-cf",
       payer: { type: "enterprise-main", name: "骋风天合 - 企业主账户", balance: 1250000 }
     }

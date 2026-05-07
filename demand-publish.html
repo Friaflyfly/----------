@@ -66,7 +66,9 @@
     .menu-group { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
     .menu-group-title { padding: 8px 24px; font-size: 11px; color: #8c8c8c; text-transform: uppercase; letter-spacing: .5px; }
 
-    .main { margin-left: 200px; flex: 1; padding: 20px 24px 96px; display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+    .main { margin-left: 200px; flex: 1; padding: 20px 24px 96px; display: flex; flex-direction: column; gap: 14px; }
+    .publish-split { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; width: 100%; }
+    .publish-split__main { min-width: 0; display: flex; flex-direction: column; gap: 14px; }
 
     /* ===== 页头 ===== */
     .page-head { grid-column: 1 / -1; background: #fff; border-radius: 8px; padding: 18px 22px; box-shadow: 0 2px 6px rgba(0,0,0,.04); display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
@@ -83,6 +85,41 @@
     .step-num.done { background: #52c41a; }
     .step-title { font-size: 16px; font-weight: 600; margin: 0; }
     .step-tip { color: #8c8c8c; font-size: 12px; margin-left: auto; }
+
+    /* 发布方式：平台套餐 / 自定义 */
+    .mode-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 4px; }
+    .mode-card { border: 2px solid #e8e8e8; border-radius: 10px; padding: 18px 16px; cursor: pointer; transition: all .2s; background: #fff; }
+    .mode-card:hover { border-color: #91d5ff; box-shadow: 0 4px 12px rgba(24,144,255,.1); }
+    .mode-card.active { border-color: #1890ff; background: linear-gradient(180deg, #e6f7ff, #fff); box-shadow: 0 4px 14px rgba(24,144,255,.16); }
+    .mode-card .mode-icon { font-size: 32px; line-height: 1; }
+    .mode-card .mode-title { font-size: 16px; font-weight: 600; margin-top: 10px; color: #262626; }
+    .mode-card .mode-desc { font-size: 12px; color: #8c8c8c; margin-top: 6px; line-height: 1.55; }
+
+    /* SPU / SKU 目录 */
+    .spu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 14px; }
+    .spu-card { border: 1px solid #e8e8e8; border-radius: 10px; padding: 16px 18px; cursor: pointer; transition: all .15s; display: flex; gap: 14px; align-items: flex-start; }
+    .spu-card:hover { border-color: #91d5ff; }
+    .spu-card.active { border-color: #1890ff; background: linear-gradient(135deg, #f0f7ff, #fff); }
+    .spu-card .spu-icon { font-size: 36px; flex-shrink: 0; }
+    .spu-card .spu-name { font-size: 15px; font-weight: 600; color: #262626; }
+    .spu-card .spu-desc { font-size: 12px; color: #8c8c8c; margin-top: 4px; line-height: 1.5; }
+    .spu-card.disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
+    .sku-wrap { margin-top: 20px; padding-top: 18px; border-top: 1px dashed #f0f0f0; }
+    .sku-wrap h3 { margin: 0 0 12px; font-size: 14px; font-weight: 600; color: #595959; }
+    .sku-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .sku-card { border: 1px solid #e8e8e8; border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: all .15s; position: relative; background: #fff; }
+    .sku-card:hover { border-color: #52c41a; box-shadow: 0 2px 10px rgba(82,196,26,.12); }
+    .sku-card.active { border-color: #52c41a; background: linear-gradient(180deg, #f6ffed, #fff); box-shadow: 0 4px 14px rgba(82,196,26,.15); }
+    .sku-card .sku-badge { position: absolute; top: 10px; right: 10px; font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #fff7e6; color: #d46b08; }
+    .sku-card .sku-name { font-size: 15px; font-weight: 600; margin-bottom: 8px; padding-right: 56px; }
+    .sku-card .sku-qty { font-size: 22px; font-weight: 700; color: #1890ff; }
+    .sku-card .sku-qty span { font-size: 13px; font-weight: 500; color: #595959; margin-left: 2px; }
+    .sku-card .sku-price { font-size: 18px; font-weight: 700; color: #cf1322; margin: 6px 0 10px; }
+    .sku-card .sku-price small { font-size: 12px; color: #8c8c8c; font-weight: 400; }
+    .sku-card .sku-highlights { margin: 0; padding-left: 18px; font-size: 12px; color: #595959; line-height: 1.65; }
+    .sku-card .sku-delivery { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #f0f0f0; font-size: 12px; color: #096dd9; }
+    .pkg-readonly { background: #fafafa; border-radius: 6px; padding: 10px 12px; font-size: 13px; color: #262626; margin-bottom: 10px; border: 1px solid #f0f0f0; }
+    .pkg-readonly .k { color: #8c8c8c; font-size: 12px; margin-right: 6px; }
 
     /* 一级类目 */
     .l1-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
@@ -155,7 +192,7 @@
     .ref-add:hover { border-color: #1890ff; color: #1890ff; }
 
     /* ===== 右侧实时摘要 ===== */
-    .summary { position: sticky; top: 72px; background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,.04); padding: 18px 20px; max-height: calc(100vh - 96px); overflow-y: auto; }
+    .summary { position: sticky; top: 72px; align-self: start; background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,.04); padding: 18px 20px; max-height: min(calc(100vh - 96px), calc(100vh - 56px - 32px)); overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; min-height: 0; }
     .summary h3 { margin: 0 0 4px; font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
     .summary .summary-sub { font-size: 12px; color: #8c8c8c; margin-bottom: 14px; }
     .summary-section { margin-bottom: 14px; }
@@ -198,7 +235,8 @@
     /* ===== 响应式 ===== */
     @media (max-width: 1280px) {
       .main { grid-template-columns: minmax(0, 1fr); }
-      .summary { position: static; max-height: none; }
+      .publish-split { grid-template-columns: minmax(0, 1fr); }
+      .summary { position: static; max-height: none; align-self: stretch; }
       .l1-grid { grid-template-columns: repeat(3, 1fr); }
     }
     @media (max-width: 768px) {
@@ -209,6 +247,9 @@
       .l1-grid { grid-template-columns: repeat(2, 1fr); }
       .level-grid { grid-template-columns: repeat(2, 1fr); }
       .form-grid, .dyn-form { grid-template-columns: 1fr; }
+      .mode-row { grid-template-columns: 1fr; }
+      .spu-grid { grid-template-columns: 1fr; }
+      .sku-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -324,7 +365,45 @@
       <section class="page-head">
         <h1 class="title">📤 发布需求</h1>
         <span class="ws-chip" id="headWsChip">骋风天合 · 短剧制作中心</span>
-        <p class="sub" id="headSub">同一份需求模板会根据「类目 + 标签 + 服务等级」动态变形——不同类目，看到的是不同表单。</p>
+        <p class="sub" id="headSub">可先选「选平台套餐」明码标价下单，或走「自定义发布」沿用类目、标签与撮合流程。</p>
+      </section>
+
+      <div class="publish-split">
+        <div class="publish-split__main">
+
+      <!-- Step 0：发布方式 -->
+      <section class="step-card" id="stepMode">
+        <div class="step-head">
+          <div class="step-num done" id="stepNum0">✓</div>
+          <h2 class="step-title">发布方式</h2>
+          <span class="step-tip">平台套餐为固定价与交付规格；自定义发布与原有流程一致</span>
+        </div>
+        <div class="mode-row">
+          <div class="mode-card active" id="modePackage" data-mode="package" title="选平台套餐">
+            <div class="mode-icon">📦</div>
+            <div class="mode-title">选平台套餐</div>
+            <div class="mode-desc">平台标品服务（SPU）+ 档位（SKU），总价与交付周期按套餐锁定，下单带条款快照。</div>
+          </div>
+          <div class="mode-card" id="modeCustom" data-mode="custom" title="自定义发布">
+            <div class="mode-icon">✏️</div>
+            <div class="mode-title">自定义发布</div>
+            <div class="mode-desc">选择类目、标签、服务等级与专属字段，预算与交期自拟，平台审核后撮合报价。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 平台套餐：SPU + SKU（可扩展多 SPU） -->
+      <section class="step-card" id="packageFlow" style="display:none;">
+        <div class="step-head">
+          <div class="step-num" id="pkgStepIcon">📦</div>
+          <h2 class="step-title">选平台套餐</h2>
+          <span class="step-tip">先选服务类型（SPU），再选具体档位（SKU）</span>
+        </div>
+        <div class="spu-grid" id="spuGrid"></div>
+        <div class="sku-wrap" id="skuWrap" style="display:none;">
+          <h3 id="skuWrapTitle">选择套餐档位</h3>
+          <div class="sku-grid" id="skuGrid"></div>
+        </div>
       </section>
 
       <!-- 不可发布提示 -->
@@ -333,7 +412,7 @@
       </div>
 
       <!-- 左：表单 -->
-      <div>
+      <div id="leftCol">
         <!-- Step 1：类目选择 -->
         <section class="step-card" id="stepCategory">
           <div class="step-head">
@@ -401,7 +480,7 @@
               <label>详细描述<span class="req">*</span></label>
               <textarea id="fldDesc" maxlength="500" placeholder="包含：剧情概要 / 核心卖点 / 必须呈现的元素 / 必须避开的元素 / 参考案例链接等"></textarea>
             </div>
-            <div>
+            <div id="budgetFieldWrap">
               <label>预算范围（含税）<span class="req">*</span></label>
               <div class="budget-row">
                 <div class="input-suffix" style="flex:1;">
@@ -415,8 +494,9 @@
                 </div>
               </div>
             </div>
-            <div>
-              <label>期望交付时间<span class="req">*</span></label>
+            <div id="pkgMoneyRow" style="display:none;"></div>
+            <div id="deadlineFieldWrap">
+              <label id="fldDeadlineLabel">期望交付时间<span class="req">*</span></label>
               <input id="fldDeadline" type="text" placeholder="如 2026-05-15 / T+10 工作日">
             </div>
             <div class="full">
@@ -429,6 +509,8 @@
         </section>
       </div>
 
+    </div>
+
       <!-- 右：实时摘要 -->
       <aside class="summary" id="summary">
         <h3>📝 实时摘要</h3>
@@ -437,6 +519,14 @@
           <span class="p-dot"></span><span class="p-dot"></span><span class="p-dot"></span><span class="p-dot"></span><span class="p-dot"></span>
         </div>
 
+        <div class="summary-section" id="sumModeRow">
+          <div class="summary-key">发布方式</div>
+          <div class="summary-val" id="sumMode">选平台套餐</div>
+        </div>
+        <div class="summary-section" id="sumPackageSection" style="display:none;">
+          <div class="summary-key">平台套餐</div>
+          <div class="summary-val empty" id="sumPackage">未选择</div>
+        </div>
         <div class="summary-section">
           <div class="summary-key">类目</div>
           <div class="summary-val empty" id="sumCategory">未选择</div>
@@ -468,10 +558,12 @@
         </div>
       </aside>
 
+      </div>
+
       <!-- 提交栏 -->
       <div class="submit-bar">
         <div class="audit-hint">
-          ⚠️ <span>提交后，<b>此需求将进入平台审核核定环节</b>（约 2 小时内），核定通过后将自动撮合 3-5 家承制方报价。</span>
+          ⚠️ <span id="auditHintText">提交后，<b>此需求将进入平台审核核定环节</b>（约 2 小时内），核定通过后将自动撮合 3-5 家承制方报价。</span>
         </div>
         <button class="btn ghost" id="btnDraft">暂存草稿</button>
         <button class="btn" id="btnReset">重置</button>
@@ -659,16 +751,300 @@
     };
 
     // ============================================================
+    // 平台标品：SPU / SKU 目录（可扩展多 SPU；单位：clip=条，article=篇）
+    // ============================================================
+    const UNIT_LABEL = { clip: "条", article: "篇" };
+
+    const PLATFORM_CATALOG = {
+      spu_marketing_video: {
+        spu_id: "spu_marketing_video",
+        name: "营销短视频制作包",
+        icon: "🎬",
+        desc: "批量营销短视频成片，按「条」计价的平台标品",
+        skus: [
+          {
+            sku_id: "sku_mv_100",
+            display_name: "基础档 · 100 条",
+            tagline: "适合小批量试产与投放测试",
+            quantity: { value: 100, unit: "clip" },
+            price: { amount: 20000, currency: "CNY" },
+            service_scope: {
+              highlights: [
+                "单条约 60 秒以内，1080p MP4 交付",
+                "含 1 次成片修改",
+                "脚本与素材规则以套餐说明为准"
+              ],
+              detail_html: "<p>本档位含 <strong>100 条</strong> 成片；完整条款以订单快照为准。</p>"
+            },
+            delivery: { lead_time_days: 7, full_delivery_days: 30, delivery_notes: "首批不晚于 7 个工作日，全部 30 个工作日内交付完毕" },
+            commercial: { tax_included: true, price_note: "含税" },
+            display: { status: "on_sale", sort_order: 10, badge: null },
+            terms_version: "terms_mv_v1",
+            sku_code: "MV-PKG-100",
+            updated_at: "2026-05-07T00:00:00Z"
+          },
+          {
+            sku_id: "sku_mv_164",
+            display_name: "进阶档 · 164 条",
+            tagline: "性价比主推档",
+            quantity: { value: 164, unit: "clip" },
+            price: { amount: 30000, currency: "CNY" },
+            service_scope: {
+              highlights: [
+                "单条约 60 秒以内，1080p MP4 交付",
+                "含 1 次成片修改",
+                "可分批交付，批次节奏在订单内确认"
+              ],
+              detail_html: "<p>本档位含 <strong>164 条</strong> 成片。</p>"
+            },
+            delivery: { lead_time_days: 7, full_delivery_days: 35, delivery_notes: "首批 7 个工作日，全部 35 个工作日内结清" },
+            commercial: { tax_included: true, price_note: "含税" },
+            display: { status: "on_sale", sort_order: 20, badge: "推荐" },
+            terms_version: "terms_mv_v1",
+            sku_code: "MV-PKG-164",
+            updated_at: "2026-05-07T00:00:00Z"
+          },
+          {
+            sku_id: "sku_mv_250",
+            display_name: "旗舰档 · 250 条",
+            tagline: "大规模持续产出",
+            quantity: { value: 250, unit: "clip" },
+            price: { amount: 40000, currency: "CNY" },
+            service_scope: {
+              highlights: [
+                "单条约 60 秒以内，1080p MP4 交付",
+                "含 1 次成片修改",
+                "优先生排期与项目经理对接（按平台规则）"
+              ],
+              detail_html: "<p>本档位含 <strong>250 条</strong> 成片。</p>"
+            },
+            delivery: { lead_time_days: 7, full_delivery_days: 45, delivery_notes: "首批 7 个工作日，全部 45 个工作日内结清" },
+            commercial: { tax_included: true, price_note: "含税" },
+            display: { status: "on_sale", sort_order: 30, badge: null },
+            terms_version: "terms_mv_v1",
+            sku_code: "MV-PKG-250",
+            updated_at: "2026-05-07T00:00:00Z"
+          }
+        ]
+      },
+      spu_marketing_copy: {
+        spu_id: "spu_marketing_copy",
+        name: "营销文案制作包",
+        icon: "✍️",
+        desc: "多场景种草 / 转化文案，按「篇」计价（即将上线）",
+        upcoming: true,
+        skus: []
+      }
+    };
+
+    function fmtMoney(n) { return "¥" + Number(n).toLocaleString("zh-CN"); }
+
+    function escapeHtml(str) {
+      if (str == null || str === "") return "";
+      const d = document.createElement("div");
+      d.textContent = String(str);
+      return d.innerHTML;
+    }
+
+    function getSku(spuId, skuId) {
+      const spu = PLATFORM_CATALOG[spuId];
+      if (!spu || !spu.skus) return null;
+      return spu.skus.find((s) => s.sku_id === skuId) || null;
+    }
+
+    function buildSkuSnapshot(sku, spuId) {
+      const spu = PLATFORM_CATALOG[spuId];
+      const snap = JSON.parse(JSON.stringify(sku));
+      snap.spu_id = spuId;
+      snap.spu_name = spu ? spu.name : "";
+      return snap;
+    }
+
+    // ============================================================
     // 表单状态
     // ============================================================
     const form = {
+      publishMode: "package", // custom | package（默认：选平台套餐）
+      spuId: null,
+      skuId: null,
+      skuSnapshot: null,
       l1: null, l2: null,
-      tags: {},          // { 场景: [...], 风格: [...] }
+      tags: {},
       level: null, methods: [],
       dyn: {},
       title: "", desc: "", budgetMin: "", budgetMax: "", deadline: "",
       refs: []
     };
+
+    function isPackageReady() {
+      return form.publishMode === "package" && form.spuId && form.skuId && form.skuSnapshot;
+    }
+
+    function setPublishMode(mode) {
+      if (form.publishMode === mode) return;
+      form.publishMode = mode;
+      if (mode === "custom") {
+        form.spuId = null;
+        form.skuId = null;
+        form.skuSnapshot = null;
+        const pr = $("pkgMoneyRow");
+        if (pr) { pr.innerHTML = ""; pr.style.display = "none"; }
+      } else {
+        form.l1 = null;
+        form.l2 = null;
+        form.tags = {};
+        form.level = null;
+        form.methods = [];
+        form.dyn = {};
+        renderL1();
+        renderL2();
+        renderTags();
+        renderLevel();
+        renderDyn();
+      }
+      syncPublishUI();
+      renderSpuGrid();
+      $("skuGrid").innerHTML = "";
+      $("skuWrap").style.display = "none";
+      if (mode === "package") window.demoToast("已切换为「选平台套餐」，请依次选择服务与档位", "info");
+      updateStepNums();
+      updateSummary();
+    }
+
+    function syncPublishUI() {
+      const pkg = form.publishMode === "package";
+      const flow = $("packageFlow");
+      if (flow) flow.style.display = pkg ? "" : "none";
+      document.querySelectorAll("#stepCategory, #stepTags, #stepLevel, #stepDyn").forEach((el) => {
+        el.style.display = pkg ? "none" : "";
+      });
+      const budgetWrap = $("budgetFieldWrap");
+      const pkgMoney = $("pkgMoneyRow");
+      const dl = $("fldDeadlineLabel");
+      const tip = document.querySelector("#stepBasic .step-tip");
+      const st = document.querySelector("#stepBasic .step-title");
+      const audit = $("auditHintText");
+      if (pkg) {
+        if (budgetWrap) budgetWrap.style.display = "none";
+        if (dl) dl.innerHTML = '交付与周期<span class="req">*</span><span style="color:#8c8c8c;font-weight:400;font-size:12px">（默认取自套餐，可改文案备注）</span>';
+        if (tip) tip.textContent = "套餐总价与交付节奏由 SKU 锁定；请填写标题与说明，必要时调整下方交期描述";
+        if (st) st.textContent = "补充信息（Brief）";
+        if (audit) audit.innerHTML = "套餐订单将按<strong>选定 SKU 快照</strong>锁价；提交后进入平台审核与锁资流程（演示环境仅模拟跳转）。";
+        $("sumPackageSection").style.display = "";
+      } else {
+        if (budgetWrap) budgetWrap.style.display = "";
+        if (pkgMoney) { pkgMoney.innerHTML = ""; pkgMoney.style.display = "none"; }
+        if (dl) dl.innerHTML = '期望交付时间<span class="req">*</span>';
+        if (tip) tip.textContent = "所有类目通用";
+        if (st) st.textContent = "基本信息 + 预算交期";
+        if (audit) audit.innerHTML = "提交后，<b>此需求将进入平台审核核定环节</b>（约 2 小时内），核定通过后将自动撮合 3-5 家承制方报价。";
+        $("sumPackageSection").style.display = "none";
+      }
+      $("modePackage").classList.toggle("active", pkg);
+      $("modeCustom").classList.toggle("active", !pkg);
+      const picon = $("pkgStepIcon");
+      if (picon) {
+        picon.classList.remove("idle", "done");
+        if (pkg && isPackageReady()) { picon.classList.add("done"); picon.textContent = "✓"; }
+        else if (pkg) { picon.classList.add("idle"); picon.textContent = "📦"; }
+      }
+    }
+
+    function applySkuToForm(sku) {
+      const p = sku.price.amount;
+      form.budgetMin = String(p);
+      form.budgetMax = String(p);
+      $("fldBudgetMin").value = p;
+      $("fldBudgetMax").value = p;
+      const line = sku.delivery.delivery_notes ||
+        ("首批 " + sku.delivery.lead_time_days + " 个工作日 · 全部 " + sku.delivery.full_delivery_days + " 个工作日内");
+      form.deadline = line;
+      $("fldDeadline").value = line;
+      const pr = $("pkgMoneyRow");
+      pr.style.display = "";
+      let tax = "";
+      if (sku.commercial && sku.commercial.tax_included) tax = " · " + (sku.commercial.price_note || "含税");
+      pr.innerHTML =
+        '<div class="pkg-readonly"><span class="k">套餐总价（锁定）</span>' + escapeHtml(fmtMoney(p)) + escapeHtml(tax) + "</div>"
+        + '<div class="pkg-readonly"><span class="k">条款版本</span>' + escapeHtml(sku.terms_version || "—") + "</div>";
+    }
+
+    function renderSpuGrid() {
+      const grid = $("spuGrid");
+      if (!grid) return;
+      grid.innerHTML = "";
+      Object.values(PLATFORM_CATALOG).forEach((spu) => {
+        const card = document.createElement("div");
+        const disabled = spu.upcoming || !spu.skus || spu.skus.length === 0;
+        card.className = "spu-card" + (form.spuId === spu.spu_id ? " active" : "") + (disabled ? " disabled" : "");
+        card.innerHTML = `
+          <div class="spu-icon">${spu.icon}</div>
+          <div>
+            <div class="spu-name">${escapeHtml(spu.name)}${disabled ? " <span style=\"color:#bfbfbf;font-size:12px\">（即将上线）</span>" : ""}</div>
+            <div class="spu-desc">${escapeHtml(spu.desc)}</div>
+          </div>`;
+        if (!disabled) card.onclick = () => selectSpu(spu.spu_id);
+        grid.appendChild(card);
+      });
+    }
+
+    function selectSpu(spuId) {
+      const spu = PLATFORM_CATALOG[spuId];
+      if (!spu || spu.upcoming || !spu.skus.length) return;
+      form.spuId = spuId;
+      form.skuId = null;
+      form.skuSnapshot = null;
+      const pr = $("pkgMoneyRow");
+      if (pr) { pr.innerHTML = ""; pr.style.display = "none"; }
+      $("fldDeadline").value = "";
+      form.deadline = "";
+      renderSpuGrid();
+      $("skuWrap").style.display = "";
+      $("skuWrapTitle").textContent = `${spu.name} · 选择档位（SKU）`;
+      renderSkuGrid();
+      updateStepNums();
+      updateSummary();
+      window.demoToast("已选择「" + spu.name + "」，请选择具体套餐档位", "info");
+    }
+
+    function renderSkuGrid() {
+      const wrap = $("skuGrid");
+      if (!wrap || !form.spuId) return;
+      const spu = PLATFORM_CATALOG[form.spuId];
+      wrap.innerHTML = "";
+      const sorted = (spu.skus || []).slice().sort((a, b) =>
+        ((a.display || {}).sort_order || 0) - ((b.display || {}).sort_order || 0)
+      );
+      sorted.forEach((sku) => {
+        const u = UNIT_LABEL[sku.quantity.unit] || sku.quantity.unit;
+        const card = document.createElement("div");
+        card.className = "sku-card" + (form.skuId === sku.sku_id ? " active" : "");
+        const badge = (sku.display && sku.display.badge) ? `<span class="sku-badge">${escapeHtml(sku.display.badge)}</span>` : "";
+        const hi = (sku.service_scope.highlights || []).slice(0, 4).map((h) => `<li>${escapeHtml(h)}</li>`).join("");
+        const del = sku.delivery.delivery_notes || "";
+        card.innerHTML = badge
+          + `<div class="sku-name">${escapeHtml(sku.display_name)}</div>`
+          + `<div class="sku-qty">${sku.quantity.value}<span>${escapeHtml(u)}</span></div>`
+          + `<div class="sku-price">${fmtMoney(sku.price.amount)} <small>/ 套餐</small></div>`
+          + `<ul class="sku-highlights">${hi}</ul>`
+          + `<div class="sku-delivery">📅 交付：${escapeHtml(del)}</div>`;
+        card.onclick = () => selectSku(sku.sku_id);
+        wrap.appendChild(card);
+      });
+    }
+
+    function selectSku(skuId) {
+      const sku = getSku(form.spuId, skuId);
+      if (!sku) return;
+      form.skuId = skuId;
+      form.skuSnapshot = buildSkuSnapshot(sku, form.spuId);
+      applySkuToForm(sku);
+      renderSkuGrid();
+      syncPublishUI();
+      updateStepNums();
+      updateSummary();
+      window.demoToast("已选择「" + sku.display_name + "」，总价 " + fmtMoney(sku.price.amount) + " 已写入本单", "ok");
+    }
 
     // ============================================================
     // 渲染：Step 1 一级类目
@@ -873,6 +1249,13 @@
     // 步骤完成度
     // ============================================================
     function isStepDone(n) {
+      if (form.publishMode === "package") {
+        if (n >= 1 && n <= 4) return isPackageReady();
+        if (n === 5) {
+          return Boolean(form.title.trim() && form.desc.trim() && (form.deadline || "").toString().trim());
+        }
+        return false;
+      }
       if (n === 1) return Boolean(form.l1 && form.l2);
       if (n === 2) {
         const total = Object.values(form.tags).reduce((s, arr) => s + arr.length, 0);
@@ -898,15 +1281,51 @@
       });
       const done = [1,2,3,4,5].filter(isStepDone).length;
       document.querySelectorAll("#progress .p-dot").forEach((d, i) => d.classList.toggle("done", i < done));
-      $("summarySub").textContent = done === 5 ? "✅ 信息完整，可提交进入平台审核" : `已完成 ${done}/5 步 · 勾选越多撮合越精准`;
+      const sub = $("summarySub");
+      if (form.publishMode === "package") {
+        sub.textContent = done === 5 ? "✅ 套餐与 Brief 已齐，可提交" : `套餐进度 ${done}/5 · 先完成档位再填写补充信息`;
+      } else {
+        sub.textContent = done === 5 ? "✅ 信息完整，可提交进入平台审核" : `已完成 ${done}/5 步 · 勾选越多撮合越精准`;
+      }
     }
 
     // ============================================================
     // 实时摘要
     // ============================================================
     function updateSummary() {
+      const sumMode = $("sumMode");
+      if (sumMode) {
+        sumMode.textContent = form.publishMode === "package" ? "选平台套餐" : "自定义发布";
+      }
+
+      const sumPkgSec = $("sumPackageSection");
+      const sumPkg = $("sumPackage");
+      if (form.publishMode === "package") {
+        sumPkgSec.style.display = "";
+        if (isPackageReady()) {
+          const spu = PLATFORM_CATALOG[form.spuId];
+          const sku = form.skuSnapshot;
+          const u = UNIT_LABEL[sku.quantity.unit] || sku.quantity.unit;
+          sumPkg.classList.remove("empty");
+          sumPkg.innerHTML =
+            `<b>${escapeHtml(spu.name)}</b><br>`
+            + `${escapeHtml(sku.display_name)} · <b>${sku.quantity.value} ${escapeHtml(u)}</b> · ${escapeHtml(fmtMoney(sku.price.amount))}<br>`
+            + `<span style="color:#8c8c8c;font-size:12px">条款 ${escapeHtml(sku.terms_version || "")}</span>`;
+        } else {
+          sumPkg.classList.add("empty");
+          sumPkg.textContent = "请选择 SPU 与 SKU 档位";
+        }
+      } else {
+        sumPkgSec.style.display = "none";
+      }
+
       const sumCat = $("sumCategory");
-      if (form.l1) {
+      if (form.publishMode === "package") {
+        sumCat.classList.remove("empty");
+        sumCat.innerHTML = isPackageReady()
+          ? '<span style="color:#8c8c8c;">无需自选类目 · 已由平台套餐指定</span>'
+          : '<span style="color:#bfbfbf;">—</span>';
+      } else if (form.l1) {
         const cat = CATEGORY_TREE[form.l1];
         sumCat.classList.remove("empty");
         sumCat.innerHTML = `<b>${cat.name}</b>` + (form.l2 ? ` → ${cat.sub[form.l2]}` : ' <span style="color:#fa8c16;">（未选二级）</span>');
@@ -915,17 +1334,31 @@
       }
 
       const sumTags = $("sumTags");
-      const allTags = [];
-      Object.entries(form.tags).forEach(([g, arr]) => arr.forEach((t) => allTags.push(t)));
-      if (allTags.length) {
+      if (form.publishMode === "package" && isPackageReady()) {
+        const sku = form.skuSnapshot;
+        const hi = (sku.service_scope && sku.service_scope.highlights) ? sku.service_scope.highlights.slice(0, 5) : [];
         sumTags.classList.remove("empty");
-        sumTags.innerHTML = '<span class="summary-tags">' + allTags.map((t) => `<span class="mini-chip">${t}</span>`).join("") + "</span>";
+        sumTags.innerHTML = '<span class="summary-tags">' +
+          hi.map((t) => `<span class="mini-chip">${escapeHtml(t)}</span>`).join("") + "</span>";
       } else {
-        sumTags.classList.add("empty"); sumTags.innerHTML = '<span class="summary-tags"><span style="color:#bfbfbf;font-size:12px;">未选标签</span></span>';
+        const allTags = [];
+        Object.entries(form.tags).forEach(([g, arr]) => arr.forEach((t) => allTags.push(t)));
+        if (allTags.length) {
+          sumTags.classList.remove("empty");
+          sumTags.innerHTML = '<span class="summary-tags">' + allTags.map((t) => `<span class="mini-chip">${t}</span>`).join("") + "</span>";
+        } else {
+          sumTags.classList.add("empty");
+          sumTags.innerHTML = '<span class="summary-tags"><span style="color:#bfbfbf;font-size:12px;">未选标签</span></span>';
+        }
       }
 
       const sumLv = $("sumLevel");
-      if (form.l1 && (form.level || form.methods.length)) {
+      if (form.publishMode === "package" && isPackageReady()) {
+        const sku = form.skuSnapshot;
+        const del = sku.delivery.delivery_notes || "";
+        sumLv.classList.remove("empty");
+        sumLv.innerHTML = `<b>套餐档位</b> · 交付：${escapeHtml(del)}`;
+      } else if (form.l1 && (form.level || form.methods.length)) {
         const cat = CATEGORY_TREE[form.l1];
         const lvName = (cat.levels.find((l) => l.id === form.level) || {}).name || "未选";
         sumLv.classList.remove("empty");
@@ -935,7 +1368,11 @@
       }
 
       const sumDyn = $("sumDyn");
-      if (form.l1) {
+      if (form.publishMode === "package" && isPackageReady()) {
+        const sku = form.skuSnapshot;
+        sumDyn.classList.remove("empty");
+        sumDyn.innerHTML = `已选 SKU · <span style="color:#8c8c8c;font-size:12px">${escapeHtml(sku.sku_code || sku.sku_id)}</span>`;
+      } else if (form.l1) {
         const cat = CATEGORY_TREE[form.l1];
         const filled = cat.dyn.filter((f) => form.dyn[f.id]).map((f) => `${f.label}：<b>${form.dyn[f.id]}</b>`);
         if (filled.length) { sumDyn.classList.remove("empty"); sumDyn.innerHTML = filled.join("<br>"); }
@@ -945,7 +1382,12 @@
       }
 
       const sumBudget = $("sumBudget");
-      if (form.budgetMin || form.budgetMax || form.deadline) {
+      if (form.publishMode === "package" && isPackageReady()) {
+        const sku = form.skuSnapshot;
+        sumBudget.classList.remove("empty");
+        sumBudget.innerHTML =
+          `总价：<b>${fmtMoney(sku.price.amount)}</b>（锁定）<br>交期说明：${escapeHtml(form.deadline || sku.delivery.delivery_notes || "")}`;
+      } else if (form.budgetMin || form.budgetMax || form.deadline) {
         sumBudget.classList.remove("empty");
         sumBudget.innerHTML = `预算：${form.budgetMin || "?"} ~ ${form.budgetMax || "?"} 元<br>交期：${form.deadline || "未填"}`;
       } else {
@@ -1012,8 +1454,19 @@
     });
     $("btnReset").addEventListener("click", () => {
       if (!window.confirm("确认清空所有已填内容？")) return;
-      Object.assign(form, { l1: null, l2: null, tags: {}, level: null, methods: [], dyn: {}, title: "", desc: "", budgetMin: "", budgetMax: "", deadline: "", refs: [] });
+      Object.assign(form, {
+        publishMode: "package",
+        spuId: null, skuId: null, skuSnapshot: null,
+        l1: null, l2: null, tags: {}, level: null, methods: [], dyn: {},
+        title: "", desc: "", budgetMin: "", budgetMax: "", deadline: "", refs: []
+      });
       $("fldTitle").value = ""; $("fldDesc").value = ""; $("fldBudgetMin").value = ""; $("fldBudgetMax").value = ""; $("fldDeadline").value = "";
+      $("skuGrid").innerHTML = "";
+      $("skuWrap").style.display = "none";
+      const pr = $("pkgMoneyRow");
+      if (pr) { pr.innerHTML = ""; pr.style.display = "none"; }
+      syncPublishUI();
+      renderSpuGrid();
       renderL1(); renderL2(); renderTags(); renderLevel(); renderDyn(); renderRefs(); updateStepNums(); updateSummary();
       window.demoApp.clearDraft();
       window.demoToast("已重置", "warn");
@@ -1022,39 +1475,80 @@
       if (!window.demoApp.requireProfile("publish")) return;
 
       const missing = [];
-      if (!isStepDone(1)) missing.push("类目");
-      if (!isStepDone(2)) missing.push("至少 1 个标签");
-      if (!isStepDone(3)) missing.push("服务等级 + 制作方式");
-      if (!isStepDone(4)) missing.push("类目专属必填字段");
-      if (!isStepDone(5)) missing.push("基本信息（标题/描述/预算/交期）");
+      if (form.publishMode === "package") {
+        if (!isPackageReady()) missing.push("平台套餐（请先选服务类型与档位）");
+        if (!isStepDone(5)) missing.push("补充信息（标题、详细说明、交期说明）");
+      } else {
+        if (!isStepDone(1)) missing.push("类目");
+        if (!isStepDone(2)) missing.push("至少 1 个标签");
+        if (!isStepDone(3)) missing.push("服务等级 + 制作方式");
+        if (!isStepDone(4)) missing.push("类目专属必填字段");
+        if (!isStepDone(5)) missing.push("基本信息（标题/描述/预算/交期）");
+      }
       if (missing.length) { window.demoToast("还缺：" + missing.join("、"), "err"); return; }
+
       const min = Number(form.budgetMin), max = Number(form.budgetMax);
-      if (min > 0 && max > 0 && min > max) { window.demoToast("预算最低值不能大于最高值", "err"); return; }
+      if (form.publishMode !== "package" && min > 0 && max > 0 && min > max) {
+        window.demoToast("预算最低值不能大于最高值", "err"); return;
+      }
 
       const ws = window.demoApp.getCurrentWorkspace();
-      const cat = CATEGORY_TREE[form.l1];
-      const id = "DM-" + new Date().toISOString().slice(0,10).replace(/-/g,"") + Math.floor(Math.random() * 90 + 10);
-      const demand = {
-        id, title: form.title.trim(),
-        category: `${cat.name} / ${cat.sub[form.l2]}`,
-        l1: form.l1, l2: form.l2,
-        tags: form.tags, level: form.level, methods: form.methods.slice(),
-        dyn: Object.assign({}, form.dyn),
-        desc: form.desc.trim(),
-        budget: max, budgetMin: min, budgetMax: max,
-        deadline: form.deadline,
-        refs: form.refs.slice(),
-        workspace: ws.id, workspaceName: ws.name,
-        status: "auditing",
-        quotesCount: 0,
-        createTime: new Date().toLocaleString("zh-CN", { hour12: false })
-      };
+      const id = "DM-" + new Date().toISOString().slice(0, 10).replace(/-/g, "") + Math.floor(Math.random() * 90 + 10);
+
+      let demand;
+      if (form.publishMode === "package") {
+        const spu = PLATFORM_CATALOG[form.spuId];
+        const sku = form.skuSnapshot;
+        demand = {
+          id,
+          requirementType: "PLATFORM_SKU",
+          spuId: form.spuId,
+          skuId: form.skuId,
+          skuSnapshot: JSON.parse(JSON.stringify(form.skuSnapshot)),
+          title: form.title.trim(),
+          category: `${spu.name} / ${sku.display_name}`,
+          l1: null, l2: null,
+          tags: {}, level: null, methods: [],
+          dyn: {},
+          desc: form.desc.trim(),
+          budget: sku.price.amount, budgetMin: sku.price.amount, budgetMax: sku.price.amount,
+          deadline: form.deadline.trim(),
+          refs: form.refs.slice(),
+          workspace: ws.id, workspaceName: ws.name,
+          payerLabel: ws.payerLabel,
+          status: "auditing",
+          quotesCount: 0,
+          createTime: new Date().toLocaleString("zh-CN", { hour12: false })
+        };
+      } else {
+        const cat = CATEGORY_TREE[form.l1];
+        demand = {
+          id, title: form.title.trim(),
+          requirementType: "CUSTOM",
+          category: `${cat.name} / ${cat.sub[form.l2]}`,
+          l1: form.l1, l2: form.l2,
+          tags: form.tags, level: form.level, methods: form.methods.slice(),
+          dyn: Object.assign({}, form.dyn),
+          desc: form.desc.trim(),
+          budget: max, budgetMin: min, budgetMax: max,
+          deadline: form.deadline,
+          refs: form.refs.slice(),
+          workspace: ws.id, workspaceName: ws.name,
+          payerLabel: ws.payerLabel,
+          status: "auditing",
+          quotesCount: 0,
+          createTime: new Date().toLocaleString("zh-CN", { hour12: false })
+        };
+      }
       window.demoApp.addDemand(demand);
       window.demoApp.clearDraft();
 
       $("btnSubmit").disabled = true; $("btnSubmit").textContent = "提交中...";
       window.demoToast("✅ 已提交，需求已进入平台审核核定环节", "ok");
-      setTimeout(() => window.demoToast(`审核通过后，平台将自动撮合 3-5 家承制方报价（约 2 小时内）`, "info"), 900);
+      const tip2 = form.publishMode === "package"
+        ? "平台套餐单已附带 SKU 快照，后续锁资与履约以快照条款为准（演示）"
+        : "审核通过后，平台将自动撮合 3-5 家承制方报价（约 2 小时内）";
+      setTimeout(() => window.demoToast(tip2, "info"), 900);
       setTimeout(() => {
         window.demoToast(`即将跳转「我的需求」查看 ${id}`, "info");
       }, 2000);
@@ -1064,24 +1558,52 @@
     // ============================================================
     // 初始化
     // ============================================================
+    $("modePackage").addEventListener("click", () => setPublishMode("package"));
+    $("modeCustom").addEventListener("click", () => setPublishMode("custom"));
+
     renderL1();
     renderL2();
     renderTags();
     renderLevel();
     renderDyn();
     renderRefs();
+    renderSpuGrid();
+    syncPublishUI();
     updateStepNums();
     updateSummary();
 
+    try {
+      const q = new URLSearchParams(window.location.search);
+      if (q.get("mode") === "custom") setPublishMode("custom");
+    } catch (e) {}
+
     // 自动加载草稿
     const draft = window.demoApp.getDraft();
-    if (draft && draft.l1) {
+    if (draft && (draft.l1 || draft.spuId || draft.publishMode === "package" || draft.publishMode === "custom")) {
       Object.assign(form, draft);
+      // 旧版草稿无 publishMode：有类目进度则视为自定义发布
+      if (draft.publishMode == null && draft.l1) form.publishMode = "custom";
+      if (form.publishMode === "package" && form.spuId && form.skuId && !form.skuSnapshot) {
+        const sku0 = getSku(form.spuId, form.skuId);
+        if (sku0) form.skuSnapshot = buildSkuSnapshot(sku0, form.spuId);
+      }
       $("fldTitle").value = form.title || "";
       $("fldDesc").value = form.desc || "";
       $("fldBudgetMin").value = form.budgetMin || "";
       $("fldBudgetMax").value = form.budgetMax || "";
       $("fldDeadline").value = form.deadline || "";
+      syncPublishUI();
+      renderSpuGrid();
+      if (form.publishMode === "package" && form.spuId) {
+        $("skuWrap").style.display = "";
+        const spu0 = PLATFORM_CATALOG[form.spuId];
+        if (spu0) $("skuWrapTitle").textContent = spu0.name + " · 选择档位（SKU）";
+        renderSkuGrid();
+        if (form.skuId) {
+          const skuR = getSku(form.spuId, form.skuId);
+          if (skuR) applySkuToForm(skuR);
+        }
+      }
       renderL1(); renderL2(); renderTags(); renderLevel(); renderDyn(); renderRefs(); updateStepNums(); updateSummary();
       setTimeout(() => window.demoToast("已恢复上次草稿", "info"), 400);
     }

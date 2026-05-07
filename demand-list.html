@@ -110,7 +110,7 @@
     .status-badge.matching { background: #e6f7ff; color: #1890ff; }
     .status-badge.quoting { background: #fff1f0; color: #cf1322; }
     .status-badge.in-progress { background: #f6ffed; color: #389e0d; }
-    .status-badge.completed { background: #f0f0f0; color: #595959; }
+    .status-badge.rejected { background: #fff1f0; color: #cf1322; }
 
     .quotes-count { display: inline-flex; align-items: center; gap: 4px; }
     .quotes-count.active { color: #cf1322; font-weight: 600; }
@@ -284,7 +284,8 @@
       "matching":   { label: "🔍 撮合中", className: "matching", desc: "已通过审核，承制方报价中" },
       "quoting":    { label: "💬 待选承制方", className: "quoting", desc: "已收到报价，请尽快选定" },
       "in-progress":{ label: "🛠 进行中", className: "in-progress", desc: "已下单，承制方制作中" },
-      "completed":  { label: "✅ 已完成", className: "completed", desc: "已结算" }
+      "completed":  { label: "✅ 已完成", className: "completed", desc: "已结算" },
+      "rejected":   { label: "❌ 已驳回", className: "rejected", desc: "未通过平台核定，请修改后重提" }
     };
 
     let activeStatus = "all";
@@ -340,6 +341,7 @@
         else if (d.status === "in-progress") actions = '<a class="btn-link primary" href="project-space.html?orderId=OD-2026042307&demandId=' + d.id + '">查看进度 →</a>';
         else if (d.status === "matching") actions = '<button class="btn-link" onclick="window.demoToast(\'承制方报价中，请耐心等待\', \'info\')">详情</button>';
         else if (d.status === "auditing") actions = '<button class="btn-link" onclick="window.demoToast(\'平台正在核定需求\', \'info\')">详情</button>';
+        else if (d.status === "rejected") actions = '<a class="btn-link urgent" href="demand-publish.html">修改并重提</a>';
         else actions = '<button class="btn-link" onclick="window.demoToast(\'订单归档详情下版本补齐\', \'info\')">归档</button>';
         const quoteCell = d.quotesCount > 0 ? '<span class="quotes-count ' + (d.status === "quoting" ? "active" : "") + '">' + d.quotesCount + ' 家</span>' : '<span style="color:#bfbfbf">—</span>';
         const contractor = d.contractor ? '<div style="font-size:12px;color:#1890ff;margin-top:2px">承制方：' + d.contractor + '</div>' : '';
