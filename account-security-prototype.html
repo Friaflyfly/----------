@@ -13,6 +13,8 @@
     .menu a { display: block; padding: 12px 24px; color: #262626; text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
     .menu a:hover { background: #f0f0f0; color: #1890ff; }
     .menu a.active { background: #e6f7ff; color: #1890ff; border-left-color: #1890ff; font-weight: 500; }
+    .menu-group { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+    .menu-group-title { padding: 8px 24px; font-size: 11px; color: #8c8c8c; letter-spacing: .5px; }
     .main { margin-left: 200px; flex: 1; padding: 20px 24px 24px; }
     .card { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
     .head { padding: 16px 20px; margin-bottom: 12px; }
@@ -72,10 +74,12 @@
       <a href="platform-home-demander.html" class="logo">🎬 骋风天合 · 创作门户</a>
       <nav class="menu">
         <a href="platform-home-demander.html" style="color:#1890ff;font-weight:500">← 返回工作台</a>
-        <a href="account-basic-info-prototype-platform-style.html">账户基础信息</a>
-        <a href="enterprise-verification-prototype.html">企业认证</a>
-        <a href="account-security-prototype.html" class="active">账号安全</a>
-        <a href="wallet-overview.html">我的钱包</a>
+        <div class="menu-group">
+          <div class="menu-group-title">账号中心</div>
+          <a href="account-basic-info-prototype-platform-style.html">账户基础信息</a>
+          <a href="enterprise-verification-prototype.html">企业认证</a>
+          <a href="account-security-prototype.html" class="active">账号安全</a>
+        </div>
       </nav>
     </aside>
 

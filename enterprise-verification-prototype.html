@@ -93,7 +93,18 @@
       font-weight: 500;
     }
 
-    .mainContent {
+    .menu-group {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .menu-group-title {
+      padding: 8px 24px;
+      font-size: 11px;
+      color: #8c8c8c;
+      letter-spacing: 0.5px;
+    }
       flex: 1;
       margin-left: 200px;
       min-height: 100vh;
@@ -972,10 +983,12 @@
       <div class="sidebarHeader"><a class="logo" href="platform-home-demander.html">🎬 骋风天合 · 创作门户</a></div>
       <nav class="menu">
         <a class="menuItem" href="platform-home-demander.html" style="color:#1890ff;font-weight:500">← 返回工作台</a>
-        <a class="menuItem" href="account-basic-info-prototype-platform-style.html">账户基础信息</a>
-        <a class="menuItem active" href="enterprise-verification-prototype.html">企业认证</a>
-        <a class="menuItem" href="account-security-prototype.html">账号安全</a>
-        <a class="menuItem" href="wallet-overview.html">我的钱包</a>
+        <div class="menu-group">
+          <div class="menu-group-title">账号中心</div>
+          <a class="menuItem" href="account-basic-info-prototype-platform-style.html">账户基础信息</a>
+          <a class="menuItem active" href="enterprise-verification-prototype.html">企业认证</a>
+          <a class="menuItem" href="account-security-prototype.html">账号安全</a>
+        </div>
       </nav>
     </aside>
 

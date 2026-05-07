@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>钱包与结算 - 骋风天合 · 创作门户交易平台</title>
+  <title>我的钱包 - 骋风天合 · 创作门户交易平台</title>
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #262626; }
@@ -220,13 +220,14 @@
     .context-banner .ctx-arrow { color: #8c8c8c; }
     .context-banner .ctx-rule { color: #595959; font-size: 12px; }
 
-    /* 页内角色 / 视图 Tab */
-    .role-tabs { display: flex; gap: 4px; padding: 6px; background: #fff; border-radius: 10px; margin-bottom: 14px; box-shadow: 0 2px 6px rgba(0,0,0,.04); }
-    .role-tabs button { flex: 1; border: none; background: transparent; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; color: #595959; display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 500; }
+    /* 页内功能 Tab */
+    .role-tabs { display: flex; gap: 4px; padding: 6px; background: #fff; border-radius: 10px; margin-bottom: 14px; box-shadow: 0 2px 6px rgba(0,0,0,.04); overflow-x: auto; }
+    .role-tabs button { flex: 1; min-width: 110px; border: none; background: transparent; padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 13.5px; color: #595959; display: flex; align-items: center; justify-content: center; gap: 4px; font-weight: 500; white-space: nowrap; }
     .role-tabs button:hover { background: #f5f5f5; color: #1890ff; }
     .role-tabs button.active { background: #e6f7ff; color: #1890ff; box-shadow: inset 0 -2px 0 #1890ff; }
     .role-tabs button .tab-sub { font-size: 11px; color: #8c8c8c; font-weight: 400; margin-left: 4px; }
     .role-tabs button.active .tab-sub { color: #69c0ff; }
+    @media (max-width: 1200px) { .role-tabs button { font-size: 12.5px; min-width: 92px; padding: 9px 8px; } }
     .panel { display: none; }
     .panel.active { display: block; }
 
@@ -346,10 +347,7 @@
       </button>
       <div class="ws-dropdown" id="wsDropdown"></div>
     </div>
-    <div class="identity-switch" id="identitySwitch">
-      <button data-identity="demander" class="active">📥 需求方</button>
-      <button data-identity="contractor">🛠 承制方</button>
-    </div>
+    <div class="identity-switch" id="identitySwitch"></div>
     <a href="wallet-overview.html" class="wallet-chip" id="walletChip" title="当前空间绑定账户的可用余额">
       <span>💰</span>
       <span>
@@ -378,21 +376,33 @@
     <aside class="sidebar">
       <nav class="menu">
         <a href="platform-home-demander.html"><span class="menu-icon">🏠</span> 工作台</a>
-        <a href="demand-publish.html"><span class="menu-icon">📤</span> 发布需求</a>
-        <a href="demand-list.html"><span class="menu-icon">📋</span> 我的需求</a>
-        <a href="contractor-marketplace.html"><span class="menu-icon">🏪</span> 承制方广场</a>
-        <a href="project-space.html"><span class="menu-icon">🤝</span> 项目协同空间</a>
-        <a href="wallet-overview.html" class="active"><span class="menu-icon">💰</span> 钱包与结算</a>
+        <div class="menu-group">
+          <div class="menu-group-title">我有需求</div>
+          <a href="demand-publish.html"><span class="menu-icon">📤</span> 发布需求</a>
+          <a href="demand-list.html"><span class="menu-icon">📋</span> 我的需求</a>
+          <a href="contractor-marketplace.html"><span class="menu-icon">🏪</span> 服务广场</a>
+        </div>
+        <div class="menu-group">
+          <div class="menu-group-title">我要接单</div>
+          <a href="contractor-demand-hall.html"><span class="menu-icon">📢</span> 接单广场</a>
+          <a href="contractor-orders.html"><span class="menu-icon">📬</span> 我的接单</a>
+          <a href="contractor-profile-edit.html"><span class="menu-icon">🛍</span> 我的服务主页</a>
+        </div>
+        <div class="menu-group">
+          <div class="menu-group-title">协同</div>
+          <a href="project-space.html"><span class="menu-icon">🤝</span> 项目协同空间</a>
+        </div>
         <div class="menu-group">
           <div class="menu-group-title">账户</div>
-          <a href="account-basic-info-prototype-platform-style.html"><span class="menu-icon">⚙️</span> 账户中心</a>
+          <a href="wallet-overview.html" class="active"><span class="menu-icon">💰</span> 我的钱包</a>
+          <a href="account-basic-info-prototype-platform-style.html"><span class="menu-icon">⚙️</span> 账号中心</a>
         </div>
       </nav>
     </aside>
 
     <main class="main">
       <section class="page-head">
-        <h1>💰 钱包与结算</h1>
+        <h1>💰 我的钱包</h1>
         <div class="sub">骋风天合采用「统一账号 + 多工作空间 + 分层资金账户」体系。<strong>工作空间</strong>决定花谁的钱，<strong>角色视角</strong>决定看哪类菜单 / 待办 / 指标。</div>
       </section>
 
@@ -405,25 +415,20 @@
         <span class="ctx-rule" id="ctxRuleNote">本空间下发起的订单，将默认从「短剧制作中心 - 团队预算账户」中扣款或冻结资金。</span>
       </div>
 
-      <!-- 页内角色 / 视图 Tab：拆开需求方钱包 / 承制方钱包 -->
+      <!-- 页内功能 Tab：按"看 / 管 / 收支动作 / 凭证 / 设置"切分 -->
       <div class="role-tabs" id="roleTabs">
-        <button data-tab="overview" class="active">📊 资金总览<span class="tab-sub">余额 / 账户 / 流水</span></button>
-        <button data-tab="demander">📥 需求方结算<span class="tab-sub">充值 / 冻结 / 订单消费 / 退款</span></button>
-        <button data-tab="contractor">🛠 承制方结算<span class="tab-sub">收入 / 提现 / 开票</span></button>
+        <button data-tab="overview" class="active">📊 资金总览</button>
+        <button data-tab="accounts">🏦 账户与预算</button>
+        <button data-tab="recharge">💳 充值与冻结</button>
+        <button data-tab="withdraw">💸 收入与提现</button>
+        <button data-tab="flows">📜 账务流水</button>
+        <button data-tab="invoice">🧾 发票</button>
+        <button data-tab="settings">⚙️ 钱包设置</button>
       </div>
 
-      <!-- ============ 面板 A：资金总览 ============ -->
+      <!-- ============ 面板 1：资金总览 ============ -->
       <section class="panel active" id="panel-overview">
-        <!-- KPI 总览（按当前空间 + 角色上下文动态变化） -->
-        <div class="kpi-row" id="kpiRow"></div>
-
-        <!-- 待处理事项（按当前空间 + 角色上下文动态变化） -->
-        <div class="pending-bar" id="pendingBar"></div>
-
-        <!-- P1-8：实时异常 banner（条件命中时自动出现） -->
-        <div id="liveBanners"></div>
-
-        <!-- 当前空间绑定账户 -->
+        <!-- 当前空间绑定账户（仪表盘的 hero） -->
         <div class="section-head">当前空间绑定账户 <span class="section-sub">切换顶部空间，下方卡片实时变化</span></div>
         <div class="current-card team-budget" id="currentCard">
           <div class="cc-label">当前工作空间：<span id="ccWsName">骋风天合 · 短剧制作中心</span></div>
@@ -443,10 +448,31 @@
           </div>
         </div>
 
-        <!-- 当前可见账户（旧称：账户矩阵；按当前空间 + 角色权限过滤） -->
+        <!-- KPI 总览（统一双角色视图：可用 / 锁定 / 待结算 / 可提现） -->
+        <div class="section-head" style="margin-top:18px">关键指标 <span class="section-sub">融合「我的需求」+「我的接单」两类视角</span></div>
+        <div class="kpi-row" id="kpiRow"></div>
+
+        <!-- 待处理事项 -->
+        <div class="pending-bar" id="pendingBar"></div>
+
+        <!-- P1-8：实时异常 banner（条件命中时自动出现） -->
+        <div id="liveBanners"></div>
+
+        <!-- P1-8：异常 / 边界场景预览 — 设计参考 -->
+        <div class="section-head" style="margin-top:22px">🧪 异常 / 边界状态预览 <span class="section-sub">高保真前先把支付系统真正难的部分（异常）露出来</span></div>
+        <div class="exception-gallery">
+          <h3>10 类资金异常 / 边界状态</h3>
+          <div class="ex-sub">点击右侧动作按钮可演示对应行为。运行时若条件命中（如团队余额不足、有对公充值审核中），相同样式的 banner 会自动出现在「当前空间绑定账户」上方。</div>
+          <div class="ex-grid" id="exceptionGallery"></div>
+        </div>
+      </section>
+
+      <!-- ============ 面板 2：账户与预算 ============ -->
+      <section class="panel" id="panel-accounts">
+        <!-- 当前可见账户（按当前空间 + 权限过滤） -->
         <div class="section-head" id="accountsSection">
           <span id="accountsSectionTitle">当前可见账户</span>
-          <span class="section-sub" id="accountsSectionSub">仅展示与你当前空间 + 角色相关的账户</span>
+          <span class="section-sub" id="accountsSectionSub">仅展示与你当前空间相关的账户</span>
         </div>
         <div class="accounts-grid" id="accountsGrid"></div>
 
@@ -463,50 +489,6 @@
               <span><span class="lg-dot available"></span>可用余额</span>
             </div>
           </section>
-        </div>
-
-        <!-- 升级版账务流水：付款账户 → 收款账户 + 变动前/后余额 + 关联订单 -->
-        <div class="section-head">账务流水 <span class="section-sub">最近 30 天 · 含付款方 / 收款方 / 变动前后余额 / 关联订单</span></div>
-        <section class="flow-card">
-          <div class="flow-head">
-            <span>共 <span id="flowCount">8</span> 条记录</span>
-            <div class="flow-filter">
-              <select id="flowAccountFilter">
-                <option value="all">所有账户</option>
-                <option value="personal-account-lixueqin">个人账户</option>
-                <option value="team-budget-cf-drama">短剧制作中心 - 预算</option>
-                <option value="team-budget-cf-marketing">市场宣传组 - 预算</option>
-                <option value="enterprise-main-cf">企业总账户</option>
-              </select>
-              <select id="flowTypeFilter">
-                <option value="all">所有类型</option>
-                <option value="recharge">充值</option>
-                <option value="lock">锁定</option>
-                <option value="unlock">解冻</option>
-                <option value="allocate">划拨</option>
-                <option value="settle">结算</option>
-                <option value="refund">退款</option>
-                <option value="withdraw">提现</option>
-                <option value="invoice">开票</option>
-              </select>
-            </div>
-          </div>
-          <div class="flow-row acct head">
-            <div></div>
-            <div>类型 / 关联订单 / 时间</div>
-            <div>付款账户 → 收款账户 / 上下文</div>
-            <div>金额 / 操作人</div>
-            <div>变动前 → 变动后</div>
-          </div>
-          <div id="flowList"></div>
-        </section>
-
-        <!-- P1-8：异常 / 边界场景预览 — 设计参考 -->
-        <div class="section-head" style="margin-top:22px">🧪 异常 / 边界状态预览 <span class="section-sub">高保真前先把支付系统真正难的部分（异常）露出来</span></div>
-        <div class="exception-gallery">
-          <h3>10 类资金异常 / 边界状态</h3>
-          <div class="ex-sub">点击右侧动作按钮可演示对应行为。运行时若条件命中（如团队余额不足、有对公充值审核中），相同样式的 banner 会自动出现在「当前空间绑定账户」上方。</div>
-          <div class="ex-grid" id="exceptionGallery"></div>
         </div>
       </section>
 

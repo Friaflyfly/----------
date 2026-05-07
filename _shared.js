@@ -389,9 +389,7 @@
       +   '</button>'
       +   '<div class="ws-dropdown" id="wsDropdown"></div>'
       + '</div>'
-      + '<div class="identity-switch" id="identitySwitch" title="切换工作台模式">'
-      +   '<button type="button" data-identity="demander"' + (identity === "demander" ? ' class="active"' : '') + '>📥 需求方</button>'
-      +   '<button type="button" data-identity="contractor"' + (identity === "contractor" ? ' class="active"' : '') + '>🛠 承制方</button>'
+      + '<div class="identity-switch" id="identitySwitch" title="进入管理 / 运营后台">'
       +   '<button type="button" data-identity="admin"' + (identity === "admin" ? ' class="active"' : '') + '>👑 管理后台</button>'
       +   '<button type="button" data-identity="ops"' + (identity === "ops" ? ' class="active"' : '') + '>🔍 运营后台</button>'
       + '</div>'
@@ -518,12 +516,6 @@
           } else if (next === "ops") {
             window.demoToast("正在进入平台运营后台…", "info");
             setTimeout(function () { location.href = "admin-demand-review.html"; }, 350);
-          } else if (next === "contractor") {
-            window.demoToast("已切换为承制方，正在跳转…", "info");
-            setTimeout(function () { location.href = "platform-home-contractor.html"; }, 400);
-          } else {
-            window.demoToast("已切换为需求方，正在跳转…", "info");
-            setTimeout(function () { location.href = "platform-home-demander.html"; }, 400);
           }
         });
       });

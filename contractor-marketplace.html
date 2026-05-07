@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>承制方广场 - 骋风天合 · 创作门户交易平台</title>
+  <title>服务广场 - 骋风天合 · 创作门户交易平台</title>
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #262626; }
@@ -183,10 +183,7 @@
       </button>
       <div class="ws-dropdown" id="wsDropdown"></div>
     </div>
-    <div class="identity-switch" id="identitySwitch">
-      <button data-identity="demander" class="active">📥 需求方</button>
-      <button data-identity="contractor">🛠 承制方</button>
-    </div>
+    <div class="identity-switch" id="identitySwitch"></div>
     <a href="wallet-overview.html" class="wallet-chip" id="walletChip">
       <span>💰</span>
       <span>
@@ -215,21 +212,33 @@
     <aside class="sidebar">
       <nav class="menu">
         <a href="platform-home-demander.html"><span class="menu-icon">🏠</span> 工作台</a>
-        <a href="demand-publish.html"><span class="menu-icon">📤</span> 发布需求</a>
-        <a href="demand-list.html"><span class="menu-icon">📋</span> 我的需求</a>
-        <a href="contractor-marketplace.html" class="active"><span class="menu-icon">🏪</span> 承制方广场</a>
-        <a href="project-space.html"><span class="menu-icon">🤝</span> 项目协同空间</a>
-        <a href="wallet-overview.html"><span class="menu-icon">💰</span> 钱包与结算</a>
+        <div class="menu-group">
+          <div class="menu-group-title">我有需求</div>
+          <a href="demand-publish.html"><span class="menu-icon">📤</span> 发布需求</a>
+          <a href="demand-list.html"><span class="menu-icon">📋</span> 我的需求</a>
+          <a href="contractor-marketplace.html" class="active"><span class="menu-icon">🏪</span> 服务广场</a>
+        </div>
+        <div class="menu-group">
+          <div class="menu-group-title">我要接单</div>
+          <a href="contractor-demand-hall.html"><span class="menu-icon">📢</span> 接单广场</a>
+          <a href="contractor-orders.html"><span class="menu-icon">📬</span> 我的接单</a>
+          <a href="contractor-profile-edit.html"><span class="menu-icon">🛍</span> 我的服务主页</a>
+        </div>
+        <div class="menu-group">
+          <div class="menu-group-title">协同</div>
+          <a href="project-space.html"><span class="menu-icon">🤝</span> 项目协同空间</a>
+        </div>
         <div class="menu-group">
           <div class="menu-group-title">账户</div>
-          <a href="account-basic-info-prototype-platform-style.html"><span class="menu-icon">⚙️</span> 账户中心</a>
+          <a href="wallet-overview.html"><span class="menu-icon">💰</span> 我的钱包</a>
+          <a href="account-basic-info-prototype-platform-style.html"><span class="menu-icon">⚙️</span> 账号中心</a>
         </div>
       </nav>
     </aside>
 
     <main class="main">
       <section class="market-banner">
-        <h1>🏪 承制方广场</h1>
+        <h1>🏪 服务广场</h1>
         <div class="mb-sub">浏览平台入驻的承制方能力、案例、报价区间，主动邀请合作；也可通过「发布需求」让平台撮合后再对比报价。</div>
         <div class="mb-stats">
           <div class="mb-stat-item"><span class="mb-stat-num">238</span> <span class="mb-stat-label">家入驻承制方</span></div>
