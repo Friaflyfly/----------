@@ -334,6 +334,109 @@
 
     @media (max-width: 1100px) { .accounts-grid { grid-template-columns: 1fr; } .flow-row { grid-template-columns: 50px 1fr 1fr 100px; } .flow-row > :nth-child(n+5) { display: none; } }
     @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding: 16px; } .ws-trigger { min-width: auto; } .topbar .brand-sub { display: none; } }
+
+    /* ============ 新版 5-Tab：附加样式 ============ */
+
+    /* 子签（销售发票 / 采购发票） */
+    .sub-tabs { display: flex; gap: 4px; padding: 4px; background: #fafafa; border: 1px solid #f0f0f0; border-radius: 8px; margin: 4px 0 14px; width: fit-content; }
+    .sub-tabs button { border: none; background: transparent; padding: 7px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; color: #595959; }
+    .sub-tabs button:hover { background: #fff; color: #1890ff; }
+    .sub-tabs button.active { background: #fff; color: #1890ff; box-shadow: 0 1px 3px rgba(0,0,0,.06); font-weight: 500; }
+    .sub-panel { display: none; }
+    .sub-panel.active { display: block; }
+
+    /* 收支记录顶部操作条 */
+    .flow-action-bar { background: #fff; border-radius: 8px; padding: 14px 18px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .flow-action-bar .fab-label { font-size: 13px; color: #595959; font-weight: 500; padding-right: 12px; border-right: 1px solid #f0f0f0; }
+    .flow-action-bar .fab-btn { height: 34px; padding: 0 14px; border-radius: 6px; border: 1px solid #d9d9d9; background: #fff; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .flow-action-bar .fab-btn:hover { border-color: #1890ff; color: #1890ff; }
+    .flow-action-bar .fab-btn.primary { background: #1890ff; border-color: #1890ff; color: #fff; }
+    .flow-action-bar .fab-btn.primary:hover { background: #40a9ff; border-color: #40a9ff; }
+    .flow-action-bar .fab-btn.warn { background: #fa8c16; border-color: #fa8c16; color: #fff; }
+    .flow-action-bar .fab-btn.warn:hover { background: #ffa940; border-color: #ffa940; }
+    .flow-action-bar .fab-btn.purple { background: #722ed1; border-color: #722ed1; color: #fff; }
+    .flow-action-bar .fab-btn.purple:hover { background: #9254de; border-color: #9254de; }
+
+    /* 迷你流水（概览/账户 Tab 用，最多 5 条 + 查看全部 →） */
+    .mini-flow-card { background: #fff; border-radius: 8px; overflow: hidden; }
+    .mini-flow-head { padding: 12px 18px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 500; }
+    .mini-flow-head .mf-link { font-size: 12px; color: #1890ff; cursor: pointer; text-decoration: none; }
+    .mini-flow-head .mf-link:hover { text-decoration: underline; }
+    .mini-flow-row { display: grid; grid-template-columns: 32px 1fr 1.2fr 110px; padding: 10px 18px; align-items: center; border-bottom: 1px solid #f5f5f5; font-size: 13px; gap: 12px; }
+    .mini-flow-row:last-child { border-bottom: none; }
+    .mini-flow-row .mf-icon { font-size: 18px; }
+    .mini-flow-row .mf-title { font-weight: 500; color: #262626; }
+    .mini-flow-row .mf-meta { font-size: 11px; color: #8c8c8c; margin-top: 2px; }
+    .mini-flow-row .mf-amt { font-weight: 600; text-align: right; }
+    .mini-flow-row .mf-amt.in { color: #389e0d; }
+    .mini-flow-row .mf-amt.out { color: #cf1322; }
+    .mini-flow-row .mf-amt.lock { color: #d46b08; }
+    @media (max-width: 900px) { .mini-flow-row { grid-template-columns: 32px 1fr 100px; } .mini-flow-row > :nth-child(3) { display: none; } }
+
+    /* 抽屉（替代 modal，从右侧滑入） */
+    .drawer-mask { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 998; }
+    .drawer-mask.open { display: block; }
+    .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 100%; max-width: 540px; background: #fff; box-shadow: -8px 0 24px rgba(0,0,0,.18); z-index: 999; transform: translateX(100%); transition: transform .25s ease-out; display: flex; flex-direction: column; }
+    .drawer.open { transform: translateX(0); }
+    .drawer-head { padding: 16px 22px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-shrink: 0; }
+    .drawer-head h3 { margin: 0; font-size: 16px; font-weight: 600; }
+    .drawer-head .dh-sub { margin: 4px 0 0; font-size: 12px; color: #8c8c8c; }
+    .drawer-head .dh-close { background: transparent; border: none; font-size: 18px; color: #8c8c8c; cursor: pointer; padding: 4px 8px; }
+    .drawer-head .dh-close:hover { color: #262626; }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 18px 22px; }
+    .drawer-foot { padding: 12px 22px; background: #fafafa; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 8px; flex-shrink: 0; }
+    @media (max-width: 600px) { .drawer { max-width: 100%; } }
+
+    /* 钱包设置 — 6 块卡片 */
+    .settings-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+    .settings-block { background: #fff; border-radius: 10px; padding: 18px 22px; border: 1px solid #f0f0f0; }
+    .settings-block .sb-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .settings-block .sb-head h3 { margin: 0 0 4px; font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .settings-block .sb-head .sb-desc { font-size: 12px; color: #8c8c8c; line-height: 1.6; }
+    .settings-block .sb-head .sb-status { flex-shrink: 0; padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+    .settings-block .sb-head .sb-status.ok { background: #f6ffed; color: #389e0d; }
+    .settings-block .sb-head .sb-status.warn { background: #fff7e6; color: #d46b08; }
+    .settings-block .sb-head .sb-status.danger { background: #fff1f0; color: #cf1322; }
+    .settings-block .sb-body { font-size: 13px; color: #262626; }
+    .settings-row { display: grid; grid-template-columns: 220px 1fr auto; gap: 14px; align-items: center; padding: 10px 0; border-bottom: 1px dashed #f5f5f5; }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-row .sr-label { font-size: 13px; color: #595959; }
+    .settings-row .sr-label .sr-tip { font-size: 11px; color: #8c8c8c; margin-top: 2px; }
+    .settings-row .sr-value { font-size: 13px; color: #262626; font-weight: 500; }
+    .settings-row .sr-value .sr-meta { font-size: 11px; color: #8c8c8c; font-weight: 400; margin-top: 2px; }
+    .settings-row .sr-action { display: flex; gap: 6px; }
+    .settings-row .sr-action .sr-link { font-size: 12px; color: #1890ff; cursor: pointer; }
+    .settings-row .sr-action .sr-link:hover { text-decoration: underline; }
+    .settings-row .sr-action .sr-link.danger { color: #cf1322; }
+    .settings-block .sb-foot { padding-top: 12px; margin-top: 6px; border-top: 1px solid #f5f5f5; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .settings-block .sb-foot .sb-foot-tip { font-size: 11px; color: #8c8c8c; }
+
+    .toggle { position: relative; width: 36px; height: 20px; background: #d9d9d9; border-radius: 10px; cursor: pointer; transition: background .2s; }
+    .toggle.on { background: #52c41a; }
+    .toggle::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: #fff; border-radius: 50%; transition: transform .2s; }
+    .toggle.on::after { transform: translateX(16px); }
+
+    .card-list { display: grid; gap: 8px; }
+    .card-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: 1px solid #f0f0f0; border-radius: 8px; }
+    .card-item .ci-logo { width: 32px; height: 32px; border-radius: 6px; background: linear-gradient(135deg,#003a8c,#1890ff); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .card-item .ci-main { flex: 1; min-width: 0; }
+    .card-item .ci-title { font-size: 13px; font-weight: 500; }
+    .card-item .ci-meta { font-size: 11px; color: #8c8c8c; }
+    .card-item .ci-default { padding: 2px 8px; border-radius: 10px; background: #e6f7ff; color: #1890ff; font-size: 11px; font-weight: 500; }
+    .card-item .ci-actions { display: flex; gap: 8px; }
+    .card-item .ci-actions a { font-size: 12px; color: #1890ff; cursor: pointer; }
+    .card-item .ci-actions a.danger { color: #cf1322; }
+    .card-item .ci-actions a:hover { text-decoration: underline; }
+
+    /* 仅管理员可见的控件占位 */
+    .admin-only-tip { font-size: 11px; color: #d46b08; padding: 8px 12px; background: #fff7e6; border-left: 3px solid #fa8c16; border-radius: 4px; }
+
+    /* 申请开票 / 提现 抽屉里的下拉发票项目 */
+    .invoice-item-list { display: grid; gap: 8px; max-height: 220px; overflow-y: auto; padding: 4px; border: 1px solid #f0f0f0; border-radius: 6px; background: #fafafa; }
+    .invoice-item-list label { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: #fff; border-radius: 6px; cursor: pointer; font-size: 13px; }
+    .invoice-item-list label:hover { background: #e6f7ff; }
+    .invoice-item-list .ii-meta { font-size: 11px; color: #8c8c8c; margin-left: 4px; }
+    .invoice-item-list .ii-amt { color: #d46b08; font-weight: 600; margin-left: auto; }
   </style>
 </head>
 <body>
@@ -415,20 +518,18 @@
         <span class="ctx-rule" id="ctxRuleNote">本空间下发起的订单，将默认从「短剧制作中心 - 团队预算账户」中扣款或冻结资金。</span>
       </div>
 
-      <!-- 页内功能 Tab：按"看 / 管 / 收支动作 / 凭证 / 设置"切分 -->
+      <!-- 5-Tab：场景化结构 -->
       <div class="role-tabs" id="roleTabs">
-        <button data-tab="overview" class="active">📊 资金总览</button>
+        <button data-tab="overview" class="active">📊 概览</button>
         <button data-tab="accounts">🏦 账户与预算</button>
-        <button data-tab="recharge">💳 充值与冻结</button>
-        <button data-tab="withdraw">💸 收入与提现</button>
-        <button data-tab="flows">📜 账务流水</button>
+        <button data-tab="flows">💸 收支记录</button>
         <button data-tab="invoice">🧾 发票</button>
         <button data-tab="settings">⚙️ 钱包设置</button>
       </div>
 
-      <!-- ============ 面板 1：资金总览 ============ -->
+      <!-- ============ Tab 1：概览 ============ -->
       <section class="panel active" id="panel-overview">
-        <!-- 当前空间绑定账户（仪表盘的 hero） -->
+        <!-- 当前空间绑定账户（仪表盘 hero） -->
         <div class="section-head">当前空间绑定账户 <span class="section-sub">切换顶部空间，下方卡片实时变化</span></div>
         <div class="current-card team-budget" id="currentCard">
           <div class="cc-label">当前工作空间：<span id="ccWsName">骋风天合 · 短剧制作中心</span></div>
@@ -448,27 +549,32 @@
           </div>
         </div>
 
-        <!-- KPI 总览（统一双角色视图：可用 / 锁定 / 待结算 / 可提现） -->
+        <!-- KPI 总览 -->
         <div class="section-head" style="margin-top:18px">关键指标 <span class="section-sub">融合「我的需求」+「我的接单」两类视角</span></div>
         <div class="kpi-row" id="kpiRow"></div>
 
         <!-- 待处理事项 -->
         <div class="pending-bar" id="pendingBar"></div>
 
-        <!-- P1-8：实时异常 banner（条件命中时自动出现） -->
+        <!-- 实时异常 banner（条件命中时自动出现） -->
         <div id="liveBanners"></div>
 
-        <!-- P1-8：异常 / 边界场景预览 — 设计参考 -->
-        <div class="section-head" style="margin-top:22px">🧪 异常 / 边界状态预览 <span class="section-sub">高保真前先把支付系统真正难的部分（异常）露出来</span></div>
-        <div class="exception-gallery">
-          <h3>10 类资金异常 / 边界状态</h3>
-          <div class="ex-sub">点击右侧动作按钮可演示对应行为。运行时若条件命中（如团队余额不足、有对公充值审核中），相同样式的 banner 会自动出现在「当前空间绑定账户」上方。</div>
-          <div class="ex-grid" id="exceptionGallery"></div>
+        <!-- 最近 5 条收支（链到 Tab 3） -->
+        <div class="section-head" style="margin-top:18px">最近收支 <span class="section-sub">仅显示最近 5 条；完整流水请见「收支记录」</span></div>
+        <div class="mini-flow-card">
+          <div class="mini-flow-head">
+            <div>📒 最近 5 条与本空间相关的资金变动</div>
+            <a class="mf-link" data-jump-tab="flows">查看全部 →</a>
+          </div>
+          <div id="overviewMiniFlows"></div>
         </div>
       </section>
 
-      <!-- ============ 面板 2：账户与预算 ============ -->
+      <!-- ============ Tab 2：账户与预算 ============ -->
       <section class="panel" id="panel-accounts">
+        <!-- 顶部快捷动作（按账户类型显示） -->
+        <div class="flow-action-bar" id="accountsActionBar"></div>
+
         <!-- 当前可见账户（按当前空间 + 权限过滤） -->
         <div class="section-head" id="accountsSection">
           <span id="accountsSectionTitle">当前可见账户</span>
@@ -476,9 +582,13 @@
         </div>
         <div class="accounts-grid" id="accountsGrid"></div>
 
-        <!-- 团队预算使用率（仅团队空间 + 管理员视角可见） -->
+        <!-- 冻结余额拆分（订单 / 退款 / 纠纷） -->
+        <div class="section-head" style="margin-top:18px">🔒 冻结余额拆分 <span class="section-sub">本空间绑定账户的冻结资金分布</span></div>
+        <div class="frozen-breakdown" id="frozenBreakdown"></div>
+
+        <!-- 团队预算使用率（个人空间隐藏） -->
         <div id="budgetUsageWrap">
-          <div class="section-head"><span id="budgetSectionTitle">团队预算使用率</span> <span class="section-sub" id="budgetSectionSub">本季度（2026 Q2）</span></div>
+          <div class="section-head" style="margin-top:18px"><span id="budgetSectionTitle">团队预算使用率</span> <span class="section-sub" id="budgetSectionSub">本季度（2026 Q2）</span></div>
           <section class="budget-usage-card">
             <h3 id="budgetCardTitle">各团队预算分配与使用情况</h3>
             <div class="bu-sub" id="budgetCardSub">企业总账户共划拨 ¥270,000 至 2 个团队，本季度已使用 ¥73,000（含已结算 + 已锁定）。</div>
@@ -490,172 +600,296 @@
             </div>
           </section>
         </div>
+
+        <!-- 本空间最近 5 条收支（链到 Tab 3） -->
+        <div class="section-head" style="margin-top:18px">本空间最近收支 <span class="section-sub">仅显示最近 5 条；完整流水请见「收支记录」</span></div>
+        <div class="mini-flow-card">
+          <div class="mini-flow-head">
+            <div>📒 与当前空间绑定账户相关的最近 5 条变动</div>
+            <a class="mf-link" data-jump-tab="flows">查看全部 →</a>
+          </div>
+          <div id="accountsMiniFlows"></div>
+        </div>
       </section>
 
-      <!-- ============ 面板 B：需求方结算 ============ -->
-      <section class="panel" id="panel-demander">
-        <div class="section-head">📥 需求方结算 <span class="section-sub">下单 / 锁资 / 验收 / 退款 链路下的资金视图</span></div>
+      <!-- ============ Tab 3：收支记录（唯一全量流水） ============ -->
+      <section class="panel" id="panel-flows">
+        <!-- 顶部操作条：充值 / 提现 / 划拨 全部走"按钮 → 抽屉" -->
+        <div class="flow-action-bar" id="flowsActionBar">
+          <span class="fab-label">📌 资金动作</span>
+          <button class="fab-btn primary" data-action="recharge">💳 充值</button>
+          <button class="fab-btn warn" data-action="withdraw">💸 提现</button>
+          <button class="fab-btn purple" data-action="allocate" id="flowsAllocateBtn">📤 划拨预算</button>
+          <button class="fab-btn" data-action="invoice">🧾 申请开票</button>
+          <span style="margin-left:auto;font-size:12px;color:#8c8c8c">所有动作以抽屉形式展开，提交后回写本表</span>
+        </div>
 
-        <!-- 余额 + 冻结拆分 -->
-        <div class="kpi-row" id="demanderKpiRow"></div>
-
-        <!-- 冻结余额拆分（订单冻结 / 退款冻结 / 纠纷冻结） -->
-        <div class="section-head">🔒 冻结余额拆分 <span class="section-sub">点击查看明细</span></div>
-        <div class="frozen-breakdown" id="frozenBreakdown"></div>
-
-        <!-- 订单消费流水 -->
-        <div class="section-head">订单消费流水 <span class="section-sub">由本空间发起、扣减绑定账户的订单</span></div>
-        <div class="simple-list" id="demanderOrderFlows"></div>
-
-        <!-- 退款记录（原路退款） -->
-        <div class="section-head" style="margin-top:18px">原路退款记录 <span class="section-sub">退款将原路退回原付款账户</span></div>
-        <div class="simple-list" id="demanderRefundFlows"></div>
+        <!-- 完整流水卡片 -->
+        <div class="section-head">📜 完整账务流水 <span class="section-sub">本页面唯一展示全量流水的位置</span></div>
+        <section class="flow-card">
+          <div class="flow-head">
+            <div>共 <span id="flowCount">0</span> 条流水</div>
+            <div class="flow-filter">
+              <select id="flowAccountFilter">
+                <option value="all">全部账户</option>
+                <option value="personal-account-lixueqin">个人账户</option>
+                <option value="team-budget-cf-drama">短剧制作中心 - 团队预算账户</option>
+                <option value="team-budget-cf-marketing">市场宣传组 - 团队预算账户</option>
+                <option value="team-budget-cf-ip">IP 孵化组 - 团队预算账户</option>
+                <option value="enterprise-main-cf">骋风天合 - 企业总账户</option>
+              </select>
+              <select id="flowTypeFilter">
+                <option value="all">全部类型</option>
+                <option value="recharge">💳 充值</option>
+                <option value="lock">🔒 锁定</option>
+                <option value="unlock">🔓 解冻</option>
+                <option value="allocate">📤 划拨</option>
+                <option value="settle">✅ 结算</option>
+                <option value="refund">↩️ 退款</option>
+                <option value="withdraw">💸 提现</option>
+                <option value="invoice">🧾 开票</option>
+              </select>
+            </div>
+          </div>
+          <div class="flow-row acct head">
+            <div></div>
+            <div>类型 / 关联订单 / 时间</div>
+            <div>付款 → 收款 / 上下文</div>
+            <div>金额 / 操作人</div>
+            <div>变动前 → 变动后</div>
+          </div>
+          <div id="flowList"></div>
+        </section>
       </section>
 
-      <!-- ============ 面板 C：承制方结算 ============ -->
-      <section class="panel" id="panel-contractor">
-        <div class="section-head">🛠 承制方结算 <span class="section-sub">交付 / 验收 / 结算 / 提现 / 开票 链路下的收入视图</span></div>
+      <!-- ============ Tab 4：发票（销售 / 采购 子签） ============ -->
+      <section class="panel" id="panel-invoice">
+        <div class="flow-action-bar">
+          <span class="fab-label">🧾 发票管理</span>
+          <button class="fab-btn primary" data-action="invoice">📝 申请开票</button>
+          <span style="margin-left:auto;font-size:12px;color:#8c8c8c">已开具 / 待开具 / 已收票 三态可视化</span>
+        </div>
 
-        <!-- 收入概览 -->
-        <div class="income-grid" id="contractorIncomeGrid"></div>
+        <div class="sub-tabs" id="invoiceSubTabs">
+          <button data-sub="sales" class="active">📤 销售发票（我开给客户）</button>
+          <button data-sub="purchase">📥 采购发票（客户开给我）</button>
+        </div>
 
-        <!-- 提现记录 -->
-        <div class="section-head">💸 提现记录 <span class="section-sub">最近 90 天</span></div>
-        <div class="simple-list" id="contractorWithdrawList"></div>
+        <!-- 销售发票（承制方视角：已结算订单 / 待开票 / 已开具） -->
+        <div class="sub-panel active" id="sub-invoice-sales">
+          <div class="info-tip" style="margin-bottom:12px">
+            销售发票：<strong>由「我」作为承制方</strong>开给需求方客户的发票。已结算订单可申请开票，平台审核后回传 PDF / 寄送纸质票。
+          </div>
+          <div class="kpi-row" id="salesInvoiceKpis"></div>
+          <div class="section-head">销售发票列表</div>
+          <div class="simple-list" id="salesInvoiceList"></div>
+        </div>
 
-        <!-- 收入流水 -->
-        <div class="section-head" style="margin-top:18px">📈 收入流水 <span class="section-sub">来自需求方订单的结算入账</span></div>
-        <div class="simple-list" id="contractorIncomeFlows"></div>
+        <!-- 采购发票（需求方视角：已下单 / 已结算 / 已收票） -->
+        <div class="sub-panel" id="sub-invoice-purchase">
+          <div class="info-tip" style="margin-bottom:12px">
+            采购发票：<strong>由承制方开给「我」</strong>作为需求方客户的发票。已结算订单可催开 / 收票，本企业用于税务抵扣。
+          </div>
+          <div class="kpi-row" id="purchaseInvoiceKpis"></div>
+          <div class="section-head">采购发票列表</div>
+          <div class="simple-list" id="purchaseInvoiceList"></div>
+        </div>
+      </section>
 
-        <!-- 开票入口 -->
-        <div class="section-head" style="margin-top:18px">🧾 开票申请 <span class="section-sub">已结算订单可申请开票</span></div>
-        <div class="simple-list" id="contractorInvoiceList"></div>
+      <!-- ============ Tab 5：钱包设置（V1 6 块） ============ -->
+      <section class="panel" id="panel-settings">
+        <div class="info-tip" style="margin-bottom:14px">
+          ⚙️ 这里集中维护「钱包扣款规则、资金通道、通知偏好与安全」相关配置。涉及预算 / 对公账户的项目仅企业管理员可改。
+        </div>
+        <div class="settings-grid" id="settingsGrid"></div>
       </section>
     </main>
   </div>
 
-  <!-- 充值 modal -->
-  <div class="modal-mask" id="rechargeModal">
-    <div class="modal">
-      <div class="modal-head">
+  <!-- ============ 通用抽屉遮罩（一份遮罩管所有抽屉） ============ -->
+  <div class="drawer-mask" id="drawerMask"></div>
+
+  <!-- 充值抽屉 -->
+  <div class="drawer" id="rechargeDrawer" data-drawer="recharge">
+    <div class="drawer-head">
+      <div>
         <h3>💳 账户充值</h3>
-        <p id="rechargeAccountName">骋风天合 - 企业总账户</p>
+        <p class="dh-sub" id="rechargeAccountName">骋风天合 - 企业总账户</p>
       </div>
-      <div class="modal-body">
-        <div class="info-tip" id="rechargeInfoTip">
-          在线充值实时到账；对公转账需上传凭证后由财务审核（约 1 个工作日）。
-        </div>
-        <div class="form-field">
-          <label>充值金额（元）</label>
-          <input type="number" id="rechargeAmount" placeholder="请输入金额" min="100">
-          <div class="quick-amt">
-            <button data-amt="1000">¥1,000</button>
-            <button data-amt="5000">¥5,000</button>
-            <button data-amt="20000">¥2万</button>
-            <button data-amt="50000">¥5万</button>
-            <button data-amt="100000">¥10万</button>
-          </div>
-        </div>
-        <div class="form-field">
-          <label>充值方式</label>
-          <select id="rechargeMethod">
-            <option value="online-alipay">支付宝（实时到账）</option>
-            <option value="online-wechat">微信支付（实时到账）</option>
-            <option value="online-unionpay">银联（实时到账）</option>
-            <option value="bank-transfer">对公转账（财务审核）</option>
-          </select>
-        </div>
-        <div class="summary-box">
-          <div class="sb-row"><span class="sb-label">充值至账户</span><span class="sb-val" id="rechargeTargetName">企业总账户</span></div>
-          <div class="sb-row"><span class="sb-label">当前余额</span><span class="sb-val" id="rechargeCurrentBalance">¥0</span></div>
-          <div class="sb-row"><span class="sb-label">充值金额</span><span class="sb-val" id="rechargeAmtPreview" style="color:#389e0d">+¥0</span></div>
-          <div class="sb-row" style="border-top:1px solid #e8e8e8;padding-top:8px;margin-top:4px"><span class="sb-label">到账后余额</span><span class="sb-val" id="rechargeAfterBalance" style="color:#389e0d;font-size:16px">¥0</span></div>
+      <button class="dh-close" data-close-drawer>×</button>
+    </div>
+    <div class="drawer-body">
+      <div class="info-tip" id="rechargeInfoTip">
+        在线充值实时到账；对公转账需上传凭证后由财务审核（约 1 个工作日）。
+      </div>
+      <div class="form-field">
+        <label>充值金额（元）</label>
+        <input type="number" id="rechargeAmount" placeholder="请输入金额" min="100">
+        <div class="quick-amt">
+          <button data-amt="1000">¥1,000</button>
+          <button data-amt="5000">¥5,000</button>
+          <button data-amt="20000">¥2万</button>
+          <button data-amt="50000">¥5万</button>
+          <button data-amt="100000">¥10万</button>
         </div>
       </div>
-      <div class="modal-foot">
-        <button class="btn" onclick="document.getElementById('rechargeModal').classList.remove('open')">取消</button>
-        <button class="btn primary" id="rechargeConfirmBtn">确认充值</button>
+      <div class="form-field">
+        <label>充值方式</label>
+        <select id="rechargeMethod">
+          <option value="online-alipay">支付宝（实时到账）</option>
+          <option value="online-wechat">微信支付（实时到账）</option>
+          <option value="online-unionpay">银联（实时到账）</option>
+          <option value="bank-transfer">对公转账（财务审核）</option>
+        </select>
       </div>
+      <div class="summary-box">
+        <div class="sb-row"><span class="sb-label">充值至账户</span><span class="sb-val" id="rechargeTargetName">企业总账户</span></div>
+        <div class="sb-row"><span class="sb-label">当前余额</span><span class="sb-val" id="rechargeCurrentBalance">¥0</span></div>
+        <div class="sb-row"><span class="sb-label">充值金额</span><span class="sb-val" id="rechargeAmtPreview" style="color:#389e0d">+¥0</span></div>
+        <div class="sb-row" style="border-top:1px solid #e8e8e8;padding-top:8px;margin-top:4px"><span class="sb-label">到账后余额</span><span class="sb-val" id="rechargeAfterBalance" style="color:#389e0d;font-size:16px">¥0</span></div>
+      </div>
+    </div>
+    <div class="drawer-foot">
+      <button class="btn" data-close-drawer>取消</button>
+      <button class="btn primary" id="rechargeConfirmBtn">确认充值</button>
     </div>
   </div>
 
-  <!-- 团队预算划拨 modal（管理员视角） -->
-  <div class="modal-mask" id="allocateModal">
-    <div class="modal">
-      <div class="modal-head">
+  <!-- 团队预算划拨抽屉（管理员视角） -->
+  <div class="drawer" id="allocateDrawer" data-drawer="allocate">
+    <div class="drawer-head">
+      <div>
         <h3>📤 团队预算划拨</h3>
-        <p>从企业总账户划拨预算到指定团队预算账户</p>
+        <p class="dh-sub">从企业总账户划拨预算到指定团队预算账户</p>
       </div>
-      <div class="modal-body">
-        <div class="info-tip">
-          仅企业管理员可操作。划拨后，对应团队成员在该团队空间下下单时将优先消耗该预算账户。
-        </div>
-        <div class="form-field">
-          <label>从（来源账户）</label>
-          <input type="text" value="骋风天合 - 企业总账户（余额 ¥1,250,000）" disabled>
-        </div>
-        <div class="form-field">
-          <label>到（目标团队预算账户）</label>
-          <select id="allocateTarget">
-            <option value="team-budget-cf-drama">短剧制作中心（当前 ¥185,000）</option>
-            <option value="team-budget-cf-marketing">市场宣传组（当前 ¥62,000）</option>
-            <option value="team-budget-cf-ip">IP 孵化组（暂未开通预算账户）</option>
-          </select>
-        </div>
-        <div class="form-field">
-          <label>划拨金额（元）</label>
-          <input type="number" id="allocateAmount" placeholder="请输入金额" min="1000">
-          <div class="quick-amt">
-            <button data-amt="10000">¥1万</button>
-            <button data-amt="50000">¥5万</button>
-            <button data-amt="100000">¥10万</button>
-            <button data-amt="200000">¥20万</button>
-          </div>
-        </div>
-        <div class="summary-box">
-          <div class="sb-row"><span class="sb-label">企业总账户当前余额</span><span class="sb-val" id="allocFromBalance">¥1,250,000</span></div>
-          <div class="sb-row"><span class="sb-label">划拨金额</span><span class="sb-val" id="allocAmtPreview" style="color:#cf1322">−¥0</span></div>
-          <div class="sb-row"><span class="sb-label">企业总账户划拨后</span><span class="sb-val" id="allocFromAfter">¥1,250,000</span></div>
-          <div class="sb-arrow">↓</div>
-          <div class="sb-row"><span class="sb-label">目标账户当前余额</span><span class="sb-val" id="allocToBalance">¥185,000</span></div>
-          <div class="sb-row"><span class="sb-label">划拨后</span><span class="sb-val" id="allocToAfter" style="color:#389e0d;font-size:16px">¥185,000</span></div>
+      <button class="dh-close" data-close-drawer>×</button>
+    </div>
+    <div class="drawer-body">
+      <div class="info-tip">
+        仅企业管理员可操作。划拨后，对应团队成员在该团队空间下下单时将优先消耗该预算账户。
+      </div>
+      <div class="form-field">
+        <label>从（来源账户）</label>
+        <input type="text" value="骋风天合 - 企业总账户（余额 ¥1,250,000）" disabled>
+      </div>
+      <div class="form-field">
+        <label>到（目标团队预算账户）</label>
+        <select id="allocateTarget">
+          <option value="team-budget-cf-drama">短剧制作中心（当前 ¥185,000）</option>
+          <option value="team-budget-cf-marketing">市场宣传组（当前 ¥62,000）</option>
+          <option value="team-budget-cf-ip">IP 孵化组（暂未开通预算账户）</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>划拨金额（元）</label>
+        <input type="number" id="allocateAmount" placeholder="请输入金额" min="1000">
+        <div class="quick-amt">
+          <button data-amt="10000">¥1万</button>
+          <button data-amt="50000">¥5万</button>
+          <button data-amt="100000">¥10万</button>
+          <button data-amt="200000">¥20万</button>
         </div>
       </div>
-      <div class="modal-foot">
-        <button class="btn" onclick="document.getElementById('allocateModal').classList.remove('open')">取消</button>
-        <button class="btn primary" id="allocConfirmBtn">确认划拨</button>
+      <div class="summary-box">
+        <div class="sb-row"><span class="sb-label">企业总账户当前余额</span><span class="sb-val" id="allocFromBalance">¥1,250,000</span></div>
+        <div class="sb-row"><span class="sb-label">划拨金额</span><span class="sb-val" id="allocAmtPreview" style="color:#cf1322">−¥0</span></div>
+        <div class="sb-row"><span class="sb-label">企业总账户划拨后</span><span class="sb-val" id="allocFromAfter">¥1,250,000</span></div>
+        <div class="sb-arrow">↓</div>
+        <div class="sb-row"><span class="sb-label">目标账户当前余额</span><span class="sb-val" id="allocToBalance">¥185,000</span></div>
+        <div class="sb-row"><span class="sb-label">划拨后</span><span class="sb-val" id="allocToAfter" style="color:#389e0d;font-size:16px">¥185,000</span></div>
       </div>
+    </div>
+    <div class="drawer-foot">
+      <button class="btn" data-close-drawer>取消</button>
+      <button class="btn primary" id="allocConfirmBtn">确认划拨</button>
     </div>
   </div>
 
-  <!-- 提现 modal -->
-  <div class="modal-mask" id="withdrawModal">
-    <div class="modal">
-      <div class="modal-head">
+  <!-- 提现抽屉 -->
+  <div class="drawer" id="withdrawDrawer" data-drawer="withdraw">
+    <div class="drawer-head">
+      <div>
         <h3>💸 余额提现</h3>
-        <p id="withdrawAccountName">个人账户</p>
+        <p class="dh-sub" id="withdrawAccountName">个人账户</p>
       </div>
-      <div class="modal-body">
-        <div class="info-tip">
-          提现申请提交后由风控/财务审核，审核通过后 1-3 个工作日到账。
-        </div>
-        <div class="form-field">
-          <label>提现金额（元）</label>
-          <input type="number" id="withdrawAmount" placeholder="请输入金额">
-          <div style="font-size:12px;color:#8c8c8c;margin-top:4px">可提现 <span id="withdrawableAmount" style="color:#1890ff;font-weight:500">¥0</span></div>
-        </div>
-        <div class="form-field">
-          <label>到账银行卡</label>
-          <select>
-            <option>中国建设银行 储蓄卡 (尾号 8826)</option>
-            <option>+ 添加新银行卡</option>
-          </select>
-        </div>
+      <button class="dh-close" data-close-drawer>×</button>
+    </div>
+    <div class="drawer-body">
+      <div class="info-tip">
+        提现申请提交后由风控/财务审核，审核通过后 1-3 个工作日到账。单笔提现 ≤ ¥100,000，每日累计 ≤ ¥500,000。
       </div>
-      <div class="modal-foot">
-        <button class="btn" onclick="document.getElementById('withdrawModal').classList.remove('open')">取消</button>
-        <button class="btn primary" id="withdrawConfirmBtn">提交提现申请</button>
+      <div class="form-field">
+        <label>提现金额（元）</label>
+        <input type="number" id="withdrawAmount" placeholder="请输入金额">
+        <div style="font-size:12px;color:#8c8c8c;margin-top:4px">可提现 <span id="withdrawableAmount" style="color:#1890ff;font-weight:500">¥0</span></div>
       </div>
+      <div class="form-field">
+        <label>到账银行卡</label>
+        <select>
+          <option>中国建设银行 储蓄卡 (尾号 8826) · 默认</option>
+          <option>+ 添加新银行卡（去「钱包设置 → 银行卡」）</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>备注（可选）</label>
+        <input type="text" placeholder="如：本月稿酬 / 项目结款">
+      </div>
+    </div>
+    <div class="drawer-foot">
+      <button class="btn" data-close-drawer>取消</button>
+      <button class="btn primary" id="withdrawConfirmBtn">提交提现申请</button>
+    </div>
+  </div>
+
+  <!-- 申请开票抽屉 -->
+  <div class="drawer" id="invoiceDrawer" data-drawer="invoice">
+    <div class="drawer-head">
+      <div>
+        <h3>🧾 申请开票</h3>
+        <p class="dh-sub" id="invoiceDrawerSub">选择已结算订单后填写抬头信息提交</p>
+      </div>
+      <button class="dh-close" data-close-drawer>×</button>
+    </div>
+    <div class="drawer-body">
+      <div class="info-tip">
+        发票审核通过后 3-5 个工作日开具。专票需提供完整税务信息；普票仅需抬头与税号即可。
+      </div>
+      <div class="form-field">
+        <label>开票方向</label>
+        <select id="invoiceDirection">
+          <option value="sales">📤 销售发票（我开给客户）</option>
+          <option value="purchase">📥 采购发票（向承制方催开）</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>选择关联订单（可多选合并开票）</label>
+        <div class="invoice-item-list" id="invoiceItemList"></div>
+        <div style="font-size:11px;color:#8c8c8c;margin-top:6px">已选合计：<span id="invoiceTotal" style="color:#d46b08;font-weight:600">¥0</span></div>
+      </div>
+      <div class="form-field">
+        <label>票种</label>
+        <select id="invoiceType">
+          <option value="special">增值税专用发票（专票，可抵扣）</option>
+          <option value="normal">增值税普通发票（普票）</option>
+          <option value="electronic">电子发票（PDF）</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>抬头</label>
+        <input type="text" id="invoiceTitle" value="骋风天合（北京）文化传媒有限公司">
+      </div>
+      <div class="form-field">
+        <label>统一社会信用代码 / 税号</label>
+        <input type="text" id="invoiceTaxId" value="91110108MA01XXXXXX">
+      </div>
+      <div class="form-field">
+        <label>开户行 / 账号 / 地址 / 电话（专票必填）</label>
+        <input type="text" placeholder="如：建设银行北京海淀支行 / 1100 1234 5600 0000 / 北京市海淀区中关村大街 1 号 / 010-8888 8888">
+      </div>
+    </div>
+    <div class="drawer-foot">
+      <button class="btn" data-close-drawer>取消</button>
+      <button class="btn primary" id="invoiceConfirmBtn">提交开票申请</button>
     </div>
   </div>
 
@@ -818,12 +1052,18 @@
       target.innerHTML = banners.map(bannerHtml).join("");
     }
 
-    // P0-3 / P0-1：页内 Tab（资金总览 / 需求方结算 / 承制方结算）
+    // 5-Tab：仅切换 panel；身份切换不再切换 Tab，只刷新内容
+    const VALID_TABS = ["overview", "accounts", "flows", "invoice", "settings"];
     function setActiveTab(name) {
+      if (!VALID_TABS.includes(name)) name = "overview";
       document.querySelectorAll("#roleTabs button").forEach(b => b.classList.toggle("active", b.getAttribute("data-tab") === name));
       document.querySelectorAll(".panel").forEach(p => p.classList.toggle("active", p.id === "panel-" + name));
-      if (name === "demander") renderDemanderPanel();
-      if (name === "contractor") renderContractorPanel();
+      // 各 Tab 切换时按需重渲染
+      if (name === "overview") renderMiniFlows("overviewMiniFlows", "all");
+      if (name === "accounts") { renderAccountsActionBar(); renderFrozenBreakdown(); renderMiniFlows("accountsMiniFlows", "current"); }
+      if (name === "flows") renderFlows();
+      if (name === "invoice") renderInvoicePanel();
+      if (name === "settings") renderSettingsPanel();
       try { localStorage.setItem("walletPanelTab", name); } catch (e) {}
     }
     document.getElementById("roleTabs").addEventListener("click", function (e) {
@@ -832,7 +1072,16 @@
       setActiveTab(b.getAttribute("data-tab"));
     });
 
-    // P0-1：拦截顶部需求方/承制方 — 在钱包页内不跳走，仅切换面板（管理后台由 SharedHeader 真跳转）
+    // 「查看全部 →」迷你流水跳到 Tab 3
+    document.addEventListener("click", function (e) {
+      const j = e.target.closest("[data-jump-tab]");
+      if (!j) return;
+      e.preventDefault();
+      setActiveTab(j.getAttribute("data-jump-tab"));
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    // 顶部需求方/承制方切换：钱包页内不跳走，仅刷新指标 / 大卡 / 待办
     document.addEventListener("click", function (e) {
       const b = e.target.closest("#identitySwitch button[data-identity]");
       if (!b) return;
@@ -842,13 +1091,16 @@
       e.preventDefault();
       window.demoApp.setCurrentIdentity(next);
       document.querySelectorAll("#identitySwitch button").forEach(x => x.classList.toggle("active", x === b));
-      setActiveTab(next === "contractor" ? "contractor" : "demander");
       renderContextBanner();
+      renderCurrentCard();
       renderKPIs();
+      // 当前 Tab 也刷新一遍（特别是发票，需求方/承制方默认子签不同）
+      const cur = document.querySelector("#roleTabs button.active");
+      if (cur) setActiveTab(cur.getAttribute("data-tab"));
       window.demoToast(next === "contractor"
-        ? "已切换到承制方视角，下方为收入 / 提现 / 开票"
-        : "已切换到需求方视角，下方为充值 / 冻结 / 退款", "info");
-    }, true); // capture phase 抢先于 SharedHeader 跳转
+        ? "已切换到承制方视角：KPI / 待办 / 发票默认子签 已切换"
+        : "已切换到需求方视角：KPI / 待办 / 发票默认子签 已切换", "info");
+    }, true);
 
     // P2-14：工作空间切换提示（SharedHeader 切换会 reload，这里读取上次 hint 再 toast）
     (function workspaceSwitchHint() {
@@ -951,12 +1203,13 @@
         primary = '<button class="cc-btn" onclick="window.openRecharge(\'' + ws.walletKey + '\')">💳 充值</button>'
                 + '<button class="cc-btn ghost" onclick="window.openWithdraw(\'' + ws.walletKey + '\')">💸 提现</button>';
         more = [
-          { label: "查看流水", onclick: "document.querySelector('[data-tab=overview]').click(); window.scrollTo({top: document.querySelector('.flow-card').offsetTop - 80, behavior:'smooth'})" },
+          { label: "查看完整流水", onclick: "document.querySelector('[data-tab=flows]').click()" },
+          { label: "申请开票", onclick: "window.openInvoice()" },
           { label: "导出对账单 (CSV)", onclick: "window.demoToast('演示环境，未实现导出', 'warn')" }
         ];
       } else if (ws.payer.type === "team-budget") {
         primary = '<button class="cc-btn ghost" onclick="window.demoToast(\'团队成员可申请增加预算 →\', \'info\')">📥 申请追加预算</button>'
-                + '<button class="cc-btn ghost" onclick="document.querySelector(\'[data-tab=demander]\').click()">📊 查看团队消费</button>';
+                + '<button class="cc-btn ghost" onclick="document.querySelector(\'[data-tab=flows]\').click()">📊 查看团队消费</button>';
         more = [
           { label: "查看预算规则", onclick: "window.demoToast('预算规则：季度初由企业管理员划拨；不足时可申请追加', 'info')" },
           { label: "查看来源账户（企业总账户）", onclick: "window.demoToast('企业总账户由企业管理员维护，团队成员仅可见已划拨额度', 'info')" }
@@ -1075,7 +1328,7 @@
         } else if (item.type === "personal") {
           primary = '<button class="primary" onclick="window.openRecharge(\'' + item.key + '\')">💳 充值</button>'
                   + '<button onclick="window.openWithdraw(\'' + item.key + '\')">💸 提现</button>';
-          manage.push({ label: "查看流水", js: "document.querySelector(\\'[data-tab=overview]\\').click()" });
+          manage.push({ label: "查看完整流水", js: "document.querySelector(\\'[data-tab=flows]\\').click()" });
         } else if (item.type === "team-budget") {
           if (ws.id === "cf-admin") {
             primary = '<button onclick="window.demoToast(\'切到该空间查看详情\', \'info\'); setTimeout(()=>{window.demoApp.setCurrentWorkspace(\'' + item.boundWs + '\'); location.reload();}, 400)">↗ 切到该空间</button>'
@@ -1086,7 +1339,7 @@
             ];
           } else {
             primary = '<button onclick="window.demoToast(\'追加预算需联系企业管理员\', \'info\')">📥 申请追加预算</button>'
-                    + '<button onclick="document.querySelector(\'[data-tab=demander]\').click()">📊 查看消费</button>';
+                    + '<button onclick="document.querySelector(\'[data-tab=flows]\').click()">📊 查看消费</button>';
             manage = [
               { label: "查看预算规则", js: "window.demoToast(\\'季度初统一划拨；不足时申请追加\\', \\'info\\')" }
             ];
@@ -1495,180 +1748,430 @@
     $("flowTypeFilter").addEventListener("change", e => { flowType = e.target.value; renderFlows(); });
 
     // ============================================================
-    // P0-3 / P1-9：需求方结算面板（充值 / 冻结拆分 / 订单消费 / 退款）
+    // Tab 2 顶部动作条 + 冻结拆分
     // ============================================================
-    function renderDemanderPanel() {
+    function renderAccountsActionBar() {
+      const ws = window.demoApp.getCurrentWorkspace();
+      const bar = document.getElementById("accountsActionBar");
+      if (!bar) return;
+      const isAdmin = ws.id === "cf-admin";
+      const walletKey = ws.walletKey;
+      let html = '<span class="fab-label">📌 当前账户动作</span>';
+      if (ws.id === "personal") {
+        html += '<button class="fab-btn primary" onclick="window.openRecharge(\'' + walletKey + '\')">💳 个人充值</button>'
+              + '<button class="fab-btn warn" onclick="window.openWithdraw(\'' + walletKey + '\')">💸 提现</button>';
+      } else if (isAdmin) {
+        html += '<button class="fab-btn primary" onclick="window.openRecharge(\'enterprise-main-cf\')">💳 企业充值</button>'
+              + '<button class="fab-btn purple" onclick="window.openAllocate()">📤 划拨预算给团队</button>'
+              + '<button class="fab-btn" onclick="location.href=\'admin-finance.html?from=wallet&tab=recharges\'">🛂 审核充值（1）</button>';
+      } else if (ws.budgetMissing) {
+        html += '<button class="fab-btn warn" onclick="window.openAllocate(\'team-budget-cf-ip\')">⚙ 申请配置团队预算</button>'
+              + '<button class="fab-btn" onclick="window.demoToast(\'已通知企业管理员\', \'info\')">📨 通知管理员</button>';
+      } else {
+        html += '<button class="fab-btn" onclick="window.demoToast(\'已发起追加预算申请\', \'ok\')">📥 申请追加预算</button>'
+              + '<button class="fab-btn" onclick="document.querySelector(\'[data-tab=flows]\').click()">📊 查看本空间消费</button>';
+      }
+      html += '<span style="margin-left:auto;font-size:12px;color:#8c8c8c">资金动作以抽屉展开</span>';
+      bar.innerHTML = html;
+    }
+
+    function renderFrozenBreakdown() {
       const ws = window.demoApp.getCurrentWorkspace();
       const wallets = window.demoApp.getWallets();
       const w = wallets[ws.walletKey] || wallets["enterprise-main-cf"];
       const fmt = window.fmtMoney;
-
-      // 顶部 KPI
-      const totalLocked = w.lockedAmount || 0;
-      // 演示：把"冻结余额"按业务拆分（订单冻结占 70%、退款冻结 20%、纠纷冻结 10%）
+      const totalLocked = w ? (w.lockedAmount || 0) : 0;
       const orderLock = Math.round(totalLocked * 0.72);
       const refundLock = Math.round(totalLocked * 0.20);
       const disputeLock = Math.max(0, totalLocked - orderLock - refundLock);
-      const refundFlows = window.demoApp.getFlows().filter(f => f.type === "refund");
-      const orderFlows = window.demoApp.getFlows().filter(f => (f.type === "lock" || f.type === "settle") && f.amount < 0 && (ws.id === "cf-admin" || f.account === ws.walletKey));
-
-      const kpis = [
-        { icon: "💰", label: "当前可用余额", value: fmt(w.balance), trend: "本空间下下单的可支配金额", cls: "" },
-        { icon: "🔒", label: "总冻结金额", value: fmt(totalLocked), trend: "拆分见下方「冻结余额拆分」", cls: "orange" },
-        { icon: "📤", label: "近 30 天订单消费", value: fmt(Math.abs(orderFlows.slice(0, 10).reduce((s, f) => s + f.amount, 0))), trend: orderFlows.length + " 笔订单流水", cls: "purple" },
-        { icon: "↩️", label: "近 30 天退款", value: fmt(refundFlows.reduce((s, f) => s + Math.abs(f.amount), 0)), trend: refundFlows.length + " 笔原路退款", cls: "green" }
-      ];
-      document.getElementById("demanderKpiRow").innerHTML = kpis.map(k => '<div class="kpi-card ' + k.cls + '">'
-        + '<div class="kpi-label"><span class="kpi-icon">' + k.icon + '</span> ' + k.label + '</div>'
-        + '<div class="kpi-value">' + k.value + '</div>'
-        + '<div class="kpi-trend">' + k.trend + '</div>'
-        + '</div>').join("");
-
-      // P1-9：冻结余额拆分（订单冻结 / 退款冻结 / 纠纷冻结）
       const frozen = [
         { cls: "", label: "📦 订单冻结", value: orderLock, meta: "订单履约中，验收完成后释放或结算" },
         { cls: "refund", label: "↩️ 退款冻结", value: refundLock, meta: "退款审核中，到原付款账户后释放" },
         { cls: "dispute", label: "⚖ 纠纷冻结", value: disputeLock, meta: "争议处理中，由平台介入裁决" }
       ];
-      document.getElementById("frozenBreakdown").innerHTML = frozen.map(c => '<div class="frozen-cell ' + c.cls + '">'
-        + '<div class="fc-label">' + c.label + '</div>'
-        + '<div class="fc-value">' + fmt(c.value) + '</div>'
-        + '<div class="fc-meta">' + c.meta + '</div>'
-        + '<a style="font-size:11px;color:#1890ff;cursor:pointer;display:inline-block;margin-top:6px" onclick="window.demoToast(\'查看' + c.label.slice(2) + '明细\', \'info\')">查看明细 →</a>'
-        + '</div>').join("");
-
-      // 订单消费流水
-      document.getElementById("demanderOrderFlows").innerHTML = ''
-        + '<div class="sl-row head"><div>订单 / 需求</div><div>账户上下文</div><div>状态</div><div>金额</div><div>时间</div></div>'
-        + orderFlows.slice(0, 6).map(f => {
-            const oid = extractOrderId(f.desc) || "—";
-            const title = extractOrderTitle(f.desc) || "（无标题）";
-            const accountName = (wallets[f.account] && wallets[f.account].name.replace("企业主账户", "企业总账户")) || f.account;
-            const status = f.type === "lock" ? '<span class="sl-status warn">🔒 已锁定</span>' : '<span class="sl-status ok">✅ 已结算</span>';
-            const oidHref = oid.indexOf("OD-") === 0 ? "project-space.html?from=wallet&orderId=" + oid : (oid.indexOf("DM-") === 0 ? "demand-list.html?from=wallet&demandId=" + oid : null);
-            const oidHtml = oidHref ? '<a href="' + oidHref + '" style="color:#1890ff;text-decoration:none">' + oid + '</a>' : oid;
-            return '<div class="sl-row">'
-              + '<div><strong>' + oidHtml + '</strong><div style="font-size:11px;color:#8c8c8c">' + title + '</div></div>'
-              + '<div style="font-size:12px;color:#595959">扣款方：' + accountName + '</div>'
-              + '<div>' + status + '</div>'
-              + '<div class="sl-amt out">' + fmt(f.amount) + '</div>'
-              + '<div style="font-size:11px;color:#8c8c8c">' + f.time + '</div>'
-              + '</div>';
-          }).join("") || '<div class="empty-state"><div class="es-icon">📦</div><div class="es-title">暂无订单消费记录</div><div class="es-sub">本空间下尚未有订单流水。下单后将在此聚合。</div></div>';
-
-      // 退款记录（原路退款）
-      document.getElementById("demanderRefundFlows").innerHTML = ''
-        + '<div class="sl-row head"><div>关联订单</div><div>退回去向（原付款账户）</div><div>状态</div><div>退款金额</div><div>时间</div></div>'
-        + refundFlows.map(f => {
-            const oid = extractOrderId(f.desc) || "—";
-            const title = extractOrderTitle(f.desc) || "（无标题）";
-            const accountName = (wallets[f.account] && wallets[f.account].name.replace("企业主账户", "企业总账户")) || f.account;
-            const oidHref = oid.indexOf("OD-") === 0 ? "project-space.html?from=wallet&orderId=" + oid : (oid.indexOf("DM-") === 0 ? "demand-list.html?from=wallet&demandId=" + oid : null);
-            const oidHtml = oidHref ? '<a href="' + oidHref + '" style="color:#1890ff;text-decoration:none">' + oid + '</a>' : oid;
-            return '<div class="sl-row">'
-              + '<div><strong>' + oidHtml + '</strong><div style="font-size:11px;color:#8c8c8c">' + title + '</div></div>'
-              + '<div style="font-size:12px;color:#595959">↩️ 原路退回 → <strong>' + accountName + '</strong></div>'
-              + '<div><span class="sl-status ok">✅ 已到账</span></div>'
-              + '<div class="sl-amt in">+' + fmt(f.amount) + '</div>'
-              + '<div style="font-size:11px;color:#8c8c8c">' + f.time + '</div>'
-              + '</div>';
-          }).join("") || '<div class="empty-state"><div class="es-icon">↩️</div><div class="es-title">暂无退款记录</div><div class="es-sub">未发生退款。退款将原路退回原付款账户。</div></div>';
+      const target = document.getElementById("frozenBreakdown");
+      if (!target) return;
+      target.innerHTML = totalLocked === 0
+        ? '<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">🔓</div><div class="es-title">当前账户无冻结资金</div><div class="es-sub">下单或退款发生后会在此分类展示</div></div>'
+        : frozen.map(c => '<div class="frozen-cell ' + c.cls + '">'
+            + '<div class="fc-label">' + c.label + '</div>'
+            + '<div class="fc-value">' + fmt(c.value) + '</div>'
+            + '<div class="fc-meta">' + c.meta + '</div>'
+            + '<a style="font-size:11px;color:#1890ff;cursor:pointer;display:inline-block;margin-top:6px" onclick="document.querySelector(\'[data-tab=flows]\').click()">在收支记录中查看 →</a>'
+            + '</div>').join("");
     }
 
     // ============================================================
-    // P0-3：承制方结算面板（收入 / 提现 / 开票）
+    // 迷你流水（概览 / 账户 用）
+    // scope: "all" = 全部账户 N 条；"current" = 仅本空间钱包绑定账户
     // ============================================================
-    function renderContractorPanel() {
+    function renderMiniFlows(targetId, scope) {
+      const target = document.getElementById(targetId);
+      if (!target) return;
+      const ws = window.demoApp.getCurrentWorkspace();
+      const wallets = window.demoApp.getWallets();
+      let flows = window.demoApp.getFlows();
+      if (scope === "current") {
+        flows = flows.filter(f => f.account === ws.walletKey);
+      } else if (ws.id !== "cf-admin") {
+        // 非管理员：仅展示与本空间钱包账户相关的流水
+        flows = flows.filter(f => f.account === ws.walletKey || f.account === "enterprise-main-cf" && ws.walletKey === "enterprise-main-cf");
+      }
+      flows = flows.slice(0, 5);
       const fmt = window.fmtMoney;
-      // 演示数据 — 承制方"星辰创作工作室"的待结算 / 可提现 / 已结算
-      const pendingSettle = 18400;       // 待结算（订单已完成，平台对账中）
-      const withdrawable = 56200;        // 可提现
-      const totalIncome = 327800;        // 累计收入
-      const invoiceable = 3;             // 可开票订单数
+      if (flows.length === 0) {
+        target.innerHTML = '<div class="empty-state" style="padding:24px"><div class="es-icon">📒</div><div class="es-title">暂无最近流水</div><div class="es-sub">交易发生后将在此展示最近 5 条；完整记录见「收支记录」</div></div>';
+        return;
+      }
+      target.innerHTML = flows.map(f => {
+        const cfg = TYPE_CONFIG[f.type] || { icon: "•", label: f.type };
+        const accountName = (wallets[f.account] && wallets[f.account].name.replace("企业主账户", "企业总账户")) || f.account;
+        const amtCls = f.type === "lock" ? "lock" : f.amount > 0 ? "in" : f.amount < 0 ? "out" : "";
+        const amtDisplay = f.amount === 0 ? (f.lockedNote || "—") : (f.amount > 0 ? "+" : "") + fmt(f.amount);
+        const oid = extractOrderId(f.desc);
+        return '<div class="mini-flow-row">'
+          + '<div class="mf-icon">' + cfg.icon + '</div>'
+          + '<div><div class="mf-title">' + cfg.label + '：' + (f.desc || "—") + '</div>'
+            + '<div class="mf-meta">' + f.time + (oid ? ' · 关联 ' + oid : '') + '</div></div>'
+          + '<div style="font-size:12px;color:#595959">' + accountName + '<div class="mf-meta">操作：' + f.operator + '</div></div>'
+          + '<div class="mf-amt ' + amtCls + '">' + amtDisplay + '</div>'
+          + '</div>';
+      }).join("");
+    }
 
-      document.getElementById("contractorIncomeGrid").innerHTML = ''
-        + '<div class="income-card settle">'
-          + '<div class="ic-label">📊 待结算收入</div>'
-          + '<div class="ic-value">' + fmt(pendingSettle) + '</div>'
-          + '<div class="ic-meta">3 笔订单已完成验收，平台 T+1 结算中</div>'
-          + '<div class="ic-actions"><button onclick="location.href=\'admin-finance.html?from=wallet&tab=settlements\'">查看待结算明细</button></div>'
-        + '</div>'
-        + '<div class="income-card withdraw">'
-          + '<div class="ic-label">💸 可提现金额</div>'
-          + '<div class="ic-value" style="color:#fa8c16">' + fmt(withdrawable) + '</div>'
-          + '<div class="ic-meta">提现到账时效 1 - 3 个工作日</div>'
-          + '<div class="ic-actions"><button class="primary" onclick="window.openWithdraw(\'personal-account-lixueqin\')">立即提现</button><button onclick="window.demoToast(\'查看提现规则\', \'info\')">规则</button></div>'
-        + '</div>'
-        + '<div class="income-card invoice">'
-          + '<div class="ic-label">🧾 可开票订单</div>'
-          + '<div class="ic-value" style="color:#1890ff">' + invoiceable + ' 笔</div>'
-          + '<div class="ic-meta">合计 ¥168,400，可申请增值税专票 / 普票</div>'
-          + '<div class="ic-actions"><button class="primary" onclick="location.href=\'admin-finance.html?from=wallet&tab=invoices\'">申请开票</button><button onclick="location.href=\'admin-finance.html?from=wallet&tab=invoices\'">历史发票</button></div>'
+    // ============================================================
+    // Tab 4 发票面板（销售 / 采购 子签 + KPI + 列表）
+    // ============================================================
+    const SALES_INVOICES = [
+      { oid: "OD-2026031502", title: "品牌片拍摄", buyer: "骋风天合", header: "骋风天合（北京）文化传媒有限公司", type: "专票", status: ["ok", "✅ 已开具"], amt: 120000, time: "2026-04-19 15:00", invNo: "INV-S-2026041901" },
+      { oid: "OD-2026042009", title: "广告片配音", buyer: "市场宣传组（骋风天合）", header: "骋风天合（北京）文化传媒有限公司", type: "专票", status: ["warn", "⏳ 待提交"], amt: 8000, time: "—", invNo: "—" },
+      { oid: "OD-2026041807", title: "广告片配音 - 修订版", buyer: "市场宣传组（骋风天合）", header: "骋风天合（北京）文化传媒有限公司", type: "专票", status: ["warn", "⏳ 待提交"], amt: 8000, time: "—", invNo: "—" },
+      { oid: "OD-2026041401", title: "IP 形象设计", buyer: "短剧制作中心（骋风天合）", header: "骋风天合（北京）文化传媒有限公司", type: "专票", status: ["processing", "🔄 平台审核中"], amt: 15000, time: "2026-04-23 10:30", invNo: "—" },
+      { oid: "OD-2026032008", title: "短视频脚本套件", buyer: "私有客户 · 北京蓝海", header: "北京蓝海传媒有限公司", type: "电子普票", status: ["ok", "✅ 已开具"], amt: 5400, time: "2026-03-21 16:55", invNo: "INV-S-2026032102" }
+    ];
+    const PURCHASE_INVOICES = [
+      { oid: "OD-2026042307", title: "新剧 IP 海报系列", contractor: "星辰创作工作室", header: "骋风天合（北京）文化传媒有限公司", type: "专票", status: ["warn", "⏳ 已结算 · 待催开"], amt: 28000, time: "—", invNo: "—" },
+      { oid: "OD-2026042009", title: "广告片配音", contractor: "声海传媒", header: "骋风天合（北京）文化传媒有限公司", type: "专票", status: ["processing", "🔄 承制方已提交"], amt: 8000, time: "2026-04-21 09:30", invNo: "—" },
+      { oid: "OD-2026041807", title: "广告片配音 - 修订版", contractor: "声海传媒", header: "骋风天合（北京）文化传媒有限公司", type: "专票", status: ["ok", "✅ 已收票"], amt: 8000, time: "2026-04-19 14:20", invNo: "INV-P-2026041902" },
+      { oid: "OD-2026031502", title: "品牌片拍摄", contractor: "云栖工作室", header: "骋风天合（北京）文化传媒有限公司", type: "专票", status: ["ok", "✅ 已收票"], amt: 120000, time: "2026-03-22 11:00", invNo: "INV-P-2026032201" }
+    ];
+
+    function renderInvoicePanel() {
+      const fmt = window.fmtMoney;
+      const id = window.demoApp.getCurrentIdentity();
+      // 默认子签：承制方默认看销售；其他默认采购
+      const sub = (function () {
+        let v = null;
+        try { v = localStorage.getItem("walletInvoiceSub"); } catch (e) {}
+        if (v === "sales" || v === "purchase") return v;
+        return id === "contractor" ? "sales" : "purchase";
+      })();
+      setInvoiceSubTab(sub, /*skipPersist*/true);
+
+      // 销售发票 KPI
+      const salesIssued = SALES_INVOICES.filter(r => r.status[0] === "ok");
+      const salesPending = SALES_INVOICES.filter(r => r.status[0] === "warn");
+      const salesAuditing = SALES_INVOICES.filter(r => r.status[0] === "processing");
+      const salesIssuedTotal = salesIssued.reduce((s, r) => s + r.amt, 0);
+      const salesPendingTotal = salesPending.reduce((s, r) => s + r.amt, 0);
+      document.getElementById("salesInvoiceKpis").innerHTML = ''
+        + '<div class="kpi-card"><div class="kpi-label"><span class="kpi-icon">🧾</span> 已开销售发票（YTD）</div><div class="kpi-value">' + fmt(salesIssuedTotal) + '</div><div class="kpi-trend">' + salesIssued.length + ' 张</div></div>'
+        + '<div class="kpi-card orange"><div class="kpi-label"><span class="kpi-icon">⏳</span> 待提交开票</div><div class="kpi-value">' + fmt(salesPendingTotal) + '</div><div class="kpi-trend">' + salesPending.length + ' 笔订单</div></div>'
+        + '<div class="kpi-card purple"><div class="kpi-label"><span class="kpi-icon">🔄</span> 审核中</div><div class="kpi-value">' + salesAuditing.length + ' 张</div><div class="kpi-trend">3-5 个工作日完成</div></div>'
+        + '<div class="kpi-card green"><div class="kpi-label"><span class="kpi-icon">📥</span> 票面合计 / 月</div><div class="kpi-value">¥48,400</div><div class="kpi-trend">本月销售发票面值</div></div>';
+
+      // 销售列表
+      document.getElementById("salesInvoiceList").innerHTML = ''
+        + '<div class="sl-row head"><div>关联订单</div><div>抬头 / 票种</div><div>状态</div><div>金额 / 发票号</div><div>时间 / 操作</div></div>'
+        + SALES_INVOICES.map(r => {
+            const oidHref = "project-space.html?from=wallet&orderId=" + r.oid;
+            const action = r.status[0] === "warn"
+              ? '<a style="color:#1890ff;cursor:pointer" onclick="window.openInvoice(\'' + r.oid + '\')">提交开票 →</a>'
+              : r.status[0] === "ok"
+                ? '<a style="color:#1890ff;cursor:pointer" onclick="window.demoToast(\'下载发票 PDF（演示）\', \'info\')">下载 PDF</a>'
+                : '<span style="color:#8c8c8c;font-size:11px">审核中</span>';
+            return '<div class="sl-row">'
+              + '<div><a href="' + oidHref + '" style="color:#1890ff;text-decoration:none"><strong>' + r.oid + '</strong></a><div style="font-size:11px;color:#8c8c8c">' + r.title + ' · 客户：' + r.buyer + '</div></div>'
+              + '<div style="font-size:12px;color:#595959">' + r.header + '<div style="font-size:11px;color:#8c8c8c">票种：' + r.type + '</div></div>'
+              + '<div><span class="sl-status ' + r.status[0] + '">' + r.status[1] + '</span></div>'
+              + '<div class="sl-amt out">' + fmt(r.amt) + '<div style="font-size:11px;color:#8c8c8c;font-weight:400;text-align:right">' + r.invNo + '</div></div>'
+              + '<div style="font-size:11px;color:#8c8c8c">' + r.time + '<div style="margin-top:4px">' + action + '</div></div>'
+              + '</div>';
+          }).join("");
+
+      // 采购发票 KPI
+      const pReceived = PURCHASE_INVOICES.filter(r => r.status[0] === "ok");
+      const pPending = PURCHASE_INVOICES.filter(r => r.status[0] === "warn");
+      const pProcessing = PURCHASE_INVOICES.filter(r => r.status[0] === "processing");
+      const pReceivedTotal = pReceived.reduce((s, r) => s + r.amt, 0);
+      const pPendingTotal = pPending.reduce((s, r) => s + r.amt, 0);
+      document.getElementById("purchaseInvoiceKpis").innerHTML = ''
+        + '<div class="kpi-card"><div class="kpi-label"><span class="kpi-icon">📥</span> 已收采购发票（YTD）</div><div class="kpi-value">' + fmt(pReceivedTotal) + '</div><div class="kpi-trend">' + pReceived.length + ' 张 · 已用于税务抵扣</div></div>'
+        + '<div class="kpi-card orange"><div class="kpi-label"><span class="kpi-icon">⏳</span> 已结算 · 待催开</div><div class="kpi-value">' + fmt(pPendingTotal) + '</div><div class="kpi-trend">' + pPending.length + ' 笔</div></div>'
+        + '<div class="kpi-card purple"><div class="kpi-label"><span class="kpi-icon">🔄</span> 承制方已提交</div><div class="kpi-value">' + pProcessing.length + ' 张</div><div class="kpi-trend">财务核验中</div></div>'
+        + '<div class="kpi-card green"><div class="kpi-label"><span class="kpi-icon">📊</span> 票面合计 / 月</div><div class="kpi-value">¥128,000</div><div class="kpi-trend">本月采购发票面值</div></div>';
+
+      // 采购列表
+      document.getElementById("purchaseInvoiceList").innerHTML = ''
+        + '<div class="sl-row head"><div>关联订单</div><div>承制方 / 票种</div><div>状态</div><div>金额 / 发票号</div><div>时间 / 操作</div></div>'
+        + PURCHASE_INVOICES.map(r => {
+            const oidHref = "project-space.html?from=wallet&orderId=" + r.oid;
+            const action = r.status[0] === "warn"
+              ? '<a style="color:#1890ff;cursor:pointer" onclick="window.demoToast(\'已向承制方催开（' + r.contractor + '）\', \'ok\')">催开发票 →</a>'
+              : r.status[0] === "ok"
+                ? '<a style="color:#1890ff;cursor:pointer" onclick="window.demoToast(\'下载发票 PDF（演示）\', \'info\')">下载 PDF</a>'
+                : '<a style="color:#1890ff;cursor:pointer" onclick="window.demoToast(\'校验通过将归档至发票池\', \'info\')">核验</a>';
+            return '<div class="sl-row">'
+              + '<div><a href="' + oidHref + '" style="color:#1890ff;text-decoration:none"><strong>' + r.oid + '</strong></a><div style="font-size:11px;color:#8c8c8c">' + r.title + '</div></div>'
+              + '<div style="font-size:12px;color:#595959">' + r.contractor + '<div style="font-size:11px;color:#8c8c8c">票种：' + r.type + '</div></div>'
+              + '<div><span class="sl-status ' + r.status[0] + '">' + r.status[1] + '</span></div>'
+              + '<div class="sl-amt out">' + fmt(r.amt) + '<div style="font-size:11px;color:#8c8c8c;font-weight:400;text-align:right">' + r.invNo + '</div></div>'
+              + '<div style="font-size:11px;color:#8c8c8c">' + r.time + '<div style="margin-top:4px">' + action + '</div></div>'
+              + '</div>';
+          }).join("");
+    }
+
+    function setInvoiceSubTab(sub, skipPersist) {
+      document.querySelectorAll("#invoiceSubTabs button").forEach(b => b.classList.toggle("active", b.getAttribute("data-sub") === sub));
+      document.querySelectorAll("#panel-invoice .sub-panel").forEach(p => p.classList.toggle("active", p.id === "sub-invoice-" + sub));
+      if (!skipPersist) { try { localStorage.setItem("walletInvoiceSub", sub); } catch (e) {} }
+    }
+    document.getElementById("invoiceSubTabs").addEventListener("click", function (e) {
+      const b = e.target.closest("button[data-sub]");
+      if (!b) return;
+      setInvoiceSubTab(b.getAttribute("data-sub"));
+    });
+
+    // ============================================================
+    // Tab 5 钱包设置（V1：6 块）
+    // 1) 默认扣款回退  2) 银行卡  3) 对公账户
+    // 4) 提现规则与限额  5) 资金通知  6) 安全入口
+    // ============================================================
+    function renderSettingsPanel() {
+      const ws = window.demoApp.getCurrentWorkspace();
+      const isAdmin = ws.id === "cf-admin";
+      const isPersonal = ws.id === "personal";
+      const grid = document.getElementById("settingsGrid");
+      if (!grid) return;
+
+      // ----- Block 1：默认扣款回退 -----
+      const block1 = ''
+        + '<div class="settings-block">'
+          + '<div class="sb-head">'
+            + '<div><h3>💰 默认扣款 / 回退策略</h3>'
+              + '<div class="sb-desc">控制本空间下单时优先扣谁的钱，以及预算耗尽时如何回退到上游账户。</div>'
+            + '</div>'
+            + '<span class="sb-status ' + (ws.budgetMissing ? 'warn' : 'ok') + '">' + (ws.budgetMissing ? '未配置' : '已配置') + '</span>'
+          + '</div>'
+          + '<div class="sb-body">'
+            + '<div class="settings-row">'
+              + '<div class="sr-label">本空间扣款主账户</div>'
+              + '<div class="sr-value">' + (ws.payer.name) + '<div class="sr-meta">下单时优先消耗此账户余额</div></div>'
+              + '<div class="sr-action">' + (isPersonal ? '<span class="sr-link" onclick="window.demoToast(\'个人空间不支持切换主账户\', \'warn\')">切换</span>' : (isAdmin ? '<span class="sr-link" onclick="window.demoToast(\'去工作台 · 角色与权限设置\', \'info\')">切换</span>' : '<span class="sr-link" onclick="window.demoToast(\'切换主账户需企业管理员审批\', \'warn\')">切换</span>')) + '</div>'
+            + '</div>'
+            + '<div class="settings-row">'
+              + '<div class="sr-label">余额不足时回退<div class="sr-tip">主账户余额不足覆盖订单时，是否自动回退至企业总账户</div></div>'
+              + '<div class="sr-value">' + (ws.budgetMissing ? '已开启（自动回退至企业总账户）' : '关闭（不足将拦截下单 → 提示充值或申请追加预算）') + '</div>'
+              + '<div class="sr-action"><div class="toggle ' + (ws.budgetMissing ? 'on' : '') + '" onclick="window.demoToast(\'回退策略调整需企业管理员审批\', \'warn\')"></div></div>'
+            + '</div>'
+            + '<div class="settings-row">'
+              + '<div class="sr-label">允许跨空间使用个人账户付款</div>'
+              + '<div class="sr-value">关闭<div class="sr-meta">为避免私混账，团队空间下单不可使用个人账户</div></div>'
+              + '<div class="sr-action"><div class="toggle" onclick="window.demoToast(\'平台风控规则，不可调整\', \'warn\')"></div></div>'
+            + '</div>'
+          + '</div>'
         + '</div>';
 
-      // 提现记录
-      document.getElementById("contractorWithdrawList").innerHTML = ''
-        + '<div class="sl-row head"><div>提现单号</div><div>到账方式</div><div>状态</div><div>金额</div><div>时间</div></div>'
-        + [
-          { id: "WD-2026042201", method: "建行储蓄卡 ****8826", status: ["ok", "✅ 已到账"], amt: 25000, time: "2026-04-22 18:20" },
-          { id: "WD-2026041502", method: "建行储蓄卡 ****8826", status: ["ok", "✅ 已到账"], amt: 18000, time: "2026-04-15 14:08" },
-          { id: "WD-2026040801", method: "建行储蓄卡 ****8826", status: ["processing", "⏳ 财务审核中"], amt: 12000, time: "2026-04-08 10:55" },
-          { id: "WD-2026032702", method: "建行储蓄卡 ****8826", status: ["danger", "❌ 风控驳回"], amt: 80000, time: "2026-03-27 16:40" }
-        ].map(r => '<div class="sl-row">'
-            + '<div><strong>' + r.id + '</strong></div>'
-            + '<div style="font-size:12px;color:#595959">' + r.method + '</div>'
-            + '<div><span class="sl-status ' + r.status[0] + '">' + r.status[1] + '</span></div>'
-            + '<div class="sl-amt out">−' + fmt(r.amt) + '</div>'
-            + '<div style="font-size:11px;color:#8c8c8c">' + r.time + '</div>'
-            + '</div>').join("");
+      // ----- Block 2：银行卡 -----
+      const block2 = ''
+        + '<div class="settings-block">'
+          + '<div class="sb-head">'
+            + '<div><h3>🏦 提现银行卡</h3>'
+              + '<div class="sb-desc">用于个人账户 / 承制方收入提现到账。最多绑定 3 张银行卡。</div>'
+            + '</div>'
+            + '<span class="sb-status ok">已绑定 1 张</span>'
+          + '</div>'
+          + '<div class="sb-body">'
+            + '<div class="card-list">'
+              + '<div class="card-item">'
+                + '<div class="ci-logo">建</div>'
+                + '<div class="ci-main"><div class="ci-title">中国建设银行 · 储蓄卡</div><div class="ci-meta">尾号 8826 · 持卡人 昭岚 · 北京海淀支行</div></div>'
+                + '<div class="ci-default">默认</div>'
+                + '<div class="ci-actions"><a onclick="window.demoToast(\'演示环境，未实现编辑\', \'warn\')">编辑</a><a class="danger" onclick="window.demoToast(\'已默认卡不可解绑，请先设置其他卡为默认\', \'warn\')">解绑</a></div>'
+              + '</div>'
+            + '</div>'
+            + '<div class="sb-foot">'
+              + '<span class="sb-foot-tip">💡 解绑前请确保没有进行中的提现申请</span>'
+              + '<button class="btn" onclick="window.demoToast(\'演示环境，未实现添加银行卡\', \'warn\')">+ 添加银行卡</button>'
+            + '</div>'
+          + '</div>'
+        + '</div>';
 
-      // 收入流水
-      document.getElementById("contractorIncomeFlows").innerHTML = ''
-        + '<div class="sl-row head"><div>关联订单</div><div>需求方</div><div>状态</div><div>结算金额</div><div>时间</div></div>'
-        + [
-          { oid: "OD-2026042009", title: "广告片配音", buyer: "市场宣传组（骋风天合）", status: ["ok", "✅ 已结算"], amt: 7600, time: "2026-04-20 16:40" },
-          { oid: "OD-2026041807", title: "广告片配音 - 修订版", buyer: "市场宣传组（骋风天合）", status: ["ok", "✅ 已结算"], amt: 7600, time: "2026-04-18 11:08" },
-          { oid: "OD-2026041401", title: "IP 形象设计", buyer: "短剧制作中心（骋风天合）", status: ["ok", "✅ 已结算"], amt: 14250, time: "2026-04-12 17:42" },
-          { oid: "OD-2026040506", title: "短剧海报系列", buyer: "短剧制作中心（骋风天合）", status: ["processing", "⏳ 平台对账中"], amt: 18400, time: "2026-04-26 09:00" }
-        ].map(r => '<div class="sl-row">'
-            + '<div><strong>' + r.oid + '</strong><div style="font-size:11px;color:#8c8c8c">' + r.title + '</div></div>'
-            + '<div style="font-size:12px;color:#595959">' + r.buyer + '</div>'
-            + '<div><span class="sl-status ' + r.status[0] + '">' + r.status[1] + '</span></div>'
-            + '<div class="sl-amt in">+' + fmt(r.amt) + '</div>'
-            + '<div style="font-size:11px;color:#8c8c8c">' + r.time + '</div>'
-            + '</div>').join("");
+      // ----- Block 3：对公账户（企业绑定） -----
+      const block3 = ''
+        + '<div class="settings-block">'
+          + '<div class="sb-head">'
+            + '<div><h3>🏢 企业对公账户绑定</h3>'
+              + '<div class="sb-desc">用于对公转账充值与企业支付。需企业认证完成后由企业管理员维护。</div>'
+            + '</div>'
+            + '<span class="sb-status ' + (isAdmin ? 'ok' : 'warn') + '">' + (isAdmin ? '已认证 · 可管理' : '仅查看') + '</span>'
+          + '</div>'
+          + '<div class="sb-body">'
+            + (!isAdmin ? '<div class="admin-only-tip">⚠️ 对公账户仅企业管理员可编辑。下方信息为只读。</div>' : '')
+            + '<div class="settings-row">'
+              + '<div class="sr-label">对公账户名</div>'
+              + '<div class="sr-value">骋风天合（北京）文化传媒有限公司</div>'
+              + '<div class="sr-action">' + (isAdmin ? '<span class="sr-link" onclick="window.demoToast(\'去企业认证页修改\', \'info\')">编辑</span>' : '<span style="font-size:11px;color:#8c8c8c">需企业管理员</span>') + '</div>'
+            + '</div>'
+            + '<div class="settings-row">'
+              + '<div class="sr-label">开户行</div>'
+              + '<div class="sr-value">中国建设银行 · 北京海淀支行</div>'
+              + '<div class="sr-action">' + (isAdmin ? '<span class="sr-link" onclick="window.demoToast(\'去企业认证页修改\', \'info\')">编辑</span>' : '') + '</div>'
+            + '</div>'
+            + '<div class="settings-row">'
+              + '<div class="sr-label">对公账号</div>'
+              + '<div class="sr-value">1100 1234 5600 0099 1234</div>'
+              + '<div class="sr-action">' + (isAdmin ? '<span class="sr-link" onclick="window.demoToast(\'去企业认证页修改\', \'info\')">编辑</span>' : '') + '</div>'
+            + '</div>'
+            + '<div class="settings-row">'
+              + '<div class="sr-label">统一社会信用代码</div>'
+              + '<div class="sr-value">91110108MA01XXXXXX</div>'
+              + '<div class="sr-action">' + (isAdmin ? '<span class="sr-link" onclick="location.href=\'enterprise-verification-prototype.html\'">去认证页</span>' : '') + '</div>'
+            + '</div>'
+          + '</div>'
+        + '</div>';
 
-      // 开票申请
-      document.getElementById("contractorInvoiceList").innerHTML = ''
-        + '<div class="sl-row head"><div>关联订单</div><div>抬头 / 票种</div><div>状态</div><div>金额</div><div>时间</div></div>'
-        + [
-          { oid: "OD-2026031502", title: "品牌片拍摄", header: "骋风天合（增值税专票）", status: ["ok", "✅ 已开具"], amt: 120000, time: "2026-04-19 15:00" },
-          { oid: "OD-2026042009", title: "广告片配音", header: "骋风天合（专票）", status: ["warn", "⏳ 待提交"], amt: 8000, time: "—" },
-          { oid: "OD-2026041807", title: "广告片配音 - 修订版", header: "骋风天合（专票）", status: ["warn", "⏳ 待提交"], amt: 8000, time: "—" },
-          { oid: "OD-2026041401", title: "IP 形象设计", header: "骋风天合（专票）", status: ["warn", "⏳ 待提交"], amt: 15000, time: "—" }
-        ].map(r => '<div class="sl-row">'
-            + '<div><strong>' + r.oid + '</strong><div style="font-size:11px;color:#8c8c8c">' + r.title + '</div></div>'
-            + '<div style="font-size:12px;color:#595959">' + r.header + '</div>'
-            + '<div><span class="sl-status ' + r.status[0] + '">' + r.status[1] + '</span></div>'
-            + '<div class="sl-amt out">' + fmt(r.amt) + '</div>'
-            + '<div style="font-size:11px;color:#8c8c8c">' + r.time + '</div>'
-            + '</div>').join("");
+      // ----- Block 4：提现规则与限额 -----
+      const block4 = ''
+        + '<div class="settings-block">'
+          + '<div class="sb-head">'
+            + '<div><h3>📐 提现规则与限额</h3>'
+              + '<div class="sb-desc">控制本主体的提现节奏与单笔 / 单日上限。规则由平台 + 企业双重风控。</div>'
+            + '</div>'
+            + '<span class="sb-status ok">已生效</span>'
+          + '</div>'
+          + '<div class="sb-body">'
+            + '<div class="settings-row">'
+              + '<div class="sr-label">单笔提现上限</div>'
+              + '<div class="sr-value">¥100,000<div class="sr-meta">超过将拒绝并提示拆笔提现</div></div>'
+              + '<div class="sr-action"><span style="font-size:11px;color:#8c8c8c">平台规则</span></div>'
+            + '</div>'
+            + '<div class="settings-row">'
+              + '<div class="sr-label">单日累计上限</div>'
+              + '<div class="sr-value">¥500,000</div>'
+              + '<div class="sr-action"><span style="font-size:11px;color:#8c8c8c">平台规则</span></div>'
+            + '</div>'
+            + '<div class="settings-row">'
+              + '<div class="sr-label">提现到账时效</div>'
+              + '<div class="sr-value">T+1 ~ T+3 工作日<div class="sr-meta">含财务审核 + 银行间清算</div></div>'
+              + '<div class="sr-action"><span style="font-size:11px;color:#8c8c8c">平台规则</span></div>'
+            + '</div>'
+            + '<div class="settings-row">'
+              + '<div class="sr-label">大额提现需 OTP 复核<div class="sr-tip">单笔 ≥ ¥50,000 时强制短信验证</div></div>'
+              + '<div class="sr-value">已开启</div>'
+              + '<div class="sr-action"><div class="toggle on" onclick="window.demoToast(\'风控规则，不可关闭\', \'warn\')"></div></div>'
+            + '</div>'
+            + '<div class="settings-row">'
+              + '<div class="sr-label">禁止节假日提现</div>'
+              + '<div class="sr-value">关闭<div class="sr-meta">如开启，节假日提交的提现将延迟到下一工作日处理</div></div>'
+              + '<div class="sr-action"><div class="toggle" onclick="window.demoToast(\'演示环境，未实现切换\', \'warn\')"></div></div>'
+            + '</div>'
+          + '</div>'
+        + '</div>';
+
+      // ----- Block 5：资金通知 -----
+      const block5 = ''
+        + '<div class="settings-block">'
+          + '<div class="sb-head">'
+            + '<div><h3>🔔 资金通知偏好</h3>'
+              + '<div class="sb-desc">资金事件触发时通过哪些渠道通知你（站内信 / 邮件 / 短信）。</div>'
+            + '</div>'
+            + '<span class="sb-status ok">已配置</span>'
+          + '</div>'
+          + '<div class="sb-body">'
+            + '<div class="settings-row"><div class="sr-label">充值成功 / 失败</div><div class="sr-value">站内信 + 邮件</div><div class="sr-action"><div class="toggle on" onclick="window.demoToast(\'已切换：仅站内信\', \'info\')"></div></div></div>'
+            + '<div class="settings-row"><div class="sr-label">下单锁资 / 解冻</div><div class="sr-value">站内信</div><div class="sr-action"><div class="toggle on" onclick="window.demoToast(\'已关闭锁资通知\', \'info\')"></div></div></div>'
+            + '<div class="settings-row"><div class="sr-label">订单结算到账</div><div class="sr-value">站内信 + 短信</div><div class="sr-action"><div class="toggle on" onclick="window.demoToast(\'已切换：仅站内信\', \'info\')"></div></div></div>'
+            + '<div class="settings-row"><div class="sr-label">提现状态变更</div><div class="sr-value">站内信 + 邮件 + 短信</div><div class="sr-action"><div class="toggle on" onclick="window.demoToast(\'已切换：站内信 + 短信\', \'info\')"></div></div></div>'
+            + '<div class="settings-row"><div class="sr-label">余额 / 预算不足预警<div class="sr-tip">余额低于阈值时主动提醒</div></div><div class="sr-value">已开启 · 阈值 ¥10,000</div><div class="sr-action"><span class="sr-link" onclick="window.demoToast(\'调整预警阈值（演示）\', \'info\')">调整</span></div></div>'
+            + '<div class="settings-row"><div class="sr-label">每月对账单</div><div class="sr-value">每月 1 日邮件推送</div><div class="sr-action"><div class="toggle on" onclick="window.demoToast(\'已切换：不再推送\', \'info\')"></div></div></div>'
+          + '</div>'
+        + '</div>';
+
+      // ----- Block 6：安全入口 -----
+      const block6 = ''
+        + '<div class="settings-block">'
+          + '<div class="sb-head">'
+            + '<div><h3>🔐 钱包安全</h3>'
+              + '<div class="sb-desc">支付密码、登录设备、二次验证等钱包级安全配置。</div>'
+            + '</div>'
+            + '<span class="sb-status ok">已启用</span>'
+          + '</div>'
+          + '<div class="sb-body">'
+            + '<div class="settings-row"><div class="sr-label">钱包支付密码</div><div class="sr-value">已设置<div class="sr-meta">最近修改 2026-04-01</div></div><div class="sr-action"><span class="sr-link" onclick="location.href=\'account-security-prototype.html\'">修改</span></div></div>'
+            + '<div class="settings-row"><div class="sr-label">短信二次验证（OTP）</div><div class="sr-value">已绑定 · 138****8826</div><div class="sr-action"><span class="sr-link" onclick="location.href=\'account-security-prototype.html\'">管理</span></div></div>'
+            + '<div class="settings-row"><div class="sr-label">大额支付二次确认<div class="sr-tip">单笔 ≥ ¥10,000 时强制弹窗 + 密码</div></div><div class="sr-value">已开启</div><div class="sr-action"><div class="toggle on" onclick="window.demoToast(\'风控规则，不可关闭\', \'warn\')"></div></div></div>'
+            + '<div class="settings-row"><div class="sr-label">登录设备管理</div><div class="sr-value">已登录 2 台设备<div class="sr-meta">macOS · Chrome · 北京 / iOS · Safari · 上海</div></div><div class="sr-action"><span class="sr-link" onclick="location.href=\'account-security-prototype.html\'">查看</span></div></div>'
+            + '<div class="settings-row"><div class="sr-label">异常登录告警</div><div class="sr-value">已开启</div><div class="sr-action"><div class="toggle on" onclick="window.demoToast(\'已关闭异常登录告警\', \'warn\')"></div></div></div>'
+            + '<div class="settings-row"><div class="sr-label">退出全部已登录设备</div><div class="sr-value">立即结束所有会话</div><div class="sr-action"><span class="sr-link danger" onclick="window.demoToast(\'演示环境，未实现退出\', \'warn\')">立即退出</span></div></div>'
+          + '</div>'
+        + '</div>';
+
+      grid.innerHTML = block1 + block2 + block3 + block4 + block5 + block6;
     }
 
     // ============================================================
-    // 充值 modal
+    // 通用抽屉 open/close
+    // ============================================================
+    function openDrawer(name) {
+      const d = document.getElementById(name + "Drawer");
+      const mask = document.getElementById("drawerMask");
+      if (!d || !mask) return;
+      d.classList.add("open");
+      mask.classList.add("open");
+    }
+    function closeAllDrawers() {
+      document.querySelectorAll(".drawer.open").forEach(d => d.classList.remove("open"));
+      document.getElementById("drawerMask").classList.remove("open");
+    }
+    document.getElementById("drawerMask").addEventListener("click", closeAllDrawers);
+    document.addEventListener("click", function (e) {
+      if (e.target.closest("[data-close-drawer]")) closeAllDrawers();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeAllDrawers();
+    });
+
+    // 收支记录 / 发票 顶部"按钮 → 抽屉"
+    document.addEventListener("click", function (e) {
+      const b = e.target.closest("[data-action]");
+      if (!b) return;
+      const action = b.getAttribute("data-action");
+      const ws = window.demoApp.getCurrentWorkspace();
+      if (action === "recharge")  window.openRecharge(ws.walletKey || "enterprise-main-cf");
+      if (action === "withdraw")  window.openWithdraw(ws.id === "personal" ? "personal-account-lixueqin" : "personal-account-lixueqin");
+      if (action === "allocate")  {
+        if (ws.id !== "cf-admin") { window.demoToast("仅企业管理员可发起划拨", "warn"); return; }
+        window.openAllocate();
+      }
+      if (action === "invoice")   window.openInvoice();
+    });
+
+    // ============================================================
+    // 充值抽屉
     // ============================================================
     let rechargeWalletKey = null;
     window.openRecharge = function (walletKey) {
       rechargeWalletKey = walletKey;
       const wallets = window.demoApp.getWallets();
       const wallet = wallets[walletKey];
+      if (!wallet) { window.demoToast("当前账户未开通钱包", "warn"); return; }
       $("rechargeAccountName").textContent = wallet.name;
       $("rechargeTargetName").textContent = wallet.name;
       $("rechargeCurrentBalance").textContent = window.fmtMoney(wallet.balance);
       $("rechargeAmount").value = "";
       updateRechargePreview();
-      $("rechargeModal").classList.add("open");
+      openDrawer("recharge");
     };
     function updateRechargePreview() {
       const wallets = window.demoApp.getWallets();
@@ -1679,7 +2182,7 @@
       $("rechargeAfterBalance").textContent = window.fmtMoney(wallet.balance + amt);
     }
     $("rechargeAmount").addEventListener("input", updateRechargePreview);
-    document.querySelectorAll("#rechargeModal .quick-amt button").forEach(btn => {
+    document.querySelectorAll("#rechargeDrawer .quick-amt button").forEach(btn => {
       btn.addEventListener("click", () => { $("rechargeAmount").value = btn.getAttribute("data-amt"); updateRechargePreview(); });
     });
     $("rechargeConfirmBtn").addEventListener("click", () => {
@@ -1688,15 +2191,13 @@
       const method = $("rechargeMethod").value;
       const wallets = window.demoApp.getWallets();
       if (method === "bank-transfer") {
-        // 对公转账：需财务审核，余额不立即变
-        window.demoApp.addFlow({ id: "F-" + Date.now(), time: now(), type: "recharge", desc: "对公转账充值（待审核 - " + window.fmtMoney(amt) + "）", account: rechargeWalletKey, amount: 0, operator: "昭岚" });
+        window.demoApp.addFlow({ id: "F-" + Date.now(), time: now(), type: "recharge", desc: "对公转账充值（待审核 - " + window.fmtMoney(amt) + "）", account: rechargeWalletKey, amount: 0, operator: "昭岚", lockedNote: "财务审核中" });
         window.demoToast("✅ 对公转账凭证已提交，财务审核中（约 1 个工作日到账）", "info");
-        $("rechargeModal").classList.remove("open");
-        // 模拟 3 秒后审核通过
+        closeAllDrawers();
         setTimeout(() => {
-          const ws = window.demoApp.getWallets();
-          ws[rechargeWalletKey].balance += amt;
-          window.demoApp.setWallets(ws);
+          const w2 = window.demoApp.getWallets();
+          w2[rechargeWalletKey].balance += amt;
+          window.demoApp.setWallets(w2);
           window.demoApp.addFlow({ id: "F-" + Date.now(), time: now(), type: "recharge", desc: "对公转账充值（财务审核通过）", account: rechargeWalletKey, amount: amt, operator: "财务" });
           window.demoToast("💰 对公转账已审核通过，余额到账 " + window.fmtMoney(amt), "ok");
           window.refreshAll();
@@ -1707,19 +2208,19 @@
         const methodLabel = { "online-alipay": "支付宝", "online-wechat": "微信", "online-unionpay": "银联" }[method] || "在线";
         window.demoApp.addFlow({ id: "F-" + Date.now(), time: now(), type: "recharge", desc: methodLabel + "充值", account: rechargeWalletKey, amount: amt, operator: "昭岚" });
         window.demoToast("✅ 充值成功 " + window.fmtMoney(amt), "ok");
-        $("rechargeModal").classList.remove("open");
+        closeAllDrawers();
         window.refreshAll();
       }
     });
 
     // ============================================================
-    // 划拨预算 modal
+    // 划拨预算抽屉
     // ============================================================
     window.openAllocate = function (presetTarget) {
       if (presetTarget) $("allocateTarget").value = presetTarget;
       $("allocateAmount").value = "";
       updateAllocPreview();
-      $("allocateModal").classList.add("open");
+      openDrawer("allocate");
     };
     function updateAllocPreview() {
       const wallets = window.demoApp.getWallets();
@@ -1736,7 +2237,7 @@
     }
     $("allocateAmount").addEventListener("input", updateAllocPreview);
     $("allocateTarget").addEventListener("change", updateAllocPreview);
-    document.querySelectorAll("#allocateModal .quick-amt button").forEach(btn => {
+    document.querySelectorAll("#allocateDrawer .quick-amt button").forEach(btn => {
       btn.addEventListener("click", () => { $("allocateAmount").value = btn.getAttribute("data-amt"); updateAllocPreview(); });
     });
     $("allocConfirmBtn").addEventListener("click", () => {
@@ -1750,7 +2251,6 @@
       const team = teamMap[toKey];
       if (!wallets[toKey]) {
         wallets[toKey] = { type: "team-budget", name: team.teamName + " - 团队预算账户", balance: 0, lockedAmount: 0, allocated: 0, owner: team.ws };
-        // 同时把工作空间的 walletKey/budgetMissing 在 LocalStorage 里没有更新（运行时 WORKSPACES 是 const，但这页的 walletKey 也指向 enterprise-main，只能下次刷新生效）
       }
       wallets["enterprise-main-cf"].balance -= amt;
       wallets[toKey].balance += amt;
@@ -1759,23 +2259,24 @@
       window.demoApp.addFlow({ id: "F-" + Date.now() + "a", time: now(), type: "allocate", desc: "从企业总账户划拨至 " + team.teamName, account: "enterprise-main-cf", amount: -amt, operator: "昭岚（企业管理员）" });
       window.demoApp.addFlow({ id: "F-" + Date.now() + "b", time: now(), type: "allocate", desc: "企业管理员划拨预算 → " + team.teamName, account: toKey, amount: amt, operator: "昭岚（企业管理员）" });
       window.demoToast("✅ 已划拨 " + window.fmtMoney(amt) + " 至 " + team.teamName, "ok");
-      $("allocateModal").classList.remove("open");
+      closeAllDrawers();
       window.refreshAll();
       if (toKey === "team-budget-cf-ip") setTimeout(() => window.demoToast("提示：IP 孵化组已开通预算账户，下次该空间下单不再回退至企业总账户", "info"), 800);
     });
 
     // ============================================================
-    // 提现 modal
+    // 提现抽屉
     // ============================================================
     let withdrawWalletKey = null;
     window.openWithdraw = function (walletKey) {
       withdrawWalletKey = walletKey;
       const wallets = window.demoApp.getWallets();
       const wallet = wallets[walletKey];
+      if (!wallet) { window.demoToast("当前账户不可提现", "warn"); return; }
       $("withdrawAccountName").textContent = wallet.name;
       $("withdrawableAmount").textContent = window.fmtMoney(wallet.balance);
       $("withdrawAmount").value = "";
-      $("withdrawModal").classList.add("open");
+      openDrawer("withdraw");
     };
     $("withdrawConfirmBtn").addEventListener("click", () => {
       const amt = Number($("withdrawAmount").value);
@@ -1783,8 +2284,59 @@
       const wallet = wallets[withdrawWalletKey];
       if (!amt || amt < 1) { window.demoToast("请输入有效金额", "err"); return; }
       if (amt > wallet.balance) { window.demoToast("超过可提现金额", "err"); return; }
+      if (amt > 100000) { window.demoToast("单笔提现 ≤ ¥100,000，请拆笔提现", "err"); return; }
+      window.demoApp.addFlow({ id: "F-" + Date.now(), time: now(), type: "withdraw", desc: "提现申请提交（财务审核中）", account: withdrawWalletKey, amount: 0, operator: "昭岚", lockedNote: "财务审核中" });
       window.demoToast("✅ 提现申请已提交，财务审核中（1-3 个工作日到账）", "info");
-      $("withdrawModal").classList.remove("open");
+      closeAllDrawers();
+      window.refreshAll();
+    });
+
+    // ============================================================
+    // 申请开票抽屉
+    // ============================================================
+    const INVOICE_AVAILABLE_ITEMS = [
+      { oid: "OD-2026042009", title: "广告片配音", amt: 8000 },
+      { oid: "OD-2026041807", title: "广告片配音 - 修订版", amt: 8000 },
+      { oid: "OD-2026041401", title: "IP 形象设计", amt: 15000 },
+      { oid: "OD-2026032008", title: "短视频脚本套件", amt: 5400 }
+    ];
+    function renderInvoiceItemList() {
+      const wrap = document.getElementById("invoiceItemList");
+      if (!wrap) return;
+      wrap.innerHTML = INVOICE_AVAILABLE_ITEMS.map(it =>
+        '<label><input type="checkbox" data-oid="' + it.oid + '" data-amt="' + it.amt + '"> '
+        + '<strong>' + it.oid + '</strong>'
+        + '<span class="ii-meta">' + it.title + '</span>'
+        + '<span class="ii-amt">' + window.fmtMoney(it.amt) + '</span>'
+        + '</label>').join("");
+      updateInvoiceTotal();
+    }
+    function updateInvoiceTotal() {
+      let total = 0;
+      document.querySelectorAll("#invoiceItemList input[type=checkbox]:checked").forEach(c => total += Number(c.getAttribute("data-amt") || 0));
+      const el = document.getElementById("invoiceTotal");
+      if (el) el.textContent = window.fmtMoney(total);
+    }
+    window.openInvoice = function (presetOid) {
+      renderInvoiceItemList();
+      if (presetOid) {
+        const cb = document.querySelector('#invoiceItemList input[data-oid="' + presetOid + '"]');
+        if (cb) { cb.checked = true; updateInvoiceTotal(); }
+      }
+      openDrawer("invoice");
+    };
+    document.getElementById("invoiceItemList").addEventListener("change", updateInvoiceTotal);
+    $("invoiceConfirmBtn").addEventListener("click", () => {
+      const checked = document.querySelectorAll("#invoiceItemList input[type=checkbox]:checked");
+      if (checked.length === 0) { window.demoToast("请至少选择一笔已结算订单", "err"); return; }
+      let total = 0;
+      checked.forEach(c => total += Number(c.getAttribute("data-amt") || 0));
+      const direction = $("invoiceDirection").value;
+      const dirLabel = direction === "sales" ? "销售发票" : "采购发票";
+      window.demoApp.addFlow({ id: "F-" + Date.now(), time: now(), type: "invoice", desc: dirLabel + "申请已提交（合计 " + window.fmtMoney(total) + " · " + checked.length + " 笔订单）", account: window.demoApp.getCurrentWorkspace().walletKey, amount: 0, operator: "昭岚", lockedNote: "平台审核中" });
+      window.demoToast("✅ " + dirLabel + "申请已提交，3-5 个工作日完成", "ok");
+      closeAllDrawers();
+      window.refreshAll();
     });
 
     function now() {
@@ -1801,35 +2353,37 @@
       renderAccountsGrid();
       renderBudgetUsage();
       renderKPIs();
-      renderFlows();
-      // 重新渲染当前激活的角色面板
+      // 当前 Tab 派生数据
       const activeTab = document.querySelector("#roleTabs button.active");
       const tabName = activeTab ? activeTab.getAttribute("data-tab") : "overview";
-      if (tabName === "demander") renderDemanderPanel();
-      if (tabName === "contractor") renderContractorPanel();
+      if (tabName === "overview") renderMiniFlows("overviewMiniFlows", "all");
+      if (tabName === "accounts") { renderAccountsActionBar(); renderFrozenBreakdown(); renderMiniFlows("accountsMiniFlows", "current"); }
+      if (tabName === "flows") renderFlows();
+      if (tabName === "invoice") renderInvoicePanel();
+      if (tabName === "settings") renderSettingsPanel();
     };
     window.onWorkspaceChanged = window.refreshAll;
 
-    // 初次渲染
+    // 初次渲染（Tab 无关）
     renderContextBanner();
     renderLiveBanners();
     renderCurrentCard();
     renderAccountsGrid();
     renderBudgetUsage();
     renderKPIs();
-    renderFlows();
-    renderExceptionGallery();
 
-    // P0-1：根据上次选择 / 身份决定默认 Tab
+    // 默认 Tab：依次取 URL hash → localStorage → "overview"
     (function pickDefaultTab() {
-      let saved = null;
-      try { saved = localStorage.getItem("walletPanelTab"); } catch (e) {}
-      if (saved && ["overview", "demander", "contractor"].includes(saved)) {
-        setActiveTab(saved);
-      } else {
-        const id = window.demoApp.getCurrentIdentity();
-        setActiveTab(id === "contractor" ? "contractor" : "overview");
+      let target = "overview";
+      const hash = (location.hash || "").replace("#", "");
+      if (VALID_TABS.includes(hash)) target = hash;
+      else {
+        try {
+          const saved = localStorage.getItem("walletPanelTab");
+          if (VALID_TABS.includes(saved)) target = saved;
+        } catch (e) {}
       }
+      setActiveTab(target);
     })();
   })();
   </script>
