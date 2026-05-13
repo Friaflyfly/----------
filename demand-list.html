@@ -108,9 +108,24 @@
     .status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 11px; font-size: 12px; font-weight: 500; }
     .status-badge.auditing { background: #fff7e6; color: #d46b08; }
     .status-badge.matching { background: #e6f7ff; color: #1890ff; }
+    .status-badge.auto-approved { background: #e6f7ff; color: #1890ff; position: relative; }
+    .status-badge.auto-approved .auto-mark { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; background: #52c41a; color: #fff; font-size: 9px; font-weight: 700; cursor: help; margin-left: 2px; }
     .status-badge.quoting { background: #fff1f0; color: #cf1322; }
     .status-badge.in-progress { background: #f6ffed; color: #389e0d; }
     .status-badge.rejected { background: #fff1f0; color: #cf1322; }
+    .status-badge.completed { background: #f5f5f5; color: #595959; }
+    .status-badge.cancelled { background: #f5f5f5; color: #8c8c8c; }
+
+    /* 状态聚合卡片右上角辅助计数 */
+    .stat-aux { font-size: 11px; color: #8c8c8c; text-align: right; padding: 4px 4px 0 0; }
+    .stat-aux a { color: #8c8c8c; text-decoration: none; cursor: pointer; }
+    .stat-aux a:hover { color: #1890ff; }
+    .stat-aux .sep { color: #d9d9d9; margin: 0 4px; }
+
+    /* 进入项目空间按钮 */
+    .btn-link.project-space { background: #f0f7ff; border-color: #91d5ff; color: #1890ff; }
+    .btn-link.project-space:hover { background: #e6f7ff; border-color: #40a9ff; color: #096dd9; }
+    .btn-link.disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
 
     .quotes-count { display: inline-flex; align-items: center; gap: 4px; }
     .quotes-count.active { color: #cf1322; font-weight: 600; }
@@ -289,12 +304,23 @@
     const $ = (id) => document.getElementById(id);
 
     const STATUS_CONFIG = {
-      "auditing":   { label: "📋 审核中", className: "auditing", desc: "平台核定需求中（≤24h）" },
-      "matching":   { label: "🔍 撮合中", className: "matching", desc: "已通过审核，承制方报价中" },
-      "quoting":    { label: "💬 待选承制方", className: "quoting", desc: "已收到报价，请尽快选定" },
-      "in-progress":{ label: "🛠 进行中", className: "in-progress", desc: "已下单，承制方制作中" },
-      "completed":  { label: "✅ 已完成", className: "completed", desc: "已结算" },
-      "rejected":   { label: "❌ 已驳回", className: "rejected", desc: "未通过平台核定，请修改后重提" }
+      "auditing":     { label: "📋 审核中", className: "auditing", desc: "平台核定需求中（≤24h）" },
+      "matching":     { label: "🔍 撮合中", className: "matching", desc: "已通过审核，承制方报价中" },
+      "auto-approved":{ label: "🔍 撮合中", className: "auto-approved", desc: "平台套餐 · 系统自动通过 · 撮合中", autoMark: true },
+      "quoting":      { label: "💬 待选承制方", className: "quoting", desc: "已收到报价，请尽快选定" },
+      "in-progress":  { label: "🛠 进行中", className: "in-progress", desc: "已下单，承制方制作中" },
+      "completed":    { label: "✅ 已完成", className: "completed", desc: "已结算" },
+      "cancelled":    { label: "🚫 已取消", className: "cancelled", desc: "需求方主动撤回" },
+      "rejected":     { label: "❌ 已驳回", className: "rejected", desc: "未通过平台核定，请修改后重提" }
+    };
+
+    // 状态聚合卡片合并规则：matching 卡片同时统计 auto-approved（业务上等价）
+    const STAT_GROUPS = {
+      "all":         (d) => true,
+      "auditing":    (d) => d.status === "auditing",
+      "matching":    (d) => d.status === "matching" || d.status === "auto-approved",
+      "quoting":     (d) => d.status === "quoting",
+      "in-progress": (d) => d.status === "in-progress"
     };
 
     let activeStatus = "all";
@@ -306,27 +332,47 @@
     function renderStats() {
       const all = window.demoApp.getDemands();
       const filtered = activeScope === "current" ? all.filter((d) => d.workspace === window.demoApp.getCurrentWorkspaceId()) : all;
-      const counts = { all: filtered.length };
-      Object.keys(STATUS_CONFIG).forEach((k) => { counts[k] = filtered.filter((d) => d.status === k).length; });
       const cards = [
-        { key: "all", label: "全部", value: counts.all, suffix: "条" },
-        { key: "auditing", label: "审核中", value: counts.auditing, suffix: "条" },
-        { key: "matching", label: "撮合中", value: counts.matching, suffix: "条" },
-        { key: "quoting", label: "待选承制方", value: counts.quoting, suffix: "条" },
-        { key: "in-progress", label: "进行中", value: counts["in-progress"], suffix: "条" }
+        { key: "all",         label: "全部",         value: filtered.length },
+        { key: "auditing",    label: "审核中",       value: filtered.filter(STAT_GROUPS.auditing).length },
+        { key: "matching",    label: "撮合中",       value: filtered.filter(STAT_GROUPS.matching).length },
+        { key: "quoting",     label: "待选承制方",    value: filtered.filter(STAT_GROUPS.quoting).length },
+        { key: "in-progress", label: "进行中",       value: filtered.filter(STAT_GROUPS["in-progress"]).length }
       ];
-      const html = cards.map((c) => '<div class="stat-card ' + (activeStatus === c.key ? "active" : "") + '" data-status="' + c.key + '"><div class="stat-label">' + c.label + '</div><div class="stat-value">' + c.value + '<span class="stat-suffix">' + c.suffix + '</span></div></div>').join("");
+      const html = cards.map((c) => '<div class="stat-card ' + (activeStatus === c.key ? "active" : "") + '" data-status="' + c.key + '"><div class="stat-label">' + c.label + '</div><div class="stat-value">' + c.value + '<span class="stat-suffix">条</span></div></div>').join("");
       $("statRow").innerHTML = html;
       $("statRow").querySelectorAll(".stat-card").forEach((el) => {
         el.addEventListener("click", () => { activeStatus = el.getAttribute("data-status"); render(); });
       });
+
+      // 辅助计数：已驳回 / 已取消 / 已完成（不单独占聚合卡位）
+      const rj = filtered.filter((d) => d.status === "rejected").length;
+      const cn = filtered.filter((d) => d.status === "cancelled").length;
+      const cp = filtered.filter((d) => d.status === "completed").length;
+      let aux = $("statAux");
+      if (!aux) {
+        aux = document.createElement("div");
+        aux.id = "statAux";
+        aux.className = "stat-aux";
+        $("statRow").parentNode.insertBefore(aux, $("statRow").nextSibling);
+      }
+      aux.innerHTML = '<a data-status="rejected">已驳回 ' + rj + '</a><span class="sep">·</span><a data-status="cancelled">已取消 ' + cn + '</a><span class="sep">·</span><a data-status="completed">已完成 ' + cp + '</a>';
+      aux.querySelectorAll("a").forEach((el) => {
+        el.addEventListener("click", () => { activeStatus = el.getAttribute("data-status"); render(); });
+      });
     }
+
+    // 项目空间入口可见状态
+    const PROJECT_SPACE_VISIBLE = ["auto-approved", "matching", "quoting", "in-progress"];
 
     function render() {
       const all = window.demoApp.getDemands();
       const curWs = window.demoApp.getCurrentWorkspaceId();
       let list = activeScope === "current" ? all.filter((d) => d.workspace === curWs) : all;
-      if (activeStatus !== "all") list = list.filter((d) => d.status === activeStatus);
+      if (activeStatus !== "all") {
+        const filterFn = STAT_GROUPS[activeStatus] || ((d) => d.status === activeStatus);
+        list = list.filter(filterFn);
+      }
       if (activeCat) list = list.filter((d) => (d.category || "").indexOf(activeCat) === 0);
       if (searchKey) {
         const k = searchKey.toLowerCase();
@@ -344,24 +390,46 @@
         const ws = window.demoApp.WORKSPACES[d.workspace] || { name: d.workspaceName || d.workspace };
         const wsClass = "ws-pill " + d.workspace;
         const isHighlight = d.id === highlightId;
-        // 操作按钮
-        let actions = "";
-        if (d.status === "quoting") actions = '<a class="btn-link urgent" href="demand-quote-comparison.html?demandId=' + d.id + '">对比报价 (' + d.quotesCount + ')</a>';
-        else if (d.status === "in-progress") actions = '<a class="btn-link primary" href="project-space.html?orderId=OD-2026042307&demandId=' + d.id + '">查看进度 →</a>';
-        else if (d.status === "matching") actions = '<button class="btn-link" onclick="window.demoToast(\'承制方报价中，请耐心等待\', \'info\')">详情</button>';
-        else if (d.status === "auditing") actions = '<button class="btn-link" onclick="window.demoToast(\'平台正在核定需求\', \'info\')">详情</button>';
-        else if (d.status === "rejected") actions = '<a class="btn-link urgent" href="demand-publish.html">修改并重提</a>';
-        else actions = '<button class="btn-link" onclick="window.demoToast(\'订单归档详情下版本补齐\', \'info\')">归档</button>';
+
+        // 状态徽章：auto-approved 增加 ✓ 自动通过标识
+        const autoMark = status.autoMark ? '<span class="auto-mark" title="平台套餐 · 系统自动审核通过">✓</span>' : '';
+        const badge = '<span class="status-badge ' + status.className + '">' + status.label + autoMark + '</span>';
+
+        // 操作按钮组装
+        const actions = [];
+        // 项目空间入口（auto-approved / matching / quoting / in-progress 状态）
+        if (PROJECT_SPACE_VISIBLE.indexOf(d.status) >= 0) {
+          if (d.projectSpaceId) {
+            actions.push('<a class="btn-link project-space" href="project-space.html?projectSpaceId=' + d.projectSpaceId + '&demandId=' + d.id + '" title="项目空间 ' + d.projectSpaceId + '">🤝 项目空间</a>');
+          } else {
+            actions.push('<button class="btn-link disabled" title="项目空间正在创建中" onclick="window.demoToast(\'项目空间正在创建中，请稍后刷新\', \'info\')">项目空间创建中…</button>');
+          }
+        }
+        // 状态相关操作
+        if (d.status === "quoting") {
+          actions.push('<a class="btn-link urgent" href="demand-quote-comparison.html?demandId=' + d.id + '">对比报价 (' + (d.quotesCount || 0) + ')</a>');
+        } else if (d.status === "matching") {
+          actions.push('<button class="btn-link" onclick="window.demoToast(\'承制方报价中，请耐心等待\', \'info\')">详情</button>');
+        } else if (d.status === "auto-approved") {
+          actions.push('<button class="btn-link" onclick="window.demoToast(\'平台套餐 · 系统已自动审核通过；承制方报价中\', \'info\')">详情</button>');
+        } else if (d.status === "auditing") {
+          actions.push('<button class="btn-link" onclick="window.demoToast(\'平台正在核定需求（自定义模式约 2 小时）\', \'info\')">详情</button>');
+        } else if (d.status === "rejected") {
+          actions.push('<a class="btn-link urgent" href="demand-publish.html">修改并重提</a>');
+        } else if (d.status === "cancelled" || d.status === "completed") {
+          actions.push('<button class="btn-link" onclick="window.demoToast(\'归档详情下版本补齐\', \'info\')">归档</button>');
+        }
+
         const quoteCell = d.quotesCount > 0 ? '<span class="quotes-count ' + (d.status === "quoting" ? "active" : "") + '">' + d.quotesCount + ' 家</span>' : '<span style="color:#bfbfbf">—</span>';
         const contractor = d.contractor ? '<div style="font-size:12px;color:#1890ff;margin-top:2px">承制方：' + d.contractor + '</div>' : '';
         return '<div class="list-row ' + (isHighlight ? "highlight" : "") + '">'
           + '<div><div class="demand-title">' + d.title + '</div><div class="demand-id">' + d.id + ' · ' + d.createTime + '</div>' + contractor + '</div>'
           + '<div style="font-size:13px;color:#595959">' + d.category + '</div>'
           + '<div><span class="' + wsClass + '">' + ws.name + '</span><div style="font-size:11px;color:#8c8c8c;margin-top:2px">扣款：' + (d.payerLabel || "—") + '</div></div>'
-          + '<div><span class="status-badge ' + status.className + '">' + status.label + '</span><div style="font-size:11px;color:#8c8c8c;margin-top:2px">' + status.desc + '</div></div>'
+          + '<div>' + badge + '<div style="font-size:11px;color:#8c8c8c;margin-top:2px">' + status.desc + '</div></div>'
           + '<div>' + quoteCell + '</div>'
           + '<div><div style="font-weight:500">' + window.fmtMoney(d.budget) + '</div><div style="font-size:11px;color:#8c8c8c">截止 ' + d.deadline + '</div></div>'
-          + '<div class="row-actions">' + actions + '</div>'
+          + '<div class="row-actions">' + actions.join('') + '</div>'
           + '</div>';
       }).join("");
       body.innerHTML = html;
@@ -382,12 +450,21 @@
 
     window.onWorkspaceChanged = () => render();
 
-    // 提示新提交
+    // 提示新提交（区分套餐自动通过 vs 自定义审核中）
     if (highlightId) {
       const all = window.demoApp.getDemands();
       const d = all.find((x) => x.id === highlightId);
       if (d) {
-        setTimeout(() => window.demoToast("✅ 需求 " + highlightId + " 已提交，预计 24h 内出报价", "ok"), 300);
+        if (d.status === "auto-approved") {
+          setTimeout(() => window.demoToast("✅ 需求 " + highlightId + " · 平台套餐已自动审核通过", "ok"), 300);
+          if (d.projectSpaceId) {
+            setTimeout(() => window.demoToast("🤝 项目协同空间已创建：" + d.projectSpaceId + "，可立即进入跟进", "info"), 1100);
+          }
+        } else if (d.status === "auditing") {
+          setTimeout(() => window.demoToast("✅ 需求 " + highlightId + " 已提交，平台核定中（≤24h）", "ok"), 300);
+        } else {
+          setTimeout(() => window.demoToast("✅ 需求 " + highlightId + " 已更新", "ok"), 300);
+        }
       }
     }
 

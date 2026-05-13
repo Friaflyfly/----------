@@ -938,7 +938,7 @@
         if (dl) dl.innerHTML = '交付与周期<span class="req">*</span><span style="color:#8c8c8c;font-weight:400;font-size:12px">（默认取自套餐，可改文案备注）</span>';
         if (tip) tip.textContent = "套餐总价与交付节奏由 SKU 锁定；请填写标题与说明，必要时调整下方交期描述";
         if (st) st.textContent = "补充信息（Brief）";
-        if (audit) audit.innerHTML = "套餐订单将按<strong>选定 SKU 快照</strong>锁价；提交后进入平台审核与锁资流程（演示环境仅模拟跳转）。";
+        if (audit) audit.innerHTML = "✅ 平台套餐 · <strong>提交后系统自动审核通过</strong>；按 <strong>SKU 快照</strong>锁价，<strong>项目协同空间将自动创建</strong>，可立即进入跟进。";
         $("sumPackageSection").style.display = "";
       } else {
         if (budgetWrap) budgetWrap.style.display = "";
@@ -946,7 +946,7 @@
         if (dl) dl.innerHTML = '期望交付时间<span class="req">*</span>';
         if (tip) tip.textContent = "所有类目通用";
         if (st) st.textContent = "基本信息 + 预算交期";
-        if (audit) audit.innerHTML = "提交后，<b>此需求将进入平台审核核定环节</b>（约 2 小时内），核定通过后将自动撮合 3-5 家承制方报价。";
+        if (audit) audit.innerHTML = "提交后，<b>此需求将进入平台审核核定环节</b>（约 2 小时内）；核定通过后将<b>自动创建项目协同空间</b>并撮合 3-5 家承制方报价。";
         $("sumPackageSection").style.display = "none";
       }
       $("modePackage").classList.toggle("active", pkg);
@@ -1502,12 +1502,14 @@
       }
 
       const ws = window.demoApp.getCurrentWorkspace();
+      const nowStr = new Date().toLocaleString("zh-CN", { hour12: false });
       const id = "DM-" + new Date().toISOString().slice(0, 10).replace(/-/g, "") + Math.floor(Math.random() * 90 + 10);
 
       let demand;
       if (form.publishMode === "package") {
         const spu = PLATFORM_CATALOG[form.spuId];
         const sku = form.skuSnapshot;
+        const projectSpaceId = "PS-" + new Date().toISOString().slice(0, 10).replace(/-/g, "") + Math.floor(Math.random() * 9000 + 1000);
         demand = {
           id,
           requirementType: "PLATFORM_SKU",
@@ -1525,9 +1527,15 @@
           refs: form.refs.slice(),
           workspace: ws.id, workspaceName: ws.name,
           payerLabel: ws.payerLabel,
-          status: "auditing",
+          // 平台套餐：系统自动审核通过 + 项目空间同步创建
+          status: "auto-approved",
+          auditMode: "auto",
+          auditedBy: "system-auto",
+          auditedAt: nowStr,
+          projectSpaceId: projectSpaceId,
+          projectSpaceCreatedAt: nowStr,
           quotesCount: 0,
-          createTime: new Date().toLocaleString("zh-CN", { hour12: false })
+          createTime: nowStr
         };
       } else {
         const cat = CATEGORY_TREE[form.l1];
@@ -1544,24 +1552,33 @@
           refs: form.refs.slice(),
           workspace: ws.id, workspaceName: ws.name,
           payerLabel: ws.payerLabel,
+          // 自定义模式：进入人工审核队列
           status: "auditing",
+          auditMode: "manual",
+          auditedBy: null,
+          auditedAt: null,
+          projectSpaceId: null,
+          projectSpaceCreatedAt: null,
           quotesCount: 0,
-          createTime: new Date().toLocaleString("zh-CN", { hour12: false })
+          createTime: nowStr
         };
       }
       window.demoApp.addDemand(demand);
       window.demoApp.clearDraft();
 
       $("btnSubmit").disabled = true; $("btnSubmit").textContent = "提交中...";
-      window.demoToast("✅ 已提交，需求已进入平台审核核定环节", "ok");
-      const tip2 = form.publishMode === "package"
-        ? "平台套餐单已附带 SKU 快照，后续锁资与履约以快照条款为准（演示）"
-        : "审核通过后，平台将自动撮合 3-5 家承制方报价（约 2 小时内）";
-      setTimeout(() => window.demoToast(tip2, "info"), 900);
+
+      if (form.publishMode === "package") {
+        window.demoToast("✅ 平台套餐 · 系统已自动审核通过", "ok");
+        setTimeout(() => window.demoToast("🤝 项目协同空间已创建（" + demand.projectSpaceId + "），可立即进入跟进", "info"), 900);
+      } else {
+        window.demoToast("✅ 已提交，需求已进入平台审核核定环节", "ok");
+        setTimeout(() => window.demoToast("审核通过后，平台将自动创建项目空间并撮合承制方（约 2 小时内）", "info"), 900);
+      }
       setTimeout(() => {
         window.demoToast(`即将跳转「我的需求」查看 ${id}`, "info");
       }, 2000);
-      setTimeout(() => { location.href = "demand-list.html"; }, 3200);
+      setTimeout(() => { location.href = "demand-list.html?highlight=" + id; }, 3200);
     });
 
     // ============================================================

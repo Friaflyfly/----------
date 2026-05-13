@@ -944,6 +944,28 @@
         setTimeout(function () { if (window.demoToast) window.demoToast(msg, "info"); }, 350);
       } catch (e) {}
     })();
+
+    // 列表页"🤝 项目空间"深链：?projectSpaceId=...&demandId=... 时
+    // 若需求仍处于早期阶段（auto-approved / matching / quoting），给出友好降级提示
+    (function () {
+      try {
+        var qp = new URLSearchParams(window.location.search);
+        var psid = qp.get("projectSpaceId") || "";
+        var did = qp.get("demandId") || "";
+        if (!psid && !did) return;
+        if (qp.get("orderId")) return; // 已带订单参数走原逻辑
+        var demands = (window.demoApp && window.demoApp.getDemands) ? window.demoApp.getDemands() : [];
+        var d = did ? demands.find(function (x) { return x.id === did; })
+                    : demands.find(function (x) { return x.projectSpaceId === psid; });
+        if (!d) return;
+        var early = ["auto-approved", "matching", "quoting"].indexOf(d.status) >= 0;
+        if (!early) return;
+        var statusLabel = { "auto-approved": "撮合中（套餐自动通过）", "matching": "撮合中", "quoting": "待选承制方" }[d.status] || d.status;
+        setTimeout(function () {
+          if (window.demoToast) window.demoToast("🤝 项目协同空间 " + (psid || d.projectSpaceId || "") + " · 当前需求「" + (d.title || did) + "」状态：" + statusLabel + "；选定承制方后将关联订单（演示环境暂以已有项目展示）", "info");
+        }, 350);
+      } catch (e) {}
+    })();
   </script>
 
   <!-- 项目列表 + 切换 -->
