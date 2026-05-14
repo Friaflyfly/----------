@@ -25,11 +25,13 @@
   } catch (e) {}
 
   // ============================================================
-  // 工作空间 mock 配置（共享 source of truth）
+  // 团队 mock 配置（共享 source of truth）
+  // 注：内部字段名仍叫 workspace / WORKSPACES（避免重命名带来的连锁改动），UI 文案统一称「团队」。
+  // 「项目空间」（projectSpaceId / project-space.html）是另一个概念，单订单协同区。
   // ============================================================
   var WORKSPACES = {
     "personal": {
-      id: "personal", name: "个人空间", shortName: "个人空间", type: "personal",
+      id: "personal", name: "个人", shortName: "个人", type: "personal",
       icon: "👤", iconClass: "personal",
       accountType: "个人账户", accountBalance: 3200,
       payerLabel: "个人账户", roleLabel: "个人创作者",
@@ -85,13 +87,13 @@
   // ============================================================
   var defaultDemands = [
     // 平台套餐 · 系统自动审核通过 · 已创建项目空间（演示新流程）
-    { id: "DM-2026042705", title: "营销短视频制作包 · 进阶档 · 164 条", category: "营销短视频制作包 / 进阶档 · 164 条", catId: "marketing-video", subCatId: "advanced", workspace: "cf-marketing", workspaceName: "骋风天合 · 市场宣传组", status: "auto-approved", quotesCount: 0, budget: 30000, createTime: "2026-04-27 09:05", deadline: "首批 7 工作日 · 全部 35 工作日", payerLabel: "本团队预算账户", requirementType: "PLATFORM_SKU", spuId: "spu_marketing_video", skuId: "sku_mv_164", auditMode: "auto", auditedBy: "system-auto", auditedAt: "2026-04-27 09:05", projectSpaceId: "PS-202604277721", projectSpaceCreatedAt: "2026-04-27 09:05" },
+    { id: "DM-2026042705", title: "营销短视频制作包 · 进阶档 · 164 条", category: "营销短视频制作包 / 进阶档 · 164 条", catId: "marketing-video", subCatId: "advanced", workspace: "cf-marketing", workspaceName: "骋风天合 · 市场宣传组", status: "auto-approved", quotesCount: 0, budget: 30000, createTime: "2026-04-27 09:05", deadline: "35 天内完成全部交付", payerLabel: "本团队预算账户", requirementType: "PLATFORM_SKU", spuId: "spu_marketing_video", skuId: "sku_mv_164", auditMode: "auto", auditedBy: "system-auto", auditedAt: "2026-04-27 09:05", projectSpaceId: "PS-202604277721", projectSpaceCreatedAt: "2026-04-27 09:05" },
     { id: "DM-2026042512", title: "三集短剧解说视频（修仙题材）", category: "视频制作 / 解说视频", catId: "video", subCatId: "drama-explain", workspace: "cf-drama", workspaceName: "骋风天合 · 短剧制作中心", status: "quoting", quotesCount: 4, budget: 18000, createTime: "2026-04-25 15:32", deadline: "2026-05-08", payerLabel: "本团队预算账户", requirementType: "CUSTOM", auditMode: "manual", auditedBy: "运营-小李", auditedAt: "2026-04-25 17:10", projectSpaceId: "PS-202604253410", projectSpaceCreatedAt: "2026-04-25 17:10" },
     { id: "DM-2026042214", title: "品牌宣传短片脚本", category: "文案服务 / 营销文案", catId: "copy", subCatId: "marketing-copy", workspace: "cf-marketing", workspaceName: "骋风天合 · 市场宣传组", status: "matching", quotesCount: 0, budget: 5000, createTime: "2026-04-22 09:14", deadline: "2026-05-02", payerLabel: "本团队预算账户", requirementType: "CUSTOM", auditMode: "manual", auditedBy: "运营-小李", auditedAt: "2026-04-22 11:30", projectSpaceId: "PS-202604222218", projectSpaceCreatedAt: "2026-04-22 11:30" },
     { id: "DM-2026042103", title: "新剧 IP 海报系列", category: "图片设计 / 海报设计", catId: "image", subCatId: "poster", workspace: "cf-drama", workspaceName: "骋风天合 · 短剧制作中心", status: "in-progress", quotesCount: 5, budget: 28000, contractor: "星辰创作工作室", createTime: "2026-04-21 11:00", deadline: "2026-04-30", payerLabel: "本团队预算账户", requirementType: "CUSTOM", auditMode: "manual", auditedBy: "运营-小王", auditedAt: "2026-04-21 14:25", projectSpaceId: "PS-202604215107", projectSpaceCreatedAt: "2026-04-21 14:25" },
     { id: "DM-2026041807", title: "广告片配音", category: "内容创作 / 配音", catId: "content", subCatId: "voice", workspace: "cf-marketing", workspaceName: "骋风天合 · 市场宣传组", status: "completed", quotesCount: 3, budget: 8000, contractor: "声海传媒", createTime: "2026-04-18 16:20", deadline: "2026-04-25", payerLabel: "本团队预算账户", requirementType: "CUSTOM", auditMode: "manual", auditedBy: "运营-小李", auditedAt: "2026-04-18 18:00", projectSpaceId: "PS-202604186804", projectSpaceCreatedAt: "2026-04-18 18:00" },
     { id: "DM-2026041602", title: "新剧广电备案许可证办理", category: "资质服务 / 广播电视节目制作许可证", catId: "license", subCatId: "broadcast", workspace: "cf-ip", workspaceName: "骋风天合 · IP 孵化组", status: "auditing", quotesCount: 0, budget: 12000, createTime: "2026-04-16 10:05", deadline: "2026-05-15", payerLabel: "回退至企业主账户", requirementType: "CUSTOM", auditMode: "manual", auditedBy: null, auditedAt: null, projectSpaceId: null, projectSpaceCreatedAt: null },
-    { id: "DM-2026041501", title: "个人公众号头图设计", category: "图片设计 / 封面 / 缩略图", catId: "image", subCatId: "cover", workspace: "personal", workspaceName: "个人空间", status: "completed", quotesCount: 2, budget: 800, contractor: "色彩工坊", createTime: "2026-04-15 22:13", deadline: "2026-04-20", payerLabel: "个人账户", requirementType: "CUSTOM", auditMode: "manual", auditedBy: "运营-小王", auditedAt: "2026-04-15 23:50", projectSpaceId: "PS-202604159932", projectSpaceCreatedAt: "2026-04-15 23:50" }
+    { id: "DM-2026041501", title: "个人公众号头图设计", category: "图片设计 / 封面 / 缩略图", catId: "image", subCatId: "cover", workspace: "personal", workspaceName: "个人", status: "completed", quotesCount: 2, budget: 800, contractor: "色彩工坊", createTime: "2026-04-15 22:13", deadline: "2026-04-20", payerLabel: "个人账户", requirementType: "CUSTOM", auditMode: "manual", auditedBy: "运营-小王", auditedAt: "2026-04-15 23:50", projectSpaceId: "PS-202604159932", projectSpaceCreatedAt: "2026-04-15 23:50" }
   ];
 
   var defaultOrders = [
@@ -431,9 +433,7 @@
       +     '<span class="ws-arrow">▼</span>'
       +   '</div>'
       +   '<div class="avatar-dropdown" id="avatarDropdown">'
-      +     '<a href="account-basic-info-prototype-platform-style.html"><span>👤</span> 账户基础信息</a>'
-      +     '<a href="enterprise-verification-prototype.html"><span>🏢</span> 企业认证</a>'
-      +     '<a href="account-security-prototype.html"><span>🔐</span> 账号安全</a>'
+      +     '<a href="account-center.html"><span>⚙️</span> 账号中心</a>'
       +     '<a href="wallet-overview.html"><span>💰</span> 我的钱包</a>'
       +     '<div class="divider"></div>'
       +     '<a href="admin-console.html"><span>👑</span> 管理后台</a>'

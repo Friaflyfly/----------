@@ -177,7 +177,7 @@
         <div class="menu-group">
           <div class="menu-group-title">账户</div>
           <a href="wallet-overview.html"><span class="menu-icon">💰</span> 我的钱包</a>
-          <a href="account-basic-info-prototype-platform-style.html"><span class="menu-icon">⚙️</span> 账号中心</a>
+          <a href="account-center.html"><span class="menu-icon">⚙️</span> 账号中心</a>
         </div>
       </nav>
     </aside>
@@ -190,7 +190,7 @@
         <div class="welcome-sub" id="welcomeSub">骋风天合 · 短剧制作中心 · 制作主管</div>
         <div class="ws-info-strip">
           <div class="ws-info">
-            <span class="ws-info-label">当前空间</span>
+            <span class="ws-info-label">当前团队</span>
             <span class="ws-info-value" id="welcomeWs">骋风天合 · 短剧制作中心</span>
           </div>
           <div class="ws-info">
@@ -321,7 +321,7 @@
       var ws = window.demoApp.getCurrentWorkspace();
       if (ws.budgetMissing) {
         setTimeout(function () {
-          window.demoToast("提示：该空间未配置预算，下单将回退至企业主账户", "warn");
+          window.demoToast("提示：该团队未配置预算，下单将回退至企业主账户", "warn");
         }, 600);
       }
     };

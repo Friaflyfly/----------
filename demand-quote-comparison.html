@@ -274,7 +274,7 @@
         <div class="menu-group">
           <div class="menu-group-title">账户</div>
           <a href="wallet-overview.html"><span class="menu-icon">💰</span> 我的钱包</a>
-          <a href="account-basic-info-prototype-platform-style.html"><span class="menu-icon">⚙️</span> 账号中心</a>
+          <a href="account-center.html"><span class="menu-icon">⚙️</span> 账号中心</a>
         </div>
       </nav>
     </aside>
@@ -297,7 +297,7 @@
           <div class="ds-item"><div class="ds-label">服务类目</div><div class="ds-value" id="demandCategory">视频制作 / 短剧解说</div></div>
           <div class="ds-item"><div class="ds-label">预算</div><div class="ds-value" id="demandBudget">¥18,000</div></div>
           <div class="ds-item"><div class="ds-label">期望交付</div><div class="ds-value" id="demandDeadline">2026-05-08</div></div>
-          <div class="ds-item"><div class="ds-label">归属空间</div><div class="ds-value" id="demandWorkspace">骋风天合 · 短剧制作中心</div></div>
+          <div class="ds-item"><div class="ds-label">所属团队</div><div class="ds-value" id="demandWorkspace">骋风天合 · 短剧制作中心</div></div>
         </div>
         <div class="ds-tags" id="demandTags"></div>
       </section>
@@ -314,7 +314,7 @@
       <!-- 报价卡片 -->
       <section class="compare-area">
         <h2>📋 4 家承制方报价</h2>
-        <p class="ca-desc">点击卡片选定承制方；选定后将进入下单确认环节，平台从当前空间对应账户锁定预算。</p>
+          <p class="ca-desc">点击卡片选定承制方；选定后将进入下单确认环节，平台从当前团队对应账户锁定预算。</p>
         <div class="quote-cards" id="quoteCards"></div>
       </section>
 
@@ -354,7 +354,7 @@
     <div class="modal">
       <div class="modal-head">
         <h3>📋 下单确认 · 扣款主体识别</h3>
-        <p>下单后，平台将从你「当前工作空间」对应的资金账户锁定预算。订单完成验收后正式结算。</p>
+        <p>下单后，平台将从你「当前团队」对应的资金账户锁定预算。订单完成验收后正式结算。</p>
       </div>
       <div class="modal-body">
         <!-- 订单摘要 -->
@@ -367,14 +367,14 @@
 
         <!-- 切空间提示 -->
         <div class="switch-tip">
-          💡 <strong>提示</strong>：下方「扣款主体」会随你切换的工作空间实时变化。可在顶部空间切换器试试切到不同空间，观察扣款账户和余额变化。
+          💡 <strong>提示</strong>：下方「扣款主体」会随你切换的团队实时变化。可在顶部团队切换器试试切到不同团队，观察扣款账户和余额变化。
         </div>
 
         <!-- ⭐ 扣款主体 badge ⭐ -->
         <div class="payer-badge" id="payerBadge">
           <div class="pb-title" id="pbTitle">本次扣款主体</div>
           <div class="pb-row">
-            <span class="pb-key">当前工作空间</span>
+            <span class="pb-key">当前团队</span>
             <span class="pb-val" id="pbWorkspace">骋风天合 · 短剧制作中心</span>
           </div>
           <div class="pb-row">
@@ -399,7 +399,7 @@
             <span class="pb-balance-after" id="pbBalanceAfter">¥167,000</span>
           </div>
           <div class="pb-fallback" id="pbFallback" style="display:none">
-            ⚠️ 当前空间「骋风天合 · IP 孵化组」<strong>未配置团队预算账户</strong>，平台规则：<strong>回退至企业主账户</strong>（骋风天合 - 企业主账户）。订单创建仍以"由 IP 孵化组发起"记录，但实际扣款主体为企业主账户。
+            ⚠️ 当前团队「骋风天合 · IP 孵化组」<strong>未配置团队预算账户</strong>，平台规则：<strong>回退至企业主账户</strong>（骋风天合 - 企业主账户）。订单创建仍以"由 IP 孵化组发起"记录，但实际扣款主体为企业主账户。
           </div>
           <div class="pb-warn" id="pbWarn" style="display:none">
             ❌ 余额不足，无法完成锁定。请先充值或申请预算划拨。

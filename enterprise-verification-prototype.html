@@ -105,6 +105,8 @@
       color: #8c8c8c;
       letter-spacing: 0.5px;
     }
+
+    .mainContent {
       flex: 1;
       margin-left: 200px;
       min-height: 100vh;
@@ -127,13 +129,51 @@
       font-size: 14px;
     }
 
-    .versionTag {
-      padding: 4px 10px;
+    .topActions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .demoSwitch {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 6px 4px 10px;
       border-radius: 999px;
+      background: #fafafa;
+      border: 1px dashed #d9d9d9;
+    }
+
+    .demoSwitchLabel {
+      font-size: 11px;
+      color: #8c8c8c;
+      letter-spacing: 0.5px;
+      padding-right: 4px;
+      border-right: 1px solid #e8e8e8;
+      margin-right: 2px;
+    }
+
+    .demoChip {
+      padding: 3px 10px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text-mute);
       font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .demoChip:hover {
       color: var(--brand);
-      border: 1px solid #91d5ff;
+    }
+
+    .demoChip.active {
       background: var(--brand-soft);
+      color: var(--brand);
+      border-color: #91d5ff;
+      font-weight: 500;
     }
 
     .card,
@@ -207,16 +247,9 @@
     .status-verified { color: #389e0d; background: var(--success-soft); border-color: #b7eb8f; }
     .status-failed { color: #cf1322; background: var(--danger-soft); border-color: #ffccc7; }
 
-    .statusGrid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-      margin-bottom: 12px;
-      align-items: start;
-    }
-
     .statusCard {
-      padding: 16px 18px;
+      padding: 20px 22px;
+      margin-bottom: 12px;
       border: 1px solid #f0f0f0;
     }
 
@@ -227,10 +260,24 @@
 
     .statusLead {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
       gap: 16px;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
+    }
+
+    .statusLeadText {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .statusLeadActions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
     .statusTitle {
@@ -287,131 +334,6 @@
       color: var(--text-mute);
       font-size: 13px;
       line-height: 1.6;
-    }
-
-    .flowLine {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 0;
-      margin-top: 18px;
-      position: relative;
-    }
-
-    .flowLine::before {
-      content: "";
-      position: absolute;
-      top: 16px;
-      left: 8%;
-      right: 8%;
-      height: 2px;
-      background: #d9d9d9;
-      z-index: 0;
-    }
-
-    .flowStep {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 0 12px;
-      cursor: pointer;
-      transition: transform 0.15s ease;
-    }
-
-    .flowStep:hover {
-      transform: translateY(-1px);
-    }
-
-    .flowDot {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: 2px solid #d9d9d9;
-      background: #fff;
-      position: relative;
-      margin-bottom: 12px;
-      display: grid;
-      place-items: center;
-      font-size: 13px;
-      font-weight: 700;
-      color: #8c8c8c;
-    }
-
-    .flowStep.active .flowDot {
-      border-color: var(--brand);
-      background: var(--brand);
-      color: #fff;
-      box-shadow: 0 0 0 4px rgba(24, 144, 255, 0.14);
-    }
-
-    .flowStep.done .flowDot {
-      border-color: var(--success);
-      background: var(--success);
-      color: #fff;
-    }
-
-    .flowStep.failed .flowDot {
-      border-color: var(--danger);
-      background: var(--danger);
-      color: #fff;
-      box-shadow: 0 0 0 4px rgba(255, 77, 79, 0.12);
-    }
-
-    .flowName {
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .flowDesc {
-      color: var(--text-mute);
-      font-size: 12px;
-      line-height: 1.6;
-      max-width: 190px;
-    }
-
-    .flowHint {
-      margin-top: 10px;
-      font-size: 12px;
-      color: var(--text-mute);
-    }
-
-    .progressPanel {
-      margin-top: 14px;
-      border-top: 1px solid var(--line);
-      padding-top: 14px;
-      display: grid;
-      grid-template-columns: minmax(0, 1.15fr) auto;
-      gap: 16px;
-      align-items: start;
-    }
-
-    .progressPanelMain {
-      min-width: 0;
-    }
-
-    .progressPanelTitle {
-      margin: 0 0 6px;
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-main);
-    }
-
-    .progressPanelTip {
-      margin: 0;
-      font-size: 13px;
-      color: var(--text-mute);
-      line-height: 1.7;
-    }
-
-    .progressActions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
     }
 
     .alert {
@@ -556,6 +478,14 @@
 
     .field.invalid .fieldHint {
       color: var(--danger);
+      font-weight: 500;
+    }
+
+    .field.invalid .fieldHint::before {
+      content: "⚠";
+      display: inline-block;
+      margin-right: 4px;
+      font-weight: 600;
     }
 
     .uploadGrid {
@@ -705,7 +635,32 @@
     .reasonList {
       display: grid;
       gap: 10px;
-      margin-top: 12px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+    }
+
+    .reasonListHeader {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+      color: #cf1322;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .reasonListHeader::before {
+      content: "!";
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--danger);
+      color: #fff;
+      display: inline-grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 700;
     }
 
     .reasonItem {
@@ -931,26 +886,8 @@
     }
 
     @media (max-width: 1100px) {
-      .statusGrid,
       .layoutGrid {
         grid-template-columns: 1fr;
-      }
-
-      .flowLine {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 14px 0;
-      }
-
-      .flowLine::before {
-        display: none;
-      }
-
-      .progressPanel {
-        grid-template-columns: 1fr;
-      }
-
-      .progressActions {
-        justify-content: flex-start;
       }
 
       .uploadGrid {
@@ -974,6 +911,10 @@
         flex-direction: column;
         align-items: flex-start;
       }
+
+      .statusLeadActions {
+        justify-content: flex-start;
+      }
     }
   </style>
 </head>
@@ -996,7 +937,15 @@
       <div class="pageWrap">
         <div class="topArea">
           <div class="breadcrumb">首页 &gt; 账户中心 &gt; 企业认证</div>
-          <div class="versionTag">企业认证流程页</div>
+          <div class="topActions">
+            <div class="demoSwitch" role="group" aria-label="Demo 状态预览">
+              <span class="demoSwitchLabel">Demo 预览</span>
+              <button type="button" class="demoChip" data-demo-status="UNVERIFIED">未认证</button>
+              <button type="button" class="demoChip" data-demo-status="PENDING">审核中</button>
+              <button type="button" class="demoChip" data-demo-status="VERIFIED">已认证</button>
+              <button type="button" class="demoChip" data-demo-status="FAILED">认证失败</button>
+            </div>
+          </div>
         </div>
 
         <section class="titleCard">
@@ -1028,73 +977,34 @@
         </div>
 
         <div id="mainPage">
-          <div class="statusGrid">
-            <section id="statusCard" class="statusCard">
-              <div class="statusLead">
-                <div>
-                  <h2 id="statusTitle" class="statusTitle">尚未完成企业认证</h2>
-                  <p id="statusDesc" class="statusDesc">请填写企业认证资料并提交审核，平台将在五个工作日内完成审核。</p>
-                </div>
+          <section id="statusCard" class="statusCard">
+            <div class="statusLead">
+              <div class="statusLeadText">
+                <h2 id="statusTitle" class="statusTitle">尚未完成企业认证</h2>
+                <p id="statusDesc" class="statusDesc">请填写企业认证资料并提交审核，平台将在五个工作日内完成审核。</p>
+              </div>
+              <div class="statusLeadActions">
                 <span id="editabilityTag" class="readonlyTag">当前可编辑</span>
+                <button id="progressSecondaryBtn" class="btn" style="display: none;">收起表单</button>
+                <button id="progressPrimaryBtn" class="btn btnPrimary">开始认证</button>
               </div>
-              <div class="statusMeta">
-                <div class="metric">
-                  <div class="metricLabel">审核时效</div>
-                  <div id="metricSla" class="metricValue">五个工作日内</div>
-                </div>
-                <div class="metric">
-                  <div class="metricLabel">最近提交时间</div>
-                  <div id="metricSubmittedAt" class="metricValue">未提交</div>
-                </div>
-                <div class="metric">
-                  <div class="metricLabel">当前可执行操作</div>
-                  <div id="metricAction" class="metricValue">提交认证</div>
-                </div>
+            </div>
+            <div class="statusMeta">
+              <div class="metric">
+                <div class="metricLabel">审核时效</div>
+                <div id="metricSla" class="metricValue">五个工作日内</div>
               </div>
-              <div class="flowLine">
-                <div id="step-unverified" class="flowStep">
-                  <div class="flowDot"></div>
-                  <div>
-                    <div class="flowName">未认证</div>
-                    <div class="flowDesc">表单可编辑，支持提交企业认证资料。</div>
-                  </div>
-                </div>
-                <div id="step-pending" class="flowStep">
-                  <div class="flowDot"></div>
-                  <div>
-                    <div class="flowName">审核中</div>
-                    <div class="flowDesc">材料锁定只读，支持撤回申请，不允许直接修改。</div>
-                  </div>
-                </div>
-                <div id="step-verified" class="flowStep">
-                  <div class="flowDot"></div>
-                  <div>
-                    <div class="flowName">已认证</div>
-                    <div class="flowDesc">默认只读，可发起企业信息变更并再次提交审核。</div>
-                  </div>
-                </div>
-                <div id="step-failed" class="flowStep">
-                  <div class="flowDot"></div>
-                  <div>
-                    <div class="flowName">认证失败</div>
-                    <div class="flowDesc">失败原因会映射到字段级错误，修改后可重新提交。</div>
-                  </div>
-                </div>
+              <div class="metric">
+                <div class="metricLabel">最近提交时间</div>
+                <div id="metricSubmittedAt" class="metricValue">未提交</div>
               </div>
-              <div class="flowHint">可点击状态节点，查看对应状态下的表单展示与可编辑性。</div>
-              <div class="progressPanel">
-                <div class="progressPanelMain">
-                  <h3 id="progressPanelTitle" class="progressPanelTitle">当前可直接开始企业认证</h3>
-                  <p id="progressPanelTip" class="progressPanelTip">点击右侧按钮后展开认证表单。认证失败时，失败原因会在这里集中展示。</p>
-                  <div id="inlineReasonList" class="reasonList" style="display: none;"></div>
-                </div>
-                <div class="progressActions">
-                  <button id="progressSecondaryBtn" class="btn" style="display: none;">返回查看</button>
-                  <button id="progressPrimaryBtn" class="btn btnPrimary">开始认证</button>
-                </div>
+              <div class="metric">
+                <div class="metricLabel">当前可执行操作</div>
+                <div id="metricAction" class="metricValue">提交认证</div>
               </div>
-            </section>
-          </div>
+            </div>
+            <div id="inlineReasonList" class="reasonList" style="display: none;"></div>
+          </section>
 
           <div id="formPanel" class="formPanel">
           <div class="layoutGrid">
@@ -1227,7 +1137,7 @@
                 </div>
               </section>
 
-              <div class="stickyActions">
+              <div id="formStickyActions" class="stickyActions">
                 <button id="secondaryActionBtn" class="btn">取消</button>
                 <button id="primaryActionBtn" class="btn btnPrimary">提交认证</button>
               </div>
@@ -1241,7 +1151,7 @@
                   <div class="kvItem"><span class="kvLabel">审核时效</span><span class="kvValue">五个工作日内</span></div>
                   <div class="kvItem"><span class="kvLabel">审核范围</span><span class="kvValue">主体资料 + 法人信息 + 对公账户</span></div>
                   <div class="kvItem"><span class="kvLabel">资料规范</span><span class="kvValue">证件清晰完整、信息一致</span></div>
-                  <div class="kvItem"><span class="kvLabel">失败处理</span><span class="kvValue">按字段提示修正后重新提交</span></div>
+                  <div class="kvItem"><span class="kvLabel">失败处理</span><span class="kvValue">按下方表单中带红色 ⚠ 提示的项逐项修正后重新提交</span></div>
                 </div>
               </section>
 
@@ -1255,11 +1165,11 @@
                   </div>
                   <div class="timelineItem">
                     <p class="timelineItemTitle">初审结论：认证失败</p>
-                    <p class="timelineItemMeta">2026-04-22 09:15 · 原因已同步至字段提示</p>
+                    <p class="timelineItemMeta">2026-04-22 09:15 · 需要修改的项已在下方表单中标出红色 ⚠ 提示</p>
                   </div>
                   <div class="timelineItem">
                     <p class="timelineItemTitle">等待重新提交</p>
-                    <p class="timelineItemMeta">请修正失败项后重新提交审核</p>
+                    <p class="timelineItemMeta">请改完带红色 ⚠ 提示的项后重新提交审核</p>
                   </div>
                 </div>
               </section>
@@ -1354,7 +1264,7 @@
         label: "认证失败",
         pillClass: "status-failed",
         title: "本次企业认证未通过",
-        desc: "失败原因会映射到字段级错误，请根据提示修改后重新提交。",
+        desc: "上次审核未通过。下方表单中带红色 ⚠ 提示的项即为需要修改的内容，点击「重新提交」展开编辑。",
         action: "重新提交认证",
         editable: true
       }
@@ -1388,8 +1298,6 @@
     const editabilityTag = document.getElementById("editabilityTag");
     const metricSubmittedAt = document.getElementById("metricSubmittedAt");
     const metricAction = document.getElementById("metricAction");
-    const progressPanelTitle = document.getElementById("progressPanelTitle");
-    const progressPanelTip = document.getElementById("progressPanelTip");
     const inlineReasonList = document.getElementById("inlineReasonList");
     const progressPrimaryBtn = document.getElementById("progressPrimaryBtn");
     const progressSecondaryBtn = document.getElementById("progressSecondaryBtn");
@@ -1398,11 +1306,13 @@
     const formIntro = document.getElementById("formIntro");
     const primaryActionBtn = document.getElementById("primaryActionBtn");
     const secondaryActionBtn = document.getElementById("secondaryActionBtn");
+    const formStickyActions = document.getElementById("formStickyActions");
     const noPermissionPage = document.getElementById("noPermissionPage");
     const mainPage = document.getElementById("mainPage");
     const confirmModalMask = document.getElementById("confirmModalMask");
     const confirmModalTitle = document.getElementById("confirmModalTitle");
     const confirmModalDesc = document.getElementById("confirmModalDesc");
+    const demoChips = document.querySelectorAll(".demoChip");
 
     function toast(message, kind = "ok") {
       const node = document.createElement("div");
@@ -1523,6 +1433,11 @@
       inlineReasonList.innerHTML = "";
       if (!shouldShow) return;
 
+      const header = document.createElement("div");
+      header.className = "reasonListHeader";
+      header.textContent = `审核驳回原因 · 共 ${state.failureReasons.length} 项`;
+      inlineReasonList.appendChild(header);
+
       state.failureReasons.forEach((item) => {
         const node = document.createElement("div");
         node.className = "reasonItem";
@@ -1555,159 +1470,127 @@
       });
     }
 
-    function renderFlow() {
-      const steps = ["UNVERIFIED", "PENDING", "VERIFIED", "FAILED"];
-      steps.forEach((status) => {
-        const node = document.getElementById(`step-${status.toLowerCase()}`);
-        node.classList.remove("active", "done", "failed");
+    function getViewModel() {
+      const { certStatus, pageMode } = state;
+      const editable = getIsEditable();
+      const cfg = statusConfig[certStatus];
+
+      let title = cfg.title;
+      let desc = cfg.desc;
+      let primaryText = cfg.action;
+      let primaryDisabled = false;
+      let secondaryVisible = false;
+      let formOpen = state.formPreviewByStatusBar || editable;
+      let formTitleText = "企业认证资料";
+      let formIntroText = "";
+      let metricActionText = cfg.action;
+
+      if (certStatus === "UNVERIFIED" && pageMode === "edit") {
+        title = "正在填写企业认证资料";
+        desc = "表单已展开，请完成资料填写后提交审核。提交后平台将在五个工作日内完成审核。";
+        primaryText = "提交认证";
+        secondaryVisible = true;
+        formTitleText = "企业认证资料";
+        formIntroText = "";
+        metricActionText = "提交认证";
+      }
+
+      if (certStatus === "PENDING") {
+        primaryText = "撤回申请";
+        formTitleText = "企业认证资料（审核中）";
+        formIntroText = "";
+        metricActionText = "撤回申请";
+      }
+
+      if (certStatus === "VERIFIED" && pageMode !== "change") {
+        primaryText = "发起变更";
+        formTitleText = "企业认证资料";
+        formIntroText = "";
+        metricActionText = "发起变更";
+      }
+
+      if (certStatus === "VERIFIED" && pageMode === "change") {
+        title = "企业认证变更编辑中";
+        desc = "修改完成后提交变更申请，平台会重新进入审核流程。";
+        primaryText = "提交变更";
+        secondaryVisible = true;
+        formTitleText = "企业认证变更";
+        formIntroText = "";
+        metricActionText = "提交变更";
+      }
+
+      if (certStatus === "FAILED" && pageMode !== "edit") {
+        primaryText = "重新提交";
+        formTitleText = "企业认证资料（失败）";
+        formIntroText = "";
+        metricActionText = "重新提交";
+      }
+
+      if (certStatus === "FAILED" && pageMode === "edit") {
+        title = "正在修正认证资料";
+        desc = "下方表单中带红色 ⚠ 提示的项即为需要修改的内容，逐项改完后点击「重新提交」。";
+        primaryText = "重新提交";
+        secondaryVisible = true;
+        formTitleText = "企业认证资料";
+        formIntroText = "";
+        metricActionText = "重新提交";
+      }
+
+      return {
+        cfg,
+        editable,
+        title,
+        desc,
+        primaryText,
+        primaryDisabled,
+        secondaryVisible,
+        formOpen,
+        formTitleText,
+        formIntroText,
+        metricActionText
+      };
+    }
+
+    function renderStatusCard() {
+      const vm = getViewModel();
+
+      pageStatusPill.className = `statusPill ${vm.cfg.pillClass}`;
+      pageStatusPill.textContent = vm.cfg.label;
+
+      statusTitle.textContent = vm.title;
+      statusDesc.textContent = vm.desc;
+
+      metricSubmittedAt.textContent = state.certStatus === "UNVERIFIED" ? "未提交" : state.submittedAt;
+      metricAction.textContent = vm.metricActionText;
+
+      editabilityTag.textContent = vm.editable ? "当前可编辑" : "当前只读";
+      statusCard.classList.toggle("failedAccent", state.certStatus === "FAILED");
+
+      [progressPrimaryBtn, primaryActionBtn].forEach((btn) => {
+        btn.textContent = vm.primaryText;
+        btn.disabled = vm.primaryDisabled;
+      });
+      [progressSecondaryBtn, secondaryActionBtn].forEach((btn) => {
+        btn.textContent = "收起表单";
       });
 
-      if (state.certStatus === "UNVERIFIED") {
-        document.getElementById("step-unverified").classList.add("active");
-      }
-      if (state.certStatus === "PENDING") {
-        document.getElementById("step-unverified").classList.add("done");
-        document.getElementById("step-pending").classList.add("active");
-      }
-      if (state.certStatus === "VERIFIED") {
-        document.getElementById("step-unverified").classList.add("done");
-        document.getElementById("step-pending").classList.add("done");
-        document.getElementById("step-verified").classList.add("active");
-      }
-      if (state.certStatus === "FAILED") {
-        document.getElementById("step-unverified").classList.add("done");
-        document.getElementById("step-pending").classList.add("done");
-        document.getElementById("step-failed").classList.add("failed");
-      }
-    }
+      progressSecondaryBtn.style.display = vm.secondaryVisible ? "inline-flex" : "none";
+      formStickyActions.style.display = vm.editable ? "flex" : "none";
 
-    function renderActions() {
-      if (state.certStatus === "UNVERIFIED") {
-        primaryActionBtn.textContent = "提交认证";
-        primaryActionBtn.disabled = false;
-        secondaryActionBtn.textContent = "收起表单";
-      }
-
-      if (state.certStatus === "FAILED") {
-        primaryActionBtn.textContent = "提交认证";
-        primaryActionBtn.disabled = false;
-        secondaryActionBtn.textContent = "收起表单";
-      }
-
-      if (state.certStatus === "PENDING") {
-        primaryActionBtn.textContent = "撤回申请";
-        primaryActionBtn.disabled = false;
-        secondaryActionBtn.textContent = "返回";
-      }
-
-      if (state.certStatus === "VERIFIED" && state.pageMode !== "change") {
-        primaryActionBtn.textContent = "变更企业认证信息";
-        primaryActionBtn.disabled = false;
-        secondaryActionBtn.textContent = "返回";
-      }
-
-      if (state.certStatus === "VERIFIED" && state.pageMode === "change") {
-        primaryActionBtn.textContent = "提交变更";
-        primaryActionBtn.disabled = false;
-        secondaryActionBtn.textContent = "收起表单";
-      }
-    }
-
-    function renderProgressPanel() {
-      progressSecondaryBtn.style.display = "none";
-      progressPrimaryBtn.style.display = "inline-flex";
-
-      if (state.certStatus === "UNVERIFIED") {
-        progressPanelTitle.textContent = "当前可直接开始企业认证";
-        progressPanelTip.textContent = "点击右侧按钮展开认证表单，填写完成后提交审核。";
-        progressPrimaryBtn.textContent = "开始认证";
-      }
-
-      if (state.certStatus === "UNVERIFIED" && state.pageMode === "edit") {
-        progressPanelTitle.textContent = "正在填写企业认证资料";
-        progressPanelTip.textContent = "表单已展开，请完成资料填写后提交审核。";
-        progressPrimaryBtn.style.display = "none";
-        progressSecondaryBtn.style.display = "inline-flex";
-        progressSecondaryBtn.textContent = "收起表单";
-      }
-
-      if (state.certStatus === "PENDING") {
-        progressPanelTitle.textContent = "资料已提交，正在审核";
-        progressPanelTip.textContent = "审核中不允许直接修改信息，如确需调整，请先撤回申请再重新填写。";
-        progressPrimaryBtn.textContent = "撤回申请";
-      }
-
-      if (state.certStatus === "VERIFIED" && state.pageMode !== "change") {
-        progressPanelTitle.textContent = "企业主体已完成认证";
-        progressPanelTip.textContent = "如需调整企业名称、法人信息或对公账户，请发起企业认证信息变更。";
-        progressPrimaryBtn.textContent = "发起变更";
-      }
-
-      if (state.certStatus === "VERIFIED" && state.pageMode === "change") {
-        progressPanelTitle.textContent = "正在编辑企业认证变更表单";
-        progressPanelTip.textContent = "修改完成后提交变更申请，平台会重新进入审核流程。";
-        progressPrimaryBtn.style.display = "none";
-        progressSecondaryBtn.style.display = "inline-flex";
-        progressSecondaryBtn.textContent = "收起表单";
-      }
-
-      if (state.certStatus === "FAILED" && state.pageMode !== "edit") {
-        progressPanelTitle.textContent = "认证失败，请先处理以下原因";
-        progressPanelTip.textContent = "失败原因集中展示在这里。点击右侧“重新提交”后展开表单，修改完成再提交。";
-        progressPrimaryBtn.textContent = "重新提交";
-      }
-
-      if (state.certStatus === "FAILED" && state.pageMode === "edit") {
-        progressPanelTitle.textContent = "正在重新填写认证资料";
-        progressPanelTip.textContent = "表单已展开，请根据失败原因逐项修正后重新提交认证。";
-        progressPrimaryBtn.style.display = "none";
-        progressSecondaryBtn.style.display = "inline-flex";
-        progressSecondaryBtn.textContent = "收起表单";
-      }
-    }
-
-    function renderStatusSummary() {
-      const cfg = statusConfig[state.certStatus];
-      pageStatusPill.className = `statusPill ${cfg.pillClass}`;
-      pageStatusPill.textContent = cfg.label;
-      statusTitle.textContent = cfg.title;
-      statusDesc.textContent = cfg.desc;
-      metricSubmittedAt.textContent = state.certStatus === "UNVERIFIED" ? "未提交" : state.submittedAt;
-      if (state.certStatus === "FAILED" && state.pageMode !== "edit") metricAction.textContent = "重新提交";
-      else if (state.certStatus === "UNVERIFIED" && state.pageMode !== "edit") metricAction.textContent = "开始认证";
-      else if (state.certStatus === "VERIFIED" && state.pageMode !== "change") metricAction.textContent = "发起变更";
-      else metricAction.textContent = primaryActionBtn.textContent;
-
-      const editable = getIsEditable();
-      editabilityTag.textContent = editable ? "当前可编辑" : "当前只读";
-      statusCard.classList.toggle("failedAccent", state.certStatus === "FAILED");
+      demoChips.forEach((chip) => {
+        chip.classList.toggle("active", chip.dataset.demoStatus === state.certStatus);
+      });
     }
 
     function renderFormPanel() {
-      const open = (
-        state.formPreviewByStatusBar ||
-        (state.certStatus === "UNVERIFIED" && state.pageMode === "edit") ||
-        (state.certStatus === "FAILED" && state.pageMode === "edit") ||
-        (state.certStatus === "VERIFIED" && state.pageMode === "change")
-      );
-
-      formPanel.classList.toggle("open", open);
-
-      if (state.certStatus === "FAILED") {
-        formTitle.textContent = "重新提交认证表单";
-        formIntro.textContent = "请根据上方失败原因修改对应字段，确认无误后重新提交。";
-      } else if (state.certStatus === "PENDING") {
-        formTitle.textContent = "企业认证资料（审核中）";
-        formIntro.textContent = "当前处于审核中状态，表单仅支持查看。若需调整资料，请先撤回申请。";
-      } else if (state.certStatus === "VERIFIED" && state.pageMode !== "change") {
-        formTitle.textContent = "企业认证资料（已认证）";
-        formIntro.textContent = "当前为已认证资料快照，默认只读；如需修改请点击“发起变更”。";
-      } else if (state.certStatus === "VERIFIED" && state.pageMode === "change") {
-        formTitle.textContent = "企业认证变更表单";
-        formIntro.textContent = "已认证信息默认只读，发起变更后才进入编辑态。提交后将重新进入审核中。";
+      const vm = getViewModel();
+      formPanel.classList.toggle("open", vm.formOpen);
+      formTitle.textContent = vm.formTitleText;
+      if (vm.formIntroText) {
+        formIntro.textContent = vm.formIntroText;
+        formIntro.style.display = "";
       } else {
-        formTitle.textContent = "企业认证表单";
-        formIntro.textContent = "企业名称需与营业执照主体一致，营业执照支持图片或 PDF。";
+        formIntro.style.display = "none";
       }
     }
 
@@ -1748,13 +1631,10 @@
       syncFieldValues();
       renderPermission();
       if (state.role !== "admin") return;
-      renderActions();
-      renderStatusSummary();
-      renderProgressPanel();
+      renderStatusCard();
       renderFailureReasons();
       renderFormPanel();
       renderUploads();
-      renderFlow();
       renderReadonlyMode();
       renderAllFieldStates();
     }
@@ -1933,25 +1813,20 @@
       });
     });
 
-    const statusNodeMap = {
-      unverified: "UNVERIFIED",
-      pending: "PENDING",
-      verified: "VERIFIED",
-      failed: "FAILED"
-    };
-
-    Object.entries(statusNodeMap).forEach(([nodeKey, status]) => {
-      const node = document.getElementById(`step-${nodeKey}`);
-      if (!node) return;
-      node.addEventListener("click", () => {
-        if (state.role !== "admin") return;
+    demoChips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const status = chip.dataset.demoStatus;
+        if (!statusConfig[status]) return;
         state.certStatus = status;
         state.failureReasons = status === "FAILED" ? [...failedReasonsMock] : [];
-        state.pageMode = status === "FAILED" ? "edit" : "view";
-        state.formPreviewByStatusBar = true;
-        if (status === "UNVERIFIED") state.pageMode = "edit";
+        if (status === "UNVERIFIED" || status === "FAILED") {
+          state.pageMode = "edit";
+        } else {
+          state.pageMode = "view";
+        }
+        state.formPreviewByStatusBar = (status === "PENDING" || status === "VERIFIED");
         render();
-        toast(`已切换到${statusConfig[status].label}状态查看`, "warn");
+        toast(`Demo 预览：已切换到「${statusConfig[status].label}」`, "warn");
       });
     });
 

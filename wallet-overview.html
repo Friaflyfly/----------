@@ -231,6 +231,94 @@
     .panel { display: none; }
     .panel.active { display: block; }
 
+    /* ============ 概览页快捷入口 ============ */
+    .quick-actions-card {
+      background: linear-gradient(135deg, #ffffff 0%, #f6faff 100%);
+      border-radius: 10px; padding: 16px 20px; margin-bottom: 14px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.04); border: 1px solid #f0f0f0;
+    }
+    .quick-actions-card .qa-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .quick-actions-card .qa-title {
+      font-size: 14px; font-weight: 600; color: #262626;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .quick-actions-card .qa-sub { font-size: 12px; color: #8c8c8c; }
+    .quick-actions-grid {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
+    }
+    .qa-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      padding: 14px 10px; border: 1px solid #e8e8e8; border-radius: 8px;
+      background: #fff; cursor: pointer; transition: all .2s; text-align: center;
+      font-size: 12.5px; color: #262626; font-weight: 500;
+    }
+    .qa-btn:hover { border-color: #1890ff; background: #f0f7ff; color: #1890ff; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(24,144,255,.12); }
+    .qa-btn .qa-icon { font-size: 22px; line-height: 1; }
+    .qa-btn .qa-sub-text { font-size: 11px; color: #8c8c8c; font-weight: 400; }
+    .qa-btn:hover .qa-sub-text { color: #69c0ff; }
+    @media (max-width: 1100px) { .quick-actions-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 600px)  { .quick-actions-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    /* ============ 钱包内左侧子导航（替代原横向 5-Tab） ============ */
+    .wallet-layout { display: flex; gap: 18px; align-items: flex-start; }
+    .wallet-submenu {
+      width: 208px; flex-shrink: 0; background: #fff; border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.04); padding: 12px 0; position: sticky; top: 76px;
+    }
+    .wallet-submenu .submenu-head {
+      padding: 4px 18px 10px; border-bottom: 1px solid #f0f0f0; margin-bottom: 6px;
+    }
+    .wallet-submenu .submenu-head .sh-title {
+      font-size: 14px; font-weight: 600; color: #262626; display: flex; align-items: center; gap: 6px;
+    }
+    .wallet-submenu .submenu-head .sh-sub {
+      font-size: 11px; color: #8c8c8c; margin-top: 2px;
+    }
+    /* 改写 .role-tabs 为垂直菜单形态（保留 id="roleTabs"，JS 无需改动） */
+    .role-tabs.vertical {
+      display: block; padding: 0; background: transparent; border-radius: 0;
+      box-shadow: none; overflow: visible; margin-bottom: 0;
+    }
+    .role-tabs.vertical .rt-group-title {
+      padding: 12px 18px 6px; font-size: 11px; color: #8c8c8c;
+      text-transform: uppercase; letter-spacing: .5px; font-weight: 600;
+    }
+    .role-tabs.vertical button {
+      display: flex; align-items: center; justify-content: flex-start;
+      width: 100%; min-width: 0; padding: 10px 18px; gap: 8px;
+      border: none; border-left: 3px solid transparent; border-radius: 0;
+      background: transparent; cursor: pointer;
+      font-size: 13.5px; color: #262626; font-weight: 500; text-align: left;
+    }
+    .role-tabs.vertical button:hover {
+      background: #f0f7ff; color: #1890ff; box-shadow: none;
+    }
+    .role-tabs.vertical button.active {
+      background: #e6f7ff; color: #1890ff; border-left-color: #1890ff;
+      box-shadow: none; font-weight: 600;
+    }
+    .wallet-content { flex: 1; min-width: 0; }
+    @media (max-width: 1100px) {
+      .wallet-submenu { width: 168px; }
+    }
+    @media (max-width: 900px) {
+      .wallet-layout { flex-direction: column; }
+      .wallet-submenu { width: 100%; position: static; padding: 8px; }
+      .wallet-submenu .submenu-head { display: none; }
+      .role-tabs.vertical { display: flex; flex-wrap: wrap; }
+      .role-tabs.vertical .rt-group-title { display: none; }
+      .role-tabs.vertical button {
+        width: auto; flex: 1 1 140px; padding: 8px 12px;
+        border-left: none; border-radius: 6px; justify-content: center;
+      }
+      .role-tabs.vertical button.active {
+        border-left: none; box-shadow: inset 0 -2px 0 #1890ff;
+      }
+    }
+
     /* 冻结余额拆分 */
     .frozen-breakdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0; }
     .frozen-cell { background: #fff; border-radius: 8px; padding: 12px 14px; border: 1px solid #f0f0f0; }
@@ -498,7 +586,7 @@
         <div class="menu-group">
           <div class="menu-group-title">账户</div>
           <a href="wallet-overview.html" class="active"><span class="menu-icon">💰</span> 我的钱包</a>
-          <a href="account-basic-info-prototype-platform-style.html"><span class="menu-icon">⚙️</span> 账号中心</a>
+          <a href="account-center.html"><span class="menu-icon">⚙️</span> 账号中心</a>
         </div>
       </nav>
     </aside>
@@ -518,14 +606,29 @@
         <span class="ctx-rule" id="ctxRuleNote">本空间下发起的订单，将默认从「短剧制作中心 - 团队预算账户」中扣款或冻结资金。</span>
       </div>
 
-      <!-- 5-Tab：场景化结构 -->
-      <div class="role-tabs" id="roleTabs">
-        <button data-tab="overview" class="active">📊 概览</button>
-        <button data-tab="accounts">🏦 账户与预算</button>
-        <button data-tab="flows">💸 收支记录</button>
-        <button data-tab="invoice">🧾 发票</button>
-        <button data-tab="settings">⚙️ 钱包设置</button>
-      </div>
+      <!-- 钱包子模块：左侧菜单 + 右侧内容（替代原横向 5-Tab） -->
+      <div class="wallet-layout">
+        <aside class="wallet-submenu">
+          <div class="submenu-head">
+            <div class="sh-title">💰 我的钱包</div>
+            <div class="sh-sub">资金管理与对账中心</div>
+          </div>
+          <nav class="role-tabs vertical" id="roleTabs">
+            <div class="rt-group-title">总览</div>
+            <button data-tab="overview" class="active">📊 钱包概览</button>
+
+            <div class="rt-group-title">资金</div>
+            <button data-tab="accounts">🏦 账户与预算</button>
+
+            <div class="rt-group-title">记录</div>
+            <button data-tab="flows">💸 收支记录</button>
+            <button data-tab="invoice">🧾 发票管理</button>
+
+            <div class="rt-group-title">设置</div>
+            <button data-tab="settings">⚙️ 钱包设置</button>
+          </nav>
+        </aside>
+        <div class="wallet-content">
 
       <!-- ============ Tab 1：概览 ============ -->
       <section class="panel active" id="panel-overview">
@@ -552,6 +655,41 @@
         <!-- KPI 总览 -->
         <div class="section-head" style="margin-top:18px">关键指标 <span class="section-sub">融合「我的需求」+「我的接单」两类视角</span></div>
         <div class="kpi-row" id="kpiRow"></div>
+
+        <!-- 快捷入口（Dashboard 化）：高频资金动作一步直达 -->
+        <div class="quick-actions-card">
+          <div class="qa-head">
+            <div class="qa-title">⚡ 快捷入口</div>
+            <span class="qa-sub">常用资金动作 · 一步直达</span>
+          </div>
+          <div class="quick-actions-grid">
+            <button class="qa-btn" data-action="recharge">
+              <span class="qa-icon">💳</span>
+              <span>充值</span>
+              <span class="qa-sub-text">给当前账户充值</span>
+            </button>
+            <button class="qa-btn" data-action="withdraw">
+              <span class="qa-icon">💸</span>
+              <span>提现</span>
+              <span class="qa-sub-text">承制方收入提现</span>
+            </button>
+            <button class="qa-btn" data-action="allocate">
+              <span class="qa-icon">📤</span>
+              <span>划拨预算</span>
+              <span class="qa-sub-text">企业 → 团队</span>
+            </button>
+            <button class="qa-btn" data-action="invoice">
+              <span class="qa-icon">🧾</span>
+              <span>申请开票</span>
+              <span class="qa-sub-text">已结算订单</span>
+            </button>
+            <button class="qa-btn" data-jump-tab="flows">
+              <span class="qa-icon">📊</span>
+              <span>查看完整流水</span>
+              <span class="qa-sub-text">全部资金记录</span>
+            </button>
+          </div>
+        </div>
 
         <!-- 待处理事项 -->
         <div class="pending-bar" id="pendingBar"></div>
@@ -703,6 +841,9 @@
         </div>
         <div class="settings-grid" id="settingsGrid"></div>
       </section>
+
+        </div><!-- /.wallet-content -->
+      </div><!-- /.wallet-layout -->
     </main>
   </div>
 
@@ -1054,7 +1195,7 @@
 
     // 5-Tab：仅切换 panel；身份切换不再切换 Tab，只刷新内容
     const VALID_TABS = ["overview", "accounts", "flows", "invoice", "settings"];
-    function setActiveTab(name) {
+    function setActiveTab(name, opts) {
       if (!VALID_TABS.includes(name)) name = "overview";
       document.querySelectorAll("#roleTabs button").forEach(b => b.classList.toggle("active", b.getAttribute("data-tab") === name));
       document.querySelectorAll(".panel").forEach(p => p.classList.toggle("active", p.id === "panel-" + name));
@@ -1065,11 +1206,25 @@
       if (name === "invoice") renderInvoicePanel();
       if (name === "settings") renderSettingsPanel();
       try { localStorage.setItem("walletPanelTab", name); } catch (e) {}
+      // 同步浏览器 URL hash，让每个子页可深链 / 可分享 / 浏览器前进后退可用
+      if (!opts || !opts.silent) {
+        try {
+          const targetHash = "#" + name;
+          if (location.hash !== targetHash) {
+            history.replaceState(null, "", location.pathname + location.search + targetHash);
+          }
+        } catch (e) {}
+      }
     }
     document.getElementById("roleTabs").addEventListener("click", function (e) {
       const b = e.target.closest("button[data-tab]");
       if (!b) return;
       setActiveTab(b.getAttribute("data-tab"));
+    });
+    // 浏览器前进/后退：响应 hashchange，切换到对应 tab
+    window.addEventListener("hashchange", function () {
+      const h = (location.hash || "").replace("#", "");
+      if (VALID_TABS.includes(h)) setActiveTab(h, { silent: true });
     });
 
     // 「查看全部 →」迷你流水跳到 Tab 3

@@ -117,7 +117,10 @@
     .sku-card .sku-price { font-size: 18px; font-weight: 700; color: #cf1322; margin: 6px 0 10px; }
     .sku-card .sku-price small { font-size: 12px; color: #8c8c8c; font-weight: 400; }
     .sku-card .sku-highlights { margin: 0; padding-left: 18px; font-size: 12px; color: #595959; line-height: 1.65; }
-    .sku-card .sku-delivery { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #f0f0f0; font-size: 12px; color: #096dd9; }
+    .sku-card .sku-delivery { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #f0f0f0; }
+    .sku-card .sku-delivery-main { font-size: 13px; color: #096dd9; font-weight: 600; }
+    .sku-card .sku-delivery-main .num { font-size: 18px; font-weight: 700; margin: 0 2px; }
+    .sku-card .sku-delivery-sub { margin-top: 2px; font-size: 11px; color: #8c8c8c; }
     .pkg-readonly { background: #fafafa; border-radius: 6px; padding: 10px 12px; font-size: 13px; color: #262626; margin-bottom: 10px; border: 1px solid #f0f0f0; }
     .pkg-readonly .k { color: #8c8c8c; font-size: 12px; margin-right: 6px; }
 
@@ -271,7 +274,7 @@
         <div class="ws-item" data-ws="personal">
           <div class="ws-item-icon personal">👤</div>
           <div class="ws-item-main">
-            <div class="ws-item-name">个人空间</div>
+            <div class="ws-item-name">个人</div>
             <div class="ws-item-desc">个人账户余额：¥3,200</div>
           </div>
           <span class="ws-item-check"></span>
@@ -363,7 +366,7 @@
         <div class="menu-group">
           <div class="menu-group-title">账户</div>
           <a href="wallet-overview.html"><span class="menu-icon">💰</span> 我的钱包</a>
-          <a href="account-basic-info-prototype-platform-style.html"><span class="menu-icon">⚙️</span> 账号中心</a>
+          <a href="account-center.html"><span class="menu-icon">⚙️</span> 账号中心</a>
         </div>
       </nav>
     </aside>
@@ -417,7 +420,7 @@
 
       <!-- 不可发布提示 -->
       <div class="block-banner" id="blockBanner" style="display:none;">
-        ⚠️ <span><b>当前空间为「企业管理员视角」</b>，仅用于资金/预算管理，不参与具体业务发单。请切换到具体业务团队空间后再发布需求。</span>
+        ⚠️ <span><b>当前为「企业管理员视角」</b>，仅用于资金/预算管理，不参与具体业务发单。请切换到具体业务团队后再发布需求。</span>
       </div>
 
       <!-- 左：表单 -->
@@ -560,7 +563,7 @@
         <div class="summary-divider"></div>
 
         <div class="summary-section">
-          <div class="summary-key">发布到工作空间</div>
+          <div class="summary-key">发布到团队</div>
           <div class="summary-val" id="sumWs"><b>骋风天合 · 短剧制作中心</b></div>
           <div class="summary-key" style="margin-top:8px;">下单后扣款主体（预估）</div>
           <div class="summary-val" id="sumPayer">本团队预算账户</div>
@@ -611,8 +614,8 @@
       window.onWorkspaceChanged = function () {
         syncWsChip();
         var ws = window.demoApp.getCurrentWorkspace();
-        if (!ws.canPublish) setTimeout(function () { window.demoToast("提示：当前空间不参与发单，请切换到业务团队空间", "warn"); }, 600);
-        else if (ws.budgetMissing) setTimeout(function () { window.demoToast("提示：该空间未配置预算，下单将回退至企业主账户", "warn"); }, 600);
+        if (!ws.canPublish) setTimeout(function () { window.demoToast("提示：当前团队不参与发单，请切换到业务团队", "warn"); }, 600);
+        else if (ws.budgetMissing) setTimeout(function () { window.demoToast("提示：该团队未配置预算，下单将回退至企业主账户", "warn"); }, 600);
       };
       syncWsChip();
     })();
@@ -785,7 +788,7 @@
               ],
               detail_html: "<p>本档位含 <strong>100 条</strong> 成片；完整条款以订单快照为准。</p>"
             },
-            delivery: { lead_time_days: 7, full_delivery_days: 30, delivery_notes: "首批不晚于 7 个工作日，全部 30 个工作日内交付完毕" },
+            delivery: { lead_time_days: 7, full_delivery_days: 30, delivery_notes: "30 天内完成全部交付" },
             commercial: { tax_included: true, price_note: "含税" },
             display: { status: "on_sale", sort_order: 10, badge: null },
             terms_version: "terms_mv_v1",
@@ -806,7 +809,7 @@
               ],
               detail_html: "<p>本档位含 <strong>164 条</strong> 成片。</p>"
             },
-            delivery: { lead_time_days: 7, full_delivery_days: 35, delivery_notes: "首批 7 个工作日，全部 35 个工作日内结清" },
+            delivery: { lead_time_days: 7, full_delivery_days: 35, delivery_notes: "35 天内完成全部交付" },
             commercial: { tax_included: true, price_note: "含税" },
             display: { status: "on_sale", sort_order: 20, badge: "推荐" },
             terms_version: "terms_mv_v1",
@@ -827,7 +830,7 @@
               ],
               detail_html: "<p>本档位含 <strong>250 条</strong> 成片。</p>"
             },
-            delivery: { lead_time_days: 7, full_delivery_days: 45, delivery_notes: "首批 7 个工作日，全部 45 个工作日内结清" },
+            delivery: { lead_time_days: 7, full_delivery_days: 45, delivery_notes: "45 天内完成全部交付" },
             commercial: { tax_included: true, price_note: "含税" },
             display: { status: "on_sale", sort_order: 30, badge: null },
             terms_version: "terms_mv_v1",
@@ -859,6 +862,18 @@
       const spu = PLATFORM_CATALOG[spuId];
       if (!spu || !spu.skus) return null;
       return spu.skus.find((s) => s.sku_id === skuId) || null;
+    }
+
+    function formatDelivery(sku) {
+      const total = (sku.delivery && sku.delivery.full_delivery_days) || 0;
+      const lead = (sku.delivery && sku.delivery.lead_time_days) || 0;
+      return {
+        total,
+        lead,
+        primary: total + " 天",
+        sub: "",
+        oneLine: total + " 天内完成全部交付"
+      };
     }
 
     function buildSkuSnapshot(sku, spuId) {
@@ -965,8 +980,7 @@
       form.budgetMax = String(p);
       $("fldBudgetMin").value = p;
       $("fldBudgetMax").value = p;
-      const line = sku.delivery.delivery_notes ||
-        ("首批 " + sku.delivery.lead_time_days + " 个工作日 · 全部 " + sku.delivery.full_delivery_days + " 个工作日内");
+      const line = formatDelivery(sku).oneLine;
       form.deadline = line;
       $("fldDeadline").value = line;
       const pr = $("pkgMoneyRow");
@@ -1030,13 +1044,16 @@
         card.className = "sku-card" + (form.skuId === sku.sku_id ? " active" : "");
         const badge = (sku.display && sku.display.badge) ? `<span class="sku-badge">${escapeHtml(sku.display.badge)}</span>` : "";
         const hi = (sku.service_scope.highlights || []).slice(0, 4).map((h) => `<li>${escapeHtml(h)}</li>`).join("");
-        const del = sku.delivery.delivery_notes || "";
+        const dlv = formatDelivery(sku);
         card.innerHTML = badge
           + `<div class="sku-name">${escapeHtml(sku.display_name)}</div>`
           + `<div class="sku-qty">${sku.quantity.value}<span>${escapeHtml(u)}</span></div>`
           + `<div class="sku-price">${fmtMoney(sku.price.amount)} <small>/ 套餐</small></div>`
           + `<ul class="sku-highlights">${hi}</ul>`
-          + `<div class="sku-delivery">📅 交付：${escapeHtml(del)}</div>`;
+          + `<div class="sku-delivery">`
+          +   `<div class="sku-delivery-main">📅 交付周期 <span class="num">${dlv.total}</span> 天</div>`
+          +   (dlv.sub ? `<div class="sku-delivery-sub">${escapeHtml(dlv.sub)}</div>` : "")
+          + `</div>`;
         card.onclick = () => selectSku(sku.sku_id);
         wrap.appendChild(card);
       });
@@ -1364,9 +1381,9 @@
       const sumLv = $("sumLevel");
       if (form.publishMode === "package" && isPackageReady()) {
         const sku = form.skuSnapshot;
-        const del = sku.delivery.delivery_notes || "";
+        const dlv = formatDelivery(sku);
         sumLv.classList.remove("empty");
-        sumLv.innerHTML = `<b>套餐档位</b> · 交付：${escapeHtml(del)}`;
+        sumLv.innerHTML = `<b>套餐档位</b> · 交付周期 <b>${dlv.total} 天</b>` + (dlv.sub ? ` · ${escapeHtml(dlv.sub)}` : "");
       } else if (form.l1 && (form.level || form.methods.length)) {
         const cat = CATEGORY_TREE[form.l1];
         const lvName = (cat.levels.find((l) => l.id === form.level) || {}).name || "未选";
@@ -1393,9 +1410,10 @@
       const sumBudget = $("sumBudget");
       if (form.publishMode === "package" && isPackageReady()) {
         const sku = form.skuSnapshot;
+        const dlv = formatDelivery(sku);
         sumBudget.classList.remove("empty");
         sumBudget.innerHTML =
-          `总价：<b>${fmtMoney(sku.price.amount)}</b>（锁定）<br>交期说明：${escapeHtml(form.deadline || sku.delivery.delivery_notes || "")}`;
+          `总价：<b>${fmtMoney(sku.price.amount)}</b>（锁定）<br>交付周期：<b>${dlv.total} 天</b>` + (dlv.sub ? `（${escapeHtml(dlv.sub)}）` : "");
       } else if (form.budgetMin || form.budgetMax || form.deadline) {
         sumBudget.classList.remove("empty");
         sumBudget.innerHTML = `预算：${form.budgetMin || "?"} ~ ${form.budgetMax || "?"} 元<br>交期：${form.deadline || "未填"}`;

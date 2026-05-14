@@ -29,12 +29,28 @@
     .kpi .note { font-size: 11px; color: #8c8c8c; }
 
     .toolbar { background: #fff; border-radius: 10px; padding: 14px 16px; box-shadow: 0 2px 6px rgba(0,0,0,.04); display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
-    .tabs { display: flex; gap: 6px; }
+    .toolbar-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; width: 100%; }
+    .toolbar-row + .toolbar-row { border-top: 1px dashed #f0f0f0; padding-top: 12px; margin-top: 4px; }
+    .toolbar-label { font-size: 12px; color: #8c8c8c; margin-right: 4px; }
+    .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
     .tab { border: 1px solid #d9d9d9; border-radius: 6px; padding: 5px 14px; font-size: 13px; background: #fff; cursor: pointer; }
     .tab:hover { border-color: #87e8de; color: #13c2c2; }
     .tab.active { background: #e6fffb; border-color: #13c2c2; color: #006d75; font-weight: 500; }
+    .tab .count { display: inline-block; margin-left: 4px; padding: 0 6px; min-width: 16px; height: 16px; line-height: 16px; text-align: center; font-size: 11px; border-radius: 9px; background: #f0f0f0; color: #595959; }
+    .tab.active .count { background: #13c2c2; color: #fff; }
     .search-box { margin-left: auto; border: 1px solid #d9d9d9; border-radius: 6px; padding: 5px 12px; font-size: 13px; width: 200px; }
     .search-box:focus { border-color: #13c2c2; outline: none; }
+
+    .type-badge.work-onboarding { background: #fff7e6; color: #d48806; }
+    .type-badge.work-cert-change { background: #f0f5ff; color: #2f54eb; }
+    .change-diff { margin-top: 14px; border: 1px solid #f0f0f0; border-radius: 8px; overflow: hidden; background: #fafbff; }
+    .change-diff-head { padding: 10px 14px; font-size: 12px; color: #595959; background: #f0f5ff; font-weight: 500; }
+    .change-row { display: grid; grid-template-columns: 110px 1fr 1fr; gap: 14px; padding: 10px 14px; font-size: 12px; border-top: 1px solid #f0f0f0; align-items: start; }
+    .change-row:first-of-type { border-top: 0; }
+    .change-row .cfield { color: #8c8c8c; }
+    .change-row .cval { padding: 4px 8px; border-radius: 4px; line-height: 1.6; }
+    .change-row .before { background: #fff1f0; color: #a8071a; text-decoration: line-through; text-decoration-color: rgba(207, 19, 34, 0.4); }
+    .change-row .after { background: #f6ffed; color: #237804; font-weight: 500; }
 
     .card { background: #fff; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,.04); margin-bottom: 12px; overflow: hidden; transition: box-shadow .15s; }
     .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); }
@@ -49,6 +65,20 @@
     .status-pending { background: #fffbe6; color: #d48806; }
     .status-approved { background: #f6ffed; color: #389e0d; }
     .status-rejected { background: #fff1f0; color: #cf1322; }
+    .status-supplementing { background: #fff7e6; color: #ad6800; border: 1px solid #ffd591; }
+
+    .supplement-banner { margin-top: 14px; border: 1px solid #ffd591; background: linear-gradient(180deg, #fff7e6, #fffbe6); border-radius: 8px; padding: 12px 14px; }
+    .supplement-banner-head { font-size: 13px; color: #ad6800; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .supplement-banner-head .pill-note { font-weight: 400; color: #8c8c8c; font-size: 11px; }
+    .supplement-list { margin: 10px 0 0; padding-left: 22px; }
+    .supplement-list li { font-size: 12px; color: #595959; line-height: 1.8; }
+    .supplement-note { margin-top: 8px; padding: 8px 10px; background: #fff; border: 1px dashed #ffd591; border-radius: 6px; font-size: 12px; color: #595959; line-height: 1.6; }
+    .supplement-meta { margin-top: 6px; font-size: 11px; color: #8c8c8c; }
+
+    .check-list { display: grid; gap: 8px; }
+    .check-list label { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; padding: 8px 10px; border: 1px solid #f0f0f0; border-radius: 6px; cursor: pointer; background: #fafafa; }
+    .check-list label:hover { background: #fffbe6; border-color: #ffe58f; }
+    .check-list input[type="checkbox"] { margin-top: 3px; }
     .card-head .toggle { color: #8c8c8c; font-size: 16px; transition: transform .2s; }
     .card.expanded .toggle { transform: rotate(90deg); }
 
@@ -98,7 +128,7 @@
 </head>
 <body>
   <header class="topbar" id="topbar-shared"></header>
-  <div class="ops-banner">📋 平台运营后台 · 入驻审核 · 审核通过后为申请方开通账号与工作空间</div>
+  <div class="ops-banner">📋 平台运营后台 · 入驻 / 认证审核 · 同一队列处理首次入驻申请与企业认证信息变更</div>
   <div class="app">
     <aside class="sidebar">
       <nav class="menu">
@@ -116,25 +146,37 @@
     </aside>
     <main class="main">
       <div class="page-head">
-        <h1>入驻审核</h1>
-        <div class="sub">企业 / 团队 / 个人提交入驻申请 → 平台审核资质材料 → 通过后自动开通账号、工作空间和资金账户。</div>
+        <h1>入驻 / 认证审核</h1>
+        <div class="sub">首次入驻申请与已认证企业的资料变更走同一审核队列：通过后开通账号或覆盖企业主体资料并回写「已认证」。</div>
       </div>
 
       <section class="kpis">
         <div class="kpi"><div class="label">待审核</div><div class="value" id="kpiPending">0</div><div class="note">应在 48h 内处理</div></div>
+        <div class="kpi"><div class="label">待补充材料</div><div class="value" id="kpiSupplementing">0</div><div class="note">等待申请方回传</div></div>
         <div class="kpi"><div class="label">本月已审</div><div class="value" id="kpiMonth">0</div><div class="note">通过率 92%</div></div>
         <div class="kpi"><div class="label">本月驳回</div><div class="value" id="kpiRejected">0</div><div class="note">主因：材料不全</div></div>
-        <div class="kpi"><div class="label">累计入驻主体</div><div class="value" id="kpiTotal">0</div><div class="note">企业 + 团队 + 个人</div></div>
       </section>
 
       <div class="toolbar">
-        <div class="tabs" id="tabs">
-          <span class="tab active" data-status="all" onclick="filterStatus('all')">全部</span>
-          <span class="tab" data-status="pending" onclick="filterStatus('pending')">待审核</span>
-          <span class="tab" data-status="approved" onclick="filterStatus('approved')">已通过</span>
-          <span class="tab" data-status="rejected" onclick="filterStatus('rejected')">已驳回</span>
+        <div class="toolbar-row">
+          <span class="toolbar-label">工单类型</span>
+          <div class="tabs" id="workOrderTabs">
+            <span class="tab active" data-type="all" onclick="filterWorkOrder('all')">全部 <span class="count" id="cntAll">0</span></span>
+            <span class="tab" data-type="onboarding" onclick="filterWorkOrder('onboarding')">入驻申请 <span class="count" id="cntOnboarding">0</span></span>
+            <span class="tab" data-type="cert-change" onclick="filterWorkOrder('cert-change')">企业认证变更 <span class="count" id="cntCertChange">0</span></span>
+          </div>
         </div>
-        <input class="search-box" id="searchBox" placeholder="搜索企业/团队/个人名称…" oninput="renderList()">
+        <div class="toolbar-row">
+          <span class="toolbar-label">审核状态</span>
+          <div class="tabs" id="tabs">
+            <span class="tab active" data-status="all" onclick="filterStatus('all')">全部</span>
+            <span class="tab" data-status="pending" onclick="filterStatus('pending')">待审核</span>
+            <span class="tab" data-status="supplementing" onclick="filterStatus('supplementing')">待补充</span>
+            <span class="tab" data-status="approved" onclick="filterStatus('approved')">已通过</span>
+            <span class="tab" data-status="rejected" onclick="filterStatus('rejected')">已驳回</span>
+          </div>
+          <input class="search-box" id="searchBox" placeholder="搜索企业/团队/个人名称…" oninput="renderList()">
+        </div>
       </div>
 
       <div id="listArea"></div>
@@ -168,6 +210,29 @@
     </div>
   </div>
 
+  <div class="modal-mask" id="supplementModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>要求补充材料</h3>
+        <div style="font-size:12px;color:#8c8c8c;margin-top:4px">勾选需要补充/重传的材料后通知申请人，申请单将进入「待补充材料」状态并保留所有上下文。</div>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <label>需要补充/重传的材料（可多选）</label>
+          <div id="supplementChecklist" class="check-list"></div>
+        </div>
+        <div class="form-row">
+          <label>给申请方的说明（建议填写）</label>
+          <textarea id="supplementNote" placeholder="例如：营业执照已过期，请上传 2026 年内核发的版本；作品集需要 ≥ 3 个完整案例。"></textarea>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="document.getElementById('supplementModal').classList.remove('open')">取消</button>
+        <button class="btn primary" onclick="confirmSupplement()">📩 发送补充材料通知</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toastWrap" class="toasts"></div>
 
   <script src="_shared.js"></script>
@@ -183,6 +248,7 @@
     var applications = [
       {
         id: "ENT-20260426001", name: "骋风天合文化传媒有限公司", type: "enterprise", typeName: "企业",
+        workOrderType: "onboarding",
         contact: "昭岚", phone: "138****6789", email: "zhaolan@cf.com",
         identity: "需求方 + 承制方", workspaces: 3, creditCode: "91110105MA0XXXXX9X",
         legalPerson: "周总", address: "北京市朝阳区建国路 88 号",
@@ -194,6 +260,7 @@
       },
       {
         id: "TEAM-20260425002", name: "星辰创作工作室", type: "team", typeName: "团队",
+        workOrderType: "onboarding",
         contact: "陈星辰", phone: "139****2345", email: "star@starlight.com",
         identity: "需求方 + 承制方", workspaces: 1, creditCode: "",
         legalPerson: "", address: "",
@@ -205,6 +272,7 @@
       },
       {
         id: "PSN-20260424003", name: "林小雅", type: "personal", typeName: "个人",
+        workOrderType: "onboarding",
         contact: "林小雅", phone: "136****7890", email: "xiaoya@qq.com",
         identity: "仅承制方", workspaces: 1, creditCode: "",
         legalPerson: "", address: "",
@@ -216,6 +284,7 @@
       },
       {
         id: "ENT-20260420004", name: "声海传媒科技有限公司", type: "enterprise", typeName: "企业",
+        workOrderType: "onboarding",
         contact: "张海", phone: "137****5678", email: "zhanghai@soundsea.cn",
         identity: "仅承制方", workspaces: 1, creditCode: "91310115MA1YYYYY3B",
         legalPerson: "张海", address: "上海市浦东新区张江路 200 号",
@@ -227,6 +296,7 @@
       },
       {
         id: "PSN-20260418005", name: "色彩工坊 · 李文", type: "personal", typeName: "个人",
+        workOrderType: "onboarding",
         contact: "李文", phone: "135****4321", email: "liwen@design.me",
         identity: "需求方 + 承制方", workspaces: 1, creditCode: "",
         legalPerson: "", address: "",
@@ -238,6 +308,7 @@
       },
       {
         id: "TEAM-20260415006", name: "XX影视文化工作室", type: "team", typeName: "团队",
+        workOrderType: "onboarding",
         contact: "王某某", phone: "133****0000", email: "wx@xx.com",
         identity: "仅需求方", workspaces: 1, creditCode: "",
         legalPerson: "", address: "",
@@ -247,28 +318,97 @@
         bizCats: ["视频制作"],
         submitTime: "2026-04-15 08:00", status: "rejected",
         rejectReason: "材料不完整 — 团队协议和作品集均未提供，简介信息过少"
+      },
+      {
+        id: "ENT-20260427009", name: "山河影像文化传媒有限公司", type: "enterprise", typeName: "企业",
+        workOrderType: "onboarding",
+        contact: "陆山河", phone: "139****0089", email: "lu@shanhe.cn",
+        identity: "需求方 + 承制方", workspaces: 2, creditCode: "91440300MA7ZZZZZ8K",
+        legalPerson: "陆山河", address: "深圳市南山区科技园 18 号",
+        intro: "国风短剧厂牌，深耕古风题材内容创作。",
+        uploads: ["📄 营业执照", "🪪 法人身份证正面", "🪪 法人身份证反面"],
+        risks: [{ text: "营业执照已过期 6 个月", cls: "warn" }, { text: "缺少作品集", cls: "warn" }],
+        bizCats: ["视频制作", "图片设计"],
+        submitTime: "2026-04-27 16:40",
+        status: "supplementing",
+        supplement: {
+          requestedAt: "2026-04-28 09:15",
+          requestedBy: "审核员 王萌",
+          items: ["营业执照（在有效期内的最新版本）", "企业作品集（≥ 3 个完整案例）"],
+          note: "营业执照已过期，请重新上传最新有效版本；作品集材料缺失，承制方身份必须提供。补充后将自动重新进入待审核队列。"
+        }
+      },
+      {
+        id: "CERT-20260502007", name: "声海传媒科技有限公司", type: "enterprise", typeName: "企业",
+        workOrderType: "cert-change",
+        contact: "张海", phone: "137****5678", email: "zhanghai@soundsea.cn",
+        identity: "仅承制方", workspaces: 1, creditCode: "91310115MA1YYYYY3B",
+        legalPerson: "张海", address: "上海市浦东新区张江路 200 号",
+        intro: "已认证企业发起对公账户变更：从招商银行更换为浦发银行，开户户名一致。",
+        originalEntId: "ENT-20260420004",
+        changedFields: [
+          { field: "开户银行", before: "招商银行上海徐汇支行", after: "浦发银行上海张江支行" },
+          { field: "银行账号", before: "6225 8800 **** 5678", after: "6217 0000 **** 1234" },
+          { field: "开户户名", before: "声海传媒科技有限公司", after: "声海传媒科技有限公司（未变）" }
+        ],
+        uploads: ["🏦 对公账户开户许可证（新）", "📄 营业执照"],
+        risks: [{ text: "原企业已认证", cls: "ok" }, { text: "开户户名一致", cls: "ok" }, { text: "对公账户在变更冷静期内", cls: "warn" }],
+        bizCats: ["内容创作", "视频制作"],
+        submitTime: "2026-05-02 09:20", status: "pending"
+      },
+      {
+        id: "CERT-20260428008", name: "骋风天合文化传媒有限公司", type: "enterprise", typeName: "企业",
+        workOrderType: "cert-change",
+        contact: "昭岚", phone: "138****6789", email: "zhaolan@cf.com",
+        identity: "需求方 + 承制方", workspaces: 3, creditCode: "91110105MA0XXXXX9X",
+        legalPerson: "周总", address: "北京市朝阳区建国路 88 号",
+        intro: "已认证企业发起注册地址变更：同区内迁址，营业执照已重新核发。",
+        originalEntId: "ENT-20260426001",
+        changedFields: [
+          { field: "注册地址", before: "北京市朝阳区建国路 88 号", after: "北京市朝阳区建国路 188 号 SOHO B 座 1801" }
+        ],
+        uploads: ["📄 营业执照（新地址）"],
+        risks: [{ text: "信用代码未变", cls: "ok" }, { text: "同区内迁址", cls: "ok" }],
+        bizCats: ["视频制作", "图片设计", "IP 孵化"],
+        submitTime: "2026-04-28 14:55", status: "approved"
       }
     ];
 
     var currentFilter = "all";
+    var currentWorkOrderFilter = "all";
     var rejectTargetId = null;
 
+    function isChange(a) { return a.workOrderType === "cert-change"; }
+
     function renderKPIs() {
-      var pending = 0, approved = 0, rejected = 0;
+      var pending = 0, supplementing = 0, approved = 0, rejected = 0;
+      var onboardingCnt = 0, certChangeCnt = 0;
       applications.forEach(function (a) {
         if (a.status === "pending") pending++;
+        else if (a.status === "supplementing") supplementing++;
         else if (a.status === "approved") approved++;
         else if (a.status === "rejected") rejected++;
+        if (a.workOrderType === "onboarding") onboardingCnt++;
+        if (a.workOrderType === "cert-change") certChangeCnt++;
       });
       document.getElementById("kpiPending").textContent = pending;
+      document.getElementById("kpiSupplementing").textContent = supplementing;
       document.getElementById("kpiMonth").textContent = approved + rejected;
       document.getElementById("kpiRejected").textContent = rejected;
-      document.getElementById("kpiTotal").textContent = approved;
+      document.getElementById("cntAll").textContent = applications.length;
+      document.getElementById("cntOnboarding").textContent = onboardingCnt;
+      document.getElementById("cntCertChange").textContent = certChangeCnt;
     }
 
     function filterStatus(s) {
       currentFilter = s;
-      document.querySelectorAll(".tab").forEach(function (t) { t.classList.toggle("active", t.getAttribute("data-status") === s); });
+      document.querySelectorAll("#tabs .tab").forEach(function (t) { t.classList.toggle("active", t.getAttribute("data-status") === s); });
+      renderList();
+    }
+
+    function filterWorkOrder(t) {
+      currentWorkOrderFilter = t;
+      document.querySelectorAll("#workOrderTabs .tab").forEach(function (n) { n.classList.toggle("active", n.getAttribute("data-type") === t); });
       renderList();
     }
 
@@ -276,59 +416,109 @@
       var q = document.getElementById("searchBox").value.toLowerCase();
       var filtered = applications.filter(function (a) {
         if (currentFilter !== "all" && a.status !== currentFilter) return false;
+        if (currentWorkOrderFilter !== "all" && a.workOrderType !== currentWorkOrderFilter) return false;
         if (q && a.name.toLowerCase().indexOf(q) === -1 && a.contact.toLowerCase().indexOf(q) === -1) return false;
         return true;
       });
 
       if (filtered.length === 0) {
-        document.getElementById("listArea").innerHTML = '<div class="empty">暂无匹配的入驻申请</div>';
+        document.getElementById("listArea").innerHTML = '<div class="empty">暂无匹配的工单</div>';
         return;
       }
 
+      var STATUS_LABEL = { pending: "待审核", supplementing: "待补充", approved: "已通过", rejected: "已驳回" };
+
       document.getElementById("listArea").innerHTML = filtered.map(function (a) {
-        var statusLabel = a.status === "pending" ? "待审核" : a.status === "approved" ? "已通过" : "已驳回";
+        var statusLabel = STATUS_LABEL[a.status] || a.status;
         var statusCls = "status-" + a.status;
+        var change = isChange(a);
+        var workLabel = change ? "认证变更" : "首次入驻";
+        var workCls = change ? "work-cert-change" : "work-onboarding";
 
         var detailFields = [
           { l: "联系人", v: a.contact },
           { l: "手机号", v: a.phone },
-          { l: "邮箱", v: a.email },
-          { l: "入驻身份", v: a.identity },
-          { l: "工作空间", v: a.workspaces + " 个" },
-          { l: "服务类目", v: a.bizCats.join("、") }
+          { l: "邮箱", v: a.email }
         ];
-        if (a.creditCode) detailFields.push({ l: "信用代码", v: a.creditCode });
-        if (a.legalPerson) detailFields.push({ l: "法定代表人", v: a.legalPerson });
-        if (a.address) detailFields.push({ l: "注册地址", v: a.address });
+        if (!change) {
+          detailFields.push({ l: "入驻身份", v: a.identity });
+          detailFields.push({ l: "团队数", v: a.workspaces + " 个" });
+          detailFields.push({ l: "服务类目", v: a.bizCats.join("、") });
+        } else {
+          detailFields.push({ l: "关联企业", v: a.originalEntId || "—" });
+          detailFields.push({ l: "信用代码", v: a.creditCode || "—" });
+          detailFields.push({ l: "法定代表人", v: a.legalPerson || "—" });
+        }
+        if (!change && a.creditCode) detailFields.push({ l: "信用代码", v: a.creditCode });
+        if (!change && a.legalPerson) detailFields.push({ l: "法定代表人", v: a.legalPerson });
+        if (!change && a.address) detailFields.push({ l: "注册地址", v: a.address });
 
         var risksHtml = a.risks.map(function (r) { return '<span class="risk-tag ' + r.cls + '">' + (r.cls === "ok" ? "✅ " : "⚠️ ") + r.text + '</span>'; }).join("");
         var uploadsHtml = a.uploads.map(function (u) { return '<div class="upload-thumb">' + u.split(" ")[0] + '</div>'; }).join("");
 
+        var changeDiffHtml = "";
+        if (change && a.changedFields && a.changedFields.length) {
+          changeDiffHtml = '<div class="change-diff">'
+            + '<div class="change-diff-head">📝 本次变更项 · 共 ' + a.changedFields.length + ' 项</div>'
+            + a.changedFields.map(function (c) {
+                return '<div class="change-row">'
+                  + '<div class="cfield">' + c.field + '</div>'
+                  + '<div class="cval before">' + c.before + '</div>'
+                  + '<div class="cval after">' + c.after + '</div>'
+                  + '</div>';
+              }).join("")
+            + '</div>';
+        }
+
+        var supplementBannerHtml = "";
+        if (a.status === "supplementing" && a.supplement) {
+          var itemsHtml = (a.supplement.items || []).map(function (it) { return '<li>' + it + '</li>'; }).join("");
+          supplementBannerHtml = '<div class="supplement-banner">'
+            + '<div class="supplement-banner-head">⏳ 待申请方补充材料 <span class="pill-note">· 状态保留，原申请上下文未清除</span></div>'
+            + '<ul class="supplement-list">' + itemsHtml + '</ul>'
+            + (a.supplement.note ? '<div class="supplement-note">📨 备注：' + a.supplement.note + '</div>' : "")
+            + '<div class="supplement-meta">通知于 ' + (a.supplement.requestedAt || "—") + ' 由 ' + (a.supplement.requestedBy || "审核员") + ' 发出</div>'
+            + '</div>';
+        }
+
         var actionsHtml = "";
         if (a.status === "pending") {
+          var primaryText = change ? "✅ 通过并覆盖主体资料" : "✅ 通过并开通账号";
           actionsHtml = '<div class="card-actions">'
-            + '<button class="btn primary" onclick="approveApp(\'' + a.id + '\')">✅ 通过</button>'
+            + '<button class="btn primary" onclick="approveApp(\'' + a.id + '\')">' + primaryText + '</button>'
             + '<button class="btn danger" onclick="openReject(\'' + a.id + '\')">❌ 驳回</button>'
-            + '<button class="btn" onclick="toast(\'已发送补充材料通知\', \'info\')">📩 要求补充材料</button>'
+            + '<button class="btn" onclick="openSupplement(\'' + a.id + '\')">📩 要求补充材料</button>'
+            + '</div>';
+        } else if (a.status === "supplementing") {
+          actionsHtml = '<div class="card-actions">'
+            + '<button class="btn" onclick="restoreToPending(\'' + a.id + '\')">↩ 撤销补充通知</button>'
+            + '<button class="btn primary" onclick="approveApp(\'' + a.id + '\')">✅ 已收到材料，通过审核</button>'
+            + '<button class="btn danger" onclick="openReject(\'' + a.id + '\')">❌ 驳回</button>'
             + '</div>';
         } else if (a.status === "rejected") {
           actionsHtml = '<div class="card-actions"><div style="font-size:12px;color:#cf1322;background:#fff1f0;padding:8px 12px;border-radius:6px;width:100%">驳回原因：' + (a.rejectReason || "未填写") + '</div></div>';
         } else {
-          actionsHtml = '<div class="card-actions"><div style="font-size:12px;color:#389e0d;background:#f6ffed;padding:8px 12px;border-radius:6px;width:100%">✅ 已通过审核，账号已自动开通</div></div>';
+          var approvedNote = change
+            ? '✅ 已通过审核，企业主体资料已覆盖、认证状态回写为「已认证」'
+            : '✅ 已通过审核，账号已自动开通';
+          actionsHtml = '<div class="card-actions"><div style="font-size:12px;color:#389e0d;background:#f6ffed;padding:8px 12px;border-radius:6px;width:100%">' + approvedNote + '</div></div>';
         }
 
         return '<div class="card" id="card-' + a.id + '">'
           + '<div class="card-head" onclick="toggleCard(\'' + a.id + '\')">'
             + '<span class="type-badge type-' + a.type + '">' + a.typeName + '</span>'
+            + '<span class="type-badge ' + workCls + '">' + workLabel + '</span>'
             + '<span class="name">' + a.name + '</span>'
-            + '<span class="meta">' + a.submitTime + '</span>'
+            + '<span class="meta">' + a.submitTime + ' · ' + a.id + '</span>'
             + '<span class="status ' + statusCls + '">' + statusLabel + '</span>'
             + '<span class="toggle">▸</span>'
           + '</div>'
           + '<div class="card-detail">'
             + '<div style="font-size:13px;color:#595959;margin-top:14px">' + a.intro + '</div>'
+            + supplementBannerHtml
+            + changeDiffHtml
             + '<div class="detail-grid">' + detailFields.map(function (f) { return '<div class="detail-item"><div class="dl">' + f.l + '</div><div class="dv">' + f.v + '</div></div>'; }).join("") + '</div>'
-            + '<div style="margin-top:12px;font-size:12px;color:#8c8c8c">上传材料：</div>'
+            + '<div style="margin-top:12px;font-size:12px;color:#8c8c8c">' + (change ? "补充材料：" : "上传材料：") + '</div>'
             + '<div class="uploads-row">' + uploadsHtml + '</div>'
             + '<div class="risk-tags">' + risksHtml + '</div>'
             + actionsHtml
@@ -347,12 +537,39 @@
       app.status = "approved";
       renderKPIs();
       renderList();
-      toast("✅ " + app.name + " 入驻审核通过！已自动开通账号和工作空间", "ok");
+      var msg = isChange(app)
+        ? "✅ " + app.name + " 认证变更已通过，企业主体资料已覆盖并回写「已认证」"
+        : "✅ " + app.name + " 入驻审核通过！已自动开通账号和团队";
+      toast(msg, "ok");
     };
+
+    var REJECT_REASONS_ONBOARDING = [
+      "材料不完整",
+      "营业执照信息与填写不符",
+      "身份证照片模糊/缺失",
+      "作品集不符合平台要求",
+      "涉嫌虚假信息",
+      "其他"
+    ];
+    var REJECT_REASONS_CERT_CHANGE = [
+      "新主体资料与原企业主体不一致",
+      "开户户名与企业名称不匹配",
+      "营业执照信息无法核验",
+      "变更项材料缺失",
+      "存在重大风险，需线下确认",
+      "其他"
+    ];
 
     window.openReject = function (id) {
       rejectTargetId = id;
-      document.getElementById("rejectReason").selectedIndex = 0;
+      var app = applications.find(function (a) { return a.id === id; });
+      var change = app && isChange(app);
+      var modalTitle = document.querySelector("#rejectModal .modal-head h3");
+      modalTitle.textContent = change ? "驳回企业认证变更" : "驳回入驻申请";
+      var sel = document.getElementById("rejectReason");
+      var reasons = change ? REJECT_REASONS_CERT_CHANGE : REJECT_REASONS_ONBOARDING;
+      sel.innerHTML = reasons.map(function (r) { return '<option>' + r + '</option>'; }).join("");
+      sel.selectedIndex = 0;
       document.getElementById("rejectNote").value = "";
       document.getElementById("rejectModal").classList.add("open");
     };
@@ -367,7 +584,67 @@
       document.getElementById("rejectModal").classList.remove("open");
       renderKPIs();
       renderList();
-      toast("已驳回 " + app.name + " 的入驻申请", "warn");
+      var msg = isChange(app)
+        ? "已驳回 " + app.name + " 的企业认证变更"
+        : "已驳回 " + app.name + " 的入驻申请";
+      toast(msg, "warn");
+    };
+
+    var supplementTargetId = null;
+
+    function defaultSupplementItems(app) {
+      if (isChange(app)) return ["变更后营业执照（清晰彩色版本）", "变更项对应的证明材料", "原企业管理员授权说明"];
+      if (app.type === "enterprise") return ["营业执照（在有效期内的最新版本）", "法人身份证正面（清晰彩色）", "法人身份证反面（含有效期）", "企业作品集（≥ 3 个完整案例）"];
+      if (app.type === "team") return ["团队负责人身份证正反面", "团队合作协议（盖章版）", "团队作品集"];
+      return ["身份证正反面（清晰彩色）", "个人作品集（≥ 3 件代表作）"];
+    }
+
+    window.openSupplement = function (id) {
+      var app = applications.find(function (a) { return a.id === id; });
+      if (!app) return;
+      supplementTargetId = id;
+      var items = defaultSupplementItems(app);
+      var listEl = document.getElementById("supplementChecklist");
+      listEl.innerHTML = items.map(function (it, i) {
+        return '<label><input type="checkbox" value="' + it.replace(/"/g, "&quot;") + '" ' + (i < 2 ? "checked" : "") + '/>' + it + '</label>';
+      }).join("");
+      document.getElementById("supplementNote").value = "";
+      document.getElementById("supplementModal").classList.add("open");
+    };
+
+    window.confirmSupplement = function () {
+      var app = applications.find(function (a) { return a.id === supplementTargetId; });
+      if (!app) return;
+      var checked = Array.prototype.slice.call(document.querySelectorAll("#supplementChecklist input[type=checkbox]:checked")).map(function (n) { return n.value; });
+      if (!checked.length) {
+        toast("请至少勾选一项需要补充的材料", "warn");
+        return;
+      }
+      var note = document.getElementById("supplementNote").value;
+      var now = new Date();
+      var pad = function (n) { return n < 10 ? "0" + n : "" + n; };
+      var stamp = now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(now.getDate()) + " " + pad(now.getHours()) + ":" + pad(now.getMinutes());
+      app.status = "supplementing";
+      app.supplement = {
+        requestedAt: stamp,
+        requestedBy: "审核员 当前用户",
+        items: checked,
+        note: note || ""
+      };
+      document.getElementById("supplementModal").classList.remove("open");
+      renderKPIs();
+      renderList();
+      toast("📩 已通知 " + app.name + " 补充 " + checked.length + " 项材料，申请单进入「待补充」状态", "info");
+    };
+
+    window.restoreToPending = function (id) {
+      var app = applications.find(function (a) { return a.id === id; });
+      if (!app) return;
+      app.status = "pending";
+      app.supplement = null;
+      renderKPIs();
+      renderList();
+      toast("已撤销补充通知，" + app.name + " 的申请单恢复到「待审核」", "warn");
     };
 
     renderKPIs();
