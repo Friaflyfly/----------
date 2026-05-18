@@ -11,40 +11,57 @@
     .page-head h1 { margin: 0 0 4px; font-size: 22px; }
     .page-head .sub { color: #8c8c8c; font-size: 13px; }
 
-    /* 账号中心：左侧子菜单 + 右侧内容（与钱包同范式） */
-    .ac-layout { display: flex; gap: 18px; align-items: flex-start; }
-    .ac-submenu {
-      width: 208px; flex-shrink: 0; background: #fff; border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,.04); padding: 12px 0;
-      position: sticky; top: 76px;
+    /* 账号中心侧栏：取代业务主导航，避免双层菜单挤占空间（与钱包页同范式） */
+    .sidebar .back-to-platform {
+      padding: 4px 18px 12px; border-bottom: 1px solid #f0f0f0; margin-bottom: 6px;
     }
-    .ac-submenu .submenu-head {
-      padding: 4px 18px 10px; border-bottom: 1px solid #f0f0f0; margin-bottom: 6px;
+    .sidebar .back-to-platform a {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12.5px; color: #1890ff; text-decoration: none;
+      padding: 4px 0; border-left: none;
     }
-    .ac-submenu .sh-title {
+    .sidebar .back-to-platform a:hover { color: #096dd9; background: transparent; }
+    .sidebar .submenu-head { padding: 8px 18px 10px; }
+    .sidebar .submenu-head .sh-title {
       font-size: 14px; font-weight: 600; color: #262626;
       display: flex; align-items: center; gap: 6px;
     }
-    .ac-submenu .sh-sub { font-size: 11px; color: #8c8c8c; margin-top: 2px; }
-    .ac-submenu .submenu-group-title {
+    .sidebar .submenu-head .sh-sub { font-size: 11px; color: #8c8c8c; margin-top: 2px; }
+    .sidebar .submenu-group-title {
       padding: 12px 18px 6px; font-size: 11px; color: #8c8c8c;
       text-transform: uppercase; letter-spacing: .5px; font-weight: 600;
     }
-    .ac-submenu a, .ac-submenu button {
+    .sidebar .ac-nav a, .sidebar .ac-nav button {
       display: flex; align-items: center; gap: 8px;
       width: 100%; padding: 10px 18px; border: none; background: transparent;
       border-left: 3px solid transparent; cursor: pointer;
       font-size: 13.5px; color: #262626; font-weight: 500;
       text-decoration: none; text-align: left;
     }
-    .ac-submenu a:hover, .ac-submenu button:hover {
+    .sidebar .ac-nav a:hover, .sidebar .ac-nav button:hover {
       background: #f0f7ff; color: #1890ff;
     }
-    .ac-submenu a.active, .ac-submenu button.active {
+    .sidebar .ac-nav a.active, .sidebar .ac-nav button.active {
       background: #e6f7ff; color: #1890ff;
       border-left-color: #1890ff; font-weight: 600;
     }
-    .ac-content { flex: 1; min-width: 0; }
+    /* 占位徽章 */
+    .badge-todo {
+      display: inline-block; margin-left: auto;
+      padding: 1px 6px; background: #f5f5f5; color: #8c8c8c;
+      border: 1px solid #e0e0e0; border-radius: 10px;
+      font-size: 10px; font-weight: 500; line-height: 1.4;
+    }
+    .sidebar .ac-nav button:has(.badge-todo) { opacity: .85; }
+    @media (max-width: 768px) {
+      .sidebar { display: block !important; position: static; width: 100%; padding: 8px 0; box-shadow: none; }
+      .sidebar .back-to-platform, .sidebar .submenu-head, .sidebar .submenu-group-title { display: none; }
+      .sidebar .ac-nav { display: flex; flex-wrap: wrap; padding: 0 8px; }
+      .sidebar .ac-nav a, .sidebar .ac-nav button {
+        width: auto; flex: 1 1 140px; padding: 8px 12px;
+        border-left: none; border-radius: 6px; justify-content: center;
+      }
+    }
 
     /* 用户卡片 */
     .user-hero {
@@ -151,11 +168,8 @@
     @media (max-width: 1100px) {
       .entry-grid { grid-template-columns: repeat(2, 1fr); }
       .status-grid { grid-template-columns: repeat(2, 1fr); }
-      .ac-submenu { width: 168px; }
     }
     @media (max-width: 900px) {
-      .ac-layout { flex-direction: column; }
-      .ac-submenu { width: 100%; position: static; }
       .entry-grid { grid-template-columns: 1fr; }
     }
   </style>
@@ -165,30 +179,31 @@
   <div id="toastWrap" class="toasts"></div>
 
   <div class="app">
+    <!-- 账号中心为"用户私有空间"，进入后用账号菜单替换业务主导航，避免双层导航挤占空间 -->
     <aside class="sidebar">
-      <nav class="menu">
-        <a href="platform-home-demander.html"><span class="menu-icon">🏠</span> 工作台</a>
-        <div class="menu-group">
-          <div class="menu-group-title">我有需求</div>
-          <a href="demand-publish.html"><span class="menu-icon">📤</span> 发布需求</a>
-          <a href="demand-list.html"><span class="menu-icon">📋</span> 我的需求</a>
-          <a href="contractor-marketplace.html"><span class="menu-icon">🏪</span> 服务广场</a>
-        </div>
-        <div class="menu-group">
-          <div class="menu-group-title">我要接单</div>
-          <a href="contractor-demand-hall.html"><span class="menu-icon">📢</span> 接单广场</a>
-          <a href="contractor-orders.html"><span class="menu-icon">📬</span> 我的接单</a>
-          <a href="contractor-profile-edit.html"><span class="menu-icon">🛍</span> 我的服务主页</a>
-        </div>
-        <div class="menu-group">
-          <div class="menu-group-title">协同</div>
-          <a href="project-space.html"><span class="menu-icon">🤝</span> 项目协同空间</a>
-        </div>
-        <div class="menu-group">
-          <div class="menu-group-title">账户</div>
-          <a href="wallet-overview.html"><span class="menu-icon">💰</span> 我的钱包</a>
-          <a href="account-center.html" class="active"><span class="menu-icon">⚙️</span> 账号中心</a>
-        </div>
+      <div class="back-to-platform">
+        <a href="platform-home-demander.html">← 返回工作台</a>
+      </div>
+      <div class="submenu-head">
+        <div class="sh-title">⚙️ 账号中心</div>
+        <div class="sh-sub">身份 · 认证 · 安全 · 偏好</div>
+      </div>
+      <nav class="ac-nav">
+        <div class="submenu-group-title">概览</div>
+        <a href="account-center.html" class="active">📋 账号概览</a>
+
+        <div class="submenu-group-title">身份</div>
+        <a href="account-basic-info-prototype-platform-style.html">👤 基本资料</a>
+        <a href="enterprise-verification-prototype.html">🏢 企业认证</a>
+
+        <div class="submenu-group-title">安全</div>
+        <a href="account-security-prototype.html">🔐 账号安全</a>
+        <button type="button" onclick="window.demoToast('「消息通知」页面即将上线','info')">🔔 消息通知<span class="badge-todo">待研发</span></button>
+        <button type="button" onclick="window.demoToast('「第三方账号」页面即将上线','info')">🔗 第三方账号<span class="badge-todo">待研发</span></button>
+
+        <div class="submenu-group-title">高级</div>
+        <button type="button" onclick="window.demoToast('「隐私设置」页面即将上线','info')">🛡 隐私设置<span class="badge-todo">待研发</span></button>
+        <button type="button" onclick="document.getElementById('dangerZone').scrollIntoView({behavior:'smooth'})">🚪 账号注销<span class="badge-todo">待研发</span></button>
       </nav>
     </aside>
 
@@ -198,30 +213,7 @@
         <div class="sub">管理你的身份、认证、安全与偏好设置。账号中心管"我是谁"，钱包管"我有什么"。</div>
       </section>
 
-      <div class="ac-layout">
-        <aside class="ac-submenu">
-          <div class="submenu-head">
-            <div class="sh-title">⚙️ 账号中心</div>
-            <div class="sh-sub">身份 · 认证 · 安全 · 偏好</div>
-          </div>
-          <div class="submenu-group-title">概览</div>
-          <a href="account-center.html" class="active">📋 账号概览</a>
-
-          <div class="submenu-group-title">身份</div>
-          <a href="account-basic-info-prototype-platform-style.html">👤 基本资料</a>
-          <a href="enterprise-verification-prototype.html">🏢 企业认证</a>
-
-          <div class="submenu-group-title">安全</div>
-          <a href="account-security-prototype.html">🔐 账号安全</a>
-          <button type="button" onclick="window.demoToast('「消息通知」页面即将上线','info')">🔔 消息通知</button>
-          <button type="button" onclick="window.demoToast('「第三方账号」页面即将上线','info')">🔗 第三方账号</button>
-
-          <div class="submenu-group-title">高级</div>
-          <button type="button" onclick="window.demoToast('「隐私设置」页面即将上线','info')">🛡 隐私设置</button>
-          <button type="button" onclick="document.getElementById('dangerZone').scrollIntoView({behavior:'smooth'})">🚪 账号注销</button>
-        </aside>
-
-        <div class="ac-content">
+      <div class="ac-content">
           <!-- 用户卡片 -->
           <div class="user-hero">
             <img src="https://api.dicebear.com/9.x/lorelei/svg?seed=account" alt="头像">
@@ -319,7 +311,6 @@
             。两个模块互相独立、彼此不嵌套，避免心智混淆。
           </div>
         </div>
-      </div>
     </main>
   </div>
 

@@ -206,6 +206,116 @@
     .summary-box .sb-arrow { text-align: center; color: #1890ff; padding: 4px 0; font-size: 18px; }
 
     .info-tip { padding: 10px 12px; background: #e6f7ff; border-left: 3px solid #1890ff; border-radius: 4px; font-size: 12px; color: #096dd9; margin-bottom: 12px; line-height: 1.6; }
+
+    /* ============ 积分中心 ============ */
+    .points-hero {
+      background: linear-gradient(135deg, #722ed1 0%, #531dab 100%);
+      border-radius: 12px; padding: 22px 26px; color: #fff;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(114,46,209,.18);
+    }
+    .points-hero .ph-label { font-size: 13px; opacity: .85; display: flex; align-items: baseline; gap: 8px; }
+    .points-hero .ph-scope-sub { font-size: 12px; opacity: .75; }
+    .points-hero .ph-balance { font-size: 36px; font-weight: 700; margin: 4px 0 8px; line-height: 1.1; }
+    .points-hero .ph-unit { font-size: 16px; font-weight: 500; opacity: .85; }
+    .points-hero .ph-meta { font-size: 12px; opacity: .9; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .points-hero .ph-meta-sep { opacity: .5; }
+    .points-hero .ph-status { padding: 1px 10px; border-radius: 10px; font-weight: 500; font-size: 11px; margin-left: 4px; }
+    .points-hero .ph-status-ok    { background: rgba(82,196,26,.85);  color: #fff; }
+    .points-hero .ph-status-low   { background: rgba(250,140,22,.85); color: #fff; }
+    .points-hero .ph-status-empty { background: rgba(255,77,79,.85);  color: #fff; }
+    .points-hero .ph-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .points-hero .ph-btn-primary, .points-hero .ph-btn-ghost {
+      padding: 9px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; border: none;
+    }
+    .points-hero .ph-btn-primary { background: #fff; color: #722ed1; font-weight: 600; }
+    .points-hero .ph-btn-primary:hover { background: #f9f0ff; }
+    .points-hero .ph-btn-ghost { background: rgba(255,255,255,.18); color: #fff; border: 1px solid rgba(255,255,255,.4); }
+    .points-hero .ph-btn-ghost:hover { background: rgba(255,255,255,.28); }
+
+    .points-pkg-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px;
+    }
+    .pkg-card {
+      background: #fff; border-radius: 10px; padding: 18px 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.04); border: 2px solid transparent;
+      position: relative; transition: all .2s;
+    }
+    .pkg-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.08); }
+    .pkg-card.recommend { border-color: #722ed1; }
+    .pkg-card.disabled { opacity: .55; }
+    .pkg-card .pkg-recommend-tag {
+      position: absolute; top: -10px; right: 14px;
+      background: #722ed1; color: #fff;
+      padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: 600;
+    }
+    .pkg-card .pkg-bonus-tag {
+      position: absolute; top: 10px; right: 10px;
+      background: #fff7e6; color: #d46b08;
+      padding: 1px 8px; border-radius: 10px; font-size: 11px; font-weight: 500;
+      border: 1px solid #ffe58f;
+    }
+    .pkg-card .pkg-icon { font-size: 28px; margin-bottom: 6px; }
+    .pkg-card .pkg-name { font-size: 13px; color: #8c8c8c; margin-bottom: 4px; }
+    .pkg-card .pkg-price { font-size: 22px; font-weight: 700; color: #262626; line-height: 1; }
+    .pkg-card .pkg-points { font-size: 13px; color: #722ed1; font-weight: 600; margin: 6px 0; }
+    .pkg-card .pkg-desc { font-size: 11.5px; color: #8c8c8c; line-height: 1.5; min-height: 32px; }
+    .pkg-card .pkg-buy {
+      width: 100%; margin-top: 12px; padding: 8px;
+      background: #722ed1; border: none; color: #fff; border-radius: 6px;
+      cursor: pointer; font-size: 13px; font-weight: 500;
+    }
+    .pkg-card .pkg-buy:hover { background: #531dab; }
+    .pkg-card .pkg-buy[disabled] { background: #d9d9d9; cursor: not-allowed; }
+
+    .points-subtabs {
+      display: flex; gap: 4px; padding: 4px; background: #fff; border-radius: 8px;
+      margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.04); width: fit-content;
+    }
+    .points-subtabs button {
+      border: none; background: transparent; cursor: pointer;
+      padding: 8px 16px; border-radius: 6px;
+      font-size: 13.5px; color: #595959; font-weight: 500;
+    }
+    .points-subtabs button:hover { background: #f5f5f5; color: #722ed1; }
+    .points-subtabs button.active { background: #f9f0ff; color: #722ed1; font-weight: 600; }
+    .points-list-card { background: #fff; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,.04); padding: 4px 0; overflow: hidden; }
+    .pts-subpanel { display: none; }
+    .pts-subpanel.active { display: block; }
+    .pts-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .pts-table thead th {
+      text-align: left; padding: 12px 14px; background: #fafafa;
+      color: #595959; font-weight: 500; font-size: 12px;
+      border-bottom: 1px solid #f0f0f0; letter-spacing: .3px;
+    }
+    .pts-table tbody td { padding: 12px 14px; border-bottom: 1px solid #f5f5f5; }
+    .pts-table tbody tr:last-child td { border-bottom: none; }
+    .pts-table tbody tr:hover { background: #fafafa; }
+    .pts-amount { font-weight: 600; color: #722ed1; text-align: right; }
+    .pts-amount.cost { color: #cf1322; }
+    .pts-amount.gain { color: #389e0d; }
+    .pts-cell-sub { font-size: 11.5px; color: #8c8c8c; margin-top: 2px; }
+    .pts-empty { text-align: center; padding: 32px 16px; color: #8c8c8c; font-size: 13px; }
+
+    /* 兑换 / 模拟 工具调用 modal 内部 */
+    .pts-modal-summary {
+      background: #f9f0ff; border-radius: 8px; padding: 14px 16px; margin-bottom: 14px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    }
+    .pts-modal-summary .psk { font-size: 12px; color: #8c8c8c; }
+    .pts-modal-summary .psv { font-size: 16px; font-weight: 600; color: #262626; margin-top: 2px; }
+    .pts-modal-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f5f5f5; }
+    .pts-modal-row:last-child { border-bottom: none; }
+    .pts-modal-row .pmk { font-size: 13px; color: #595959; }
+    .pts-modal-row .pmv { font-size: 13px; color: #262626; font-weight: 500; }
+
+    @media (max-width: 1100px) {
+      .points-pkg-grid { grid-template-columns: repeat(2, 1fr); }
+      .points-hero { flex-direction: column; align-items: flex-start; }
+    }
+    @media (max-width: 700px) {
+      .points-pkg-grid { grid-template-columns: 1fr; }
+    }
     .warn-tip { padding: 10px 12px; background: #fff1f0; border-left: 3px solid #ff4d4f; border-radius: 4px; font-size: 12px; color: #cf1322; margin-bottom: 12px; line-height: 1.6; }
 
     .btn { height: 36px; border: 1px solid #d9d9d9; background: #fff; border-radius: 6px; padding: 0 18px; font-size: 14px; color: #595959; cursor: pointer; }
@@ -262,22 +372,25 @@
     @media (max-width: 1100px) { .quick-actions-grid { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 600px)  { .quick-actions-grid { grid-template-columns: repeat(2, 1fr); } }
 
-    /* ============ 钱包内左侧子导航（替代原横向 5-Tab） ============ */
-    .wallet-layout { display: flex; gap: 18px; align-items: flex-start; }
-    .wallet-submenu {
-      width: 208px; flex-shrink: 0; background: #fff; border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,.04); padding: 12px 0; position: sticky; top: 76px;
+    /* ============ 钱包侧栏：取代业务主导航，避免双层菜单挤占空间 ============ */
+    /* 钱包页内的侧栏沿用 .sidebar 的 fixed 定位，仅替换内容 */
+    .sidebar .back-to-platform {
+      padding: 4px 18px 12px; border-bottom: 1px solid #f0f0f0; margin-bottom: 6px;
     }
-    .wallet-submenu .submenu-head {
-      padding: 4px 18px 10px; border-bottom: 1px solid #f0f0f0; margin-bottom: 6px;
+    .sidebar .back-to-platform a {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12.5px; color: #1890ff; text-decoration: none;
+      padding: 4px 0; border-left: none;
     }
-    .wallet-submenu .submenu-head .sh-title {
-      font-size: 14px; font-weight: 600; color: #262626; display: flex; align-items: center; gap: 6px;
+    .sidebar .back-to-platform a:hover { color: #096dd9; background: transparent; }
+    .sidebar .submenu-head { padding: 8px 18px 10px; }
+    .sidebar .submenu-head .sh-title {
+      font-size: 14px; font-weight: 600; color: #262626;
+      display: flex; align-items: center; gap: 6px;
     }
-    .wallet-submenu .submenu-head .sh-sub {
-      font-size: 11px; color: #8c8c8c; margin-top: 2px;
-    }
-    /* 改写 .role-tabs 为垂直菜单形态（保留 id="roleTabs"，JS 无需改动） */
+    .sidebar .submenu-head .sh-sub { font-size: 11px; color: #8c8c8c; margin-top: 2px; }
+
+    /* .role-tabs 垂直形态（保留 id="roleTabs"，JS 无需改动） */
     .role-tabs.vertical {
       display: block; padding: 0; background: transparent; border-radius: 0;
       box-shadow: none; overflow: visible; margin-bottom: 0;
@@ -293,30 +406,23 @@
       background: transparent; cursor: pointer;
       font-size: 13.5px; color: #262626; font-weight: 500; text-align: left;
     }
-    .role-tabs.vertical button:hover {
-      background: #f0f7ff; color: #1890ff; box-shadow: none;
-    }
+    .role-tabs.vertical button:hover { background: #f0f7ff; color: #1890ff; box-shadow: none; }
     .role-tabs.vertical button.active {
       background: #e6f7ff; color: #1890ff; border-left-color: #1890ff;
       box-shadow: none; font-weight: 600;
     }
-    .wallet-content { flex: 1; min-width: 0; }
-    @media (max-width: 1100px) {
-      .wallet-submenu { width: 168px; }
-    }
-    @media (max-width: 900px) {
-      .wallet-layout { flex-direction: column; }
-      .wallet-submenu { width: 100%; position: static; padding: 8px; }
-      .wallet-submenu .submenu-head { display: none; }
-      .role-tabs.vertical { display: flex; flex-wrap: wrap; }
+
+    @media (max-width: 768px) {
+      /* 移动端：钱包侧栏铺底变为顶部横向菜单，避免被 _shared 的 .sidebar{display:none} 干掉 */
+      .sidebar { display: block !important; position: static; width: 100%; padding: 8px 0; box-shadow: none; }
+      .sidebar .submenu-head, .sidebar .back-to-platform { display: none; }
+      .role-tabs.vertical { display: flex; flex-wrap: wrap; padding: 0 8px; }
       .role-tabs.vertical .rt-group-title { display: none; }
       .role-tabs.vertical button {
         width: auto; flex: 1 1 140px; padding: 8px 12px;
         border-left: none; border-radius: 6px; justify-content: center;
       }
-      .role-tabs.vertical button.active {
-        border-left: none; box-shadow: inset 0 -2px 0 #1890ff;
-      }
+      .role-tabs.vertical button.active { border-left: none; box-shadow: inset 0 -2px 0 #1890ff; }
     }
 
     /* 冻结余额拆分 */
@@ -564,30 +670,31 @@
   </header>
 
   <div class="app">
+    <!-- 钱包模块为"用户私有空间"，进入后用钱包菜单替换业务主导航，避免双层导航挤占空间 -->
     <aside class="sidebar">
-      <nav class="menu">
-        <a href="platform-home-demander.html"><span class="menu-icon">🏠</span> 工作台</a>
-        <div class="menu-group">
-          <div class="menu-group-title">我有需求</div>
-          <a href="demand-publish.html"><span class="menu-icon">📤</span> 发布需求</a>
-          <a href="demand-list.html"><span class="menu-icon">📋</span> 我的需求</a>
-          <a href="contractor-marketplace.html"><span class="menu-icon">🏪</span> 服务广场</a>
-        </div>
-        <div class="menu-group">
-          <div class="menu-group-title">我要接单</div>
-          <a href="contractor-demand-hall.html"><span class="menu-icon">📢</span> 接单广场</a>
-          <a href="contractor-orders.html"><span class="menu-icon">📬</span> 我的接单</a>
-          <a href="contractor-profile-edit.html"><span class="menu-icon">🛍</span> 我的服务主页</a>
-        </div>
-        <div class="menu-group">
-          <div class="menu-group-title">协同</div>
-          <a href="project-space.html"><span class="menu-icon">🤝</span> 项目协同空间</a>
-        </div>
-        <div class="menu-group">
-          <div class="menu-group-title">账户</div>
-          <a href="wallet-overview.html" class="active"><span class="menu-icon">💰</span> 我的钱包</a>
-          <a href="account-center.html"><span class="menu-icon">⚙️</span> 账号中心</a>
-        </div>
+      <div class="back-to-platform">
+        <a href="platform-home-demander.html">← 返回工作台</a>
+      </div>
+      <div class="submenu-head">
+        <div class="sh-title">💰 我的钱包</div>
+        <div class="sh-sub">资金管理与对账中心</div>
+      </div>
+      <nav class="role-tabs vertical" id="roleTabs">
+        <div class="rt-group-title">总览</div>
+        <button data-tab="overview" class="active">📊 钱包概览</button>
+
+        <div class="rt-group-title">资金</div>
+        <button data-tab="accounts">🏦 账户与预算</button>
+
+        <div class="rt-group-title">凭证</div>
+        <button data-tab="points">🎯 积分中心</button>
+
+        <div class="rt-group-title">记录</div>
+        <button data-tab="flows">💸 收支记录</button>
+        <button data-tab="invoice">🧾 发票管理</button>
+
+        <div class="rt-group-title">设置</div>
+        <button data-tab="settings">⚙️ 钱包设置</button>
       </nav>
     </aside>
 
@@ -606,29 +713,12 @@
         <span class="ctx-rule" id="ctxRuleNote">本空间下发起的订单，将默认从「短剧制作中心 - 团队预算账户」中扣款或冻结资金。</span>
       </div>
 
-      <!-- 钱包子模块：左侧菜单 + 右侧内容（替代原横向 5-Tab） -->
-      <div class="wallet-layout">
-        <aside class="wallet-submenu">
-          <div class="submenu-head">
-            <div class="sh-title">💰 我的钱包</div>
-            <div class="sh-sub">资金管理与对账中心</div>
-          </div>
-          <nav class="role-tabs vertical" id="roleTabs">
-            <div class="rt-group-title">总览</div>
-            <button data-tab="overview" class="active">📊 钱包概览</button>
-
-            <div class="rt-group-title">资金</div>
-            <button data-tab="accounts">🏦 账户与预算</button>
-
-            <div class="rt-group-title">记录</div>
-            <button data-tab="flows">💸 收支记录</button>
-            <button data-tab="invoice">🧾 发票管理</button>
-
-            <div class="rt-group-title">设置</div>
-            <button data-tab="settings">⚙️ 钱包设置</button>
-          </nav>
-        </aside>
-        <div class="wallet-content">
+      <!-- 管理员引导：钱包是空间视角，治理性操作请去管理后台 -->
+      <div id="adminGovHint" style="display:none;background:linear-gradient(90deg,#f9f0ff,#fff);border-left:3px solid #722ed1;border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12.5px;line-height:1.65;color:#262626">
+        <strong style="color:#722ed1">👑 你是企业管理员</strong><br>
+        钱包仅展示当前工作空间相关账户。要看<strong>全企业资金鸟瞰、预算划拨、充值审核、开票汇总</strong>，请前往
+        <a href="admin-console.html" style="color:#722ed1;font-weight:500;text-decoration:none">管理后台 · 资金与预算 →</a>。
+      </div>
 
       <!-- ============ Tab 1：概览 ============ -->
       <section class="panel active" id="panel-overview">
@@ -750,6 +840,50 @@
         </div>
       </section>
 
+      <!-- ============ 积分中心（凭证类） ============ -->
+      <section class="panel" id="panel-points">
+        <div class="info-tip" style="margin-bottom:14px">
+          🎯 积分用于平台内 AI 工具调用（每次消耗 2-10 积分）。<strong>兑换比例</strong>：¥1 = 10 积分；高档位送积分；
+          <strong>积分按工作空间隔离</strong>（个人空间用个人积分、团队空间用团队池），不可跨空间使用，不可退回现金。
+        </div>
+
+        <!-- 当前空间积分余额卡 -->
+        <div class="points-hero" id="pointsHero">
+          <div class="ph-left">
+            <div class="ph-label">
+              <span id="pointsScope">当前空间积分</span>
+              <span id="pointsScopeSub" class="ph-scope-sub">短剧制作中心 · 团队预算账户</span>
+            </div>
+            <div class="ph-balance"><span id="pointsBalanceNum">0</span> <span class="ph-unit">积分</span></div>
+            <div class="ph-meta">
+              <span>💡 本月已消耗 <strong id="pointsMonthCost">0</strong> 积分</span>
+              <span class="ph-meta-sep">·</span>
+              <span>对应 ¥<span id="pointsCashEquiv">0</span></span>
+              <span class="ph-meta-sep">·</span>
+              <span id="pointsStatus" class="ph-status ph-status-ok">✓ 充足</span>
+            </div>
+          </div>
+          <div class="ph-actions">
+            <button class="ph-btn-primary" onclick="scrollToPointsPackages()">💎 立即兑换</button>
+            <button class="ph-btn-ghost" onclick="openSimulateModal()">🤖 试用 AI 工具</button>
+          </div>
+        </div>
+
+        <!-- 兑换包 -->
+        <div class="section-head">兑换包 <span class="section-sub">从当前空间钱包余额兑换 · 阶梯送积分</span></div>
+        <div class="points-pkg-grid" id="pointsPkgGrid"></div>
+
+        <!-- 子签：消耗记录 / 兑换记录 -->
+        <div class="points-subtabs">
+          <button class="active" data-pts-sub="consumption" onclick="switchPointsSub('consumption')">📊 消耗记录</button>
+          <button data-pts-sub="exchange" onclick="switchPointsSub('exchange')">💎 兑换记录</button>
+        </div>
+        <div class="points-list-card">
+          <div id="pointsConsumptionList" class="pts-subpanel active"></div>
+          <div id="pointsExchangeList"    class="pts-subpanel"></div>
+        </div>
+      </section>
+
       <!-- ============ Tab 3：收支记录（唯一全量流水） ============ -->
       <section class="panel" id="panel-flows">
         <!-- 顶部操作条：充值 / 提现 / 划拨 全部走"按钮 → 抽屉" -->
@@ -841,9 +975,6 @@
         </div>
         <div class="settings-grid" id="settingsGrid"></div>
       </section>
-
-        </div><!-- /.wallet-content -->
-      </div><!-- /.wallet-layout -->
     </main>
   </div>
 
@@ -1036,6 +1167,85 @@
 
   <div id="toastWrap" class="toasts"></div>
 
+  <!-- ============ 积分兑换 Modal ============ -->
+  <div class="modal-mask" id="ptsExchangeModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>💎 兑换积分</h3>
+        <p>从当前空间的钱包余额兑换 · 兑换成功立即到账</p>
+      </div>
+      <div class="modal-body">
+        <div id="ptsExchangeSummary"></div>
+        <div class="form-field" style="margin-top:14px">
+          <label>资金来源 · <span style="color:#8c8c8c;font-weight:400">扣款账户</span></label>
+          <select id="ptsExchangeSource"></select>
+        </div>
+        <div id="ptsExchangeWarn" style="display:none;font-size:12px;color:#cf1322;background:#fff1f0;padding:8px 10px;border-radius:6px;margin-top:8px"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closePtsExchangeModal()">取消</button>
+        <button class="btn primary" id="ptsExchangeConfirmBtn" onclick="confirmExchange()" style="background:#722ed1;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer">确认兑换</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 模拟 AI 工具调用 Modal ============ -->
+  <div class="modal-mask" id="ptsSimulateModal">
+    <div class="modal" style="max-width:520px">
+      <div class="modal-head">
+        <h3>🤖 模拟 AI 工具调用</h3>
+        <p>演示三档消耗时的不同确认行为（≤3 不提示 / 4-7 toast / ≥8 模态）</p>
+      </div>
+      <div class="modal-body">
+        <div style="font-size:12.5px;color:#595959;line-height:1.7;margin-bottom:12px;padding:10px 12px;background:#fafafa;border-radius:6px">
+          这里模拟"在使用 AI 工具时调起消费"的场景（入口 A）。任何业务页面调用
+          <code>window.demoApp.consumePoints()</code> 都会走相同的流程：积分够则按消耗档位提示，不够则弹出兑换抽屉，兑换完成后无缝继续。
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="ai-tool-btn" onclick="invokeAiTool('AI 翻译', 2)">AI 翻译 · 2 积分 <span class="aitb-tier">不提示，直接执行</span></button>
+          <button class="ai-tool-btn" onclick="invokeAiTool('AI 文案生成', 5)">AI 文案生成 · 5 积分 <span class="aitb-tier">底部 toast 提示</span></button>
+          <button class="ai-tool-btn" onclick="invokeAiTool('AI 剪辑建议', 8)">AI 剪辑建议 · 8 积分 <span class="aitb-tier">弹模态确认</span></button>
+          <button class="ai-tool-btn" onclick="invokeAiTool('AI 4K 重制', 10)">AI 4K 重制 · 10 积分 <span class="aitb-tier">弹模态确认</span></button>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeSimulateModal()">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 高消耗确认 Modal（≥8 积分时） ============ -->
+  <div class="modal-mask" id="ptsConsumeConfirmModal">
+    <div class="modal" style="max-width:440px">
+      <div class="modal-head">
+        <h3>⚠️ 确认消耗积分</h3>
+        <p>本次操作消耗较多积分，请确认</p>
+      </div>
+      <div class="modal-body">
+        <div id="ptsConsumeConfirmBody"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeConsumeConfirm()">取消</button>
+        <button class="btn primary" id="ptsConsumeConfirmYes" style="background:#722ed1;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer">确认消耗</button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .ai-tool-btn {
+      width: 100%; padding: 12px 14px; background: #fff; border: 1px solid #e8e8e8;
+      border-radius: 8px; cursor: pointer; text-align: left;
+      font-size: 13.5px; color: #262626; font-weight: 500;
+      display: flex; justify-content: space-between; align-items: center;
+      transition: all .15s;
+    }
+    .ai-tool-btn:hover { border-color: #722ed1; background: #f9f0ff; color: #722ed1; }
+    .ai-tool-btn .aitb-tier {
+      font-size: 11px; color: #8c8c8c; font-weight: 400;
+    }
+    .ai-tool-btn:hover .aitb-tier { color: #722ed1; }
+  </style>
+
   <!-- 共享底座 -->
   <script src="_shared.js"></script>
   <script>
@@ -1086,6 +1296,9 @@
       $("ctxRoleName").textContent = roleName;
       const roleChip = $("ctxRoleChip");
       if (roleChip && roleChip.firstChild) roleChip.firstChild.textContent = roleIcon;
+      // 管理员视角提示：进入 cf-admin 空间时展示治理入口
+      const govHint = $("adminGovHint");
+      if (govHint) govHint.style.display = (ws.id === "cf-admin") ? "block" : "none";
       // P2-12 规则说明
       let rule = "";
       const wallets = window.demoApp.getWallets();
@@ -1193,8 +1406,8 @@
       target.innerHTML = banners.map(bannerHtml).join("");
     }
 
-    // 5-Tab：仅切换 panel；身份切换不再切换 Tab，只刷新内容
-    const VALID_TABS = ["overview", "accounts", "flows", "invoice", "settings"];
+    // 钱包子模块切换；身份切换不再切换 Tab，只刷新内容
+    const VALID_TABS = ["overview", "accounts", "points", "flows", "invoice", "settings"];
     function setActiveTab(name, opts) {
       if (!VALID_TABS.includes(name)) name = "overview";
       document.querySelectorAll("#roleTabs button").forEach(b => b.classList.toggle("active", b.getAttribute("data-tab") === name));
@@ -1202,6 +1415,7 @@
       // 各 Tab 切换时按需重渲染
       if (name === "overview") renderMiniFlows("overviewMiniFlows", "all");
       if (name === "accounts") { renderAccountsActionBar(); renderFrozenBreakdown(); renderMiniFlows("accountsMiniFlows", "current"); }
+      if (name === "points")   { renderPointsBalance(); renderPointsPackages(); renderPointsConsumptions(); renderPointsExchanges(); }
       if (name === "flows") renderFlows();
       if (name === "invoice") renderInvoicePanel();
       if (name === "settings") renderSettingsPanel();
@@ -2540,6 +2754,250 @@
       }
       setActiveTab(target);
     })();
+
+    // ============================================================
+    // 积分中心
+    // ============================================================
+    function getCurrentPointsWalletKey() {
+      // 当前空间使用的积分池：与该空间默认扣款账户一致
+      const ws = window.demoApp.getCurrentWorkspace();
+      return ws.walletKey || "personal-account-lixueqin";
+    }
+
+    function renderPointsBalance() {
+      const ws = window.demoApp.getCurrentWorkspace();
+      const wKey = getCurrentPointsWalletKey();
+      const balance = window.demoApp.getPointsBalance(wKey);
+      $("pointsBalanceNum").textContent = balance.toLocaleString();
+      $("pointsScope").textContent = ws.type === "personal" ? "个人积分" : (ws.type === "admin" ? "企业积分" : "团队积分");
+      $("pointsScopeSub").textContent = ws.shortName + " · " + (ws.accountType || "");
+      // 本月消耗
+      const all = window.demoApp.getPointsConsumptions();
+      const monthPrefix = (new Date()).toISOString().slice(0, 7); // YYYY-MM
+      const monthCost = all.filter(c => c.walletKey === wKey && c.time.indexOf(monthPrefix) === 0)
+        .reduce((s, c) => s + c.cost, 0);
+      $("pointsMonthCost").textContent = monthCost;
+      $("pointsCashEquiv").textContent = (balance / 10).toFixed(1);
+      // 状态徽章
+      const statusEl = $("pointsStatus");
+      statusEl.classList.remove("ph-status-ok", "ph-status-low", "ph-status-empty");
+      if (balance === 0)        { statusEl.textContent = "× 已耗尽"; statusEl.classList.add("ph-status-empty"); }
+      else if (balance < 50)    { statusEl.textContent = "⚠ 即将告急"; statusEl.classList.add("ph-status-low"); }
+      else                       { statusEl.textContent = "✓ 充足";  statusEl.classList.add("ph-status-ok"); }
+    }
+
+    function renderPointsPackages() {
+      const grid = $("pointsPkgGrid");
+      const pkgs = window.demoApp.getPointsPackages();
+      const ws = window.demoApp.getCurrentWorkspace();
+      const isAdmin = (ws.type === "admin");
+      grid.innerHTML = pkgs.map(p => {
+        const recommendTag = p.recommend ? '<div class="pkg-recommend-tag">推荐</div>' : '';
+        const bonusTag = p.bonus > 0 ? '<div class="pkg-bonus-tag">' + p.badge + '</div>' : '';
+        const disabled = p.adminOnly && !isAdmin;
+        const btnLabel = disabled ? '仅企业管理员' : '兑换';
+        return '<div class="pkg-card' + (p.recommend ? ' recommend' : '') + (disabled ? ' disabled' : '') + '">'
+          + recommendTag + bonusTag
+          + '<div class="pkg-icon">' + p.icon + '</div>'
+          + '<div class="pkg-name">' + p.name + '</div>'
+          + '<div class="pkg-price">¥' + p.price + '</div>'
+          + '<div class="pkg-points">+ ' + p.points.toLocaleString() + ' 积分</div>'
+          + '<div class="pkg-desc">' + p.desc + '</div>'
+          + '<button class="pkg-buy" ' + (disabled ? 'disabled' : 'onclick="openExchange(\'' + p.id + '\')"') + '>' + btnLabel + '</button>'
+          + '</div>';
+      }).join('');
+    }
+
+    function renderPointsConsumptions() {
+      const wKey = getCurrentPointsWalletKey();
+      const list = window.demoApp.getPointsConsumptions().filter(c => c.walletKey === wKey).slice(0, 30);
+      const container = $("pointsConsumptionList");
+      if (list.length === 0) {
+        container.innerHTML = '<div class="pts-empty">暂无消耗记录</div>';
+        return;
+      }
+      const rows = list.map(c => {
+        const demand = c.relatedDemand ? '<div class="pts-cell-sub">关联 ' + c.relatedDemand + '</div>' : '';
+        return '<tr>'
+          + '<td>' + c.time + '</td>'
+          + '<td><div>' + c.tool + '</div><div class="pts-cell-sub">' + c.callId + '</div></td>'
+          + '<td>' + c.operator + demand + '</td>'
+          + '<td class="pts-amount cost">- ' + c.cost + ' 积分</td>'
+          + '</tr>';
+      }).join('');
+      container.innerHTML = '<table class="pts-table">'
+        + '<thead><tr><th style="width:160px">时间</th><th>工具 / 调用号</th><th>使用人 / 关联</th><th class="pts-amount" style="width:120px">消耗</th></tr></thead>'
+        + '<tbody>' + rows + '</tbody></table>';
+    }
+
+    function renderPointsExchanges() {
+      const wKey = getCurrentPointsWalletKey();
+      const pkgs = window.demoApp.getPointsPackages();
+      const list = window.demoApp.getPointsExchanges().filter(e => e.walletKey === wKey).slice(0, 30);
+      const container = $("pointsExchangeList");
+      if (list.length === 0) {
+        container.innerHTML = '<div class="pts-empty">暂无兑换记录</div>';
+        return;
+      }
+      const rows = list.map(e => {
+        const pkg = pkgs.find(p => p.id === e.packageId) || { name: '—', icon: '💎' };
+        return '<tr>'
+          + '<td>' + e.time + '</td>'
+          + '<td>' + pkg.icon + ' ' + pkg.name + '<div class="pts-cell-sub">' + e.id + '</div></td>'
+          + '<td>' + e.operator + '</td>'
+          + '<td style="text-align:right">- ¥' + e.price + '</td>'
+          + '<td class="pts-amount gain">+ ' + e.points.toLocaleString() + ' 积分</td>'
+          + '</tr>';
+      }).join('');
+      container.innerHTML = '<table class="pts-table">'
+        + '<thead><tr><th style="width:160px">时间</th><th>套餐</th><th>操作人</th><th style="width:100px;text-align:right">扣款</th><th class="pts-amount" style="width:140px">到账积分</th></tr></thead>'
+        + '<tbody>' + rows + '</tbody></table>';
+    }
+
+    window.switchPointsSub = function (name) {
+      document.querySelectorAll('.points-subtabs button').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-pts-sub') === name);
+      });
+      $("pointsConsumptionList").classList.toggle('active', name === 'consumption');
+      $("pointsExchangeList").classList.toggle('active', name === 'exchange');
+    };
+
+    window.scrollToPointsPackages = function () {
+      const grid = $("pointsPkgGrid");
+      if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+
+    // ---- 兑换 modal ----
+    let _selectedPkgId = null;
+    let _exchangeContinueCb = null;  // 兑换成功后的回调（用于"积分不足→兑换→自动重试工具"）
+
+    window.openExchange = function (packageId, continueCb) {
+      _selectedPkgId = packageId;
+      _exchangeContinueCb = continueCb || null;
+      const pkg = window.demoApp.getPointsPackages().find(p => p.id === packageId);
+      if (!pkg) return;
+      // 资金来源 select：当前空间 + 个人 + (管理员可见)企业
+      const ws = window.demoApp.getCurrentWorkspace();
+      const wallets = window.demoApp.getWallets();
+      const sourceSel = $("ptsExchangeSource");
+      const candidates = [];
+      if (wallets[ws.walletKey]) candidates.push(ws.walletKey);
+      if (ws.walletKey !== "personal-account-lixueqin" && wallets["personal-account-lixueqin"]) {
+        candidates.push("personal-account-lixueqin");
+      }
+      if (ws.type === "admin" && wallets["enterprise-main-cf"]) candidates.push("enterprise-main-cf");
+      sourceSel.innerHTML = candidates.map(k => {
+        const w = wallets[k];
+        return '<option value="' + k + '">' + w.name + ' · 余额 ' + window.fmtMoney(w.balance) + '</option>';
+      }).join('');
+      sourceSel.value = ws.walletKey || candidates[0];
+      // 摘要
+      $("ptsExchangeSummary").innerHTML = '<div class="pts-modal-summary">'
+        + '<div><div class="psk">套餐</div><div class="psv">' + pkg.icon + ' ' + pkg.name + '</div></div>'
+        + '<div><div class="psk">扣款金额</div><div class="psv">¥' + pkg.price + '</div></div>'
+        + '<div><div class="psk">到账积分</div><div class="psv" style="color:#722ed1">+ ' + pkg.points.toLocaleString() + '</div></div>'
+        + '<div><div class="psk">送积分</div><div class="psv" style="color:#d46b08">' + (pkg.bonus > 0 ? '+ ' + pkg.bonus.toLocaleString() : '—') + '</div></div>'
+        + '</div>';
+      checkExchangeBalance();
+      sourceSel.onchange = checkExchangeBalance;
+      $("ptsExchangeModal").classList.add("open");
+    };
+
+    function checkExchangeBalance() {
+      const sourceKey = $("ptsExchangeSource").value;
+      const pkg = window.demoApp.getPointsPackages().find(p => p.id === _selectedPkgId);
+      const w = window.demoApp.getWallets()[sourceKey];
+      const warn = $("ptsExchangeWarn");
+      const btn = $("ptsExchangeConfirmBtn");
+      if (!w || w.balance < pkg.price) {
+        warn.style.display = "block";
+        warn.innerHTML = "⚠ 该账户余额不足（当前 " + window.fmtMoney(w ? w.balance : 0) + " / 需 ¥" + pkg.price + "），请先充值或换一个账户";
+        btn.disabled = true;
+        btn.style.opacity = "0.5";
+        btn.style.cursor = "not-allowed";
+      } else {
+        warn.style.display = "none";
+        btn.disabled = false;
+        btn.style.opacity = "1";
+        btn.style.cursor = "pointer";
+      }
+    }
+
+    window.closePtsExchangeModal = function () {
+      $("ptsExchangeModal").classList.remove("open");
+      _exchangeContinueCb = null;
+    };
+
+    window.confirmExchange = function () {
+      const sourceKey = $("ptsExchangeSource").value;
+      const result = window.demoApp.exchangePoints(sourceKey, _selectedPkgId, "昭岚");
+      if (!result.ok) {
+        window.demoToast(result.error, "warn");
+        return;
+      }
+      const pkg = window.demoApp.getPointsPackages().find(p => p.id === _selectedPkgId);
+      window.demoToast("已兑换 " + pkg.points.toLocaleString() + " 积分，现有 " + result.newPoints.toLocaleString() + " 积分", "ok");
+      closePtsExchangeModal();
+      renderPointsBalance();
+      renderPointsExchanges();
+      // 触发其他面板数据刷新（流水、账户余额）
+      try { renderFlows && renderFlows(); } catch (e) {}
+      // 兑换成功后无缝继续原操作
+      if (_exchangeContinueCb) { const cb = _exchangeContinueCb; _exchangeContinueCb = null; setTimeout(cb, 350); }
+    };
+
+    // ---- 模拟 AI 工具调用（演示三档确认） ----
+    window.openSimulateModal = function () { $("ptsSimulateModal").classList.add("open"); };
+    window.closeSimulateModal = function () { $("ptsSimulateModal").classList.remove("open"); };
+
+    window.invokeAiTool = function (toolName, cost) {
+      const wKey = getCurrentPointsWalletKey();
+      const cur = window.demoApp.getPointsBalance(wKey);
+      // 积分不足 → 提示 + 跳兑换抽屉，兑换成功后无缝继续
+      if (cur < cost) {
+        closeSimulateModal();
+        if (!confirm("积分不足（当前 " + cur + " / 需 " + cost + "）。是否前往兑换？兑换成功后将自动继续此操作")) return;
+        // 推荐套餐：标准档
+        openExchange("pkg-standard", function () { invokeAiTool(toolName, cost); });
+        return;
+      }
+      // 三档确认
+      if (cost <= 3) {
+        // 静默执行
+        doConsume(toolName, cost);
+      } else if (cost <= 7) {
+        // toast 提示
+        doConsume(toolName, cost);
+        window.demoToast("「" + toolName + "」已消耗 " + cost + " 积分（剩余 " + (cur - cost) + "）", "info");
+      } else {
+        // ≥8 模态确认
+        $("ptsConsumeConfirmBody").innerHTML = '<div class="pts-modal-row"><span class="pmk">工具</span><span class="pmv">' + toolName + '</span></div>'
+          + '<div class="pts-modal-row"><span class="pmk">本次消耗</span><span class="pmv" style="color:#cf1322;font-size:18px">' + cost + ' 积分</span></div>'
+          + '<div class="pts-modal-row"><span class="pmk">剩余余额</span><span class="pmv">' + cur + ' → ' + (cur - cost) + '</span></div>'
+          + '<div style="font-size:11.5px;color:#8c8c8c;margin-top:8px">高消耗操作建议确认。可在「钱包 → 积分中心 → 设置」调整确认阈值（下版本）。</div>';
+        $("ptsConsumeConfirmYes").onclick = function () {
+          closeConsumeConfirm();
+          doConsume(toolName, cost);
+          window.demoToast("「" + toolName + "」已确认执行，消耗 " + cost + " 积分", "ok");
+        };
+        $("ptsConsumeConfirmModal").classList.add("open");
+      }
+    };
+
+    function doConsume(toolName, cost) {
+      const wKey = getCurrentPointsWalletKey();
+      const result = window.demoApp.consumePoints(wKey, toolName, cost, "昭岚", null);
+      if (!result.ok) { window.demoToast(result.error, "err"); return; }
+      renderPointsBalance();
+      renderPointsConsumptions();
+    }
+
+    window.closeConsumeConfirm = function () { $("ptsConsumeConfirmModal").classList.remove("open"); };
+
+    // 进入 points tab 时上面 setActiveTab 会调用渲染；初始化也跑一次让数据就绪
+    if (typeof renderPointsBalance === "function") {
+      try { renderPointsBalance(); renderPointsPackages(); renderPointsConsumptions(); renderPointsExchanges(); } catch (e) {}
+    }
   })();
   </script>
 </body>

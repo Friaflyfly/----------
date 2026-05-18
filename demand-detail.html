@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>需求详情 - 骋风天合 · 创作门户交易平台</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #262626; }
+    .topbar { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.06); z-index: 200; display: flex; align-items: center; padding: 0 20px; gap: 16px; }
+    .topbar .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 16px; color: #1890ff; text-decoration: none; min-width: 220px; }
+    .topbar .brand-sub { color: #8c8c8c; font-weight: 400; font-size: 12px; margin-left: 4px; }
+    .ws-switcher { position: relative; }
+    .ws-trigger { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid #e8e8e8; border-radius: 6px; background: #fafafa; cursor: pointer; font-size: 13px; min-width: 240px; }
+    .ws-trigger:hover { border-color: #1890ff; background: #e6f7ff; }
+    .ws-trigger .ws-name { font-weight: 500; color: #262626; flex: 1; }
+    .ws-trigger .ws-arrow { color: #8c8c8c; font-size: 10px; }
+    .ws-dropdown { display: none; position: absolute; top: calc(100% + 6px); left: 0; min-width: 320px; background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,.12); padding: 8px; z-index: 300; }
+    .ws-dropdown.open { display: block; }
+    .ws-group-label { font-size: 12px; color: #8c8c8c; padding: 6px 10px; }
+    .ws-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+    .ws-item:hover, .ws-item.active { background: #e6f7ff; }
+    .ws-item-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .ws-item-icon.personal { background: #fff7e6; color: #fa8c16; }
+    .ws-item-icon.team { background: #e6f7ff; color: #1890ff; }
+    .ws-item-icon.admin { background: #f9f0ff; color: #722ed1; }
+    .ws-item-main { flex: 1; min-width: 0; }
+    .ws-item-name { font-weight: 500; color: #262626; }
+    .ws-item-desc { font-size: 12px; color: #8c8c8c; margin-top: 2px; }
+    .ws-item-check { color: #1890ff; font-size: 14px; }
+    .identity-switch { display: flex; gap: 4px; background: #f0f0f0; border-radius: 18px; padding: 3px; flex-wrap: wrap; }
+    .identity-switch button { border: none; background: transparent; padding: 5px 10px; border-radius: 16px; font-size: 13px; color: #595959; cursor: pointer; }
+    .identity-switch button.active { background: #fff; color: #1890ff; box-shadow: 0 1px 2px rgba(0,0,0,.06); font-weight: 500; }
+    .identity-switch button[data-identity="admin"].active { color: #722ed1; }
+    .identity-switch button[data-identity="ops"].active { color: #08979c; }
+    .wallet-chip { display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: linear-gradient(135deg, #fff7e6, #fff1d6); border: 1px solid #ffd591; border-radius: 18px; cursor: pointer; font-size: 13px; color: #d46b08; text-decoration: none; }
+    .wallet-amount { font-weight: 600; font-size: 14px; }
+    .wallet-account { font-size: 11px; opacity: .85; }
+    .avatar-wrap { position: relative; margin-left: auto; }
+    .avatar-trigger { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px 8px; border-radius: 18px; }
+    .avatar-trigger:hover { background: #f5f5f5; }
+    .avatar-trigger img { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #f0f0f0; }
+    .avatar-name { font-size: 13px; color: #262626; }
+    .avatar-dropdown { display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 220px; background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,.12); padding: 8px; z-index: 300; }
+    .avatar-dropdown.open { display: block; }
+    .avatar-dropdown a { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 6px; color: #262626; text-decoration: none; font-size: 13px; }
+    .avatar-dropdown a:hover { background: #f0f7ff; color: #1890ff; }
+    .avatar-dropdown .divider { height: 1px; background: #f0f0f0; margin: 6px 4px; }
+    .app { display: flex; padding-top: 56px; min-height: 100vh; }
+    .sidebar { width: 200px; background: #fff; box-shadow: 2px 0 8px rgba(0,0,0,.06); position: fixed; top: 56px; left: 0; bottom: 0; padding: 16px 0; overflow-y: auto; }
+    .menu a { display: flex; align-items: center; gap: 10px; padding: 11px 24px; color: #262626; text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
+    .menu a:hover { background: #f0f7ff; color: #1890ff; }
+    .menu a.active { background: #e6f7ff; color: #1890ff; border-left-color: #1890ff; font-weight: 500; }
+    .menu-icon { width: 18px; text-align: center; }
+    .menu-group { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+    .menu-group-title { padding: 8px 24px; font-size: 11px; color: #8c8c8c; text-transform: uppercase; letter-spacing: .5px; }
+    .main { margin-left: 200px; flex: 1; padding: 22px 28px 40px; }
+    .breadcrumb { font-size: 13px; margin-bottom: 12px; }
+    .breadcrumb a { color: #1890ff; text-decoration: none; }
+    .breadcrumb span { color: #bfbfbf; margin: 0 6px; }
+    .hero { background: linear-gradient(135deg, #1890ff, #2f54eb); border-radius: 12px; padding: 22px 26px; color: #fff; margin-bottom: 14px; position: relative; overflow: hidden; }
+    .hero::after { content: ""; position: absolute; right: -40px; top: -40px; width: 200px; height: 200px; background: rgba(255,255,255,.08); border-radius: 50%; }
+    .hero h1 { margin: 8px 0 8px; font-size: 22px; position: relative; z-index: 1; }
+    .hero .id { display: inline-block; font-size: 12px; font-family: monospace; padding: 2px 10px; background: rgba(255,255,255,.16); border-radius: 10px; position: relative; z-index: 1; }
+    .hero-meta { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 14px; position: relative; z-index: 1; }
+    .hero-meta .label { font-size: 11px; opacity: .75; }
+    .hero-meta .value { font-size: 14px; font-weight: 500; margin-top: 2px; }
+    .action-row { background: #fff; border-radius: 8px; padding: 14px 18px; margin-bottom: 14px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .action-row .hint { color: #8c8c8c; font-size: 13px; margin-right: auto; }
+    .btn { height: 34px; border: 1px solid #d9d9d9; background: #fff; color: #595959; border-radius: 6px; padding: 0 14px; font-size: 13px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; }
+    .btn:hover { border-color: #1890ff; color: #1890ff; }
+    .btn.primary { background: #1890ff; border-color: #1890ff; color: #fff; }
+    .btn.urgent { background: #ff4d4f; border-color: #ff4d4f; color: #fff; }
+    .content-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 14px; }
+    .panel { background: #fff; border-radius: 8px; padding: 18px 20px; margin-bottom: 14px; }
+    .panel h3 { margin: 0 0 12px; font-size: 15px; }
+    .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 20px; }
+    .info-item { background: #fafafa; border-radius: 6px; padding: 10px 12px; }
+    .info-label { color: #8c8c8c; font-size: 12px; }
+    .info-value { margin-top: 3px; font-size: 13px; font-weight: 500; color: #262626; }
+    .status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+    .status-badge.auditing { background: #fff7e6; color: #d46b08; }
+    .status-badge.matching, .status-badge.auto-approved { background: #e6f7ff; color: #096dd9; }
+    .status-badge.quoting { background: #fff1f0; color: #cf1322; }
+    .status-badge.in-progress { background: #f6ffed; color: #389e0d; }
+    .status-badge.completed, .status-badge.cancelled { background: #f5f5f5; color: #595959; }
+    .status-badge.rejected { background: #fff1f0; color: #cf1322; }
+    .desc-box { background: #fafafa; border-radius: 6px; padding: 12px 14px; color: #595959; font-size: 13px; line-height: 1.8; white-space: pre-wrap; }
+    .timeline { position: relative; padding-left: 18px; }
+    .timeline::before { content: ""; position: absolute; left: 5px; top: 8px; bottom: 8px; width: 2px; background: #f0f0f0; }
+    .timeline-item { position: relative; padding: 8px 0 12px 8px; font-size: 13px; }
+    .timeline-item::before { content: ""; position: absolute; left: -16px; top: 13px; width: 8px; height: 8px; border-radius: 50%; background: #1890ff; box-shadow: 0 0 0 3px #fff; }
+    .timeline-item.warn::before { background: #fa8c16; }
+    .timeline-item.ok::before { background: #52c41a; }
+    .timeline-title { color: #262626; font-weight: 500; }
+    .timeline-desc { color: #8c8c8c; font-size: 12px; margin-top: 2px; line-height: 1.6; }
+    .side-card { border: 1px solid #f0f0f0; border-radius: 8px; padding: 14px 16px; margin-top: 10px; }
+    .side-card-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .side-card-desc { color: #8c8c8c; font-size: 12px; line-height: 1.6; margin-bottom: 10px; }
+    .empty { padding: 60px 20px; text-align: center; color: #8c8c8c; background: #fff; border-radius: 8px; }
+    .toasts { position: fixed; top: 72px; right: 20px; width: min(90vw, 360px); display: grid; gap: 8px; z-index: 500; }
+    .toast { background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; padding: 10px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.1); animation: slideIn .25s ease-out; }
+    .toast.ok { border-color: #b7eb8f; background: #f6ffed; color: #389e0d; }
+    .toast.warn { border-color: #ffe58f; background: #fffbe6; color: #d48806; }
+    .toast.info { border-color: #91d5ff; background: #e6f7ff; color: #096dd9; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    @media (max-width: 1100px) { .content-grid, .info-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding: 16px; } .topbar .brand-sub { display: none; } }
+  </style>
+</head>
+<body>
+  <header class="topbar" id="topbar-shared"></header>
+  <div class="app">
+    <aside class="sidebar">
+      <nav class="menu">
+        <a href="platform-home-demander.html"><span class="menu-icon">🏠</span> 工作台</a>
+        <div class="menu-group">
+          <div class="menu-group-title">我有需求</div>
+          <a href="demand-publish.html"><span class="menu-icon">📤</span> 发布需求</a>
+          <a href="demand-list.html" class="active"><span class="menu-icon">📋</span> 我的需求</a>
+          <a href="contractor-marketplace.html"><span class="menu-icon">🏪</span> 服务广场</a>
+        </div>
+        <div class="menu-group">
+          <div class="menu-group-title">我要接单</div>
+          <a href="contractor-demand-hall.html"><span class="menu-icon">📢</span> 接单广场</a>
+          <a href="contractor-orders.html"><span class="menu-icon">📬</span> 我的接单</a>
+          <a href="contractor-profile-edit.html"><span class="menu-icon">🛍</span> 我的服务主页</a>
+        </div>
+        <div class="menu-group">
+          <div class="menu-group-title">协同</div>
+          <a href="project-space-list.html"><span class="menu-icon">🤝</span> 项目协同空间</a>
+        </div>
+        <div class="menu-group">
+          <div class="menu-group-title">账户</div>
+          <a href="wallet-overview.html"><span class="menu-icon">💰</span> 我的钱包</a>
+          <a href="account-center.html"><span class="menu-icon">⚙️</span> 账号中心</a>
+        </div>
+      </nav>
+    </aside>
+    <main class="main" id="main"></main>
+  </div>
+  <div id="toastWrap" class="toasts"></div>
+  <script src="_shared.js"></script>
+  <script>SharedHeader.mount({ activeNav: "my-demands" });</script>
+  <script>
+  (function () {
+    var $ = function (id) { return document.getElementById(id); };
+    var STATUS_CONFIG = {
+      "auditing": { label: "📋 审核中", className: "auditing", desc: "平台核定需求中（≤24h）" },
+      "matching": { label: "🔍 撮合中", className: "matching", desc: "已通过审核，承制方报价中" },
+      "auto-approved": { label: "🔍 撮合中 · 自动通过", className: "auto-approved", desc: "平台套餐 · 系统自动审核通过" },
+      "quoting": { label: "💬 待选承制方", className: "quoting", desc: "已收到报价，请尽快选定" },
+      "in-progress": { label: "🛠 进行中", className: "in-progress", desc: "已下单，承制方制作中" },
+      "completed": { label: "✅ 已完成", className: "completed", desc: "已结算" },
+      "cancelled": { label: "🚫 已取消", className: "cancelled", desc: "需求方主动撤回" },
+      "rejected": { label: "❌ 已驳回", className: "rejected", desc: "未通过平台核定，请修改后重提" }
+    };
+
+    function getDemand() {
+      var qp = new URLSearchParams(location.search);
+      var id = qp.get("demandId") || qp.get("id") || qp.get("highlight") || "";
+      var list = window.demoApp.getDemands();
+      return id ? list.find(function (d) { return d.id === id; }) : list[0];
+    }
+
+    function makeActions(d, order) {
+      var actions = ['<a class="btn" href="demand-list.html?highlight=' + d.id + '">返回列表</a>'];
+      if (d.status === "quoting") actions.push('<a class="btn urgent" href="demand-quote-comparison.html?demandId=' + d.id + '">对比报价 (' + (d.quotesCount || 0) + ')</a>');
+      if (d.projectSpaceId) {
+        var href = order ? "project-space.html?orderId=" + order.id : "project-space.html?projectSpaceId=" + d.projectSpaceId + "&demandId=" + d.id;
+        actions.push('<a class="btn primary" href="' + href + '">进入项目空间</a>');
+      }
+      if (d.status === "rejected") actions.push('<a class="btn urgent" href="demand-publish.html?edit=' + d.id + '">修改并重提</a>');
+      return actions.join("");
+    }
+
+    function render() {
+      var d = getDemand();
+      if (!d) {
+        $("main").innerHTML = '<div class="breadcrumb"><a href="demand-list.html">我的需求</a><span>/</span><span style="color:#262626">需求详情</span></div><div class="empty">未找到该需求<br><a href="demand-list.html" style="color:#1890ff;text-decoration:none">返回我的需求 →</a></div>';
+        return;
+      }
+      var ws = window.demoApp.WORKSPACES[d.workspace] || { name: d.workspaceName || d.workspace };
+      var order = window.demoApp.getOrders().find(function (o) { return o.demandId === d.id; });
+      var status = STATUS_CONFIG[d.status] || { label: d.status, className: "", desc: "" };
+      var mode = d.requirementType === "PLATFORM_SKU" ? "平台套餐" : "自定义需求";
+      var audit = d.auditMode === "auto" ? "系统自动审核" : "运营人工核定";
+      var description = d.description || [
+        "需求说明：围绕「" + d.title + "」完成内容创作与交付。",
+        "交付要求：按约定类目、预算和截止日期完成；如进入履约，版本、素材、沟通和验收会沉淀到项目空间。",
+        "验收口径：需求方确认质量、文件完整性、版权归属和交付格式后结算。"
+      ].join("\n");
+
+      $("main").innerHTML = ''
+        + '<div class="breadcrumb"><a href="platform-home-demander.html">工作台</a><span>/</span><a href="demand-list.html">我的需求</a><span>/</span><span style="color:#262626">需求详情</span></div>'
+        + '<section class="hero"><span class="id">' + d.id + '</span><h1>' + d.title + '</h1><div class="hero-meta">'
+        + '<div><div class="label">状态</div><div class="value">' + status.label + '</div></div>'
+        + '<div><div class="label">服务类目</div><div class="value">' + d.category + '</div></div>'
+        + '<div><div class="label">所属团队</div><div class="value">' + ws.name + '</div></div>'
+        + '<div><div class="label">预算</div><div class="value">' + window.fmtMoney(d.budget) + '</div></div>'
+        + '</div></section>'
+        + '<section class="action-row"><span class="hint">' + status.desc + '</span>' + makeActions(d, order) + '</section>'
+        + '<div class="content-grid">'
+        + '<div>'
+        + '<section class="panel"><h3>需求基本信息</h3><div class="info-grid">'
+        + '<div class="info-item"><div class="info-label">需求类型</div><div class="info-value">' + mode + '</div></div>'
+        + '<div class="info-item"><div class="info-label">创建时间</div><div class="info-value">' + d.createTime + '</div></div>'
+        + '<div class="info-item"><div class="info-label">期望截止</div><div class="info-value">' + d.deadline + '</div></div>'
+        + '<div class="info-item"><div class="info-label">扣款主体</div><div class="info-value">' + (d.payerLabel || "—") + '</div></div>'
+        + '<div class="info-item"><div class="info-label">报价数</div><div class="info-value">' + (d.quotesCount ? d.quotesCount + " 家" : "—") + '</div></div>'
+        + '<div class="info-item"><div class="info-label">承制方</div><div class="info-value">' + (d.contractor || (order && order.contractor) || "待选定") + '</div></div>'
+        + '</div></section>'
+        + '<section class="panel"><h3>需求详细描述</h3><div class="desc-box">' + description + '</div></section>'
+        + '<section class="panel"><h3>处理记录</h3><div class="timeline">'
+        + '<div class="timeline-item ok"><div class="timeline-title">需求已提交</div><div class="timeline-desc">' + d.createTime + ' · ' + ws.name + '</div></div>'
+        + (d.auditedAt ? '<div class="timeline-item ok"><div class="timeline-title">平台核定通过</div><div class="timeline-desc">' + d.auditedAt + ' · ' + audit + (d.auditedBy ? ' · ' + d.auditedBy : '') + '</div></div>' : '<div class="timeline-item warn"><div class="timeline-title">等待平台核定</div><div class="timeline-desc">预计 24 小时内完成，期间可补充资料。</div></div>')
+        + (d.projectSpaceId ? '<div class="timeline-item ok"><div class="timeline-title">项目空间已创建</div><div class="timeline-desc">' + d.projectSpaceId + ' · ' + (d.projectSpaceCreatedAt || d.auditedAt || d.createTime) + '</div></div>' : '')
+        + (order ? '<div class="timeline-item ok"><div class="timeline-title">订单已生成</div><div class="timeline-desc">' + order.id + ' · 承制方：' + order.contractor + ' · 金额 ' + window.fmtMoney(order.amount) + '</div></div>' : '')
+        + '</div></section>'
+        + '</div>'
+        + '<aside>'
+        + '<section class="panel"><h3>当前状态</h3><span class="status-badge ' + status.className + '">' + status.label + '</span><div style="margin-top:10px;color:#8c8c8c;font-size:13px;line-height:1.7">' + status.desc + '</div></section>'
+        + '<section class="panel"><h3>关联项目空间</h3>' + renderProjectSpaceCard(d, order) + '</section>'
+        + '<section class="panel"><h3>下一步建议</h3>' + renderNextStep(d) + '</section>'
+        + '</aside>'
+        + '</div>';
+    }
+
+    function renderProjectSpaceCard(d, order) {
+      if (!d.projectSpaceId) {
+        return '<div class="side-card"><div class="side-card-title">暂未创建</div><div class="side-card-desc">需求通过平台核定后会自动创建协同项目空间。</div></div>';
+      }
+      var href = order ? "project-space.html?orderId=" + order.id : "project-space.html?projectSpaceId=" + d.projectSpaceId + "&demandId=" + d.id;
+      return '<div class="side-card"><div class="side-card-title">' + d.projectSpaceId + '</div><div class="side-card-desc">需求、素材、沟通、报价选择和履约信息会在空间内持续沉淀。</div><a class="btn primary" href="' + href + '">进入空间详情</a></div>';
+    }
+
+    function renderNextStep(d) {
+      if (d.status === "auditing") return '<div class="side-card-desc">等待平台核定。可先准备素材包和验收口径，审核通过后系统会创建项目空间。</div>';
+      if (d.status === "matching" || d.status === "auto-approved") return '<div class="side-card-desc">等待承制方报价。项目空间可先用于沉淀需求材料，选定承制方后进入履约。</div>';
+      if (d.status === "quoting") return '<div class="side-card-desc">已有承制方报价，建议进入报价对比页完成选择并生成订单。</div>';
+      if (d.status === "in-progress") return '<div class="side-card-desc">进入项目空间查看版本交付、沟通记录和验收动作。</div>';
+      if (d.status === "completed") return '<div class="side-card-desc">需求已完成，可查看归档项目空间、钱包流水与验收记录。</div>';
+      if (d.status === "rejected") return '<div class="side-card-desc">根据驳回原因修改需求后重新提交。</div>';
+      return '<div class="side-card-desc">可返回需求列表继续处理。</div>';
+    }
+
+    render();
+  })();
+  </script>
+</body>
+</html>

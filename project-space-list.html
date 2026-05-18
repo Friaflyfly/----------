@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的协同项目空间 - 骋风天合 · 创作门户交易平台</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #262626; }
+    .topbar { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.06); z-index: 200; display: flex; align-items: center; padding: 0 20px; gap: 16px; }
+    .topbar .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 16px; color: #1890ff; text-decoration: none; min-width: 220px; }
+    .topbar .brand-sub { color: #8c8c8c; font-weight: 400; font-size: 12px; margin-left: 4px; }
+    .ws-switcher { position: relative; }
+    .ws-trigger { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid #e8e8e8; border-radius: 6px; background: #fafafa; cursor: pointer; font-size: 13px; min-width: 240px; }
+    .ws-trigger:hover { border-color: #1890ff; background: #e6f7ff; }
+    .ws-trigger .ws-name { font-weight: 500; color: #262626; flex: 1; }
+    .ws-trigger .ws-arrow { color: #8c8c8c; font-size: 10px; }
+    .ws-dropdown { display: none; position: absolute; top: calc(100% + 6px); left: 0; min-width: 320px; background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,.12); padding: 8px; z-index: 300; }
+    .ws-dropdown.open { display: block; }
+    .ws-group-label { font-size: 12px; color: #8c8c8c; padding: 6px 10px; }
+    .ws-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+    .ws-item:hover, .ws-item.active { background: #e6f7ff; }
+    .ws-item-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .ws-item-icon.personal { background: #fff7e6; color: #fa8c16; }
+    .ws-item-icon.team { background: #e6f7ff; color: #1890ff; }
+    .ws-item-icon.admin { background: #f9f0ff; color: #722ed1; }
+    .ws-item-main { flex: 1; min-width: 0; }
+    .ws-item-name { font-weight: 500; color: #262626; }
+    .ws-item-desc { font-size: 12px; color: #8c8c8c; margin-top: 2px; }
+    .ws-item-check { color: #1890ff; font-size: 14px; }
+    .identity-switch { display: flex; gap: 4px; background: #f0f0f0; border-radius: 18px; padding: 3px; flex-wrap: wrap; }
+    .identity-switch button { border: none; background: transparent; padding: 5px 10px; border-radius: 16px; font-size: 13px; color: #595959; cursor: pointer; }
+    .identity-switch button.active { background: #fff; color: #1890ff; box-shadow: 0 1px 2px rgba(0,0,0,.06); font-weight: 500; }
+    .identity-switch button[data-identity="admin"].active { color: #722ed1; }
+    .identity-switch button[data-identity="ops"].active { color: #08979c; }
+    .wallet-chip { display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: linear-gradient(135deg, #fff7e6, #fff1d6); border: 1px solid #ffd591; border-radius: 18px; cursor: pointer; font-size: 13px; color: #d46b08; text-decoration: none; }
+    .wallet-amount { font-weight: 600; font-size: 14px; }
+    .wallet-account { font-size: 11px; opacity: .85; }
+    .avatar-wrap { position: relative; margin-left: auto; }
+    .avatar-trigger { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px 8px; border-radius: 18px; }
+    .avatar-trigger:hover { background: #f5f5f5; }
+    .avatar-trigger img { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #f0f0f0; }
+    .avatar-name { font-size: 13px; color: #262626; }
+    .avatar-dropdown { display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 220px; background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,.12); padding: 8px; z-index: 300; }
+    .avatar-dropdown.open { display: block; }
+    .avatar-dropdown a { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 6px; color: #262626; text-decoration: none; font-size: 13px; }
+    .avatar-dropdown a:hover { background: #f0f7ff; color: #1890ff; }
+    .avatar-dropdown .divider { height: 1px; background: #f0f0f0; margin: 6px 4px; }
+    .app { display: flex; padding-top: 56px; min-height: 100vh; }
+    .sidebar { width: 200px; background: #fff; box-shadow: 2px 0 8px rgba(0,0,0,.06); position: fixed; top: 56px; left: 0; bottom: 0; padding: 16px 0; overflow-y: auto; }
+    .menu a { display: flex; align-items: center; gap: 10px; padding: 11px 24px; color: #262626; text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
+    .menu a:hover { background: #f0f7ff; color: #1890ff; }
+    .menu a.active { background: #e6f7ff; color: #1890ff; border-left-color: #1890ff; font-weight: 500; }
+    .menu-icon { width: 18px; text-align: center; }
+    .menu-group { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+    .menu-group-title { padding: 8px 24px; font-size: 11px; color: #8c8c8c; text-transform: uppercase; letter-spacing: .5px; }
+    .main { margin-left: 200px; flex: 1; padding: 24px 28px; }
+    .page-head { background: linear-gradient(135deg, #1890ff, #2f54eb); border-radius: 12px; padding: 24px 28px; margin-bottom: 14px; color: #fff; position: relative; overflow: hidden; }
+    .page-head::after { content: ""; position: absolute; right: -42px; top: -48px; width: 210px; height: 210px; background: rgba(255,255,255,.08); border-radius: 50%; }
+    .page-head h1 { margin: 0 0 6px; font-size: 22px; position: relative; z-index: 1; }
+    .page-head .sub { opacity: .9; font-size: 13px; position: relative; z-index: 1; }
+    .toolbar { background: #fff; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .toolbar select, .toolbar input { height: 32px; border: 1px solid #d9d9d9; border-radius: 6px; padding: 0 10px; font-size: 13px; outline: none; }
+    .toolbar input { min-width: 260px; }
+    .toolbar .right { margin-left: auto; color: #8c8c8c; font-size: 12px; }
+    .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 14px; }
+    .stat-card { background: #fff; border-radius: 10px; padding: 14px 16px; border: 1px solid #f0f0f0; }
+    .stat-label { color: #8c8c8c; font-size: 12px; }
+    .stat-value { margin-top: 4px; font-size: 22px; font-weight: 700; color: #262626; }
+    .space-table { background: #fff; border-radius: 8px; overflow: hidden; border: 1px solid #f0f0f0; }
+    .space-row { display: grid; grid-template-columns: 1.6fr 1.05fr .95fr .9fr .85fr .9fr .7fr; gap: 12px; align-items: center; padding: 14px 18px; border-bottom: 1px solid #f0f0f0; transition: background .15s; }
+    .space-row:last-child { border-bottom: none; }
+    .space-row.head { background: #fafafa; color: #8c8c8c; font-size: 12px; font-weight: 500; }
+    .space-row:not(.head):hover { background: #f0f7ff; }
+    .space-title { color: #262626; font-size: 14px; font-weight: 600; text-decoration: none; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .space-title:hover { color: #1890ff; }
+    .space-id { font-size: 12px; color: #8c8c8c; font-family: monospace; margin-top: 3px; }
+    .muted { color: #8c8c8c; font-size: 12px; margin-top: 2px; }
+    .cell-main { min-width: 0; }
+    .status { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+    .status.pending { background: #fff7e6; color: #d46b08; }
+    .status.quoting { background: #fff1f0; color: #cf1322; }
+    .status.doing { background: #e6f7ff; color: #096dd9; }
+    .status.done { background: #f6ffed; color: #389e0d; }
+    .amount { color: #1890ff; font-weight: 600; }
+    .row-actions { display: flex; gap: 6px; justify-content: flex-end; }
+    .btn-link { padding: 4px 10px; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff; color: #595959; font-size: 12px; cursor: pointer; text-decoration: none; white-space: nowrap; }
+    .btn-link:hover { border-color: #1890ff; color: #1890ff; }
+    .btn-link.primary { background: #1890ff; border-color: #1890ff; color: #fff; }
+    .btn-link.primary:hover { background: #40a9ff; border-color: #40a9ff; color: #fff; }
+    .empty { padding: 60px 20px; text-align: center; color: #8c8c8c; background: #fff; border-radius: 8px; }
+    .toasts { position: fixed; top: 72px; right: 20px; width: min(90vw, 360px); display: grid; gap: 8px; z-index: 500; }
+    .toast { background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; padding: 10px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.1); animation: slideIn .25s ease-out; }
+    .toast.ok { border-color: #b7eb8f; background: #f6ffed; color: #389e0d; }
+    .toast.warn { border-color: #ffe58f; background: #fffbe6; color: #d48806; }
+    .toast.info { border-color: #91d5ff; background: #e6f7ff; color: #096dd9; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    @media (max-width: 1100px) {
+      .stat-row { grid-template-columns: 1fr; }
+      .space-row { grid-template-columns: 1.8fr 1fr 1fr .8fr; }
+      .space-row > :nth-child(4),
+      .space-row > :nth-child(6),
+      .space-row > :nth-child(7) { display: none; }
+    }
+    @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding: 16px; } .topbar .brand-sub { display: none; } }
+  </style>
+</head>
+<body>
+  <header class="topbar" id="topbar-shared"></header>
+  <div class="app">
+    <aside class="sidebar">
+      <nav class="menu">
+        <a href="platform-home-demander.html"><span class="menu-icon">🏠</span> 工作台</a>
+        <div class="menu-group">
+          <div class="menu-group-title">我有需求</div>
+          <a href="demand-publish.html"><span class="menu-icon">📤</span> 发布需求</a>
+          <a href="demand-list.html"><span class="menu-icon">📋</span> 我的需求</a>
+          <a href="contractor-marketplace.html"><span class="menu-icon">🏪</span> 服务广场</a>
+        </div>
+        <div class="menu-group">
+          <div class="menu-group-title">我要接单</div>
+          <a href="contractor-demand-hall.html"><span class="menu-icon">📢</span> 接单广场</a>
+          <a href="contractor-orders.html"><span class="menu-icon">📬</span> 我的接单</a>
+          <a href="contractor-profile-edit.html"><span class="menu-icon">🛍</span> 我的服务主页</a>
+        </div>
+        <div class="menu-group">
+          <div class="menu-group-title">协同</div>
+          <a href="project-space-list.html" class="active"><span class="menu-icon">🤝</span> 项目协同空间</a>
+        </div>
+        <div class="menu-group">
+          <div class="menu-group-title">账户</div>
+          <a href="wallet-overview.html"><span class="menu-icon">💰</span> 我的钱包</a>
+          <a href="account-center.html"><span class="menu-icon">⚙️</span> 账号中心</a>
+        </div>
+      </nav>
+    </aside>
+    <main class="main">
+      <section class="page-head">
+        <h1>🤝 我的协同项目空间</h1>
+        <div class="sub">一个需求通过审核后会创建一个项目空间；选定承制方并生成订单后，空间进入履约详情。</div>
+      </section>
+      <section class="stat-row" id="statRow"></section>
+      <section class="toolbar">
+        <span style="font-size:13px;color:#595959">团队范围：</span>
+        <select id="scopeFilter">
+          <option value="all" selected>所有团队（我参与的）</option>
+          <option value="current">仅当前团队</option>
+        </select>
+        <span style="font-size:13px;color:#595959">阶段：</span>
+        <select id="stageFilter">
+          <option value="">全部阶段</option>
+          <option value="pending">撮合 / 报价中</option>
+          <option value="doing">履约中</option>
+          <option value="done">已完成</option>
+        </select>
+        <input id="searchInput" placeholder="搜索项目空间 / 需求名 / 需求号 / 订单号">
+        <span class="right" id="resultCount">共 0 个空间</span>
+      </section>
+      <section class="space-table" id="spaceTable">
+        <div class="space-row head">
+          <div>项目空间 / 需求</div>
+          <div>所属团队</div>
+          <div>阶段</div>
+          <div>承制方</div>
+          <div>金额</div>
+          <div>创建 / 截止</div>
+          <div style="text-align:right">操作</div>
+        </div>
+        <div id="spaceBody"></div>
+      </section>
+    </main>
+  </div>
+  <div id="toastWrap" class="toasts"></div>
+  <script src="_shared.js"></script>
+  <script>SharedHeader.mount({ activeNav: "project-space" });</script>
+  <script>
+  (function () {
+    var $ = function (id) { return document.getElementById(id); };
+    var stageFilter = "";
+    var scopeFilter = "all";
+    var searchKey = "";
+
+    var STATUS = {
+      "auto-approved": { text: "撮合中 · 自动通过", stage: "pending", cls: "pending" },
+      "matching": { text: "撮合中", stage: "pending", cls: "pending" },
+      "quoting": { text: "待选承制方", stage: "pending", cls: "quoting" },
+      "in-progress": { text: "履约中", stage: "doing", cls: "doing" },
+      "completed": { text: "已完成", stage: "done", cls: "done" }
+    };
+
+    function getSpaces() {
+      var demands = window.demoApp.getDemands().filter(function (d) { return !!d.projectSpaceId; });
+      var orders = window.demoApp.getOrders();
+      return demands.map(function (d) {
+        var order = orders.find(function (o) { return o.demandId === d.id; });
+        var status = STATUS[d.status] || { text: d.status, stage: "pending", cls: "pending" };
+        var ws = window.demoApp.WORKSPACES[d.workspace] || { name: d.workspaceName || d.workspace };
+        var href = order
+          ? "project-space.html?orderId=" + order.id
+          : "project-space.html?projectSpaceId=" + d.projectSpaceId + "&demandId=" + d.id;
+        return {
+          id: d.projectSpaceId,
+          title: d.title,
+          demandId: d.id,
+          orderId: order ? order.id : "",
+          workspace: d.workspace,
+          workspaceName: ws.name,
+          category: d.category,
+          contractor: order ? order.contractor : (d.contractor || "待选定"),
+          amount: order ? order.amount : d.budget,
+          deadline: d.deadline,
+          createdAt: d.projectSpaceCreatedAt || d.createTime,
+          status: status,
+          href: href
+        };
+      });
+    }
+
+    function renderStats(list) {
+      var cards = [
+        { label: "全部空间", value: list.length },
+        { label: "撮合 / 报价中", value: list.filter(function (x) { return x.status.stage === "pending"; }).length },
+        { label: "履约中", value: list.filter(function (x) { return x.status.stage === "doing"; }).length },
+        { label: "已完成", value: list.filter(function (x) { return x.status.stage === "done"; }).length }
+      ];
+      $("statRow").innerHTML = cards.map(function (c) {
+        return '<div class="stat-card"><div class="stat-label">' + c.label + '</div><div class="stat-value">' + c.value + '<span style="font-size:13px;color:#8c8c8c;font-weight:400;margin-left:4px">个</span></div></div>';
+      }).join("");
+    }
+
+    function render() {
+      var curWs = window.demoApp.getCurrentWorkspaceId();
+      var list = getSpaces();
+      if (scopeFilter === "current") list = list.filter(function (x) { return x.workspace === curWs; });
+      if (stageFilter) list = list.filter(function (x) { return x.status.stage === stageFilter; });
+      if (searchKey) {
+        var k = searchKey.toLowerCase();
+        list = list.filter(function (x) {
+          return [x.id, x.title, x.demandId, x.orderId, x.contractor].join(" ").toLowerCase().indexOf(k) >= 0;
+        });
+      }
+      $("resultCount").textContent = "共 " + list.length + " 个空间";
+      renderStats(scopeFilter === "current" ? getSpaces().filter(function (x) { return x.workspace === curWs; }) : getSpaces());
+      if (!list.length) {
+        $("spaceBody").innerHTML = '<div class="empty">暂无符合条件的项目空间<br><a href="demand-list.html" style="color:#1890ff;text-decoration:none">返回我的需求查看审核状态 →</a></div>';
+        return;
+      }
+      $("spaceBody").innerHTML = list.map(function (s) {
+        return '<div class="space-row">'
+          + '<div class="cell-main"><a class="space-title" href="' + s.href + '">🤝 ' + s.title + '</a><div class="space-id">' + s.id + ' · ' + s.demandId + (s.orderId ? ' · ' + s.orderId : '') + '</div><div class="muted">' + s.category + '</div></div>'
+          + '<div><div style="font-size:13px;color:#262626">' + s.workspaceName.replace("骋风天合 · ", "") + '</div></div>'
+          + '<div><span class="status ' + s.status.cls + '">' + s.status.text + '</span></div>'
+          + '<div><div style="font-size:13px;color:#262626">' + s.contractor + '</div></div>'
+          + '<div class="amount">' + window.fmtMoney(s.amount) + '</div>'
+          + '<div><div style="font-size:12px;color:#595959">创建 ' + s.createdAt + '</div><div class="muted">截止 ' + s.deadline + '</div></div>'
+          + '<div class="row-actions"><a class="btn-link primary" href="' + s.href + '">进入</a><a class="btn-link" href="demand-detail.html?demandId=' + s.demandId + '">需求</a></div>'
+          + '</div>';
+      }).join("");
+    }
+
+    $("scopeFilter").addEventListener("change", function (e) { scopeFilter = e.target.value; render(); });
+    $("stageFilter").addEventListener("change", function (e) { stageFilter = e.target.value; render(); });
+    $("searchInput").addEventListener("input", function (e) { searchKey = e.target.value.trim(); render(); });
+    window.onWorkspaceChanged = render;
+    render();
+  })();
+  </script>
+</body>
+</html>

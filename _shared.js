@@ -166,8 +166,118 @@
     contractorInbox: "demoContractorInbox",
     members: "demoMembers",
     roles: "demoRoles",
-    profileComplete: "demoProfileComplete"
+    profileComplete: "demoProfileComplete",
+    spendReviewConfig: "demoSpendReviewConfig",
+    spendApprovals:    "demoSpendApprovals",
+    spendApprovalHistory: "demoSpendApprovalHistory",
+    pointsBalance:       "demoPointsBalance",
+    pointsExchanges:     "demoPointsExchanges",
+    pointsConsumptions:  "demoPointsConsumptions"
   };
+
+  // ============================================================
+  // 积分中心：阶梯兑换包 + 个人池/团队池余额 + 收支记录
+  // ============================================================
+  // 兑换基准：¥1 = 10 积分；高档位送积分激励大额兑换
+  var POINTS_PACKAGES = [
+    { id: "pkg-starter",    name: "入门档", price: 10,   points: 100,    bonus: 0,    icon: "🌱", recommend: false, badge: "",        desc: "约 10-50 次工具调用" },
+    { id: "pkg-standard",   name: "标准档", price: 99,   points: 1100,   bonus: 100,  icon: "⭐", recommend: true,  badge: "送 10%",  desc: "约 100-500 次工具调用" },
+    { id: "pkg-pro",        name: "高级档", price: 499,  points: 6000,   bonus: 1010, icon: "🚀", recommend: false, badge: "送 20%",  desc: "约 600-3,000 次调用" },
+    { id: "pkg-enterprise", name: "企业档", price: 1999, points: 26000,  bonus: 6010, icon: "🏢", recommend: false, badge: "送 30%",  desc: "约 2,600-13,000 次 · 仅企业管理员", adminOnly: true }
+  ];
+
+  // 积分余额：按 walletKey 索引（个人 + 团队两层共用同一表）
+  var defaultPointsBalance = {
+    "personal-account-lixueqin": 350,
+    "team-budget-cf-drama":      1840,
+    "team-budget-cf-marketing":  620,
+    "team-budget-cf-ip":         0,
+    "enterprise-main-cf":        5200
+  };
+
+  // 兑换历史
+  var defaultPointsExchanges = [
+    { id: "EX-202605120902", time: "2026-05-12 09:02", walletKey: "team-budget-cf-drama",      packageId: "pkg-standard",   price: 99,   points: 1100,  operator: "昭岚" },
+    { id: "EX-202604280915", time: "2026-04-28 09:15", walletKey: "personal-account-lixueqin", packageId: "pkg-starter",    price: 10,   points: 100,   operator: "昭岚" },
+    { id: "EX-202604200800", time: "2026-04-20 08:00", walletKey: "team-budget-cf-marketing",  packageId: "pkg-pro",        price: 499,  points: 6000,  operator: "陈薇" },
+    { id: "EX-202604010900", time: "2026-04-01 09:00", walletKey: "enterprise-main-cf",        packageId: "pkg-enterprise", price: 1999, points: 26000, operator: "李总（企业管理员）" }
+  ];
+
+  // 消耗历史（AI 工具调用）
+  var defaultPointsConsumptions = [
+    { id: "C-202605131420", time: "2026-05-13 14:20", walletKey: "team-budget-cf-drama",      tool: "AI 文案生成", cost: 5,  callId: "AI-2026051301", operator: "昭岚", relatedDemand: "DM-2026042512" },
+    { id: "C-202605131358", time: "2026-05-13 13:58", walletKey: "team-budget-cf-drama",      tool: "AI 配音转写", cost: 8,  callId: "AI-2026051302", operator: "林涛", relatedDemand: "DM-2026041807" },
+    { id: "C-202605131015", time: "2026-05-13 10:15", walletKey: "team-budget-cf-drama",      tool: "AI 海报建议", cost: 3,  callId: "AI-2026051303", operator: "昭岚", relatedDemand: "DM-2026042103" },
+    { id: "C-202605120930", time: "2026-05-12 09:30", walletKey: "team-budget-cf-marketing",  tool: "AI 文案生成", cost: 5,  callId: "AI-2026051201", operator: "陈薇", relatedDemand: "DM-2026042214" },
+    { id: "C-202605120815", time: "2026-05-12 08:15", walletKey: "personal-account-lixueqin", tool: "AI 翻译",     cost: 2,  callId: "AI-2026051202", operator: "昭岚", relatedDemand: null },
+    { id: "C-202605101100", time: "2026-05-10 11:00", walletKey: "team-budget-cf-drama",      tool: "AI 剪辑建议", cost: 10, callId: "AI-2026051001", operator: "昭岚", relatedDemand: "DM-2026042512" }
+  ];
+
+  // ============================================================
+  // 消费审核（事前审批）默认数据
+  // ============================================================
+  var defaultSpendReviewConfig = {
+    enabled: true,
+    singleAmountCap: 10000,      // 单笔金额上限 ¥
+    budgetPctCap: 40,            // 团队预算占用比例上限 %
+    monthlyCapPerMember: 80000,  // 单成员月度累计上限 ¥
+    autoExpireHours: 24,         // 自动到期小时数
+    expireAction: "reject"       // 'reject' | 'remind'
+  };
+
+  var defaultSpendApprovals = [
+    {
+      id: "PA-2026051301", demandId: "DM-2026051301", title: "春节档广告片 · 50 条短视频拼盘",
+      applicant: "昭岚", applicantRole: "制作主管",
+      workspace: "cf-drama", workspaceName: "骋风天合 · 短剧制作中心",
+      amount: 48000, hitRules: ["单笔金额超 ¥10,000", "占用本团队预算 26%"],
+      submittedAt: "2026-05-13 14:32",
+      note: "春节档刚需，预算来源已和财务对齐，请尽快审批",
+      status: "pending"
+    },
+    {
+      id: "PA-2026051302", demandId: "DM-2026051302", title: "IP 海报新系列 5 套",
+      applicant: "林涛", applicantRole: "创作者",
+      workspace: "cf-drama", workspaceName: "骋风天合 · 短剧制作中心",
+      amount: 25000, hitRules: ["单笔金额超 ¥10,000"],
+      submittedAt: "2026-05-13 11:08",
+      note: "",
+      status: "pending"
+    },
+    {
+      id: "PA-2026051303", demandId: "DM-2026051303", title: "广电备案咨询服务",
+      applicant: "陈薇", applicantRole: "市场专员",
+      workspace: "cf-marketing", workspaceName: "骋风天合 · 市场宣传组",
+      amount: 12000, hitRules: ["单笔金额超 ¥10,000"],
+      submittedAt: "2026-05-12 17:45",
+      note: "外部资质办理，时间相对宽裕",
+      status: "pending"
+    }
+  ];
+
+  var defaultSpendApprovalHistory = [
+    {
+      id: "PA-2026051001", demandId: "DM-2026051001", title: "老剧重制项目 - 后期预算",
+      applicant: "昭岚", workspace: "cf-drama", workspaceName: "骋风天合 · 短剧制作中心",
+      amount: 65000, hitRules: ["单笔金额超 ¥10,000", "占用本团队预算 35%"],
+      decision: "approved", decidedBy: "李总（企业管理员）",
+      decidedAt: "2026-05-10 09:32", note: "已确认预算来源 OK，批准"
+    },
+    {
+      id: "PA-2026050802", demandId: "DM-2026050802", title: "新人编剧合作探索",
+      applicant: "林涛", workspace: "cf-drama", workspaceName: "骋风天合 · 短剧制作中心",
+      amount: 18000, hitRules: ["单笔金额超 ¥10,000"],
+      decision: "rejected", decidedBy: "李总（企业管理员）",
+      decidedAt: "2026-05-08 16:20", note: "建议先做小规模试点（< ¥10,000）验证后再扩大投入"
+    },
+    {
+      id: "PA-2026050501", demandId: "DM-2026050501", title: "产品发布会主视觉",
+      applicant: "陈薇", workspace: "cf-marketing", workspaceName: "骋风天合 · 市场宣传组",
+      amount: 32000, hitRules: ["单笔金额超 ¥10,000"],
+      decision: "approved", decidedBy: "李总（企业管理员）",
+      decidedAt: "2026-05-05 10:15", note: ""
+    }
+  ];
 
   // 默认资金流水（钱包页 / 项目空间结算分账演示用）
   var defaultFlows = [
@@ -240,6 +350,12 @@
     if (!localStorage.getItem(KEY.members))  writeJson(KEY.members,  defaultMembers);
     if (!localStorage.getItem(KEY.roles))    writeJson(KEY.roles,    defaultRoles);
     if (!localStorage.getItem(KEY.profileComplete)) localStorage.setItem(KEY.profileComplete, "1");
+    if (!localStorage.getItem(KEY.spendReviewConfig))    writeJson(KEY.spendReviewConfig,    defaultSpendReviewConfig);
+    if (!localStorage.getItem(KEY.spendApprovals))       writeJson(KEY.spendApprovals,       defaultSpendApprovals);
+    if (!localStorage.getItem(KEY.spendApprovalHistory)) writeJson(KEY.spendApprovalHistory, defaultSpendApprovalHistory);
+    if (!localStorage.getItem(KEY.pointsBalance))        writeJson(KEY.pointsBalance,        defaultPointsBalance);
+    if (!localStorage.getItem(KEY.pointsExchanges))      writeJson(KEY.pointsExchanges,      defaultPointsExchanges);
+    if (!localStorage.getItem(KEY.pointsConsumptions))   writeJson(KEY.pointsConsumptions,   defaultPointsConsumptions);
   }
 
   // ============================================================
@@ -301,6 +417,138 @@
     getMembers: function () { return readJson(KEY.members, defaultMembers); },
     setMembers: function (v) { writeJson(KEY.members, v); },
     getRoles:   function () { return readJson(KEY.roles, defaultRoles); },
+
+    // ---- 积分中心 ----
+    POINTS_PACKAGES: POINTS_PACKAGES,
+    getPointsPackages: function () { return POINTS_PACKAGES.slice(); },
+    getPointsBalances: function () { return readJson(KEY.pointsBalance, defaultPointsBalance); },
+    getPointsBalance: function (walletKey) {
+      var m = readJson(KEY.pointsBalance, defaultPointsBalance);
+      return m[walletKey] || 0;
+    },
+    setPointsBalance: function (walletKey, value) {
+      var m = readJson(KEY.pointsBalance, defaultPointsBalance);
+      m[walletKey] = Math.max(0, value);
+      writeJson(KEY.pointsBalance, m);
+    },
+    getPointsExchanges:    function () { return readJson(KEY.pointsExchanges, defaultPointsExchanges); },
+    getPointsConsumptions: function () { return readJson(KEY.pointsConsumptions, defaultPointsConsumptions); },
+
+    // 兑换：从指定钱包余额扣除现金，对应账户加积分
+    exchangePoints: function (walletKey, packageId, operator) {
+      var pkg = POINTS_PACKAGES.find(function (p) { return p.id === packageId; });
+      if (!pkg) return { ok: false, error: "套餐不存在" };
+      var wallets = readJson(KEY.wallets, defaultWallets);
+      var w = wallets[walletKey];
+      if (!w) return { ok: false, error: "钱包不存在" };
+      if (w.balance < pkg.price) return { ok: false, error: "账户余额不足，请先充值" };
+      // 扣余额
+      w.balance -= pkg.price;
+      writeJson(KEY.wallets, wallets);
+      // 加积分
+      var balances = readJson(KEY.pointsBalance, defaultPointsBalance);
+      balances[walletKey] = (balances[walletKey] || 0) + pkg.points;
+      writeJson(KEY.pointsBalance, balances);
+      // 记一笔兑换历史
+      var exchanges = readJson(KEY.pointsExchanges, defaultPointsExchanges);
+      var now = new Date();
+      var pad = function (n) { return n < 10 ? "0" + n : n; };
+      var ts = now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(now.getDate())
+        + " " + pad(now.getHours()) + ":" + pad(now.getMinutes());
+      exchanges.unshift({
+        id: "EX-" + now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate())
+          + pad(now.getHours()) + pad(now.getMinutes()),
+        time: ts, walletKey: walletKey, packageId: pkg.id,
+        price: pkg.price, points: pkg.points, operator: operator || "昭岚"
+      });
+      writeJson(KEY.pointsExchanges, exchanges);
+      // 同时写一笔资金流水（让钱包·收支记录里看得到）
+      var flows = readJson(KEY.flows, defaultFlows);
+      flows.unshift({
+        id: "F-EX-" + Date.now(),
+        time: ts, type: "withdraw",
+        desc: "兑换积分 · " + pkg.name + "（+" + pkg.points + " 积分）",
+        account: walletKey, amount: -pkg.price,
+        operator: operator || "昭岚"
+      });
+      writeJson(KEY.flows, flows);
+      return { ok: true, newPoints: balances[walletKey], newBalance: w.balance };
+    },
+
+    // 消耗：扣积分 + 写消耗记录
+    consumePoints: function (walletKey, tool, cost, operator, relatedDemand) {
+      var balances = readJson(KEY.pointsBalance, defaultPointsBalance);
+      var cur = balances[walletKey] || 0;
+      if (cur < cost) return { ok: false, error: "积分不足", current: cur, need: cost };
+      balances[walletKey] = cur - cost;
+      writeJson(KEY.pointsBalance, balances);
+      var consumptions = readJson(KEY.pointsConsumptions, defaultPointsConsumptions);
+      var now = new Date();
+      var pad = function (n) { return n < 10 ? "0" + n : n; };
+      var ts = now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(now.getDate())
+        + " " + pad(now.getHours()) + ":" + pad(now.getMinutes());
+      var seq = pad(now.getHours()) + pad(now.getMinutes());
+      consumptions.unshift({
+        id: "C-" + now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate()) + seq,
+        time: ts, walletKey: walletKey, tool: tool, cost: cost,
+        callId: "AI-" + Date.now(), operator: operator || "昭岚",
+        relatedDemand: relatedDemand || null
+      });
+      writeJson(KEY.pointsConsumptions, consumptions);
+      return { ok: true, newPoints: balances[walletKey] };
+    },
+
+    // ---- 消费审核（事前审批） ----
+    getSpendReviewConfig: function () { return readJson(KEY.spendReviewConfig, defaultSpendReviewConfig); },
+    setSpendReviewConfig: function (v) { writeJson(KEY.spendReviewConfig, v); },
+    getSpendApprovals:    function () { return readJson(KEY.spendApprovals, defaultSpendApprovals); },
+    setSpendApprovals:    function (v) { writeJson(KEY.spendApprovals, v); },
+    addSpendApproval:     function (p) {
+      var l = readJson(KEY.spendApprovals, defaultSpendApprovals);
+      l.unshift(p);
+      writeJson(KEY.spendApprovals, l);
+    },
+    getSpendApprovalHistory: function () { return readJson(KEY.spendApprovalHistory, defaultSpendApprovalHistory); },
+    setSpendApprovalHistory: function (v) { writeJson(KEY.spendApprovalHistory, v); },
+    decideSpendApproval: function (id, decision, decidedBy, note) {
+      // decision: 'approved' | 'rejected'
+      var pending = readJson(KEY.spendApprovals, defaultSpendApprovals);
+      var idx = pending.findIndex(function (x) { return x.id === id; });
+      if (idx < 0) return false;
+      var item = pending[idx];
+      pending.splice(idx, 1);
+      writeJson(KEY.spendApprovals, pending);
+      var history = readJson(KEY.spendApprovalHistory, defaultSpendApprovalHistory);
+      history.unshift({
+        id: item.id, demandId: item.demandId, title: item.title,
+        applicant: item.applicant, workspace: item.workspace, workspaceName: item.workspaceName,
+        amount: item.amount, hitRules: item.hitRules,
+        decision: decision, decidedBy: decidedBy || "李总（企业管理员）",
+        decidedAt: new Date().toISOString().slice(0, 16).replace("T", " "),
+        note: note || ""
+      });
+      writeJson(KEY.spendApprovalHistory, history);
+      return true;
+    },
+    // 判定一笔下单金额是否会触发审批
+    evaluateSpendReview: function (amount, walletKey, applicant) {
+      var cfg = readJson(KEY.spendReviewConfig, defaultSpendReviewConfig);
+      if (!cfg.enabled) return { triggered: false, hitRules: [] };
+      var hits = [];
+      if (cfg.singleAmountCap > 0 && amount > cfg.singleAmountCap) {
+        hits.push("单笔金额超 ¥" + cfg.singleAmountCap.toLocaleString());
+      }
+      var wallets = readJson(KEY.wallets, defaultWallets);
+      var w = wallets[walletKey];
+      if (w && w.allocated && cfg.budgetPctCap > 0) {
+        var pct = (amount / w.allocated) * 100;
+        if (pct > cfg.budgetPctCap) {
+          hits.push("占用本团队预算 " + pct.toFixed(0) + "%（超 " + cfg.budgetPctCap + "%）");
+        }
+      }
+      // monthlyCapPerMember 真实实现需汇总该成员本月所有订单，这里 mock 留为占位规则
+      return { triggered: hits.length > 0, hitRules: hits };
+    },
 
     isProfileComplete: function () { return localStorage.getItem(KEY.profileComplete) === "1"; },
     setProfileComplete: function (v) { localStorage.setItem(KEY.profileComplete, v ? "1" : "0"); },

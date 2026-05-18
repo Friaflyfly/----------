@@ -223,7 +223,7 @@
         </div>
         <div class="menu-group">
           <div class="menu-group-title">协同</div>
-          <a href="project-space.html"><span class="menu-icon">🤝</span> 项目协同空间</a>
+          <a href="project-space-list.html"><span class="menu-icon">🤝</span> 项目协同空间</a>
         </div>
         <div class="menu-group">
           <div class="menu-group-title">账户</div>
@@ -405,15 +405,10 @@
             actions.push('<button class="btn-link disabled" title="项目空间正在创建中" onclick="window.demoToast(\'项目空间正在创建中，请稍后刷新\', \'info\')">项目空间创建中…</button>');
           }
         }
+        actions.push('<a class="btn-link" href="demand-detail.html?demandId=' + d.id + '">详情</a>');
         // 状态相关操作
         if (d.status === "quoting") {
           actions.push('<a class="btn-link urgent" href="demand-quote-comparison.html?demandId=' + d.id + '">对比报价 (' + (d.quotesCount || 0) + ')</a>');
-        } else if (d.status === "matching") {
-          actions.push('<button class="btn-link" onclick="window.demoToast(\'承制方报价中，请耐心等待\', \'info\')">详情</button>');
-        } else if (d.status === "auto-approved") {
-          actions.push('<button class="btn-link" onclick="window.demoToast(\'平台套餐 · 系统已自动审核通过；承制方报价中\', \'info\')">详情</button>');
-        } else if (d.status === "auditing") {
-          actions.push('<button class="btn-link" onclick="window.demoToast(\'平台正在核定需求（自定义模式约 2 小时）\', \'info\')">详情</button>');
         } else if (d.status === "rejected") {
           actions.push('<a class="btn-link urgent" href="demand-publish.html">修改并重提</a>');
         } else if (d.status === "cancelled" || d.status === "completed") {
@@ -423,7 +418,7 @@
         const quoteCell = d.quotesCount > 0 ? '<span class="quotes-count ' + (d.status === "quoting" ? "active" : "") + '">' + d.quotesCount + ' 家</span>' : '<span style="color:#bfbfbf">—</span>';
         const contractor = d.contractor ? '<div style="font-size:12px;color:#1890ff;margin-top:2px">承制方：' + d.contractor + '</div>' : '';
         return '<div class="list-row ' + (isHighlight ? "highlight" : "") + '">'
-          + '<div><div class="demand-title">' + d.title + '</div><div class="demand-id">' + d.id + ' · ' + d.createTime + '</div>' + contractor + '</div>'
+          + '<div><a class="demand-title" href="demand-detail.html?demandId=' + d.id + '" style="text-decoration:none">' + d.title + '</a><div class="demand-id">' + d.id + ' · ' + d.createTime + '</div>' + contractor + '</div>'
           + '<div style="font-size:13px;color:#595959">' + d.category + '</div>'
           + '<div><span class="' + wsClass + '">' + ws.name + '</span><div style="font-size:11px;color:#8c8c8c;margin-top:2px">扣款：' + (d.payerLabel || "—") + '</div></div>'
           + '<div>' + badge + '<div style="font-size:11px;color:#8c8c8c;margin-top:2px">' + status.desc + '</div></div>'

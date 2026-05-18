@@ -37,6 +37,211 @@
     .btn { height: 34px; border: 1px solid #d9d9d9; background: #fff; border-radius: 6px; padding: 0 16px; font-size: 13px; color: #595959; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
     .btn:hover { border-color: #91d5ff; color: #1890ff; }
     .btn.primary { background: #722ed1; border-color: #722ed1; color: #fff; }
+
+    /* ==== Tab 4 消费审核 ==== */
+    .tab-pending-badge {
+      display: inline-block; margin-left: 6px;
+      min-width: 18px; height: 18px; padding: 0 5px;
+      background: #ff4d4f; color: #fff;
+      border-radius: 9px; font-size: 11px; font-weight: 600;
+      line-height: 18px; text-align: center;
+      vertical-align: middle;
+    }
+    .tab-pending-badge.zero { background: #d9d9d9; }
+
+    .sr-status-strip {
+      flex: 1; min-width: 0; padding: 8px 14px;
+      background: #fafafa; border: 1px solid #f0f0f0; border-radius: 6px;
+      font-size: 12.5px; color: #595959; line-height: 1.5;
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .sr-status-strip .sr-status-dot {
+      display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+    }
+    .sr-status-strip .sr-status-dot.on  { background: #52c41a; box-shadow: 0 0 0 3px rgba(82,196,26,.15); }
+    .sr-status-strip .sr-status-dot.off { background: #d9d9d9; }
+    .sr-status-strip strong { color: #262626; }
+    .sr-status-strip .sr-rule-chip {
+      display: inline-block; padding: 1px 8px;
+      background: #fff; border: 1px solid #e8e8e8; border-radius: 10px;
+      font-size: 11.5px; color: #595959;
+    }
+
+    .sr-subtabs {
+      display: flex; gap: 4px; padding: 4px;
+      background: #fff; border-radius: 8px; margin-bottom: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.04); width: fit-content;
+    }
+    .sr-subtabs button {
+      border: none; background: transparent; cursor: pointer;
+      padding: 8px 16px; border-radius: 6px;
+      font-size: 13.5px; color: #595959; font-weight: 500;
+      display: inline-flex; align-items: center; gap: 4px;
+    }
+    .sr-subtabs button:hover { background: #f5f5f5; color: #722ed1; }
+    .sr-subtabs button.active { background: #f9f0ff; color: #722ed1; font-weight: 600; }
+
+    .sr-list-card {
+      background: #fff; border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.04);
+      padding: 4px 0;
+      overflow: hidden;
+    }
+    .sr-subpanel { display: none; }
+    .sr-subpanel.active { display: block; }
+
+    /* ==== 待审批表格 ==== */
+    .sr-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .sr-table thead th {
+      text-align: left; padding: 12px 14px;
+      background: #fafafa; color: #595959; font-weight: 500;
+      font-size: 12px; border-bottom: 1px solid #f0f0f0;
+      letter-spacing: .3px;
+    }
+    .sr-table tbody td {
+      padding: 14px 14px; border-bottom: 1px solid #f5f5f5;
+      vertical-align: middle;
+    }
+    .sr-table tbody tr:last-child td { border-bottom: none; }
+    .sr-table tbody tr:hover { background: #fafafa; }
+    .sr-cell-title { font-size: 13.5px; font-weight: 600; color: #262626; }
+    .sr-cell-sub { font-size: 11.5px; color: #8c8c8c; margin-top: 2px; }
+    .sr-cell-note {
+      font-size: 11.5px; color: #595959; margin-top: 6px;
+      padding: 4px 8px; background: #fafafa; border-left: 2px solid #d9d9d9;
+      border-radius: 0 4px 4px 0;
+      max-width: 380px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .sr-cell-rules { display: flex; gap: 4px; flex-wrap: wrap; }
+    .sr-amount-cell { text-align: right; font-weight: 600; color: #d46b08; white-space: nowrap; }
+    .sr-time-cell { color: #595959; white-space: nowrap; }
+    .sr-actions-cell { text-align: right; white-space: nowrap; }
+    .sr-actions-cell .sr-btn-pass,
+    .sr-actions-cell .sr-btn-reject {
+      padding: 4px 12px; font-size: 12.5px; margin-left: 4px;
+    }
+    @media (max-width: 1100px) {
+      .sr-table { font-size: 12.5px; }
+      .sr-table thead th, .sr-table tbody td { padding: 10px 8px; }
+      .sr-cell-note { max-width: 220px; }
+    }
+
+    .sr-count {
+      display: inline-block; padding: 1px 8px;
+      background: #f0f5ff; color: #1890ff;
+      border-radius: 10px; font-size: 11px; font-weight: 500;
+    }
+    .sr-subtabs button.active .sr-count {
+      background: #722ed1; color: #fff;
+    }
+
+    .sr-switch {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; color: #262626; cursor: pointer; white-space: nowrap;
+    }
+    .sr-switch input { width: 16px; height: 16px; accent-color: #722ed1; }
+    .sr-rules { display: flex; flex-direction: column; gap: 10px; }
+    .sr-rule {
+      display: grid; grid-template-columns: 200px 240px 1fr;
+      align-items: center; gap: 12px; padding: 8px 0;
+      border-bottom: 1px dashed #f5f5f5;
+    }
+    .sr-rule:last-child { border-bottom: none; }
+    .sr-rule-label { font-size: 13px; color: #262626; }
+    .sr-rule-input { font-size: 13px; color: #262626; }
+    .sr-rule-input input[type=number] {
+      width: 100px; padding: 5px 8px; border: 1px solid #d9d9d9;
+      border-radius: 4px; font-size: 13px;
+    }
+    .sr-rule-input input[type=number]:focus { border-color: #722ed1; outline: none; }
+    .sr-rule.sr-expire .sr-rule-input { display: flex; gap: 16px; }
+    .sr-rule.sr-expire .sr-rule-input label {
+      display: inline-flex; align-items: center; gap: 4px; cursor: pointer;
+    }
+    .sr-rule-hint { font-size: 11px; color: #8c8c8c; }
+
+    .sr-item {
+      display: grid; grid-template-columns: 1fr 220px;
+      gap: 14px; padding: 14px 0;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    .sr-item:last-child { border-bottom: none; }
+    .sr-item-main { min-width: 0; }
+    .sr-item-title { font-size: 14px; font-weight: 600; color: #262626; margin-bottom: 6px; }
+    .sr-item-title .sr-id {
+      font-size: 11px; color: #8c8c8c; font-weight: 400; margin-left: 8px;
+    }
+    .sr-item-meta {
+      display: flex; gap: 12px; flex-wrap: wrap;
+      font-size: 12px; color: #595959; margin-bottom: 8px;
+    }
+    .sr-item-meta .sr-meta-k { color: #8c8c8c; }
+    .sr-item-amount { font-weight: 600; color: #d46b08; font-size: 13px; }
+    .sr-item-rules {
+      display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px;
+    }
+    .sr-rule-tag {
+      display: inline-block; padding: 2px 8px;
+      background: #fff7e6; color: #d46b08;
+      border: 1px solid #ffe7ba; border-radius: 10px;
+      font-size: 11px;
+    }
+    .sr-item-note {
+      font-size: 12px; color: #595959; background: #fafafa;
+      border-left: 2px solid #d9d9d9; padding: 6px 10px; margin-top: 6px;
+    }
+    .sr-item-actions {
+      display: flex; gap: 8px; align-items: flex-start; justify-content: flex-end;
+    }
+    .sr-btn-pass {
+      padding: 6px 14px; background: #52c41a; border: 1px solid #52c41a;
+      color: #fff; border-radius: 6px; cursor: pointer; font-size: 13px;
+    }
+    .sr-btn-pass:hover { background: #389e0d; }
+    .sr-btn-reject {
+      padding: 6px 14px; background: #fff; border: 1px solid #ff4d4f;
+      color: #ff4d4f; border-radius: 6px; cursor: pointer; font-size: 13px;
+    }
+    .sr-btn-reject:hover { background: #fff1f0; }
+
+    .sr-history-item {
+      display: grid; grid-template-columns: 1fr 110px;
+      gap: 14px; padding: 12px 0;
+      border-bottom: 1px solid #f5f5f5;
+      align-items: center;
+    }
+    .sr-history-item:last-child { border-bottom: none; }
+    .sr-decision-tag {
+      display: inline-block; padding: 2px 10px;
+      border-radius: 10px; font-size: 11px; font-weight: 500;
+      white-space: nowrap;
+    }
+    .sr-decision-tag.approved { background: #f6ffed; color: #389e0d; }
+    .sr-decision-tag.rejected { background: #fff1f0; color: #cf1322; }
+
+    .sr-empty {
+      text-align: center; padding: 32px 16px; color: #8c8c8c; font-size: 13px;
+    }
+    .sr-empty .sr-empty-icon { font-size: 32px; opacity: .35; margin-bottom: 6px; }
+
+    @media (max-width: 900px) {
+      .sr-rule { grid-template-columns: 1fr; }
+      .sr-item { grid-template-columns: 1fr; }
+      .sr-item-actions { justify-content: flex-start; }
+      .sr-history-item { grid-template-columns: 1fr; }
+    }
+
+    /* 占位徽章：标记尚未研发的功能入口 */
+    .badge-todo {
+      display: inline-block; margin-left: 4px;
+      padding: 1px 6px; background: #f5f5f5; color: #8c8c8c;
+      border: 1px solid #e0e0e0; border-radius: 10px;
+      font-size: 10px; font-weight: 500; line-height: 1.4;
+      vertical-align: middle;
+    }
+    .badge-todo.plan { background: #f9f0ff; color: #722ed1; border-color: #d3adf7; }
+    button:has(.badge-todo), a:has(.badge-todo) { opacity: .92; }
     .btn.primary:hover { background: #9254de; border-color: #9254de; }
     .btn.blue { background: #1890ff; border-color: #1890ff; color: #fff; }
     .btn.blue:hover { background: #40a9ff; }
@@ -146,13 +351,14 @@
         <button class="tab-btn" onclick="switchTab(1)">🏢 工作空间</button>
         <button class="tab-btn" onclick="switchTab(2)">🔑 角色与权限</button>
         <button class="tab-btn" onclick="switchTab(3)">💰 资金与预算</button>
+        <button class="tab-btn" onclick="switchTab(4)">🛡 消费审核<span id="pendingApprovalBadge" class="tab-pending-badge">0</span></button>
       </div>
 
       <!-- Tab 0: 成员管理 -->
       <div class="tab-panel active" id="panel0">
         <div class="toolbar">
           <button class="btn primary" onclick="openModal('inviteModal')">+ 邀请成员</button>
-          <button class="btn" onclick="toast('批量导入功能下版本补齐', 'info')">📥 批量导入</button>
+          <button class="btn" onclick="toast('批量导入功能下版本补齐', 'info')">📥 批量导入<span class="badge-todo">待研发</span></button>
           <input class="search" placeholder="搜索姓名 / 邮箱 / 角色" id="memberSearch" oninput="renderMembers()">
         </div>
         <table>
@@ -173,7 +379,7 @@
       <!-- Tab 2: 角色与权限 -->
       <div class="tab-panel" id="panel2">
         <div class="toolbar">
-          <button class="btn primary" onclick="toast('自定义角色编辑功能下版本补齐', 'info')">+ 新建角色</button>
+          <button class="btn primary" onclick="toast('自定义角色编辑功能下版本补齐', 'info')">+ 新建角色<span class="badge-todo" style="background:rgba(255,255,255,.25);color:#fff;border-color:rgba(255,255,255,.4)">待研发</span></button>
           <span style="font-size:12px;color:#8c8c8c">角色定义操作权限，分配给成员后生效</span>
         </div>
         <table>
@@ -184,12 +390,49 @@
 
       <!-- Tab 3: 资金与预算 -->
       <div class="tab-panel" id="panel3">
+        <div style="background:#f0f5ff;border-left:3px solid #1890ff;border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12.5px;color:#262626;line-height:1.7">
+          <strong style="color:#1890ff">📊 全企业资金鸟瞰 · 治理视角</strong><br>
+          此处为<strong>企业级治理</strong>：预算分配、对公充值审核、开票汇总。<strong>日常的充值 / 提现 / 流水 / 个人发票</strong>请前往
+          <a href="wallet-overview.html" style="color:#1890ff;font-weight:500">我的钱包 →</a>。
+        </div>
         <div class="toolbar">
           <button class="btn blue" onclick="openModal('allocModal')">💸 划拨预算</button>
-          <button class="btn" onclick="toast('对公充值入口：线下转账后平台财务审核到账', 'info')">📤 企业充值</button>
-          <button class="btn" onclick="toast('开票管理功能下版本补齐', 'info')">🧾 开票管理</button>
+          <button class="btn" onclick="toast('对公转账后由财务上传凭证，此处用于审核到账（下版本研发）', 'info')">📥 充值审核<span class="badge-todo">待研发</span></button>
+          <button class="btn" onclick="switchTab(4)">🛡 消费审核</button>
+          <button class="btn" onclick="toast('企业级开票汇总：销售 / 采购发票汇总报表（下版本研发）', 'info')">🧾 开票汇总<span class="badge-todo">待研发</span></button>
+          <span style="margin-left:auto;font-size:12px;color:#8c8c8c">
+            想看具体流水？
+            <a href="wallet-overview.html#flows" style="color:#1890ff;text-decoration:none">→ 钱包·收支记录</a>
+          </span>
         </div>
         <div id="fundRows"></div>
+      </div>
+
+      <!-- Tab 4: 消费审核 -->
+      <div class="tab-panel" id="panel4">
+        <div style="background:#f9f0ff;border-left:3px solid #722ed1;border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12.5px;color:#262626;line-height:1.7">
+          <strong style="color:#722ed1">🛡 事前审批管控</strong><br>
+          成员发起大额订单或超出团队预算时，订单进入<strong>"审批中"</strong>状态，<strong>不锁资、不扣款</strong>。管理员审批通过后才进入正常下单流程；驳回后订单退回草稿，附驳回理由通知申请人。
+        </div>
+
+        <!-- 工具栏：当前规则摘要 + 配置按钮 + 模拟触发按钮 -->
+        <div class="toolbar">
+          <div class="sr-status-strip" id="srStatusStrip">加载配置中…</div>
+          <button class="btn primary" onclick="openSpendConfigModal()">⚙️ 审核配置</button>
+          <button class="btn" onclick="simulateNewPending()" title="模拟一笔新触发审批的订单进入待审批队列">+ 模拟新触发</button>
+        </div>
+
+        <!-- 子签：待审批 / 审核记录 -->
+        <div class="sr-subtabs">
+          <button data-subtab="pending" class="active" onclick="switchSrSubtab('pending')">⏳ 待审批 <span class="sr-count" id="srPendingCount">0</span></button>
+          <button data-subtab="history" onclick="switchSrSubtab('history')">📜 审核记录 <span class="sr-count" id="srHistoryCount">0</span></button>
+        </div>
+
+        <!-- 列表区（按子签切换） -->
+        <div class="sr-list-card">
+          <div id="srPendingList" class="sr-subpanel active"></div>
+          <div id="srHistoryList" class="sr-subpanel"></div>
+        </div>
       </div>
     </main>
   </div>
@@ -266,6 +509,60 @@
       <div class="modal-foot">
         <button class="btn" onclick="closeModal('allocModal')">取消</button>
         <button class="btn blue" onclick="doAllocate()">确认划拨</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 消费审核配置 Modal -->
+  <div class="modal-mask" id="srConfigModal">
+    <div class="modal" style="max-width:620px">
+      <div class="modal-head">
+        <h3>⚙️ 消费审核配置</h3>
+        <button class="modal-close" onclick="closeModal('srConfigModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div style="padding:10px 12px;background:#f9f0ff;border-radius:6px;font-size:12px;color:#722ed1;margin-bottom:14px;line-height:1.7">
+          满足任意条件即触发审批。保存后<strong>立即生效</strong>，不影响存量审批单。
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;margin-bottom:10px;border-bottom:1px solid #f0f0f0">
+          <div>
+            <div style="font-size:14px;font-weight:600">启用消费审核</div>
+            <div style="font-size:12px;color:#8c8c8c;margin-top:2px">关闭后所有订单不再走审批，直接进入支付流程</div>
+          </div>
+          <label class="sr-switch">
+            <input type="checkbox" id="srEnabledSwitch">
+            <span style="font-size:13px;color:#722ed1;font-weight:500">启用</span>
+          </label>
+        </div>
+        <div class="sr-rules" id="srRules">
+          <label class="sr-rule">
+            <span class="sr-rule-label">单笔金额超过</span>
+            <span class="sr-rule-input">¥ <input type="number" id="srSingleAmount" min="0" step="500"></span>
+            <span class="sr-rule-hint">建议 ¥5,000 ~ ¥20,000</span>
+          </label>
+          <label class="sr-rule">
+            <span class="sr-rule-label">占用本团队预算超过</span>
+            <span class="sr-rule-input"><input type="number" id="srBudgetPct" min="0" max="100" step="5"> %</span>
+            <span class="sr-rule-hint">订单金额 ÷ 团队季度预算</span>
+          </label>
+          <label class="sr-rule">
+            <span class="sr-rule-label">单成员本月累计超过</span>
+            <span class="sr-rule-input">¥ <input type="number" id="srMonthlyCap" min="0" step="5000"></span>
+            <span class="sr-rule-hint">含已审批通过 + 审批中</span>
+          </label>
+          <div class="sr-rule sr-expire">
+            <span class="sr-rule-label">审批超时（24h）后</span>
+            <span class="sr-rule-input">
+              <label><input type="radio" name="srExpire" value="reject"> 自动驳回</label>
+              <label><input type="radio" name="srExpire" value="remind"> 仅催办，不自动处理</label>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="resetSpendReviewConfig()">恢复默认</button>
+        <button class="btn" onclick="closeModal('srConfigModal')">取消</button>
+        <button class="btn primary" onclick="saveSpendReviewConfig(); closeModal('srConfigModal')">保存配置</button>
       </div>
     </div>
   </div>
@@ -379,7 +676,7 @@
           +   (ws.budgetMissing ? '<div class="ws-meta" style="color:#fa8c16">⚠️ 未配置独立预算，下单回退企业主账户</div>' : '')
           + '</div>'
           + '<div class="ws-actions">'
-          +   '<button class="btn" style="height:28px;font-size:12px" onclick="toast(\'空间设置编辑功能下版本补齐\', \'info\')">设置</button>'
+          +   '<button class="btn" style="height:28px;font-size:12px" onclick="toast(\'空间设置编辑功能下版本补齐\', \'info\')">设置<span class="badge-todo">待研发</span></button>'
           +   (ws.budgetMissing ? '<button class="btn blue" style="height:28px;font-size:12px" onclick="openModal(\'allocModal\')">配置预算</button>' : '')
           + '</div>'
           + '</div>';
@@ -397,7 +694,7 @@
           + '<td><strong>' + r.name + '</strong></td>'
           + '<td><div class="perm-grid">' + permsHtml + '</div></td>'
           + '<td>' + cnt + ' 人</td>'
-          + '<td><button class="btn" style="height:28px;font-size:12px" onclick="toast(\'角色编辑功能下版本补齐\', \'info\')">编辑</button></td>'
+          + '<td><button class="btn" style="height:28px;font-size:12px" onclick="toast(\'角色编辑功能下版本补齐\', \'info\')">编辑<span class="badge-todo">待研发</span></button></td>'
           + '</tr>';
       });
       body.innerHTML = html;
@@ -417,14 +714,17 @@
       accounts.forEach(function (a) {
         var w = wallets[a.key];
         if (!w) return;
+        // 跳到钱包·收支记录并按该账户过滤
+        var flowLink = 'wallet-overview.html#flows';
         html += '<div class="fund-row">'
           + '<div><div class="fund-name">' + a.icon + ' ' + w.name + '</div><div class="fund-sub">' + w.type + '</div></div>'
           + '<div class="fund-amount' + (a.type === 'main' ? ' main' : '') + '">' + window.fmtMoney(w.balance) + '</div>'
           + '<div>' + window.fmtMoney(w.lockedAmount || 0) + '</div>'
           + '<div>' + (w.allocated ? window.fmtMoney(w.allocated) : '-') + '</div>'
-          + '<div>'
+          + '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">'
           + (a.type === 'team' ? '<button class="btn blue" style="height:28px;font-size:12px" onclick="openModal(\'allocModal\')">追加</button>' : '')
           + (a.type === 'main' ? '<button class="btn" style="height:28px;font-size:12px" onclick="toast(\'充值流程：线下对公转账 → 财务审核 → 到账\', \'info\')">充值</button>' : '')
+          + '<a href="' + flowLink + '" style="font-size:11px;color:#1890ff;text-decoration:none;white-space:nowrap">查看流水 →</a>'
           + '</div></div>';
       });
       container.innerHTML = html;
@@ -466,6 +766,235 @@
     renderWorkspaces();
     renderRoles();
     renderFunds();
+
+    // ============================================================
+    // 消费审核（Tab 4）
+    // ============================================================
+    function renderSpendReviewConfig() {
+      var cfg = window.demoApp.getSpendReviewConfig();
+      document.getElementById('srEnabledSwitch').checked = !!cfg.enabled;
+      document.getElementById('srSingleAmount').value = cfg.singleAmountCap;
+      document.getElementById('srBudgetPct').value    = cfg.budgetPctCap;
+      document.getElementById('srMonthlyCap').value   = cfg.monthlyCapPerMember;
+      var expireRadios = document.querySelectorAll('input[name="srExpire"]');
+      expireRadios.forEach(function (r) { r.checked = (r.value === cfg.expireAction); });
+      // 同步页面顶部工具栏的当前规则摘要
+      renderSpendStatusStrip(cfg);
+    }
+
+    function renderSpendStatusStrip(cfg) {
+      cfg = cfg || window.demoApp.getSpendReviewConfig();
+      var strip = document.getElementById('srStatusStrip');
+      if (!strip) return;
+      if (!cfg.enabled) {
+        strip.innerHTML = '<span class="sr-status-dot off"></span><strong>消费审核已关闭</strong>'
+          + '<span style="color:#8c8c8c">所有订单将直接进入支付流程</span>';
+        return;
+      }
+      var chips = [];
+      if (cfg.singleAmountCap > 0) chips.push('<span class="sr-rule-chip">单笔 > ¥' + cfg.singleAmountCap.toLocaleString() + '</span>');
+      if (cfg.budgetPctCap > 0)    chips.push('<span class="sr-rule-chip">预算占比 > ' + cfg.budgetPctCap + '%</span>');
+      if (cfg.monthlyCapPerMember > 0) chips.push('<span class="sr-rule-chip">月度累计 > ¥' + cfg.monthlyCapPerMember.toLocaleString() + '</span>');
+      var expire = cfg.expireAction === 'reject' ? '超时自动驳回' : '超时仅催办';
+      strip.innerHTML = '<span class="sr-status-dot on"></span><strong>已启用</strong>'
+        + '<span style="color:#8c8c8c">触发条件：</span>'
+        + chips.join('<span style="color:#d9d9d9">·</span>')
+        + '<span style="color:#d9d9d9">·</span><span class="sr-rule-chip">' + expire + '</span>';
+    }
+
+    function openSpendConfigModal() {
+      renderSpendReviewConfig();   // 每次打开都从 storage 读最新
+      openModal('srConfigModal');
+    }
+
+    function switchSrSubtab(name) {
+      document.querySelectorAll('.sr-subtabs button').forEach(function (b) {
+        b.classList.toggle('active', b.getAttribute('data-subtab') === name);
+      });
+      document.getElementById('srPendingList').classList.toggle('active', name === 'pending');
+      document.getElementById('srHistoryList').classList.toggle('active', name === 'history');
+    }
+    window.switchSrSubtab = switchSrSubtab;
+    window.openSpendConfigModal = openSpendConfigModal;
+
+    function saveSpendReviewConfig() {
+      var expireVal = (document.querySelector('input[name="srExpire"]:checked') || {}).value || 'reject';
+      var cfg = {
+        enabled: document.getElementById('srEnabledSwitch').checked,
+        singleAmountCap: Number(document.getElementById('srSingleAmount').value) || 0,
+        budgetPctCap:    Number(document.getElementById('srBudgetPct').value)    || 0,
+        monthlyCapPerMember: Number(document.getElementById('srMonthlyCap').value) || 0,
+        autoExpireHours: 24,
+        expireAction: expireVal
+      };
+      window.demoApp.setSpendReviewConfig(cfg);
+      renderSpendStatusStrip(cfg);
+      toast('配置已保存，立即生效', 'ok');
+    }
+
+    function resetSpendReviewConfig() {
+      if (!confirm('恢复默认阈值配置？当前修改将丢失')) return;
+      try { localStorage.removeItem(window.demoApp.KEY.spendReviewConfig); } catch (e) {}
+      renderSpendReviewConfig();
+      toast('已恢复默认配置', 'info');
+    }
+
+    function renderPendingApprovals() {
+      var list = window.demoApp.getSpendApprovals();
+      var container = document.getElementById('srPendingList');
+      var countEl = document.getElementById('srPendingCount');
+      var badgeEl = document.getElementById('pendingApprovalBadge');
+      countEl.textContent = list.length;
+      badgeEl.textContent = list.length;
+      badgeEl.classList.toggle('zero', list.length === 0);
+      if (list.length === 0) {
+        container.innerHTML = '<div class="sr-empty"><div class="sr-empty-icon">✨</div>暂无待审批订单</div>';
+        return;
+      }
+      var rows = list.map(function (p) {
+        var rules = p.hitRules.map(function (r) { return '<span class="sr-rule-tag">' + escapeHtml(r) + '</span>'; }).join('');
+        var noteHtml = p.note
+          ? '<div class="sr-cell-note" title="' + escapeHtml(p.note) + '">📝 ' + escapeHtml(p.note) + '</div>'
+          : '';
+        return '<tr>'
+          + '<td>'
+          +   '<div class="sr-cell-title">' + escapeHtml(p.title) + '</div>'
+          +   '<div class="sr-cell-sub">' + p.id + ' · 关联 ' + p.demandId + '</div>'
+          +   noteHtml
+          + '</td>'
+          + '<td>'
+          +   '<div>' + escapeHtml(p.applicant) + ' <span class="sr-cell-sub" style="display:inline">· ' + escapeHtml(p.applicantRole || '') + '</span></div>'
+          +   '<div class="sr-cell-sub">' + escapeHtml(p.workspaceName) + '</div>'
+          + '</td>'
+          + '<td class="sr-amount-cell">' + window.fmtMoney(p.amount) + '</td>'
+          + '<td><div class="sr-cell-rules">' + rules + '</div></td>'
+          + '<td class="sr-time-cell">' + p.submittedAt + '</td>'
+          + '<td class="sr-actions-cell">'
+          +   '<button class="sr-btn-pass" onclick="approveSpend(\'' + p.id + '\')">通过</button>'
+          +   '<button class="sr-btn-reject" onclick="rejectSpend(\'' + p.id + '\')">驳回</button>'
+          + '</td>'
+          + '</tr>';
+      }).join('');
+      container.innerHTML = '<table class="sr-table">'
+        + '<thead><tr>'
+        +   '<th style="width:30%">订单</th>'
+        +   '<th style="width:18%">申请人</th>'
+        +   '<th class="sr-amount-cell" style="width:11%">金额</th>'
+        +   '<th>命中规则</th>'
+        +   '<th class="sr-time-cell" style="width:14%">提交时间</th>'
+        +   '<th class="sr-actions-cell" style="width:140px">操作</th>'
+        + '</tr></thead>'
+        + '<tbody>' + rows + '</tbody>'
+        + '</table>';
+    }
+
+    function renderApprovalHistory() {
+      var list = window.demoApp.getSpendApprovalHistory();
+      var container = document.getElementById('srHistoryList');
+      document.getElementById('srHistoryCount').textContent = list.length;
+      if (list.length === 0) {
+        container.innerHTML = '<div class="sr-empty"><div class="sr-empty-icon">📭</div>暂无历史决策</div>';
+        return;
+      }
+      var rows = list.slice(0, 20).map(function (h) {
+        var decisionLabel = h.decision === 'approved' ? '✓ 通过' : '✗ 驳回';
+        var noteCell = h.note
+          ? '<div class="sr-cell-note" title="' + escapeHtml(h.note) + '">💬 ' + escapeHtml(h.note) + '</div>'
+          : '<span class="sr-cell-sub">—</span>';
+        return '<tr>'
+          + '<td>'
+          +   '<div class="sr-cell-title">' + escapeHtml(h.title) + '</div>'
+          +   '<div class="sr-cell-sub">' + h.id + ' · 关联 ' + h.demandId + '</div>'
+          + '</td>'
+          + '<td>'
+          +   '<div>' + escapeHtml(h.applicant) + '</div>'
+          +   '<div class="sr-cell-sub">' + escapeHtml(h.workspaceName) + '</div>'
+          + '</td>'
+          + '<td class="sr-amount-cell">' + window.fmtMoney(h.amount) + '</td>'
+          + '<td><span class="sr-decision-tag ' + h.decision + '">' + decisionLabel + '</span></td>'
+          + '<td>'
+          +   '<div>' + escapeHtml(h.decidedBy) + '</div>'
+          +   '<div class="sr-cell-sub">' + h.decidedAt + '</div>'
+          + '</td>'
+          + '<td>' + noteCell + '</td>'
+          + '</tr>';
+      }).join('');
+      container.innerHTML = '<table class="sr-table">'
+        + '<thead><tr>'
+        +   '<th style="width:24%">订单</th>'
+        +   '<th style="width:16%">申请人</th>'
+        +   '<th class="sr-amount-cell" style="width:11%">金额</th>'
+        +   '<th style="width:90px">决策</th>'
+        +   '<th style="width:18%">决策人 / 时间</th>'
+        +   '<th>备注</th>'
+        + '</tr></thead>'
+        + '<tbody>' + rows + '</tbody>'
+        + '</table>';
+    }
+
+    window.approveSpend = function (id) {
+      var note = prompt('通过备注（可选，对申请人可见）：', '') || '';
+      var ok = window.demoApp.decideSpendApproval(id, 'approved', '李总（企业管理员）', note);
+      if (!ok) { toast('订单不存在或已处理', 'warn'); return; }
+      toast('已通过，订单进入支付/锁资流程', 'ok');
+      renderPendingApprovals();
+      renderApprovalHistory();
+    };
+
+    window.rejectSpend = function (id) {
+      var reason = prompt('驳回理由（必填，将通知申请人）：', '');
+      if (reason === null) return;
+      if (!reason.trim()) { toast('请填写驳回理由', 'warn'); return; }
+      var ok = window.demoApp.decideSpendApproval(id, 'rejected', '李总（企业管理员）', reason.trim());
+      if (!ok) { toast('订单不存在或已处理', 'warn'); return; }
+      toast('已驳回，订单退回草稿并通知申请人', 'info');
+      renderPendingApprovals();
+      renderApprovalHistory();
+    };
+
+    window.simulateNewPending = function () {
+      var rand = Math.floor(Math.random() * 9000 + 1000);
+      var samples = [
+        { title: '年度 IP 海报包采购', applicant: '林涛', applicantRole: '创作者', ws: 'cf-drama', wsName: '骋风天合 · 短剧制作中心', amount: 38000, hits: ['单笔金额超 ¥10,000', '占用本团队预算 21%'] },
+        { title: '紧急广告片配音 · 10 条', applicant: '陈薇', applicantRole: '市场专员', ws: 'cf-marketing', wsName: '骋风天合 · 市场宣传组', amount: 15500, hits: ['单笔金额超 ¥10,000'] },
+        { title: '剧本顾问季度服务', applicant: '昭岚', applicantRole: '制作主管', ws: 'cf-drama', wsName: '骋风天合 · 短剧制作中心', amount: 60000, hits: ['单笔金额超 ¥10,000', '占用本团队预算 33%'] }
+      ];
+      var s = samples[Math.floor(Math.random() * samples.length)];
+      var now = new Date();
+      var pad = function (n) { return n < 10 ? '0' + n : n; };
+      var ts = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate()) + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes());
+      window.demoApp.addSpendApproval({
+        id: 'PA-' + now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate()) + rand,
+        demandId: 'DM-' + now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate()) + rand,
+        title: s.title, applicant: s.applicant, applicantRole: s.applicantRole,
+        workspace: s.ws, workspaceName: s.wsName,
+        amount: s.amount, hitRules: s.hits, submittedAt: ts,
+        note: '', status: 'pending'
+      });
+      toast('已模拟一笔新触发审批的订单', 'info');
+      renderPendingApprovals();
+    };
+
+    function escapeHtml(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    renderSpendReviewConfig();
+    renderPendingApprovals();
+    renderApprovalHistory();
+
+    // 顶部 KPI 同步加一个待审批数（可选）
+    // 等用户进入 Tab 4 也能看到最新数字，做一个轻量定时刷新
+    setInterval(function () {
+      var n = window.demoApp.getSpendApprovals().length;
+      var badge = document.getElementById('pendingApprovalBadge');
+      if (badge && badge.textContent != String(n)) {
+        badge.textContent = n;
+        badge.classList.toggle('zero', n === 0);
+      }
+    }, 3000);
   </script>
 </body>
 </html>

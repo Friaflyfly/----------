@@ -62,19 +62,6 @@
     .menu-group-title { padding: 8px 24px; font-size: 11px; color: #8c8c8c; text-transform: uppercase; letter-spacing: .5px; }
     .main { margin-left: 200px; flex: 1; padding: 22px 28px 100px; }
 
-    /* 项目切换器 */
-    .project-switcher { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 2px; }
-    .project-card { flex-shrink: 0; background: #fff; border: 2px solid #f0f0f0; border-radius: 10px; padding: 12px 16px; cursor: pointer; min-width: 200px; max-width: 280px; transition: all .15s; }
-    .project-card:hover { border-color: #91d5ff; box-shadow: 0 2px 8px rgba(24,144,255,.1); }
-    .project-card.active { border-color: #1890ff; background: #e6f7ff; box-shadow: 0 2px 8px rgba(24,144,255,.15); }
-    .project-card .pc-name { font-size: 13px; font-weight: 600; color: #262626; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .project-card .pc-id { font-size: 11px; color: #8c8c8c; font-family: monospace; }
-    .project-card .pc-meta { display: flex; gap: 10px; margin-top: 6px; font-size: 11px; color: #8c8c8c; }
-    .project-card .pc-status { padding: 1px 8px; border-radius: 8px; font-size: 11px; font-weight: 500; }
-    .pc-status.in-progress { background: #e6f7ff; color: #096dd9; }
-    .pc-status.completed { background: #f6ffed; color: #389e0d; }
-    .pc-status.review { background: #fff7e6; color: #d48806; }
-
     /* 面包屑 */
     .breadcrumb { font-size: 13px; margin-bottom: 12px; }
     .breadcrumb a { color: #1890ff; text-decoration: none; }
@@ -367,7 +354,7 @@
         </div>
         <div class="menu-group">
           <div class="menu-group-title">协同</div>
-          <a href="project-space.html" class="active"><span class="menu-icon">🤝</span> 项目协同空间</a>
+          <a href="project-space-list.html" class="active"><span class="menu-icon">🤝</span> 项目协同空间</a>
         </div>
         <div class="menu-group">
           <div class="menu-group-title">账户</div>
@@ -380,12 +367,9 @@
     <main class="main">
       <div class="breadcrumb">
         <a href="platform-home-demander.html">工作台</a><span>/</span>
-        <a href="demand-list.html">我的需求</a><span>/</span>
-        <span style="color:#262626">项目协同空间</span>
+        <a href="project-space-list.html">我的协同项目空间</a><span>/</span>
+        <span style="color:#262626">项目空间详情</span>
       </div>
-
-      <!-- 项目切换器 -->
-      <section class="project-switcher" id="projectSwitcher"></section>
 
       <!-- 订单概览 banner -->
       <section class="order-banner" id="orderBanner">
@@ -968,7 +952,7 @@
     })();
   </script>
 
-  <!-- 项目列表 + 切换 -->
+  <!-- 项目详情数据渲染 -->
   <script>
   (function () {
     var PROJECTS = [
@@ -979,26 +963,6 @@
 
     var urlParams = new URLSearchParams(location.search);
     var currentProjectId = urlParams.get("orderId") || PROJECTS[0].id;
-
-    function renderSwitcher() {
-      var el = document.getElementById("projectSwitcher");
-      el.innerHTML = PROJECTS.map(function (p) {
-        var stCls = p.status === "completed" ? "completed" : (p.stage.indexOf("验收") >= 0 ? "review" : "in-progress");
-        return '<div class="project-card ' + (p.id === currentProjectId ? "active" : "") + '" data-pid="' + p.id + '">'
-          + '<div class="pc-name">' + p.name + '</div>'
-          + '<div class="pc-id">' + p.id + ' · ' + p.contractor + '</div>'
-          + '<div class="pc-meta"><span class="pc-status ' + stCls + '">' + p.stageIcon + ' ' + p.stage + '</span><span>' + window.fmtMoney(p.amount) + '</span></div>'
-          + '</div>';
-      }).join("");
-
-      el.querySelectorAll(".project-card").forEach(function (card) {
-        card.addEventListener("click", function () {
-          currentProjectId = card.getAttribute("data-pid");
-          renderSwitcher();
-          renderBanner();
-        });
-      });
-    }
 
     function renderBanner() {
       var p = PROJECTS.find(function (x) { return x.id === currentProjectId; });
@@ -1033,7 +997,6 @@
       if (footerBar) footerBar.style.display = isCompleted ? "none" : "";
     }
 
-    renderSwitcher();
     renderBanner();
   })();
   </script>
