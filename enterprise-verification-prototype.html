@@ -1282,6 +1282,47 @@
       submittedAt: "2026-04-21 14:30"
     };
 
+    const PROFILE_KEY = "enterpriseProfile";
+    const PROFILE_TO_CERT = { verified: "VERIFIED", pending: "PENDING", rejected: "FAILED", draft: "UNVERIFIED" };
+    const CERT_TO_PROFILE = { VERIFIED: "verified", PENDING: "pending", FAILED: "rejected", UNVERIFIED: "draft" };
+
+    function readEnterpriseProfile() {
+      try { return JSON.parse(localStorage.getItem(PROFILE_KEY) || "null") || null; }
+      catch (_) { return null; }
+    }
+
+    function hydrateStateFromProfile() {
+      const profile = readEnterpriseProfile();
+      if (!profile) return;
+      if (profile.enterpriseName) state.form.enterpriseName = profile.enterpriseName;
+      if (profile.legalName) state.form.legalPersonName = profile.legalName;
+      if (profile.certStatus && PROFILE_TO_CERT[profile.certStatus]) {
+        state.certStatus = PROFILE_TO_CERT[profile.certStatus];
+        if (state.certStatus === "VERIFIED" || state.certStatus === "PENDING") {
+          state.pageMode = "view";
+          state.failureReasons = [];
+          state.formPreviewByStatusBar = true;
+        }
+      }
+    }
+
+    function persistStateToProfile() {
+      try {
+        const profile = readEnterpriseProfile() || {};
+        profile.enterpriseName = state.form.enterpriseName;
+        profile.legalName = state.form.legalPersonName;
+        profile.certStatus = CERT_TO_PROFILE[state.certStatus] || profile.certStatus || "verified";
+        if (state.certStatus === "VERIFIED") {
+          const d = new Date();
+          const pad = (n) => (n < 10 ? "0" + n : String(n));
+          profile.certUpdatedAt = d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+        }
+        localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+      } catch (_) {}
+    }
+
+    hydrateStateFromProfile();
+
     const inputs = {
       enterpriseName: document.getElementById("enterpriseName"),
       legalPersonName: document.getElementById("legalPersonName"),
@@ -1710,6 +1751,7 @@
       state.pageMode = "view";
       state.failureReasons = [];
       state.submittedAt = "2026-04-22 10:18";
+      persistStateToProfile();
       toast("提交成功，平台将在五个工作日内完成审核", "ok");
       render();
     }
@@ -1741,6 +1783,7 @@
         state.certStatus = "UNVERIFIED";
         state.pageMode = "edit";
         state.failureReasons = [];
+        persistStateToProfile();
         toast("认证申请已撤回，您可以重新修改资料并提交", "ok");
         render();
       }
@@ -1763,6 +1806,7 @@
       input.addEventListener("blur", () => {
         if (key === "bankAccountNumber") state.form[key] = input.value.replace(/\s+/g, "");
         if (state.role === "admin") applyFieldState(key);
+        if (key === "enterpriseName" || key === "legalPersonName") persistStateToProfile();
       });
     });
 
@@ -1825,6 +1869,7 @@
           state.pageMode = "view";
         }
         state.formPreviewByStatusBar = (status === "PENDING" || status === "VERIFIED");
+        persistStateToProfile();
         render();
         toast(`Demo 预览：已切换到「${statusConfig[status].label}」`, "warn");
       });

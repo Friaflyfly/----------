@@ -43,6 +43,8 @@
 
     .type-badge.work-onboarding { background: #fff7e6; color: #d48806; }
     .type-badge.work-cert-change { background: #f0f5ff; color: #2f54eb; }
+    .type-badge.work-member-onboarding { background: #f9f0ff; color: #722ed1; }
+    .type-member { background: #f9f0ff; color: #722ed1; }
     .change-diff { margin-top: 14px; border: 1px solid #f0f0f0; border-radius: 8px; overflow: hidden; background: #fafbff; }
     .change-diff-head { padding: 10px 14px; font-size: 12px; color: #595959; background: #f0f5ff; font-weight: 500; }
     .change-row { display: grid; grid-template-columns: 110px 1fr 1fr; gap: 14px; padding: 10px 14px; font-size: 12px; border-top: 1px solid #f0f0f0; align-items: start; }
@@ -164,6 +166,7 @@
             <span class="tab active" data-type="all" onclick="filterWorkOrder('all')">全部 <span class="count" id="cntAll">0</span></span>
             <span class="tab" data-type="onboarding" onclick="filterWorkOrder('onboarding')">入驻申请 <span class="count" id="cntOnboarding">0</span></span>
             <span class="tab" data-type="cert-change" onclick="filterWorkOrder('cert-change')">企业认证变更 <span class="count" id="cntCertChange">0</span></span>
+            <span class="tab" data-type="member-onboarding" onclick="filterWorkOrder('member-onboarding')">📨 入企申请 <span class="count" id="cntMemberOnboarding">0</span></span>
           </div>
         </div>
         <div class="toolbar-row">
@@ -379,10 +382,58 @@
     var rejectTargetId = null;
 
     function isChange(a) { return a.workOrderType === "cert-change"; }
+    function isMemberOnboarding(a) { return a.workOrderType === "member-onboarding"; }
+
+    function loadMemberOnboardingApplications() {
+      var list;
+      try { list = JSON.parse(localStorage.getItem("pendingEnterpriseMembers") || "[]"); }
+      catch (_) { list = []; }
+      var profile;
+      try { profile = JSON.parse(localStorage.getItem("enterpriseProfile") || "null"); }
+      catch (_) { profile = null; }
+      var entName = (profile && (profile.enterpriseName || profile.shortName)) || "骋风天合文化传媒有限公司";
+
+      return list.map(function (m) {
+        var statusMap = { Pending: "pending", Approved: "approved", Rejected: "rejected" };
+        return {
+          id: m.id,
+          name: m.name + "（申请加入 " + entName + "）",
+          type: "personal",
+          typeName: "成员",
+          workOrderType: "member-onboarding",
+          contact: m.name,
+          phone: m.phone || "—",
+          email: m.email || "—",
+          identity: "邀请码加入企业",
+          workspaces: 1,
+          creditCode: "",
+          legalPerson: "",
+          address: "",
+          intro: "通过邀请码 " + (m.inviteCode || "—") + " 申请加入「" + entName + "」，需企业管理员二次审核后方可登录。",
+          uploads: ["📨 邀请码：" + (m.inviteCode || "—")],
+          risks: [
+            { text: "已通过邀请码校验", cls: "ok" },
+            { text: "需校验申请人手机号 / 姓名", cls: "warn" }
+          ],
+          bizCats: [],
+          submitTime: m.createdAt || "—",
+          status: statusMap[m.auditStatus] || "pending",
+          inviteCode: m.inviteCode,
+          enterpriseName: entName,
+          rejectReason: m.rejectReason || ""
+        };
+      });
+    }
+
+    function mergeMemberApplications() {
+      var memberApps = loadMemberOnboardingApplications();
+      applications = applications.filter(function (a) { return !isMemberOnboarding(a); });
+      applications = memberApps.concat(applications);
+    }
 
     function renderKPIs() {
       var pending = 0, supplementing = 0, approved = 0, rejected = 0;
-      var onboardingCnt = 0, certChangeCnt = 0;
+      var onboardingCnt = 0, certChangeCnt = 0, memberCnt = 0;
       applications.forEach(function (a) {
         if (a.status === "pending") pending++;
         else if (a.status === "supplementing") supplementing++;
@@ -390,6 +441,7 @@
         else if (a.status === "rejected") rejected++;
         if (a.workOrderType === "onboarding") onboardingCnt++;
         if (a.workOrderType === "cert-change") certChangeCnt++;
+        if (a.workOrderType === "member-onboarding") memberCnt++;
       });
       document.getElementById("kpiPending").textContent = pending;
       document.getElementById("kpiSupplementing").textContent = supplementing;
@@ -398,6 +450,8 @@
       document.getElementById("cntAll").textContent = applications.length;
       document.getElementById("cntOnboarding").textContent = onboardingCnt;
       document.getElementById("cntCertChange").textContent = certChangeCnt;
+      var memberCntEl = document.getElementById("cntMemberOnboarding");
+      if (memberCntEl) memberCntEl.textContent = memberCnt;
     }
 
     function filterStatus(s) {
@@ -432,15 +486,20 @@
         var statusLabel = STATUS_LABEL[a.status] || a.status;
         var statusCls = "status-" + a.status;
         var change = isChange(a);
-        var workLabel = change ? "认证变更" : "首次入驻";
-        var workCls = change ? "work-cert-change" : "work-onboarding";
+        var memberJoin = isMemberOnboarding(a);
+        var workLabel = memberJoin ? "入企申请" : (change ? "认证变更" : "首次入驻");
+        var workCls = memberJoin ? "work-member-onboarding" : (change ? "work-cert-change" : "work-onboarding");
 
         var detailFields = [
           { l: "联系人", v: a.contact },
           { l: "手机号", v: a.phone },
           { l: "邮箱", v: a.email }
         ];
-        if (!change) {
+        if (memberJoin) {
+          detailFields.push({ l: "申请加入", v: a.enterpriseName || "—" });
+          detailFields.push({ l: "邀请码", v: a.inviteCode || "—" });
+          detailFields.push({ l: "申请角色", v: a.identity || "—" });
+        } else if (!change) {
           detailFields.push({ l: "入驻身份", v: a.identity });
           detailFields.push({ l: "团队数", v: a.workspaces + " 个" });
           detailFields.push({ l: "服务类目", v: a.bizCats.join("、") });
@@ -449,9 +508,9 @@
           detailFields.push({ l: "信用代码", v: a.creditCode || "—" });
           detailFields.push({ l: "法定代表人", v: a.legalPerson || "—" });
         }
-        if (!change && a.creditCode) detailFields.push({ l: "信用代码", v: a.creditCode });
-        if (!change && a.legalPerson) detailFields.push({ l: "法定代表人", v: a.legalPerson });
-        if (!change && a.address) detailFields.push({ l: "注册地址", v: a.address });
+        if (!change && !memberJoin && a.creditCode) detailFields.push({ l: "信用代码", v: a.creditCode });
+        if (!change && !memberJoin && a.legalPerson) detailFields.push({ l: "法定代表人", v: a.legalPerson });
+        if (!change && !memberJoin && a.address) detailFields.push({ l: "注册地址", v: a.address });
 
         var risksHtml = a.risks.map(function (r) { return '<span class="risk-tag ' + r.cls + '">' + (r.cls === "ok" ? "✅ " : "⚠️ ") + r.text + '</span>'; }).join("");
         var uploadsHtml = a.uploads.map(function (u) { return '<div class="upload-thumb">' + u.split(" ")[0] + '</div>'; }).join("");
@@ -483,11 +542,14 @@
 
         var actionsHtml = "";
         if (a.status === "pending") {
-          var primaryText = change ? "✅ 通过并覆盖主体资料" : "✅ 通过并开通账号";
+          var primaryText;
+          if (memberJoin) primaryText = "✅ 通过并加入企业";
+          else if (change) primaryText = "✅ 通过并覆盖主体资料";
+          else primaryText = "✅ 通过并开通账号";
           actionsHtml = '<div class="card-actions">'
             + '<button class="btn primary" onclick="approveApp(\'' + a.id + '\')">' + primaryText + '</button>'
             + '<button class="btn danger" onclick="openReject(\'' + a.id + '\')">❌ 驳回</button>'
-            + '<button class="btn" onclick="openSupplement(\'' + a.id + '\')">📩 要求补充材料</button>'
+            + (memberJoin ? "" : '<button class="btn" onclick="openSupplement(\'' + a.id + '\')">📩 要求补充材料</button>')
             + '</div>';
         } else if (a.status === "supplementing") {
           actionsHtml = '<div class="card-actions">'
@@ -498,9 +560,10 @@
         } else if (a.status === "rejected") {
           actionsHtml = '<div class="card-actions"><div style="font-size:12px;color:#cf1322;background:#fff1f0;padding:8px 12px;border-radius:6px;width:100%">驳回原因：' + (a.rejectReason || "未填写") + '</div></div>';
         } else {
-          var approvedNote = change
-            ? '✅ 已通过审核，企业主体资料已覆盖、认证状态回写为「已认证」'
-            : '✅ 已通过审核，账号已自动开通';
+          var approvedNote;
+          if (memberJoin) approvedNote = "✅ 已通过审核，成员已加入企业并写入成员管理，可登录平台";
+          else if (change) approvedNote = "✅ 已通过审核，企业主体资料已覆盖、认证状态回写为「已认证」";
+          else approvedNote = "✅ 已通过审核，账号已自动开通";
           actionsHtml = '<div class="card-actions"><div style="font-size:12px;color:#389e0d;background:#f6ffed;padding:8px 12px;border-radius:6px;width:100%">' + approvedNote + '</div></div>';
         }
 
@@ -531,15 +594,80 @@
       document.getElementById("card-" + id).classList.toggle("expanded");
     };
 
+    function persistMemberApproval(app) {
+      var members;
+      try { members = JSON.parse(localStorage.getItem("demoMembers") || "[]"); }
+      catch (_) { members = []; }
+      members.push({
+        id: "U-" + Date.now(),
+        name: app.contact,
+        email: app.email,
+        phone: app.phone,
+        role: "publisher",
+        roleName: "发布员",
+        workspaces: ["cf-drama"],
+        status: "active",
+        lastLogin: "（尚未登录）",
+        joinedVia: "邀请码 " + (app.inviteCode || ""),
+        joinedAt: new Date().toISOString().slice(0, 16).replace("T", " ")
+      });
+      try { localStorage.setItem("demoMembers", JSON.stringify(members)); } catch (_) {}
+
+      try {
+        var auth = JSON.parse(localStorage.getItem("authAccounts") || "[]");
+        for (var i = 0; i < auth.length; i++) {
+          if (auth[i].phone === app.phone) {
+            auth[i].status = "Active";
+            auth[i].joinedAt = new Date().toISOString();
+          }
+        }
+        localStorage.setItem("authAccounts", JSON.stringify(auth));
+      } catch (_) {}
+
+      try {
+        var pending = JSON.parse(localStorage.getItem("pendingEnterpriseMembers") || "[]");
+        for (var j = 0; j < pending.length; j++) {
+          if (pending[j].id === app.id) pending[j].auditStatus = "Approved";
+        }
+        localStorage.setItem("pendingEnterpriseMembers", JSON.stringify(pending));
+      } catch (_) {}
+    }
+
+    function persistMemberRejection(app, reason) {
+      try {
+        var auth = JSON.parse(localStorage.getItem("authAccounts") || "[]");
+        for (var i = 0; i < auth.length; i++) {
+          if (auth[i].phone === app.phone) {
+            auth[i].status = "Rejected";
+            auth[i].rejectReason = reason || "";
+          }
+        }
+        localStorage.setItem("authAccounts", JSON.stringify(auth));
+      } catch (_) {}
+
+      try {
+        var pending = JSON.parse(localStorage.getItem("pendingEnterpriseMembers") || "[]");
+        for (var j = 0; j < pending.length; j++) {
+          if (pending[j].id === app.id) {
+            pending[j].auditStatus = "Rejected";
+            pending[j].rejectReason = reason || "";
+          }
+        }
+        localStorage.setItem("pendingEnterpriseMembers", JSON.stringify(pending));
+      } catch (_) {}
+    }
+
     window.approveApp = function (id) {
       var app = applications.find(function (a) { return a.id === id; });
       if (!app) return;
       app.status = "approved";
+      if (isMemberOnboarding(app)) persistMemberApproval(app);
       renderKPIs();
       renderList();
-      var msg = isChange(app)
-        ? "✅ " + app.name + " 认证变更已通过，企业主体资料已覆盖并回写「已认证」"
-        : "✅ " + app.name + " 入驻审核通过！已自动开通账号和团队";
+      var msg;
+      if (isMemberOnboarding(app)) msg = "✅ " + app.contact + " 已加入「" + app.enterpriseName + "」，可登录平台";
+      else if (isChange(app)) msg = "✅ " + app.name + " 认证变更已通过，企业主体资料已覆盖并回写「已认证」";
+      else msg = "✅ " + app.name + " 入驻审核通过！已自动开通账号和团队";
       toast(msg, "ok");
     };
 
@@ -559,15 +687,23 @@
       "存在重大风险，需线下确认",
       "其他"
     ];
+    var REJECT_REASONS_MEMBER_ONBOARDING = [
+      "申请人非本企业员工",
+      "邀请码使用错误或来源不明",
+      "手机号或姓名与企业花名册不一致",
+      "申请角色与所属团队不匹配",
+      "其他"
+    ];
 
     window.openReject = function (id) {
       rejectTargetId = id;
       var app = applications.find(function (a) { return a.id === id; });
       var change = app && isChange(app);
+      var member = app && isMemberOnboarding(app);
       var modalTitle = document.querySelector("#rejectModal .modal-head h3");
-      modalTitle.textContent = change ? "驳回企业认证变更" : "驳回入驻申请";
+      modalTitle.textContent = member ? "驳回入企申请" : (change ? "驳回企业认证变更" : "驳回入驻申请");
       var sel = document.getElementById("rejectReason");
-      var reasons = change ? REJECT_REASONS_CERT_CHANGE : REJECT_REASONS_ONBOARDING;
+      var reasons = member ? REJECT_REASONS_MEMBER_ONBOARDING : (change ? REJECT_REASONS_CERT_CHANGE : REJECT_REASONS_ONBOARDING);
       sel.innerHTML = reasons.map(function (r) { return '<option>' + r + '</option>'; }).join("");
       sel.selectedIndex = 0;
       document.getElementById("rejectNote").value = "";
@@ -579,14 +715,17 @@
       if (!app) return;
       var reason = document.getElementById("rejectReason").value;
       var note = document.getElementById("rejectNote").value;
+      var combinedReason = reason + (note ? " — " + note : "");
       app.status = "rejected";
-      app.rejectReason = reason + (note ? " — " + note : "");
+      app.rejectReason = combinedReason;
+      if (isMemberOnboarding(app)) persistMemberRejection(app, combinedReason);
       document.getElementById("rejectModal").classList.remove("open");
       renderKPIs();
       renderList();
-      var msg = isChange(app)
-        ? "已驳回 " + app.name + " 的企业认证变更"
-        : "已驳回 " + app.name + " 的入驻申请";
+      var msg;
+      if (isMemberOnboarding(app)) msg = "已驳回 " + app.contact + " 的入企申请";
+      else if (isChange(app)) msg = "已驳回 " + app.name + " 的企业认证变更";
+      else msg = "已驳回 " + app.name + " 的入驻申请";
       toast(msg, "warn");
     };
 
@@ -647,8 +786,17 @@
       toast("已撤销补充通知，" + app.name + " 的申请单恢复到「待审核」", "warn");
     };
 
+    mergeMemberApplications();
     renderKPIs();
     renderList();
+
+    window.addEventListener("storage", function (event) {
+      if (event.key === "pendingEnterpriseMembers" || event.key === "enterpriseProfile") {
+        mergeMemberApplications();
+        renderKPIs();
+        renderList();
+      }
+    });
   </script>
 </body>
 </html>

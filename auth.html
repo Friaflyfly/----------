@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>统一登录注册 - 骋风天合创作门户交易平台</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.css">
+  <style>
+    :root {
+      --primary: #5569ff;
+      --primary-dark: #4252c6;
+      --surface: #ffffff;
+      --text-main: #1f2238;
+      --text-sub: #7d829e;
+      --line: #e8eaf7;
+    }
+    body { margin: 0; padding: 0; font-family: "PingFang SC", "Microsoft YaHei", sans-serif; }
+    .authPage {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 10% 15%, rgba(120, 138, 255, 0.45), transparent 45%),
+        radial-gradient(circle at 90% 85%, rgba(142, 104, 255, 0.35), transparent 50%),
+        linear-gradient(145deg, #1e2548 0%, #2b3570 45%, #1b2345 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .authWrap {
+      width: 100%;
+      max-width: 1160px;
+      display: grid;
+      grid-template-columns: 43% 57%;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 18px 44px rgba(12, 16, 34, 0.35);
+      background: #0f1530;
+      min-height: 700px;
+    }
+    .authHero {
+      color: #f6f8ff;
+      padding: 40px 38px;
+      background:
+        linear-gradient(160deg, rgba(128, 142, 255, 0.22), rgba(112, 94, 255, 0.06)),
+        #141b3b;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .brand {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      color: #dde3ff;
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 14px;
+    }
+    .heroTitle {
+      font-size: 34px;
+      line-height: 1.22;
+      margin: 0 0 12px;
+      color: #ffffff;
+    }
+    .heroDesc {
+      color: rgba(231, 235, 255, 0.85);
+      line-height: 1.8;
+      font-size: 14px;
+      margin-bottom: 28px;
+    }
+    .policyCard {
+      border: 1px solid rgba(157, 170, 255, 0.35);
+      border-radius: 12px;
+      padding: 14px 16px;
+      background: rgba(134, 147, 255, 0.12);
+      font-size: 13px;
+      color: rgba(233, 237, 255, 0.96);
+      line-height: 1.7;
+    }
+    .heroList {
+      margin: 0;
+      padding-left: 18px;
+      color: rgba(231, 235, 255, 0.9);
+      line-height: 1.9;
+      font-size: 13px;
+    }
+    .authMain {
+      background: var(--surface);
+      padding: 34px 36px 28px;
+      overflow-y: auto;
+    }
+    .mainTop {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .mainTitle {
+      margin: 0;
+      color: var(--text-main);
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .mainSub {
+      color: var(--text-sub);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+    .switchHint {
+      font-size: 12px;
+      color: #5f68a6;
+    }
+    .chooseCardRow {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin: 10px 0 16px;
+    }
+    .chooseCard {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px 16px;
+      transition: all .18s ease;
+      background: #fff;
+      cursor: pointer;
+    }
+    .chooseCard:hover { border-color: #b5c2ff; box-shadow: 0 5px 16px rgba(101, 123, 255, 0.12); }
+    .chooseCard.active {
+      border-color: #8da0ff;
+      background: #f6f8ff;
+      box-shadow: 0 8px 18px rgba(91, 113, 255, 0.15);
+    }
+    .chooseTitle {
+      margin: 0 0 5px;
+      font-size: 15px;
+      color: #2a3158;
+      font-weight: 600;
+    }
+    .chooseDesc { margin: 0; color: #7980a1; font-size: 12px; line-height: 1.6; }
+    .splitLine {
+      margin: 14px 0 12px;
+      border-top: 1px dashed #dfe3f9;
+    }
+    .pageFooter {
+      text-align: center;
+      margin-top: 14px;
+      color: #8b90ab;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    .footerLinks {
+      margin-top: 8px;
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+    }
+    .footerLinks a { color: #5e6cd8; text-decoration: none; }
+    .inviteStatus {
+      margin-top: -4px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 12px;
+      border: 1px solid #e6e9fa;
+      color: #5d6486;
+      background: #f8f9ff;
+      line-height: 1.6;
+    }
+    .inviteStatus.valid {
+      border-color: #cce8be;
+      background: #f1fbe9;
+      color: #3f8d29;
+    }
+    .inviteStatus.error {
+      border-color: #f4d1d1;
+      background: #fff2f2;
+      color: #c14545;
+    }
+    @media (max-width: 980px) {
+      .authWrap { grid-template-columns: 1fr; min-height: 0; }
+      .authHero { min-height: 250px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useMemo, useRef, useState } = React;
+    const { Form, Input, Button, Tabs, Checkbox, message, Modal, Tag, Alert } = antd;
+
+    const INVITE_PRESETS = {
+      CFTH2026: { state: "valid", enterpriseName: "骋风天合文化传媒有限公司", leftQuota: 8 },
+      EXPIRED88: { state: "expired", enterpriseName: "骋风天合文化传媒有限公司", leftQuota: 0 },
+      REVOKE99: { state: "revoked", enterpriseName: "骋风天合文化传媒有限公司", leftQuota: 0 },
+      USEDUP66: { state: "usedup", enterpriseName: "骋风天合文化传媒有限公司", leftQuota: 0 }
+    };
+
+    function getLocalList(key) {
+      try { return JSON.parse(localStorage.getItem(key) || "[]"); } catch (_) { return []; }
+    }
+
+    function saveLocalList(key, list) {
+      localStorage.setItem(key, JSON.stringify(list));
+    }
+
+    function getAuthAccounts() {
+      return getLocalList("authAccounts");
+    }
+
+    function getEnterpriseProfile() {
+      try { return JSON.parse(localStorage.getItem("enterpriseProfile") || "null") || {}; }
+      catch (_) { return {}; }
+    }
+
+    function currentEnterpriseDisplayName(fallback) {
+      const p = getEnterpriseProfile();
+      return p.enterpriseName || p.shortName || fallback || "骋风天合文化传媒有限公司";
+    }
+
+    function saveAuthAccount(nextAccount) {
+      const all = getAuthAccounts();
+      const idx = all.findIndex((x) => x.phone === nextAccount.phone);
+      if (idx >= 0) all[idx] = { ...all[idx], ...nextAccount };
+      else all.push(nextAccount);
+      saveLocalList("authAccounts", all);
+    }
+
+    function parseInviteDate(s) {
+      if (!s) return 0;
+      const parts = s.split(/[\/\-\s:]/).map(Number);
+      return new Date(parts[0], (parts[1] || 1) - 1, parts[2] || 1, parts[3] || 0, parts[4] || 0, parts[5] || 0).getTime();
+    }
+
+    function resolveInvite(code) {
+      const normalized = (code || "").trim().toUpperCase();
+      if (!normalized) return { state: "empty" };
+
+      try {
+        const list = JSON.parse(localStorage.getItem("enterpriseInvites") || "[]");
+        const hit = list.find((x) => (x.code || "").toUpperCase() === normalized);
+        if (hit) {
+          if (hit.status === "revoked") return { state: "revoked" };
+          if ((hit.used || 0) >= (hit.quota || 0)) return { state: "usedup" };
+          if (parseInviteDate(hit.expireAt) && parseInviteDate(hit.expireAt) < Date.now()) {
+            return { state: "expired" };
+          }
+          return {
+            state: "valid",
+            code: hit.code,
+            enterpriseName: currentEnterpriseDisplayName(hit.enterpriseName),
+            workspaceName: hit.workspaceName,
+            roleName: hit.roleName,
+            leftQuota: Math.max(0, (hit.quota || 0) - (hit.used || 0))
+          };
+        }
+      } catch (_) {}
+
+      const preset = INVITE_PRESETS[normalized];
+      if (!preset) return { state: "notfound" };
+      return { ...preset, code: normalized, enterpriseName: currentEnterpriseDisplayName(preset.enterpriseName) };
+    }
+
+    function consumeInviteQuota(code) {
+      try {
+        const list = JSON.parse(localStorage.getItem("enterpriseInvites") || "[]");
+        const idx = list.findIndex((x) => (x.code || "").toUpperCase() === (code || "").toUpperCase());
+        if (idx >= 0) {
+          list[idx].used = (list[idx].used || 0) + 1;
+          localStorage.setItem("enterpriseInvites", JSON.stringify(list));
+        }
+      } catch (_) {}
+    }
+
+    function readInviteFromUrl() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        return (params.get("invite") || "").trim();
+      } catch (_) { return ""; }
+    }
+
+    const UnifiedAuth = () => {
+      const urlInvite = useMemo(() => readInviteFromUrl(), []);
+      const [mainTab, setMainTab] = useState(urlInvite ? "register" : "login");
+      const [loginMode, setLoginMode] = useState("code");
+      const [registerMode, setRegisterMode] = useState("invite");
+
+      const [loginForm] = Form.useForm();
+      const [inviteForm] = Form.useForm();
+      const [personalForm] = Form.useForm();
+      const [resetForm] = Form.useForm();
+
+      const [loadingLogin, setLoadingLogin] = useState(false);
+      const [loadingInviteReg, setLoadingInviteReg] = useState(false);
+      const [loadingPersonalReg, setLoadingPersonalReg] = useState(false);
+
+      const [showResetModal, setShowResetModal] = useState(false);
+      const [loginCodeCountdown, setLoginCodeCountdown] = useState(0);
+      const [resetCodeCountdown, setResetCodeCountdown] = useState(0);
+      const loginTimerRef = useRef(null);
+      const resetTimerRef = useRef(null);
+
+      const inviteCodeValue = Form.useWatch("inviteCode", inviteForm);
+      const inviteResult = useMemo(() => resolveInvite(inviteCodeValue), [inviteCodeValue]);
+
+      React.useEffect(() => {
+        if (urlInvite) {
+          inviteForm.setFieldsValue({ inviteCode: urlInvite });
+        }
+      }, [urlInvite, inviteForm]);
+
+      const startCountdown = (setter, timerRef) => {
+        setter(60);
+        clearInterval(timerRef.current);
+        timerRef.current = setInterval(() => {
+          setter((prev) => {
+            if (prev <= 1) {
+              clearInterval(timerRef.current);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+      };
+
+      const assertPhone = (phone) => /^1\d{10}$/.test(phone || "");
+
+      const getLegacyPassword = (phone) => {
+        const pending = getLocalList("pendingStudents");
+        const hit = pending.find((x) => x.phone === phone);
+        return hit ? hit.password : "";
+      };
+
+      const getTalentUser = (phone) => {
+        const talent = getLocalList("talentPool");
+        return talent.find((x) => x.phone === phone);
+      };
+
+      const getPendingEnterpriseRequest = (phone) => {
+        const list = getLocalList("pendingEnterpriseMembers");
+        return list.find((x) => x.phone === phone);
+      };
+
+      const checkPhoneDuplicated = (phone) => {
+        if (getAuthAccounts().some((x) => x.phone === phone)) return true;
+        if (getLocalList("pendingStudents").some((x) => x.phone === phone)) return true;
+        if (getLocalList("pendingEnterpriseMembers").some((x) => x.phone === phone)) return true;
+        if (getLocalList("talentPool").some((x) => x.phone === phone)) return true;
+        return false;
+      };
+
+      const finishLogin = (user) => {
+        const profileName = currentEnterpriseDisplayName(user.enterpriseName);
+        localStorage.setItem("currentUser", JSON.stringify({
+          id: user.id || ("U_" + Date.now()),
+          phone: user.phone,
+          nickname: user.nickname || user.name || "平台用户",
+          takerRole: user.takerRole || "剪辑师",
+          enterpriseName: user.tenantType === "personal" ? "" : profileName,
+          tenantType: user.tenantType || "personal",
+          status: "Active",
+          loginTime: dayjs().format("YYYY-MM-DD HH:mm:ss")
+        }));
+        message.success("登录成功，正在进入工作台...");
+        setTimeout(() => { window.location.href = "Home.html"; }, 900);
+      };
+
+      const handleLoginSendCode = () => {
+        const phone = loginForm.getFieldValue("phone");
+        if (!assertPhone(phone)) {
+          message.warning("请输入正确的手机号");
+          return;
+        }
+        startCountdown(setLoginCodeCountdown, loginTimerRef);
+        message.success("验证码已发送（测试验证码：123456）");
+      };
+
+      const handleLogin = () => {
+        loginForm.validateFields().then((values) => {
+          setLoadingLogin(true);
+          const account = getAuthAccounts().find((x) => x.phone === values.phone);
+          const pendingEnterprise = getPendingEnterpriseRequest(values.phone);
+          const legacyUser = getTalentUser(values.phone);
+
+          if (!account && !legacyUser && !pendingEnterprise) {
+            message.error("该手机号尚未注册，请先在统一入口完成注册");
+            setLoadingLogin(false);
+            return;
+          }
+
+          if (pendingEnterprise && pendingEnterprise.auditStatus === "Pending") {
+            message.warning("你的入企申请仍在审核中，请等待企业管理员审核通过");
+            setLoadingLogin(false);
+            return;
+          }
+
+          if (account && account.status === "Pending") {
+            message.warning("账号审核中，暂不可登录");
+            setLoadingLogin(false);
+            return;
+          }
+          if (account && account.status === "Rejected") {
+            message.error("账号审核已驳回，请联系管理员重新发起邀请");
+            setLoadingLogin(false);
+            return;
+          }
+
+          if (loginMode === "code" && values.code !== "123456") {
+            message.error("验证码错误（测试验证码：123456）");
+            setLoadingLogin(false);
+            return;
+          }
+
+          if (loginMode === "password") {
+            const plain = account ? account.password : getLegacyPassword(values.phone);
+            if (!plain) {
+              message.error("未找到密码记录，请使用验证码登录");
+              setLoadingLogin(false);
+              return;
+            }
+            if (values.password !== plain) {
+              message.error("密码错误");
+              setLoadingLogin(false);
+              return;
+            }
+          }
+
+          finishLogin(account || legacyUser);
+          setLoadingLogin(false);
+        }).catch(() => {});
+      };
+
+      const handleInviteRegister = () => {
+        inviteForm.validateFields().then((values) => {
+          if (inviteResult.state !== "valid") {
+            message.error("邀请码无效，无法提交申请");
+            return;
+          }
+          if (checkPhoneDuplicated(values.phone)) {
+            message.warning("该手机号已存在注册记录，请直接登录或联系管理员");
+            return;
+          }
+          setLoadingInviteReg(true);
+
+          const req = {
+            id: "EJOIN_" + Date.now(),
+            name: values.name.trim(),
+            phone: values.phone,
+            password: values.password,
+            inviteCode: values.inviteCode.trim().toUpperCase(),
+            enterpriseName: inviteResult.enterpriseName,
+            tenantType: "enterprise",
+            auditStatus: "Pending",
+            createdAt: dayjs().format("YYYY-MM-DD HH:mm:ss")
+          };
+          const list = getLocalList("pendingEnterpriseMembers");
+          list.push(req);
+          saveLocalList("pendingEnterpriseMembers", list);
+
+          saveAuthAccount({
+            id: req.id,
+            phone: req.phone,
+            name: req.name,
+            nickname: req.name,
+            password: req.password,
+            status: "Pending",
+            tenantType: "enterprise",
+            enterpriseName: req.enterpriseName
+          });
+
+          consumeInviteQuota(req.inviteCode);
+
+          message.success("申请已提交，需企业管理员二次审核后才能登录");
+          inviteForm.resetFields();
+          setLoadingInviteReg(false);
+          setMainTab("login");
+        }).catch(() => {});
+      };
+
+      const handlePersonalRegister = () => {
+        personalForm.validateFields().then((values) => {
+          if (checkPhoneDuplicated(values.phone)) {
+            message.warning("该手机号已存在注册记录，请直接登录");
+            return;
+          }
+          setLoadingPersonalReg(true);
+
+          const pending = getLocalList("pendingStudents");
+          pending.push({
+            id: "REG_" + Date.now(),
+            userType: "personal",
+            nickname: values.name,
+            username: values.phone,
+            phone: values.phone,
+            takerRole: "剪辑师",
+            applyTime: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+            status: "Approved",
+            password: values.password
+          });
+          saveLocalList("pendingStudents", pending);
+
+          const talent = getLocalList("talentPool");
+          talent.push({
+            id: "TP_" + Date.now(),
+            phone: values.phone,
+            nickname: values.name,
+            takerRole: "剪辑师",
+            status: "Active"
+          });
+          saveLocalList("talentPool", talent);
+
+          saveAuthAccount({
+            id: "A_" + Date.now(),
+            phone: values.phone,
+            name: values.name,
+            nickname: values.name,
+            password: values.password,
+            status: "Active",
+            tenantType: "personal"
+          });
+
+          message.success("个人注册成功，可直接登录");
+          personalForm.resetFields();
+          setLoadingPersonalReg(false);
+          setMainTab("login");
+        }).catch(() => {});
+      };
+
+      const sendResetCode = () => {
+        const phone = resetForm.getFieldValue("phone");
+        if (!assertPhone(phone)) {
+          message.warning("请输入正确的手机号");
+          return;
+        }
+        startCountdown(setResetCodeCountdown, resetTimerRef);
+        message.success("验证码已发送（测试验证码：123456）");
+      };
+
+      const submitResetPassword = () => {
+        resetForm.validateFields().then((values) => {
+          if (values.code !== "123456") {
+            message.error("验证码错误（测试验证码：123456）");
+            return;
+          }
+          const all = getAuthAccounts();
+          const idx = all.findIndex((x) => x.phone === values.phone);
+          if (idx < 0) {
+            message.error("未找到该手机号对应账号");
+            return;
+          }
+          all[idx].password = values.newPassword;
+          saveLocalList("authAccounts", all);
+          message.success("密码重置成功，请重新登录");
+          setShowResetModal(false);
+          resetForm.resetFields();
+        }).catch(() => {});
+      };
+
+      const inviteHint = (() => {
+        if (inviteResult.state === "empty") return "请输入邀请码，系统将自动绑定所属企业（租户严格映射企业）。";
+        if (inviteResult.state === "valid") return `邀请码有效，目标企业：${inviteResult.enterpriseName}，剩余名额 ${inviteResult.leftQuota}。`;
+        if (inviteResult.state === "notfound") return "邀请码不存在，请联系企业管理员重新获取。";
+        if (inviteResult.state === "expired") return "邀请码已过期，请联系企业管理员重新生成。";
+        if (inviteResult.state === "revoked") return "邀请码已撤销，无法使用。";
+        return "邀请码名额已用尽，请联系管理员。";
+      })();
+
+      const inviteClass = inviteResult.state === "valid" ? "inviteStatus valid" : (inviteResult.state === "empty" ? "inviteStatus" : "inviteStatus error");
+
+      return (
+        <div className="authPage">
+          <div className="authWrap">
+            <section className="authHero">
+              <div>
+                <a href="demo-index.html" className="brand">🎬 骋风天合 · 创作门户交易平台</a>
+                <h1 className="heroTitle">统一身份入口</h1>
+                <p className="heroDesc">
+                  接单平台与 AIGC 平台共用同一套账号体系。<br />
+                  所有租户严格映射为企业主体，成员入企必须通过邀请码并完成管理员二次审核。
+                </p>
+                <div className="policyCard">
+                  <strong>当前规则</strong>
+                  <ul className="heroList">
+                    <li>租户严格映射企业，不再存在独立 AIGC 注册入口</li>
+                    <li>邀请码加入企业后，须由企业管理员审核通过</li>
+                    <li>个人注册默认进入个人空间（无需企业审核）</li>
+                  </ul>
+                </div>
+              </div>
+              <div style={{ fontSize: 12, color: "rgba(222,228,255,.8)", lineHeight: 1.8 }}>
+                已有账号可直接登录，历史账号也可在这里继续使用。<br />
+                企业/团队主体创建请走入驻流程，成员入企请走邀请码路径。
+              </div>
+            </section>
+
+            <section className="authMain">
+              <div className="mainTop">
+                <div>
+                  <h2 className="mainTitle">登录与注册</h2>
+                  <div className="mainSub">同一入口覆盖接单平台与 AIGC 平台账号体系</div>
+                </div>
+                <div className="switchHint">入口页：`auth.html`</div>
+              </div>
+
+              <Tabs
+                activeKey={mainTab}
+                onChange={(key) => setMainTab(key)}
+                items={[{ key: "login", label: "登录" }, { key: "register", label: "注册" }]}
+              />
+
+              {mainTab === "login" && (
+                <div style={{ marginTop: 4 }}>
+                  <Tabs
+                    activeKey={loginMode}
+                    onChange={(k) => { setLoginMode(k); loginForm.resetFields(["code", "password"]); }}
+                    items={[
+                      { key: "code", label: "验证码登录" },
+                      { key: "password", label: "密码登录" }
+                    ]}
+                  />
+                  <Form form={loginForm} layout="vertical">
+                    <Form.Item
+                      name="phone"
+                      label="手机号"
+                      rules={[
+                        { required: true, message: "请输入手机号" },
+                        { pattern: /^1\d{10}$/, message: "请输入正确的手机号" }
+                      ]}
+                    >
+                      <Input placeholder="请输入手机号" maxLength={11} size="large" />
+                    </Form.Item>
+                    {loginMode === "code" ? (
+                      <Form.Item
+                        name="code"
+                        label="验证码"
+                        rules={[{ required: true, message: "请输入验证码" }, { len: 6, message: "验证码为6位" }]}
+                      >
+                        <div style={{ display: "flex", gap: 8 }}>
+                          <Input placeholder="6位验证码" maxLength={6} size="large" style={{ flex: 1 }} />
+                          <Button style={{ width: 132 }} size="large" disabled={loginCodeCountdown > 0} onClick={handleLoginSendCode}>
+                            {loginCodeCountdown > 0 ? `${loginCodeCountdown}s` : "获取验证码"}
+                          </Button>
+                        </div>
+                      </Form.Item>
+                    ) : (
+                      <Form.Item name="password" label="密码" rules={[{ required: true, message: "请输入密码" }]}>
+                        <Input.Password placeholder="请输入密码" size="large" />
+                      </Form.Item>
+                    )}
+
+                    {loginMode === "password" && (
+                      <div style={{ textAlign: "right", marginTop: -10, marginBottom: 10 }}>
+                        <a href="#" onClick={(e) => { e.preventDefault(); setShowResetModal(true); }}>
+                          忘记密码？
+                        </a>
+                      </div>
+                    )}
+
+                    <Button
+                      type="primary"
+                      block
+                      size="large"
+                      loading={loadingLogin}
+                      onClick={handleLogin}
+                      style={{ height: 46, borderRadius: 8, fontWeight: 600, background: "var(--primary)" }}
+                    >
+                      登 录
+                    </Button>
+                  </Form>
+                </div>
+              )}
+
+              {mainTab === "register" && (
+                <div style={{ marginTop: 4 }}>
+                  <div className="chooseCardRow">
+                    <div className={`chooseCard ${registerMode === "invite" ? "active" : ""}`} onClick={() => setRegisterMode("invite")}>
+                      <h4 className="chooseTitle">🔑 凭邀请码加入企业（需管理员二次审核）</h4>
+                      <p className="chooseDesc">用于加入已存在企业。邀请码校验通过后提交申请，审核通过方可登录。</p>
+                    </div>
+                    <div className={`chooseCard ${registerMode === "newOrg" ? "active" : ""}`} onClick={() => setRegisterMode("newOrg")}>
+                      <h4 className="chooseTitle">🏢 创建企业/团队主体</h4>
+                      <p className="chooseDesc">用于新建企业或团队租户主体，进入入驻流程提交资质材料。</p>
+                    </div>
+                    <div className={`chooseCard ${registerMode === "personal" ? "active" : ""}`} onClick={() => setRegisterMode("personal")}>
+                      <h4 className="chooseTitle">👤 个人注册</h4>
+                      <p className="chooseDesc">默认进入个人空间，无需企业管理员审核，可直接登录。</p>
+                    </div>
+                  </div>
+
+                  {registerMode === "invite" && (
+                    <div>
+                      <Alert
+                        type="info"
+                        showIcon
+                        style={{ marginBottom: 12 }}
+                        message="租户严格映射企业：通过邀请码仅能加入对应企业，注册后不可自行切换企业归属。"
+                      />
+                      <Form form={inviteForm} layout="vertical">
+                        <Form.Item name="name" label="姓名" rules={[{ required: true, message: "请输入姓名" }, { min: 2, message: "至少2个字" }]}>
+                          <Input placeholder="请输入真实姓名" maxLength={20} />
+                        </Form.Item>
+                        <Form.Item
+                          name="phone"
+                          label="手机号"
+                          rules={[
+                            { required: true, message: "请输入手机号" },
+                            { pattern: /^1\d{10}$/, message: "请输入正确的手机号" }
+                          ]}
+                        >
+                          <Input placeholder="请输入手机号" maxLength={11} />
+                        </Form.Item>
+                        <Form.Item name="inviteCode" label="邀请码" rules={[{ required: true, message: "请输入邀请码" }]}>
+                          <Input placeholder="如：CFTH2026（演示）" />
+                        </Form.Item>
+                        <div className={inviteClass}>
+                          {inviteHint}
+                          {inviteResult.state === "valid" && (
+                            <div style={{ marginTop: 4 }}>
+                              <Tag color="green">状态：有效</Tag>
+                              <Tag color="blue">企业：{inviteResult.enterpriseName}</Tag>
+                            </div>
+                          )}
+                        </div>
+                        <Form.Item name="password" label="密码" rules={[{ required: true, message: "请输入密码" }, { min: 6, message: "至少6位" }]}>
+                          <Input.Password placeholder="至少6位" />
+                        </Form.Item>
+                        <Form.Item
+                          name="confirmPassword"
+                          label="确认密码"
+                          dependencies={["password"]}
+                          rules={[
+                            { required: true, message: "请确认密码" },
+                            ({ getFieldValue }) => ({
+                              validator(_, value) {
+                                if (!value || getFieldValue("password") === value) return Promise.resolve();
+                                return Promise.reject(new Error("两次密码不一致"));
+                              }
+                            })
+                          ]}
+                        >
+                          <Input.Password placeholder="再次输入密码" />
+                        </Form.Item>
+                        <Form.Item
+                          name="agree"
+                          valuePropName="checked"
+                          rules={[{ validator: (_, v) => (v ? Promise.resolve() : Promise.reject(new Error("请先同意协议"))) }]}
+                        >
+                          <Checkbox>我已阅读并同意《用户协议》《隐私政策》</Checkbox>
+                        </Form.Item>
+                        <Button
+                          type="primary"
+                          block
+                          loading={loadingInviteReg}
+                          onClick={handleInviteRegister}
+                          style={{ height: 44, borderRadius: 8, fontWeight: 600, background: "var(--primary)" }}
+                        >
+                          注册并提交管理员审核
+                        </Button>
+                      </Form>
+                    </div>
+                  )}
+
+                  {registerMode === "newOrg" && (
+                    <div>
+                      <Alert
+                        type="warning"
+                        showIcon
+                        style={{ marginBottom: 12 }}
+                        message="你将创建新的企业/团队主体（租户），该流程需提交资质并经平台审核。"
+                      />
+                      <div className="chooseCard" style={{ cursor: "default", borderStyle: "dashed" }}>
+                        <h4 className="chooseTitle">进入主体入驻流程</h4>
+                        <p className="chooseDesc">支持企业、团队、个人主体创建；完成后自动回到统一登录入口。</p>
+                        <Button type="primary" onClick={() => { window.location.href = "enterprise-onboarding.html"; }}>
+                          去入驻
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {registerMode === "personal" && (
+                    <div>
+                      <Alert type="success" showIcon style={{ marginBottom: 12 }} message="个人注册会直接开通个人空间，无需企业管理员审核。" />
+                      <Form form={personalForm} layout="vertical">
+                        <Form.Item name="name" label="姓名" rules={[{ required: true, message: "请输入姓名" }, { min: 2, message: "至少2个字" }]}>
+                          <Input placeholder="请输入姓名" maxLength={20} />
+                        </Form.Item>
+                        <Form.Item
+                          name="phone"
+                          label="手机号"
+                          rules={[
+                            { required: true, message: "请输入手机号" },
+                            { pattern: /^1\d{10}$/, message: "请输入正确的手机号" }
+                          ]}
+                        >
+                          <Input placeholder="请输入手机号" maxLength={11} />
+                        </Form.Item>
+                        <Form.Item name="password" label="密码" rules={[{ required: true, message: "请输入密码" }, { min: 6, message: "至少6位" }]}>
+                          <Input.Password placeholder="至少6位" />
+                        </Form.Item>
+                        <Form.Item
+                          name="confirmPassword"
+                          label="确认密码"
+                          dependencies={["password"]}
+                          rules={[
+                            { required: true, message: "请确认密码" },
+                            ({ getFieldValue }) => ({
+                              validator(_, value) {
+                                if (!value || getFieldValue("password") === value) return Promise.resolve();
+                                return Promise.reject(new Error("两次密码不一致"));
+                              }
+                            })
+                          ]}
+                        >
+                          <Input.Password placeholder="再次输入密码" />
+                        </Form.Item>
+                        <Form.Item
+                          name="agree"
+                          valuePropName="checked"
+                          rules={[{ validator: (_, v) => (v ? Promise.resolve() : Promise.reject(new Error("请先同意协议"))) }]}
+                        >
+                          <Checkbox>我已阅读并同意《用户协议》《隐私政策》</Checkbox>
+                        </Form.Item>
+                        <Button
+                          type="primary"
+                          block
+                          loading={loadingPersonalReg}
+                          onClick={handlePersonalRegister}
+                          style={{ height: 44, borderRadius: 8, fontWeight: 600, background: "var(--primary)" }}
+                        >
+                          注册并开始使用
+                        </Button>
+                      </Form>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="splitLine"></div>
+              <div className="pageFooter">
+                统一入口上线后，AIGC 独立注册页将下线；所有账号均从接单平台入口进入。
+                <div className="footerLinks">
+                  <a href="demo-index.html">返回原型导航</a>
+                  <a href="Home.html">返回首页</a>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <Modal
+            title="重置密码"
+            open={showResetModal}
+            onCancel={() => { setShowResetModal(false); resetForm.resetFields(); }}
+            footer={null}
+            width={420}
+          >
+            <Form form={resetForm} layout="vertical" style={{ marginTop: 14 }}>
+              <Form.Item name="phone" label="手机号" rules={[{ required: true, message: "请输入手机号" }, { pattern: /^1\d{10}$/, message: "请输入正确的手机号" }]}>
+                <Input placeholder="请输入手机号" maxLength={11} />
+              </Form.Item>
+              <Form.Item name="code" label="验证码" rules={[{ required: true, message: "请输入验证码" }, { len: 6, message: "验证码为6位" }]}>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <Input placeholder="6位验证码" maxLength={6} style={{ flex: 1 }} />
+                  <Button disabled={resetCodeCountdown > 0} onClick={sendResetCode} style={{ width: 130 }}>
+                    {resetCodeCountdown > 0 ? `${resetCodeCountdown}s` : "获取验证码"}
+                  </Button>
+                </div>
+              </Form.Item>
+              <Form.Item name="newPassword" label="新密码" rules={[{ required: true, message: "请输入新密码" }, { min: 6, message: "至少6位" }]}>
+                <Input.Password placeholder="至少6位" />
+              </Form.Item>
+              <Form.Item
+                name="confirmPassword"
+                label="确认新密码"
+                dependencies={["newPassword"]}
+                rules={[
+                  { required: true, message: "请确认新密码" },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue("newPassword") === value) return Promise.resolve();
+                      return Promise.reject(new Error("两次密码不一致"));
+                    }
+                  })
+                ]}
+              >
+                <Input.Password placeholder="再次输入新密码" />
+              </Form.Item>
+              <Button type="primary" block onClick={submitResetPassword} style={{ height: 42, borderRadius: 8, fontWeight: 600, background: "var(--primary)" }}>
+                重置密码
+              </Button>
+            </Form>
+          </Modal>
+        </div>
+      );
+    };
+
+    function renderApp() {
+      if (typeof React === "undefined" || typeof ReactDOM === "undefined") {
+        setTimeout(renderApp, 100);
+        return;
+      }
+      try {
+        ReactDOM.render(<UnifiedAuth />, document.getElementById("root"));
+      } catch (e) {
+        console.error("渲染错误:", e);
+        document.getElementById("root").innerHTML = '<div style="padding:20px;color:#d4380d">页面加载失败，请检查脚本。</div>';
+      }
+    }
+    if (document.readyState === "loading") window.addEventListener("load", renderApp);
+    else renderApp();
+  </script>
+</body>
+</html>

@@ -228,6 +228,21 @@
     accountTypeText.textContent = "企业账号";
     renderErrors();
     setDisabled();
+
+    function loadEnterpriseDisplay() {
+      try {
+        const profile = JSON.parse(localStorage.getItem("enterpriseProfile") || "null");
+        if (!profile) return;
+        const el = document.getElementById("enterpriseNameText");
+        if (el && (profile.enterpriseName || profile.shortName)) {
+          el.textContent = profile.enterpriseName || profile.shortName;
+        }
+      } catch (_) {}
+    }
+    loadEnterpriseDisplay();
+    window.addEventListener("storage", function (event) {
+      if (event.key === "enterpriseProfile") loadEnterpriseDisplay();
+    });
   </script>
 </body>
 </html>
