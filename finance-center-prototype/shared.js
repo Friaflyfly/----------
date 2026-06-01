@@ -53,6 +53,15 @@
       actions: [],
       section: "front"
     },
+    points: {
+      title: "积分中心",
+      desc: "管理积分余额、余额兑换积分、充值并兑换积分，以及 AIGC token 消费记录。",
+      actions: [
+        { label: "兑换积分", modal: "pointsExchange", tone: "primary" },
+        { label: "充值并兑换", href: "recharge.html", tone: "" }
+      ],
+      section: "front"
+    },
     invoices: {
       title: "发票中心",
       desc: "可开票订单、申请记录、已开具发票与抬头信息集中处理。",
@@ -138,8 +147,9 @@
       ["transactions", "交易流水", "↹"],
       ["fundFlows", "资金流水", "≋"],
       ["bills", "账单明细", "◫"],
-      ["invoices", "发票中心", "▣"],
       ["recharge", "充值中心", "＋"],
+      ["points", "积分中心", "◒"],
+      ["invoices", "发票中心", "▣"],
       ["withdraw", "提现中心", "－"],
       ["security", "支付与安全", "⌘"]
     ],
@@ -221,6 +231,24 @@
         ]},
         { name: "操作信息", columns: [
           ["actions", "操作", true]
+        ]}
+      ]
+    },
+    points: {
+      title: "定制列",
+      groups: [
+        { name: "积分信息", columns: [
+          ["pointNo", "积分流水号", true],
+          ["type", "积分动作", true],
+          ["direction", "变动方向", true],
+          ["points", "积分变动", true]
+        ]},
+        { name: "业务信息", columns: [
+          ["cash", "关联金额", true],
+          ["token", "关联 token", true],
+          ["bizNo", "关联业务单号", true],
+          ["status", "状态", true],
+          ["time", "发生时间", true]
         ]}
       ]
     }
@@ -796,6 +824,61 @@
     ];
   }
 
+  function parsePoints(value) {
+    return Number(String(value).replace(/[^\d.-]/g, "")) || 0;
+  }
+
+  function getPointsView(team, accountScope = "team") {
+    const isDrama = team.name.includes("短剧");
+    const isPersonal = accountScope === "personal";
+    const personal = getPersonalAccountView(team);
+    const balance = isPersonal ? parsePoints(personal.points) : (isDrama ? 12800 : 6400);
+    const accountName = isPersonal ? personal.name : `${team.name} - 团队积分账户`;
+    const accountId = isPersonal ? personal.accountId.replace("WAL", "PTS") : (isDrama ? "PTS-TEAM-10021" : "PTS-TEAM-10057");
+    const rows = isPersonal
+      ? [
+        ["PF-2026052701", "承接奖励积分", "获得", "+1,200", "—", "—", "SET-2026052701", "成功", "2026-05-27 09:30"],
+        ["PF-2026052402", "AIGC token 消费", "消耗", "-680", "—", "8,500", "AI-2026052402", "成功", "2026-05-24 16:40"],
+        ["PF-2026051803", "余额兑换积分", "获得", "+5,000", "¥ 500", "—", isDrama ? "PT-2026051803" : "PT-2026051403", "成功", "2026-05-18 09:36"],
+        ["PF-2026051506", "AIGC token 消费", "消耗", "-1,320", "—", "16,200", "AI-2026051506", "成功", "2026-05-15 14:21"]
+      ]
+      : [
+        ["PF-2026052801", "AIGC token 消费", "消耗", isDrama ? "-3,200" : "-1,400", "—", isDrama ? "42,000" : "18,000", "AI-2026052801", "成功", "2026-05-28 11:36"],
+        ["PF-2026051801", "余额兑换积分", "获得", isDrama ? "+20,000" : "+10,000", isDrama ? "¥ 2,000" : "¥ 1,000", "—", isDrama ? "PT-2026051801" : "PT-2026051401", "成功", isDrama ? "2026-05-18 09:36" : "2026-05-14 10:08"],
+        ["PF-2026051609", "AIGC token 消费", "消耗", isDrama ? "-2,500" : "-900", "—", isDrama ? "31,000" : "12,000", "AI-2026051609", "成功", "2026-05-16 17:20"],
+        ["PF-2026051207", "消费失败退回", "退回", isDrama ? "+500" : "+300", "—", isDrama ? "6,000" : "3,200", "AI-2026051207", "已退回", "2026-05-12 19:08"]
+      ];
+    const consumption = isPersonal
+      ? [
+        ["AI-2026052402", "智能分镜生成", "AIGC 创作台", "8,500", "680", "分镜草稿 v2", "成功", "2026-05-24 16:40"],
+        ["AI-2026051506", "文案扩写", "AIGC 创作台", "16,200", "1,320", "广告脚本文案", "成功", "2026-05-15 14:21"]
+      ]
+      : [
+        ["AI-2026052801", isDrama ? "短剧口播脚本生成" : "活动海报文案生成", "天合 AIGC 平台", isDrama ? "42,000" : "18,000", isDrama ? "3,200" : "1,400", isDrama ? "修仙题材第 3 集脚本" : "6 月活动主视觉", "成功", "2026-05-28 11:36"],
+        ["AI-2026051609", isDrama ? "角色图提示词优化" : "投放标题批量生成", "天合 AIGC 平台", isDrama ? "31,000" : "12,000", isDrama ? "2,500" : "900", isDrama ? "IP 海报系列" : "营销短视频制作包", "成功", "2026-05-16 17:20"],
+        ["AI-2026051207", "视频脚本试算失败退回", "天合 AIGC 平台", isDrama ? "6,000" : "3,200", isDrama ? "500" : "300", "模型超时自动退回", "已退回", "2026-05-12 19:08"]
+      ];
+    const earned = rows
+      .filter(row => row[2] === "获得" || row[2] === "退回")
+      .reduce((sum, row) => sum + parsePoints(row[3]), 0);
+    const used = rows
+      .filter(row => row[2] === "消耗")
+      .reduce((sum, row) => sum + Math.abs(parsePoints(row[3])), 0);
+
+    return {
+      accountScope: isPersonal ? "个人账户" : "团队账户",
+      accountName,
+      accountId,
+      balance,
+      earned,
+      used,
+      tokenEstimate: balance * 12,
+      pending: isPersonal ? 0 : (isDrama ? 300 : 120),
+      rows,
+      consumption
+    };
+  }
+
   function buildBillDetailRows(team) {
     if (team.name.includes("短剧")) {
       return [
@@ -979,6 +1062,7 @@
       transactions: "transactions.html",
       fundFlows: "fund-flows.html",
       bills: "bills.html",
+      points: "points.html",
       invoices: "invoices.html",
       recharge: "recharge.html",
       withdraw: "withdraw.html",
@@ -997,6 +1081,7 @@
   Object.assign(PAGES.transactions, { icon: "↹" });
   Object.assign(PAGES.fundFlows, { icon: "≋" });
   Object.assign(PAGES.bills, { icon: "◫" });
+  Object.assign(PAGES.points, { icon: "◒" });
   Object.assign(PAGES.invoices, { icon: "▣" });
   Object.assign(PAGES.recharge, { icon: "＋" });
   Object.assign(PAGES.withdraw, { icon: "－" });
@@ -1014,11 +1099,11 @@
           <div>
             <div class="hero-kicker">Prototype Directory</div>
             <h3 class="hero-title">资金中心多页面原型</h3>
-            <div class="hero-balance">13</div>
+            <div class="hero-balance">15</div>
             <div class="hero-caption">已拆成独立页面，便于逐页打磨细节，而不是继续在单页大文件里堆内容。</div>
           </div>
           <div class="hero-side">
-            <div class="hero-side-card"><div class="label">前台页面</div><div class="value">9 页</div><div class="sub">总览、账户、交易流水、资金流水、账单明细、发票、充值、提现、安全。</div></div>
+            <div class="hero-side-card"><div class="label">前台页面</div><div class="value">10 页</div><div class="sub">总览、账户、交易流水、资金流水、账单明细、充值、积分、发票、提现、安全。</div></div>
             <div class="hero-side-card"><div class="label">三层流水</div><div class="value">交易 / 资金 / 账单</div><div class="sub">交易事件、余额变化、用户账单三层分离展示。</div></div>
             <div class="hero-side-card"><div class="label">补充页面</div><div class="value">5 页</div><div class="sub">订单资金详情 + 4 个后台财务页面。</div></div>
           </div>
@@ -1034,8 +1119,9 @@
               ["transactions.html", "交易流水", "记录交易事件"],
               ["fund-flows.html", "资金流水", "记录余额真实变化"],
               ["bills.html", "账单明细", "用户可读账单记录"],
-              ["invoices.html", "发票中心", "可开票与发票归档"],
               ["recharge.html", "充值中心", "补钱与到账状态"],
+              ["points.html", "积分中心", "积分兑换与 AIGC 消费"],
+              ["invoices.html", "发票中心", "可开票与发票归档"],
               ["withdraw.html", "提现中心", "收益提现记录"],
               ["security.html", "支付与安全", "支付工具与校验"]
             ].map(item => `<a class="card-link" href="${item[0]}"><strong>${item[1]}</strong><span>${item[2]}</span></a>`).join("")}
@@ -1601,6 +1687,137 @@
         </div>
       </div>
       ${renderColumnConfigModal("bills")}
+    `;
+  }
+
+  function renderPoints(team, accountScope = "team") {
+    const view = getPointsView(team, accountScope);
+    const exchangeAmount = accountScope === "personal" ? "500" : "2,000";
+    const exchangePoints = parseMoney(exchangeAmount) * 10;
+    return `
+      <div class="points-hero">
+        <div>
+          <div class="hero-kicker">Points Wallet</div>
+          <h3>积分是统一账户下的虚拟权益资产</h3>
+          <p>积分可通过余额兑换或充值后兑换获得，并可在天合 AIGC 平台消费 token。积分不等同现金余额，提现和发票口径后续单独确认。</p>
+          <div class="points-hero-actions">
+            <button class="btn primary" type="button" data-open-recharge-modal="pointsExchange">兑换积分</button>
+            <a class="btn" href="recharge.html">充值并兑换</a>
+          </div>
+        </div>
+        <div class="points-balance-card">
+          <span>${view.accountScope}</span>
+          <strong>${view.balance.toLocaleString("zh-CN")}</strong>
+          <em>当前积分余额</em>
+        </div>
+      </div>
+
+      <div class="summary-strip" style="grid-template-columns:repeat(5,minmax(0,1fr));">
+        <div class="summary-box"><div class="kicker">积分账户</div><div class="big">${view.accountName}</div></div>
+        <div class="summary-box"><div class="kicker">本月获得积分</div><div class="big">${view.earned.toLocaleString("zh-CN")}</div></div>
+        <div class="summary-box"><div class="kicker">本月消耗积分</div><div class="big">${view.used.toLocaleString("zh-CN")}</div></div>
+        <div class="summary-box"><div class="kicker">预计可用 token</div><div class="big">${view.tokenEstimate.toLocaleString("zh-CN")}</div></div>
+        <div class="summary-box"><div class="kicker">处理中积分</div><div class="big">${view.pending.toLocaleString("zh-CN")}</div></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="surface">
+          <div class="surface-head"><div><h3>积分兑换</h3><p>使用当前账户可用余额兑换积分</p></div><span class="tag blue">10 积分 / ¥1</span></div>
+          <div class="point-rule-grid">
+            <div><span>兑换账户</span><strong>${view.accountName}</strong></div>
+            <div><span>积分账户 ID</span><strong>${view.accountId}</strong></div>
+            <div><span>默认兑换金额</span><strong>¥ ${exchangeAmount}</strong></div>
+            <div><span>预计获得积分</span><strong>${exchangePoints.toLocaleString("zh-CN")} 分</strong></div>
+          </div>
+          <div class="summary-actions" style="margin-top:16px;">
+            <button class="btn primary" type="button" data-open-recharge-modal="pointsExchange">立即兑换</button>
+            <a class="btn" href="recharge.html">余额不足先充值</a>
+          </div>
+        </div>
+        <div class="surface">
+          <div class="surface-head"><div><h3>AIGC token 使用规则</h3><p>积分在 AIGC 平台消费 token</p></div></div>
+          <div class="notice-list">
+            <div class="notice-item ok"><div class="notice-main"><strong>消费对象</strong><span>文案生成、脚本扩写、图片提示词、分镜生成等 AIGC 能力。</span></div></div>
+            <div class="notice-item warn"><div class="notice-main"><strong>失败退回</strong><span>模型超时、任务失败时，系统生成退回记录并回补积分。</span></div></div>
+            <div class="notice-item ok"><div class="notice-main"><strong>使用范围</strong><span>积分当前用于天合 AIGC 平台，不支持提现，退款退回以页面状态为准。</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card compact-filters" data-filter-panel="points" style="margin-top:16px;">
+        <div class="form-grid" style="grid-template-columns:repeat(4,minmax(0,1fr));">
+          <div class="field"><label>积分动作</label><select><option>全部动作</option><option>余额兑换积分</option><option>AIGC token 消费</option><option>消费失败退回</option><option>承接奖励积分</option></select></div>
+          <div class="field"><label>关联业务单号</label><input type="text" placeholder="请输入 PT / AI / RC 单号"></div>
+          <div class="field"><label>变动方向</label><select><option>全部方向</option><option>获得</option><option>消耗</option><option>退回</option></select></div>
+          <div class="field"><label>发生时间范围</label><select><option>2026-05-01 ~ 2026-05-31</option></select></div>
+          <div class="field advanced-filter"><label>账户类型</label><select><option>${view.accountScope}</option><option>个人账户</option><option>团队账户</option></select></div>
+          <div class="field advanced-filter"><label>状态</label><select><option>全部状态</option><option>成功</option><option>处理中</option><option>失败</option><option>已退回</option></select></div>
+        </div>
+        <div class="form-actions">
+          <a class="btn primary" href="#">搜索</a>
+          <a class="btn" href="#">重置</a>
+          <button class="text-link-btn" type="button" data-toggle-filter-panel="points">更多筛选</button>
+        </div>
+      </div>
+
+      <div class="soft-table-panel" style="margin-top:16px;">
+        <div class="soft-table-head">
+          <strong>积分明细</strong>
+          <div class="table-head-actions">
+            <span class="tiny">当前页展示 ${view.rows.length} 条记录</span>
+            <button class="table-config-btn" type="button" data-open-column-config="points">配置列</button>
+          </div>
+        </div>
+        <div class="table-wrap" style="border:none;border-radius:0;">
+          <table data-table="points">
+            <thead><tr><th data-col="pointNo">积分流水号</th><th data-col="type">积分动作</th><th data-col="direction">变动方向</th><th data-col="points">积分变动</th><th data-col="cash">关联金额</th><th data-col="token">关联 token</th><th data-col="bizNo">关联业务单号</th><th data-col="status">状态</th><th data-col="time">发生时间</th></tr></thead>
+            <tbody>${view.rows.map(row => `<tr><td data-col="pointNo">${row[0]}</td><td data-col="type">${row[1]}</td><td data-col="direction">${row[2]}</td><td data-col="points" class="${row[3].startsWith("+") ? "amt-in" : "amt-out"}">${row[3]}</td><td data-col="cash">${row[4]}</td><td data-col="token">${row[5]}</td><td data-col="bizNo">${row[6]}</td><td data-col="status"><span class="tag ${row[7].includes("退回") ? "orange" : "green"}">${row[7]}</span></td><td data-col="time">${row[8]}</td></tr>`).join("")}</tbody>
+          </table>
+        </div>
+        <div class="table-footbar">
+          <div class="pager-meta">共 ${view.rows.length} 条</div>
+          <div class="pager"><span class="pager-btn disabled">上一页</span><span class="pager-btn active">1</span><span class="pager-btn disabled">下一页</span></div>
+        </div>
+      </div>
+
+      <div class="soft-table-panel" style="margin-top:16px;">
+        <div class="soft-table-head"><strong>AIGC token 消费记录</strong><span class="tiny">积分消耗到具体模型任务的记录</span></div>
+        <div class="table-wrap" style="border:none;border-radius:0;">
+          <table>
+            <thead><tr><th>消费单号</th><th>应用/场景</th><th>平台</th><th>token 消耗</th><th>积分消耗</th><th>关联任务</th><th>状态</th><th>发生时间</th></tr></thead>
+            <tbody>${view.consumption.map(row => `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td><td class="amt-out">-${row[4]}</td><td>${row[5]}</td><td><span class="tag ${row[6].includes("退回") ? "orange" : "green"}">${row[6]}</span></td><td>${row[7]}</td></tr>`).join("")}</tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="recharge-modal-mask" data-recharge-modal="pointsExchange" hidden>
+        <div class="recharge-modal">
+          <div class="config-modal-head">
+            <div><h3>兑换积分</h3><p>使用当前账户余额兑换积分，兑换成功后积分会立即进入当前积分账户。</p></div>
+            <button class="config-close" type="button" data-close-recharge-modal="pointsExchange">×</button>
+          </div>
+          <div class="recharge-modal-body">
+            <div class="method-card recharge-modal-card">
+              <span class="tag blue">${view.accountScope}</span>
+              <h4>${view.accountName}</h4>
+              <p>积分账户 ID：${view.accountId}，当前积分余额：${view.balance.toLocaleString("zh-CN")} 分</p>
+              <div class="detail-grid detail-grid-2 compact-detail-grid">
+                <div class="detail-item"><span class="detail-label">兑换金额</span><strong class="detail-value">¥ ${exchangeAmount}</strong></div>
+                <div class="detail-item"><span class="detail-label">预计到账积分</span><strong class="detail-value">${exchangePoints.toLocaleString("zh-CN")} 分</strong></div>
+                <div class="detail-item"><span class="detail-label">兑换比例</span><strong class="detail-value">¥1 = 10 积分</strong></div>
+                <div class="detail-item"><span class="detail-label">关联业务单</span><strong class="detail-value">PT-2026060101</strong></div>
+              </div>
+              <div class="field"><label>兑换金额</label><input type="text" value="${exchangeAmount}"></div>
+              <div class="field"><label>兑换说明</label><input type="text" value="${accountScope === "personal" ? "个人 AIGC 消费积分补充" : "团队 AIGC 消费积分补充"}"></div>
+            </div>
+          </div>
+          <div class="config-modal-foot">
+            <button class="btn primary" type="button">确认兑换</button>
+            <button class="btn" type="button" data-close-recharge-modal="pointsExchange">取消</button>
+          </div>
+        </div>
+      </div>
+      ${renderColumnConfigModal("points")}
     `;
   }
 
@@ -2247,6 +2464,7 @@
       case "transactions": return renderTransactions(team);
       case "fundFlows": return renderFundFlows(team);
       case "bills": return renderBills(team);
+      case "points": return renderPoints(team, accountScope);
       case "invoices": return renderInvoices(team);
       case "recharge": return renderRecharge(team, accountScope);
       case "withdraw": return renderWithdraw(team);
@@ -2739,7 +2957,7 @@
         topStatus.style.background = isWarn ? "rgba(217,119,6,.10)" : "rgba(23,128,61,.08)";
         topStatus.style.borderColor = isWarn ? "rgba(217,119,6,.16)" : "rgba(23,128,61,.14)";
         document.getElementById("pageMount").innerHTML = renderPage(page, teamKey, accountScope);
-        ["transactions", "fundFlows", "bills"].forEach(applyColumnVisibility);
+        ["transactions", "fundFlows", "bills", "points"].forEach(applyColumnVisibility);
         bindPrototypeInteractions();
       }
 
