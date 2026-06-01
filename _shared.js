@@ -101,11 +101,68 @@
     { id: "OD-2026042009", demandId: "DM-2026041807", projectName: "广告片配音", contractor: "声海传媒", contractorId: "soundsea", workspace: "cf-marketing", payerType: "team-budget", payerName: "市场宣传组 - 团队预算账户", payerWalletKey: "team-budget-cf-marketing", amount: 8000, status: "completed", createTime: "2026-04-20 14:30" }
   ];
 
+  // ============================================================
+  // 钱包数据结构（v2，对齐《统一账户与资金中心 一期架构设计方案》）
+  // 设计文档字段（source of truth）：
+  //   available_balance  可用余额（含充值余额 + 收益）
+  //   frozen_balance     冻结余额（TCC 锁定）
+  //   recharge_balance   充值余额（可退款部分）
+  //   total_earnings     累计收益（承制方收入入账累计）
+  //   total_withdrawn    累计已提现
+  //   pending_withdraw   提现处理中（锁定，防重复提现）
+  //   points_balance     积分可用
+  //   points_frozen      积分冻结
+  // 不变量：
+  //   available_balance >= recharge_balance
+  //   total_earnings    >= total_withdrawn + pending_withdraw
+  //   可提现金额 = total_earnings - total_withdrawn - pending_withdraw
+  //   退款上限 = min(recharge_order.remaining_refundable, wallet.recharge_balance)
+  // 兼容字段（不要在新代码中读，仅作为旧页面 backfill）：
+  //   balance       = available_balance
+  //   lockedAmount  = frozen_balance
+  // ============================================================
   var defaultWallets = {
-    "personal-account-lixueqin": { type: "personal", name: "昭岚 - 个人账户", balance: 3200, lockedAmount: 0 },
-    "team-budget-cf-drama":      { type: "team-budget", name: "短剧制作中心 - 团队预算账户", balance: 185000, lockedAmount: 28000, allocated: 200000 },
-    "team-budget-cf-marketing":  { type: "team-budget", name: "市场宣传组 - 团队预算账户", balance: 62000, lockedAmount: 8000, allocated: 70000 },
-    "enterprise-main-cf":        { type: "enterprise-main", name: "骋风天合 - 企业主账户", balance: 1250000, lockedAmount: 0 }
+    "personal-account-lixueqin": {
+      // ¥300 退款冻结（FRZ-202605101430），等待平台回退至原付款账户
+      type: "personal", name: "昭岚 - 个人账户",
+      available_balance: 2900, frozen_balance: 300,
+      recharge_balance: 1900, total_earnings: 1800,
+      total_withdrawn: 800, pending_withdraw: 0,
+      points_balance: 350, points_frozen: 0,
+      // 兼容
+      balance: 2900, lockedAmount: 300
+    },
+    "team-budget-cf-drama": {
+      // 冻结 ¥40,000 = ¥28,000(订单 FRZ-202604231000) + ¥12,000(纠纷 FRZ-202605120920)
+      type: "team-budget", name: "短剧制作中心 - 团队预算账户",
+      available_balance: 173000, frozen_balance: 40000,
+      // 团队预算来自上游划拨，不是充值，所以 recharge_balance = 0；不可提现
+      recharge_balance: 0, total_earnings: 0,
+      total_withdrawn: 0, pending_withdraw: 0,
+      points_balance: 1840, points_frozen: 0,
+      allocated: 200000,
+      balance: 173000, lockedAmount: 40000
+    },
+    "team-budget-cf-marketing": {
+      // 8000 元 OD-2026042009 已通过 TCC 完成（F-010 lock + F-011 settle），
+      // 已从冻结划走到平台，frozen_balance 现为 0；available = allocated - settled
+      type: "team-budget", name: "市场宣传组 - 团队预算账户",
+      available_balance: 62000, frozen_balance: 0,
+      recharge_balance: 0, total_earnings: 0,
+      total_withdrawn: 0, pending_withdraw: 0,
+      points_balance: 620, points_frozen: 0,
+      allocated: 70000,
+      balance: 62000, lockedAmount: 0
+    },
+    "enterprise-main-cf": {
+      type: "enterprise-main", name: "骋风天合 - 企业主账户",
+      available_balance: 1250000, frozen_balance: 0,
+      // 企业主账户的可用余额几乎全部由充值产生
+      recharge_balance: 1250000, total_earnings: 0,
+      total_withdrawn: 0, pending_withdraw: 0,
+      points_balance: 5200, points_frozen: 0,
+      balance: 1250000, lockedAmount: 0
+    }
   };
 
   // ---- 给 B 组准备：承制方相关 ----
@@ -172,7 +229,13 @@
     spendApprovalHistory: "demoSpendApprovalHistory",
     pointsBalance:       "demoPointsBalance",
     pointsExchanges:     "demoPointsExchanges",
-    pointsConsumptions:  "demoPointsConsumptions"
+    pointsConsumptions:  "demoPointsConsumptions",
+    // v2 新增（对齐《统一账户与资金中心 一期架构设计方案》）
+    accountUser:    "demoAccountUser",     // 统一操作人 + 实名状态
+    rechargeOrders: "demoRechargeOrders",  // 充值订单（remaining_refundable 跟踪）
+    freezeOrders:   "demoFreezeOrders",    // TCC 冻结单
+    transferOrders: "demoTransferOrders",  // 划拨单（企业总→团队预算）
+    withdrawOrders: "demoWithdrawOrders"   // 提现单（pending → approved/rejected）
   };
 
   // ============================================================
@@ -279,30 +342,247 @@
     }
   ];
 
+  // ============================================================
+  // 统一操作人（account_user）+ 实名认证（v2 新增）
+  // 状态机：unverified → pending → basic_verified → liveness_verified → enterprise_verified
+  //         （rejected 允许修正后重提；状态不可降级）
+  // 提现要求：>= liveness_verified
+  // ============================================================
+  var defaultAccountUser = {
+    id: "AU-100",
+    name: "昭岚",
+    phone: "138****8826",
+    email: "zhaolan@cf.com",
+    real_name_status: "basic_verified",        // 当前演示：二要素已通过，未做活体
+    real_name_method: "identity",
+    real_name_vendor: "aliyun",
+    real_name_biz_id: "ALI-RN-2026041030001",
+    real_name_verified_at: "2026-04-10 09:30",
+    reject_reason: null,
+    id_card_name_masked: "昭**",                // 仅展示用，真实文档要 AES-256
+    id_card_number_masked: "1101**********1234"
+  };
+
+  // ============================================================
+  // 充值订单（recharge_order）
+  // 与 defaultFlows 中 type="recharge" 的几条对应；按充值订单维度跟踪可退额度
+  // remaining_refundable = amount - refunded_amount
+  // status: pending（对公审核中）/ success / failed
+  // ============================================================
+  var defaultRechargeOrders = [
+    {
+      id: "RC-202604221831", out_recharge_no: "RC_20260422_001",
+      time: "2026-04-22 18:31", walletKey: "personal-account-lixueqin",
+      amount: 1000, refunded_amount: 0, remaining_refundable: 1000,
+      status: "success", channel: "alipay", channelLabel: "支付宝",
+      voucher_no: "V-202604221831"
+    },
+    {
+      id: "RC-202604180915", out_recharge_no: "RC_20260418_001",
+      time: "2026-04-18 09:15", walletKey: "enterprise-main-cf",
+      amount: 500000, refunded_amount: 0, remaining_refundable: 500000,
+      status: "success", channel: "bank", channelLabel: "对公转账",
+      voucher_no: "V-202604180915"
+    },
+    {
+      id: "RC-202604051000", out_recharge_no: "RC_20260405_001",
+      time: "2026-04-05 10:00", walletKey: "enterprise-main-cf",
+      amount: 1250000, refunded_amount: 0, remaining_refundable: 1250000,
+      status: "success", channel: "bank", channelLabel: "对公转账",
+      voucher_no: "V-202604051000"
+    },
+    {
+      id: "RC-202604261732", out_recharge_no: "RC_20260426_001",
+      time: "2026-04-26 17:32", walletKey: "enterprise-main-cf",
+      amount: 200000, refunded_amount: 0, remaining_refundable: 0,
+      status: "pending", channel: "bank", channelLabel: "对公转账",
+      voucher_no: null,
+      auditNote: "财务审核中"
+    }
+  ];
+
+  // ============================================================
+  // 冻结单（freeze_order，TCC Try 阶段产物）
+  // 状态机：frozen → confirmed（不可逆）
+  //         frozen → cancelled（主动取消 / 超时自动）
+  // expire_at：超时未 confirm/cancel 时由定时任务自动 cancel
+  // ============================================================
+  var defaultFreezeOrders = [
+    {
+      id: "FRZ-202604231000", out_freeze_no: "FRZ_20260423_001",
+      walletKey: "team-budget-cf-drama", amount: 28000, recharge_deduct: 0,
+      biz_type: "cash_consume", status: "frozen",
+      created_at: "2026-04-23 10:00", expire_at: "2026-04-30 10:00",
+      relatedDemand: "DM-2026042103", relatedOrder: "OD-2026042307",
+      voucher_no: "V-202604231000",
+      operator: "昭岚"
+    },
+    {
+      id: "FRZ-202604220930", out_freeze_no: "FRZ_20260422_001",
+      walletKey: "team-budget-cf-marketing", amount: 8000, recharge_deduct: 0,
+      biz_type: "cash_consume", status: "confirmed",
+      created_at: "2026-04-22 09:30", expire_at: "2026-04-29 09:30",
+      confirmed_at: "2026-04-25 11:08",
+      relatedDemand: "DM-2026041807", relatedOrder: "OD-2026042009",
+      voucher_no: "V-202604220930",
+      operator: "陈默"
+    },
+    {
+      id: "FRZ-202604141030", out_freeze_no: "FRZ_20260414_001",
+      walletKey: "team-budget-cf-drama", amount: 15000, recharge_deduct: 0,
+      biz_type: "cash_consume", status: "confirmed",
+      created_at: "2026-04-14 10:30", expire_at: "2026-04-21 10:30",
+      confirmed_at: "2026-04-12 17:42",
+      relatedDemand: "DM-2026041401", relatedOrder: "OD-2026041401",
+      voucher_no: "V-202604141030",
+      operator: "昭岚"
+    },
+    {
+      // 注：状态故意保留 cancelled 而非 frozen，确保 cf-drama 的 frozen_balance(28000)
+      // 与活跃冻结单求和(28000) 严格一致；该 demand 仍在 quoting，可演示"冻结取消重锁"路径
+      id: "FRZ-202604251548", out_freeze_no: "FRZ_20260425_001",
+      walletKey: "team-budget-cf-drama", amount: 18000, recharge_deduct: 0,
+      biz_type: "cash_consume", status: "cancelled",
+      created_at: "2026-04-25 15:48", expire_at: "2026-05-02 15:48",
+      cancelled_at: "2026-04-25 16:30", cancel_reason: "需求方撤回再编辑",
+      relatedDemand: "DM-2026042512", relatedOrder: null,
+      voucher_no: "V-202604251548",
+      operator: "昭岚"
+    },
+    // ---- 二期演示：退款冻结 / 纠纷冻结（biz_type 不同） ----
+    {
+      id: "FRZ-202605101430", out_freeze_no: "FRZ_20260510_REF1",
+      walletKey: "personal-account-lixueqin", amount: 300, recharge_deduct: 300,
+      biz_type: "refund_lock", status: "frozen",
+      created_at: "2026-05-10 14:30", expire_at: "2026-05-17 14:30",
+      relatedDemand: "DM-2026050908", relatedOrder: "OD-2026050912",
+      voucher_no: "V-202605101430",
+      operator: "昭岚",
+      note: "退款审核中，待原付款账户回退"
+    },
+    {
+      id: "FRZ-202605120920", out_freeze_no: "FRZ_20260512_DSP1",
+      walletKey: "team-budget-cf-drama", amount: 12000, recharge_deduct: 0,
+      biz_type: "dispute_lock", status: "frozen",
+      created_at: "2026-05-12 09:20", expire_at: null,
+      relatedDemand: "DM-2026050203", relatedOrder: "OD-2026050501",
+      voucher_no: "V-202605120920",
+      operator: "平台介入",
+      note: "需求方质疑交付物质量，平台仲裁中"
+    }
+  ];
+
+  // ============================================================
   // 默认资金流水（钱包页 / 项目空间结算分账演示用）
+  // v2 字段（对齐复式记账）：
+  //   voucher_no    凭证号（一证至少两分录；同一凭证下多条 ledger 共用此号）
+  //   subject_code  科目编码（见设计文档 6.5 节）
+  //   direction     debit | credit  借/贷方向
+  //
+  // 编码速查：1001 可用 / 1002 冻结 / 2001 充值本金 / 3001 经营收益
+  //          5001 消耗 / 6001 平台收入
+  // ============================================================
+
+  // ============================================================
+  // 划拨单（transfer_order）— 二期 P2 跟随后端落地
+  // 状态机：success（划拨即时生效，无审核中态；如需审核走另一通道 budget_request）
+  // ============================================================
+  var defaultTransferOrders = [
+    {
+      id: "TF-202603250900", out_transfer_no: "TF_20260325_001",
+      time: "2026-03-25 09:00",
+      from_walletKey: "enterprise-main-cf", to_walletKey: "team-budget-cf-drama",
+      amount: 200000, biz_type: "budget_allocate",
+      status: "success", operator: "周总（企业管理员）",
+      memo: "Q2 短剧制作中心预算下达",
+      voucher_no: "V-202603250900"
+    },
+    {
+      id: "TF-202603251000", out_transfer_no: "TF_20260325_002",
+      time: "2026-03-25 10:00",
+      from_walletKey: "enterprise-main-cf", to_walletKey: "team-budget-cf-marketing",
+      amount: 80000, biz_type: "budget_allocate",
+      status: "success", operator: "周总（企业管理员）",
+      memo: "Q2 市场宣传组预算下达",
+      voucher_no: "V-202603251000"
+    }
+  ];
+
+  // ============================================================
+  // 提现单（withdraw_order）— 二期 P2 跟随后端落地
+  // 状态机：pending → reviewing → approved → success
+  //         pending → reviewing → rejected
+  // 仅 personal / contractor 钱包可发起；扣减 total_earnings、累加 total_withdrawn
+  // ============================================================
+  var defaultWithdrawOrders = [
+    {
+      id: "WD-202604180821", out_withdraw_no: "WD_20260418_001",
+      time: "2026-04-18 08:21",
+      walletKey: "personal-account-lixueqin",
+      amount: 800,
+      status: "success", risk_level: "low",
+      bank_card: "中国建设银行 (尾号 8826)",
+      memo: "三月配音稿酬",
+      submitted_at: "2026-04-15 14:00",
+      risk_check_at: "2026-04-15 14:08",
+      reviewed_at: "2026-04-16 10:30",
+      arrived_at:  "2026-04-18 08:21",
+      voucher_no: "V-202604180821",
+      operator: "昭岚",
+      reviewer: "财务-赵静"
+    },
+    {
+      id: "WD-202604261410", out_withdraw_no: "WD_20260426_002",
+      time: "2026-04-26 14:10",
+      walletKey: "personal-account-lixueqin",
+      amount: 35000,
+      status: "reviewing", risk_level: "low",
+      bank_card: "中国建设银行 (尾号 8826)",
+      memo: "Q2 项目结款",
+      submitted_at: "2026-04-26 14:10",
+      risk_check_at: "2026-04-26 14:12",
+      operator: "昭岚"
+    },
+    {
+      id: "WD-202604220955", out_withdraw_no: "WD_20260422_003",
+      time: "2026-04-22 09:55",
+      walletKey: "personal-account-lixueqin",
+      amount: 80000,
+      status: "rejected", risk_level: "high",
+      bank_card: "招商银行 (尾号 1234)",
+      memo: "代付他人款项",
+      submitted_at: "2026-04-22 09:55",
+      risk_check_at: "2026-04-22 10:02",
+      reviewed_at: "2026-04-22 10:30",
+      reject_reason: "风控审核未通过：高金额提现需补充更详细的资金来源说明 + 实际收款人需与本人一致",
+      reviewer: "风控-自动 + 风控-王浩",
+      operator: "昭岚"
+    }
+  ];
+
   var defaultFlows = [
-    { id: "F-001", time: "2026-04-26 17:32", type: "recharge", desc: "对公转账充值（待财务审核）", account: "enterprise-main-cf", amount: 0, lockedNote: "审核中 ¥200,000", operator: "周总（企业管理员）" },
-    { id: "F-002", time: "2026-04-25 15:48", type: "lock", desc: "下单锁定 - DM-2026042512「三集短剧解说视频」", account: "team-budget-cf-drama", amount: -18000, operator: "昭岚" },
-    { id: "F-003", time: "2026-04-25 11:08", type: "settle", desc: "订单分账 - OD-2026041807「广告片配音」承制方入账", account: "team-budget-cf-marketing", amount: 0, operator: "系统" },
-    { id: "F-004", time: "2026-04-25 11:08", type: "settle", desc: "订单分账 - 平台服务费 5%", account: "enterprise-main-cf", amount: -400, operator: "系统" },
-    { id: "F-005", time: "2026-04-24 16:30", type: "refund", desc: "部分退款 - DM-2026031908「电商主图」交付不达标", account: "team-budget-cf-marketing", amount: 1500, operator: "陈默" },
-    { id: "F-006", time: "2026-04-24 14:20", type: "allocate", desc: "企业管理员划拨预算 → 短剧制作中心", account: "team-budget-cf-drama", amount: 50000, operator: "周总（企业管理员）" },
-    { id: "F-007", time: "2026-04-24 14:20", type: "allocate", desc: "从企业主账户划拨至 短剧制作中心", account: "enterprise-main-cf", amount: -50000, operator: "周总（企业管理员）" },
-    { id: "F-008", time: "2026-04-23 10:00", type: "lock", desc: "下单锁定 - OD-2026042307「新剧 IP 海报系列」", account: "team-budget-cf-drama", amount: -28000, operator: "昭岚" },
-    { id: "F-009", time: "2026-04-22 18:20", type: "withdraw", desc: "提现申请 - 个人账户至建行 8826（已打款）", account: "personal-account-lixueqin", amount: -800, operator: "昭岚" },
-    { id: "F-010", time: "2026-04-22 09:30", type: "lock", desc: "下单锁定 - OD-2026042009「广告片配音」", account: "team-budget-cf-marketing", amount: -8000, operator: "陈默" },
-    { id: "F-011", time: "2026-04-20 16:40", type: "settle", desc: "订单结算入账 - OD-2026042009「广告片配音」验收完成", account: "team-budget-cf-marketing", amount: -8000, operator: "系统" },
-    { id: "F-012", time: "2026-04-19 15:00", type: "invoice", desc: "开具增值税专票 - OD-2026031502「品牌片拍摄」¥120,000", account: "enterprise-main-cf", amount: 0, operator: "周总（企业管理员）" },
-    { id: "F-013", time: "2026-04-18 09:15", type: "recharge", desc: "对公转账充值（财务审核通过）", account: "enterprise-main-cf", amount: 500000, operator: "周总（企业管理员）" },
-    { id: "F-014", time: "2026-04-16 14:50", type: "settle", desc: "订单结算 - OD-2026031502「品牌片拍摄」", account: "team-budget-cf-marketing", amount: -120000, operator: "系统" },
-    { id: "F-015", time: "2026-04-15 22:25", type: "recharge", desc: "支付宝充值", account: "personal-account-lixueqin", amount: 1000, operator: "昭岚" },
-    { id: "F-016", time: "2026-04-14 10:30", type: "lock", desc: "下单锁定 - OD-2026041401「IP 形象设计」", account: "team-budget-cf-drama", amount: -15000, operator: "昭岚" },
-    { id: "F-017", time: "2026-04-12 17:42", type: "settle", desc: "订单结算 - OD-2026041401「IP 形象设计」", account: "team-budget-cf-drama", amount: -15000, operator: "系统" },
-    { id: "F-018", time: "2026-04-08 11:20", type: "allocate", desc: "企业管理员划拨预算 → 市场宣传组（季度初配置）", account: "team-budget-cf-marketing", amount: 70000, operator: "周总（企业管理员）" },
-    { id: "F-019", time: "2026-04-08 11:20", type: "allocate", desc: "从企业主账户划拨至 市场宣传组（季度初）", account: "enterprise-main-cf", amount: -70000, operator: "周总（企业管理员）" },
-    { id: "F-020", time: "2026-04-08 11:18", type: "allocate", desc: "企业管理员划拨预算 → 短剧制作中心（季度初配置）", account: "team-budget-cf-drama", amount: 150000, operator: "周总（企业管理员）" },
-    { id: "F-021", time: "2026-04-08 11:18", type: "allocate", desc: "从企业主账户划拨至 短剧制作中心（季度初）", account: "enterprise-main-cf", amount: -150000, operator: "周总（企业管理员）" },
-    { id: "F-022", time: "2026-04-05 10:00", type: "recharge", desc: "对公转账充值 - 季度预算补充", account: "enterprise-main-cf", amount: 1250000, operator: "周总（企业管理员）" }
+    { id: "F-001", time: "2026-04-26 17:32", type: "recharge", desc: "对公转账充值（待财务审核）", account: "enterprise-main-cf", amount: 0, lockedNote: "审核中 ¥200,000", operator: "周总（企业管理员）", voucher_no: null, subject_code: "1001", direction: "debit", related_recharge: "RC-202604261732" },
+    { id: "F-002", time: "2026-04-25 15:48", type: "lock", desc: "下单锁定 - DM-2026042512「三集短剧解说视频」", account: "team-budget-cf-drama", amount: -18000, operator: "昭岚", voucher_no: "V-202604251548", subject_code: "1002", direction: "debit", related_freeze: "FRZ-202604251548" },
+    { id: "F-003", time: "2026-04-25 11:08", type: "settle", desc: "订单分账 - OD-2026041807「广告片配音」承制方入账", account: "team-budget-cf-marketing", amount: 0, operator: "系统", voucher_no: "V-202604251108", subject_code: "1002", direction: "credit" },
+    { id: "F-004", time: "2026-04-25 11:08", type: "settle", desc: "订单分账 - 平台服务费 5%", account: "enterprise-main-cf", amount: -400, operator: "系统", voucher_no: "V-202604251108", subject_code: "6001", direction: "credit" },
+    { id: "F-005", time: "2026-04-24 16:30", type: "refund", desc: "部分退款 - DM-2026031908「电商主图」交付不达标", account: "team-budget-cf-marketing", amount: 1500, operator: "陈默", voucher_no: "V-202604241630", subject_code: "2001", direction: "debit" },
+    { id: "F-006", time: "2026-04-24 14:20", type: "allocate", desc: "企业管理员划拨预算 → 短剧制作中心", account: "team-budget-cf-drama", amount: 50000, operator: "周总（企业管理员）", voucher_no: "V-202604241420", subject_code: "1001", direction: "debit" },
+    { id: "F-007", time: "2026-04-24 14:20", type: "allocate", desc: "从企业主账户划拨至 短剧制作中心", account: "enterprise-main-cf", amount: -50000, operator: "周总（企业管理员）", voucher_no: "V-202604241420", subject_code: "1001", direction: "credit" },
+    { id: "F-008", time: "2026-04-23 10:00", type: "lock", desc: "下单锁定 - OD-2026042307「新剧 IP 海报系列」", account: "team-budget-cf-drama", amount: -28000, operator: "昭岚", voucher_no: "V-202604231000", subject_code: "1002", direction: "debit", related_freeze: "FRZ-202604231000" },
+    { id: "F-009", time: "2026-04-22 18:20", type: "withdraw", desc: "提现申请 - 个人账户至建行 8826（已打款）", account: "personal-account-lixueqin", amount: -800, operator: "昭岚", voucher_no: "V-202604221820", subject_code: "3001", direction: "debit" },
+    { id: "F-010", time: "2026-04-22 09:30", type: "lock", desc: "下单锁定 - OD-2026042009「广告片配音」", account: "team-budget-cf-marketing", amount: -8000, operator: "陈默", voucher_no: "V-202604220930", subject_code: "1002", direction: "debit", related_freeze: "FRZ-202604220930" },
+    { id: "F-011", time: "2026-04-20 16:40", type: "settle", desc: "订单结算入账 - OD-2026042009「广告片配音」验收完成", account: "team-budget-cf-marketing", amount: -8000, operator: "系统", voucher_no: "V-202604201640", subject_code: "5001", direction: "debit" },
+    { id: "F-012", time: "2026-04-19 15:00", type: "invoice", desc: "开具增值税专票 - OD-2026031502「品牌片拍摄」¥120,000", account: "enterprise-main-cf", amount: 0, operator: "周总（企业管理员）", voucher_no: null, subject_code: null, direction: null },
+    { id: "F-013", time: "2026-04-18 09:15", type: "recharge", desc: "对公转账充值（财务审核通过）", account: "enterprise-main-cf", amount: 500000, operator: "周总（企业管理员）", voucher_no: "V-202604180915", subject_code: "1001", direction: "debit", related_recharge: "RC-202604180915" },
+    { id: "F-014", time: "2026-04-16 14:50", type: "settle", desc: "订单结算 - OD-2026031502「品牌片拍摄」", account: "team-budget-cf-marketing", amount: -120000, operator: "系统", voucher_no: "V-202604161450", subject_code: "5001", direction: "debit" },
+    { id: "F-015", time: "2026-04-15 22:25", type: "recharge", desc: "支付宝充值", account: "personal-account-lixueqin", amount: 1000, operator: "昭岚", voucher_no: "V-202604221831", subject_code: "1001", direction: "debit", related_recharge: "RC-202604221831" },
+    { id: "F-016", time: "2026-04-14 10:30", type: "lock", desc: "下单锁定 - OD-2026041401「IP 形象设计」", account: "team-budget-cf-drama", amount: -15000, operator: "昭岚", voucher_no: "V-202604141030", subject_code: "1002", direction: "debit", related_freeze: "FRZ-202604141030" },
+    { id: "F-017", time: "2026-04-12 17:42", type: "settle", desc: "订单结算 - OD-2026041401「IP 形象设计」", account: "team-budget-cf-drama", amount: -15000, operator: "系统", voucher_no: "V-202604121742", subject_code: "5001", direction: "debit" },
+    { id: "F-018", time: "2026-04-08 11:20", type: "allocate", desc: "企业管理员划拨预算 → 市场宣传组（季度初配置）", account: "team-budget-cf-marketing", amount: 70000, operator: "周总（企业管理员）", voucher_no: "V-202604081120", subject_code: "1001", direction: "debit" },
+    { id: "F-019", time: "2026-04-08 11:20", type: "allocate", desc: "从企业主账户划拨至 市场宣传组（季度初）", account: "enterprise-main-cf", amount: -70000, operator: "周总（企业管理员）", voucher_no: "V-202604081120", subject_code: "1001", direction: "credit" },
+    { id: "F-020", time: "2026-04-08 11:18", type: "allocate", desc: "企业管理员划拨预算 → 短剧制作中心（季度初配置）", account: "team-budget-cf-drama", amount: 150000, operator: "周总（企业管理员）", voucher_no: "V-202604081118", subject_code: "1001", direction: "debit" },
+    { id: "F-021", time: "2026-04-08 11:18", type: "allocate", desc: "从企业主账户划拨至 短剧制作中心（季度初）", account: "enterprise-main-cf", amount: -150000, operator: "周总（企业管理员）", voucher_no: "V-202604081118", subject_code: "1001", direction: "credit" },
+    { id: "F-022", time: "2026-04-05 10:00", type: "recharge", desc: "对公转账充值 - 季度预算补充", account: "enterprise-main-cf", amount: 1250000, operator: "周总（企业管理员）", voucher_no: "V-202604051000", subject_code: "1001", direction: "debit", related_recharge: "RC-202604051000" }
   ];
 
   function readJson(k, fallback) {
@@ -337,6 +617,39 @@
     localStorage.setItem(migKey, "1");
   }
 
+  // 钱包数据 v2 schema 迁移：给已有 localStorage 中的 wallets 回填新字段
+  // 仅一次性"加字段"，不覆盖已有值；同时把 balance/lockedAmount 与 available_balance/frozen_balance 双向同步
+  function migrateWalletsSchemaV2() {
+    var migKey = "demoWalletsSchemaV2";
+    if (localStorage.getItem(migKey)) return;
+    var wallets = readJson(KEY.wallets, null);
+    if (!wallets) { localStorage.setItem(migKey, "1"); return; }
+    var ptsMap = readJson(KEY.pointsBalance, defaultPointsBalance);
+    Object.keys(wallets).forEach(function (k) {
+      var w = wallets[k];
+      // 主字段（设计文档 source of truth）
+      if (w.available_balance == null) w.available_balance = w.balance || 0;
+      if (w.frozen_balance == null)    w.frozen_balance    = w.lockedAmount || 0;
+      if (w.recharge_balance == null) {
+        // 团队预算无充值；个人/企业主默认按"全部可用"作为充值余额（保守上限）
+        w.recharge_balance = (w.type === "team-budget") ? 0 : (w.available_balance || 0);
+      }
+      if (w.total_earnings == null) {
+        // 仅个人/承制方有收益；其他默认 0。个人账户 demo 给 1800（用于演示提现拦截）
+        w.total_earnings = (w.type === "personal") ? 1800 : 0;
+      }
+      if (w.total_withdrawn == null)  w.total_withdrawn  = (w.type === "personal") ? 800 : 0;
+      if (w.pending_withdraw == null) w.pending_withdraw = 0;
+      if (w.points_balance == null)   w.points_balance   = ptsMap[k] || 0;
+      if (w.points_frozen == null)    w.points_frozen    = 0;
+      // 兼容字段同步
+      w.balance      = w.available_balance;
+      w.lockedAmount = w.frozen_balance;
+    });
+    writeJson(KEY.wallets, wallets);
+    localStorage.setItem(migKey, "1");
+  }
+
   function initDemoState() {
     if (!localStorage.getItem(KEY.ws))       localStorage.setItem(KEY.ws, "cf-drama");
     if (!localStorage.getItem(KEY.identity)) localStorage.setItem(KEY.identity, "demander");
@@ -344,6 +657,7 @@
     migrateDemands();
     if (!localStorage.getItem(KEY.orders))   writeJson(KEY.orders,   defaultOrders);
     if (!localStorage.getItem(KEY.wallets))  writeJson(KEY.wallets,  defaultWallets);
+    migrateWalletsSchemaV2();
     if (!localStorage.getItem(KEY.flows))    writeJson(KEY.flows,    defaultFlows);
     if (!localStorage.getItem(KEY.contractorProfile)) writeJson(KEY.contractorProfile, defaultContractorProfile);
     if (!localStorage.getItem(KEY.contractorInbox))   writeJson(KEY.contractorInbox,   defaultContractorInbox);
@@ -356,6 +670,26 @@
     if (!localStorage.getItem(KEY.pointsBalance))        writeJson(KEY.pointsBalance,        defaultPointsBalance);
     if (!localStorage.getItem(KEY.pointsExchanges))      writeJson(KEY.pointsExchanges,      defaultPointsExchanges);
     if (!localStorage.getItem(KEY.pointsConsumptions))   writeJson(KEY.pointsConsumptions,   defaultPointsConsumptions);
+    // v2 新增 mock 表（一期 batch A）
+    if (!localStorage.getItem(KEY.accountUser))    writeJson(KEY.accountUser,    defaultAccountUser);
+    if (!localStorage.getItem(KEY.rechargeOrders)) writeJson(KEY.rechargeOrders, defaultRechargeOrders);
+    if (!localStorage.getItem(KEY.freezeOrders))   writeJson(KEY.freezeOrders,   defaultFreezeOrders);
+    // 二期 batch B 跟随后端落地
+    if (!localStorage.getItem(KEY.transferOrders)) writeJson(KEY.transferOrders, defaultTransferOrders);
+    if (!localStorage.getItem(KEY.withdrawOrders)) writeJson(KEY.withdrawOrders, defaultWithdrawOrders);
+    // 迁移：B-4 引入了 reviewing/rejected 种子，旧版只有 1 条 success，自动追加（不覆盖用户演示中产生的真实单）
+    (function migrateWithdrawSeedV2() {
+      var migKey = "demo_migrated_withdraw_seed_v2";
+      if (localStorage.getItem(migKey)) return;
+      var existing = readJson(KEY.withdrawOrders, []);
+      var existingIds = new Set(existing.map(function (o) { return o.id; }));
+      var added = 0;
+      defaultWithdrawOrders.forEach(function (seed) {
+        if (!existingIds.has(seed.id)) { existing.push(seed); added++; }
+      });
+      if (added) writeJson(KEY.withdrawOrders, existing);
+      localStorage.setItem(migKey, "1");
+    })();
   }
 
   // ============================================================
@@ -390,16 +724,304 @@
     },
 
     getWallets: function () { return readJson(KEY.wallets, defaultWallets); },
-    setWallets: function (v) { writeJson(KEY.wallets, v); },
+    // 同步规则：以 balance / lockedAmount 为最新值（旧页面直接写它们），
+    // setWallets 时把 v2 主字段（available_balance / frozen_balance）拉齐。
+    // 新代码若想更新可用余额，请同时写 balance 和 available_balance（或只写 balance）。
+    setWallets: function (v) {
+      Object.keys(v || {}).forEach(function (k) {
+        var w = v[k]; if (!w) return;
+        if (w.balance != null)      w.available_balance = w.balance;
+        if (w.lockedAmount != null) w.frozen_balance    = w.lockedAmount;
+      });
+      writeJson(KEY.wallets, v);
+    },
     lockBudget: function (walletKey, amount) {
       var w = readJson(KEY.wallets, defaultWallets);
       if (!w[walletKey]) return false;
-      if (w[walletKey].balance < amount) return false;
-      w[walletKey].balance -= amount;
-      w[walletKey].lockedAmount = (w[walletKey].lockedAmount || 0) + amount;
+      if ((w[walletKey].available_balance || w[walletKey].balance || 0) < amount) return false;
+      w[walletKey].available_balance = (w[walletKey].available_balance || w[walletKey].balance || 0) - amount;
+      w[walletKey].frozen_balance    = (w[walletKey].frozen_balance    || w[walletKey].lockedAmount || 0) + amount;
+      // 兼容
+      w[walletKey].balance      = w[walletKey].available_balance;
+      w[walletKey].lockedAmount = w[walletKey].frozen_balance;
       writeJson(KEY.wallets, w);
       return true;
     },
+
+    // ---- v2 新增：基于设计文档的资金能力 ----
+
+    // 可提现金额 = total_earnings - total_withdrawn - pending_withdraw
+    // 注意：设计文档明确"提现仅针对收益部分"，充值余额不能提现，只能退款
+    getWithdrawableAmount: function (walletKey) {
+      var w = readJson(KEY.wallets, defaultWallets)[walletKey];
+      if (!w) return 0;
+      return Math.max(0, (w.total_earnings || 0) - (w.total_withdrawn || 0) - (w.pending_withdraw || 0));
+    },
+
+    // 统一操作人 + 实名状态
+    getAccountUser:    function () { return readJson(KEY.accountUser, defaultAccountUser); },
+    setAccountUser:    function (v) { writeJson(KEY.accountUser, v); },
+    getRealNameStatus: function () { return (readJson(KEY.accountUser, defaultAccountUser) || {}).real_name_status || "unverified"; },
+    setRealNameStatus: function (status, extra) {
+      var u = readJson(KEY.accountUser, defaultAccountUser) || {};
+      u.real_name_status = status;
+      if (extra) Object.keys(extra).forEach(function (k) { u[k] = extra[k]; });
+      writeJson(KEY.accountUser, u);
+    },
+    // 实名等级权重（不可降级；用于"是否满足提现/AIGC 等门槛"判定）
+    realNameLevel: function (status) {
+      var rank = { unverified: 0, pending: 0, rejected: 0, expired: 0,
+                   basic_verified: 1, liveness_verified: 2, enterprise_verified: 3 };
+      return rank[status] != null ? rank[status] : 0;
+    },
+    // 提现合规检查：必须 >= liveness_verified（中级实名）
+    canWithdraw: function () {
+      return this.realNameLevel(this.getRealNameStatus()) >= 2;
+    },
+
+    // 充值订单
+    getRechargeOrders: function () { return readJson(KEY.rechargeOrders, defaultRechargeOrders); },
+    setRechargeOrders: function (v) { writeJson(KEY.rechargeOrders, v); },
+    addRechargeOrder:  function (o) { var l = readJson(KEY.rechargeOrders, defaultRechargeOrders); l.unshift(o); writeJson(KEY.rechargeOrders, l); },
+    // 按充值订单维度退款（前端模拟）：扣减 remaining_refundable + 钱包 recharge_balance + available_balance
+    refundByRechargeOrder: function (rechargeOrderId, amount, outRefundNo) {
+      var orders = readJson(KEY.rechargeOrders, defaultRechargeOrders);
+      var idx = orders.findIndex(function (o) { return o.id === rechargeOrderId; });
+      if (idx < 0) return { ok: false, error: "充值订单不存在" };
+      var ro = orders[idx];
+      if (ro.status !== "success") return { ok: false, error: "充值订单状态非 success，不可退款" };
+      if (amount > ro.remaining_refundable) return { ok: false, error: "超过该笔充值剩余可退额度（" + ro.remaining_refundable + "）" };
+      var wallets = readJson(KEY.wallets, defaultWallets);
+      var w = wallets[ro.walletKey];
+      if (!w) return { ok: false, error: "钱包不存在" };
+      if (amount > (w.recharge_balance || 0)) return { ok: false, error: "钱包充值余额不足（已部分消费）" };
+      // 扣减
+      ro.refunded_amount = (ro.refunded_amount || 0) + amount;
+      ro.remaining_refundable = ro.remaining_refundable - amount;
+      writeJson(KEY.rechargeOrders, orders);
+      w.recharge_balance  = (w.recharge_balance || 0) - amount;
+      w.available_balance = (w.available_balance || w.balance || 0) - amount;
+      w.balance = w.available_balance;
+      writeJson(KEY.wallets, wallets);
+      return { ok: true, remaining: ro.remaining_refundable, walletBalance: w.available_balance };
+    },
+
+    // 冻结单（TCC）
+    getFreezeOrders: function () { return readJson(KEY.freezeOrders, defaultFreezeOrders); },
+    setFreezeOrders: function (v) { writeJson(KEY.freezeOrders, v); },
+    addFreezeOrder:  function (o) { var l = readJson(KEY.freezeOrders, defaultFreezeOrders); l.unshift(o); writeJson(KEY.freezeOrders, l); },
+    // 按钱包过滤当前 status=frozen 的冻结单
+    getActiveFreezeOrders: function (walletKey) {
+      var l = readJson(KEY.freezeOrders, defaultFreezeOrders);
+      return l.filter(function (o) { return o.walletKey === walletKey && o.status === "frozen"; });
+    },
+
+    // ------ B-3：TCC 三段联动（Try / Confirm / Cancel）------
+    // 业务语义：
+    //   tccTry      = 下单冻结：钱包 available -= amt, frozen += amt + 写凭证（1002 借 / 1001 贷）+ 落 freeze_order(frozen)
+    //   tccConfirm  = 订单完成：钱包 frozen -= amt + 写结算凭证（5001 借 / 1002 贷）+ freeze_order.status="confirmed"
+    //   tccCancel   = 订单取消：钱包 available += amt, frozen -= amt + 写解冻凭证（1001 借 / 1002 贷）+ freeze_order.status="cancelled"
+    // 入参 ctx：{ walletKey, amount, demandId?, orderId?, biz_type?, operator?, expireDays? }
+    tccTry: function (ctx) {
+      ctx = ctx || {};
+      var amt = Number(ctx.amount) || 0;
+      var walletKey = ctx.walletKey;
+      if (!amt || !walletKey) return { ok: false, error: "参数不全" };
+
+      var wallets = readJson(KEY.wallets, defaultWallets);
+      var w = wallets[walletKey];
+      if (!w) return { ok: false, error: "钱包不存在" };
+      var avail = (w.available_balance != null ? w.available_balance : w.balance) || 0;
+      if (amt > avail) return { ok: false, error: "可用余额不足" };
+
+      var ts = (function () {
+        var d = new Date();
+        function p(n) { return String(n).padStart(2,"0"); }
+        return d.getFullYear() + "-" + p(d.getMonth()+1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes());
+      })();
+      var ymd = ts.slice(0,10).replace(/-/g,"");
+      var seq = String(Date.now()).slice(-4);
+      var frzId = "FRZ-" + Date.now();
+      var voucherNo = "V-" + Date.now();
+      var expireDays = ctx.expireDays || 7;
+      var expireAt = (function () {
+        var d = new Date(); d.setDate(d.getDate() + expireDays);
+        function p(n){ return String(n).padStart(2,"0"); }
+        return d.getFullYear() + "-" + p(d.getMonth()+1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes());
+      })();
+
+      // 1) 钱包：available -= amt, frozen += amt
+      w.available_balance = avail - amt;
+      w.frozen_balance    = (w.frozen_balance || 0) + amt;
+      w.lockedAmount      = (w.lockedAmount || 0) + amt; // 兼容字段
+      w.balance           = w.available_balance;
+      wallets[walletKey] = w;
+      writeJson(KEY.wallets, wallets);
+
+      // 2) freeze_order 入库
+      var fo = {
+        id: frzId, out_freeze_no: "FRZ_" + ymd + "_" + seq,
+        walletKey: walletKey, amount: amt, recharge_deduct: 0,
+        biz_type: ctx.biz_type || "cash_consume",
+        status: "frozen",
+        created_at: ts, expire_at: expireAt,
+        relatedDemand: ctx.demandId || null,
+        relatedOrder:  ctx.orderId  || null,
+        voucher_no: voucherNo,
+        operator: ctx.operator || "昭岚"
+      };
+      var fos = readJson(KEY.freezeOrders, defaultFreezeOrders);
+      fos.unshift(fo);
+      writeJson(KEY.freezeOrders, fos);
+
+      // 3) 双向凭证：1002 冻结 借（资产内部转移） / 1001 可用 贷
+      var flows = readJson(KEY.flows, defaultFlows);
+      flows.unshift({
+        id: "F-FRZ-T-" + Date.now(),
+        time: ts, type: "lock",
+        desc: "下单锁定" + (ctx.demandId ? " - " + ctx.demandId : "") + (ctx.orderTitle ? "「" + ctx.orderTitle + "」" : ""),
+        account: walletKey,
+        amount: -amt, operator: ctx.operator || "昭岚",
+        voucher_no: voucherNo, subject_code: "1002", direction: "debit",
+        related_freeze: frzId, relatedDemand: ctx.demandId || null
+      });
+      flows.unshift({
+        id: "F-FRZ-T-OFFSET-" + Date.now(),
+        time: ts, type: "lock",
+        desc: "（对手方）下单锁定 - 可用余额减少",
+        account: walletKey,
+        amount: 0, _voucherAmt: amt, operator: "system",
+        voucher_no: voucherNo, subject_code: "1001", direction: "credit",
+        related_freeze: frzId, lockedNote: "对手方记账（贷方）"
+      });
+      writeJson(KEY.flows, flows);
+
+      return { ok: true, freezeId: frzId, voucherNo: voucherNo };
+    },
+
+    tccConfirm: function (freezeId, opts) {
+      opts = opts || {};
+      var fos = readJson(KEY.freezeOrders, defaultFreezeOrders);
+      var idx = fos.findIndex(function (o) { return o.id === freezeId; });
+      if (idx < 0) return { ok: false, error: "冻结单不存在" };
+      var fo = fos[idx];
+      if (fo.status !== "frozen") return { ok: false, error: "冻结单已 " + fo.status + "，无法 confirm" };
+
+      var wallets = readJson(KEY.wallets, defaultWallets);
+      var w = wallets[fo.walletKey];
+      if (!w) return { ok: false, error: "钱包不存在" };
+
+      var ts = (function () {
+        var d = new Date();
+        function p(n) { return String(n).padStart(2,"0"); }
+        return d.getFullYear() + "-" + p(d.getMonth()+1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes());
+      })();
+      var voucherNo = "V-" + Date.now();
+
+      // 1) freeze_order: frozen → confirmed
+      fo.status = "confirmed";
+      fo.confirmed_at = ts;
+      fo.relatedOrder = opts.orderId || fo.relatedOrder;
+      fos[idx] = fo;
+      writeJson(KEY.freezeOrders, fos);
+
+      // 2) 钱包：frozen -= amt（资金真正出账）
+      w.frozen_balance = Math.max(0, (w.frozen_balance || 0) - fo.amount);
+      w.lockedAmount   = Math.max(0, (w.lockedAmount   || 0) - fo.amount);
+      wallets[fo.walletKey] = w;
+      writeJson(KEY.wallets, wallets);
+
+      // 3) 结算凭证：5001 已结算消耗 借 / 1002 冻结余额 贷
+      var flows = readJson(KEY.flows, defaultFlows);
+      flows.unshift({
+        id: "F-FRZ-C-" + Date.now(),
+        time: ts, type: "settle",
+        desc: "订单结算" + (fo.relatedOrder ? " - " + fo.relatedOrder : ""),
+        account: fo.walletKey,
+        amount: -fo.amount, operator: opts.operator || "system",
+        voucher_no: voucherNo, subject_code: "5001", direction: "debit",
+        related_freeze: freezeId, relatedDemand: fo.relatedDemand
+      });
+      flows.unshift({
+        id: "F-FRZ-C-OFFSET-" + Date.now(),
+        time: ts, type: "settle",
+        desc: "（对手方）订单结算 - 冻结余额释放",
+        account: fo.walletKey,
+        amount: 0, _voucherAmt: fo.amount, operator: "system",
+        voucher_no: voucherNo, subject_code: "1002", direction: "credit",
+        related_freeze: freezeId, lockedNote: "对手方记账（贷方）"
+      });
+      writeJson(KEY.flows, flows);
+      return { ok: true, voucherNo: voucherNo };
+    },
+
+    tccCancel: function (freezeId, opts) {
+      opts = opts || {};
+      var fos = readJson(KEY.freezeOrders, defaultFreezeOrders);
+      var idx = fos.findIndex(function (o) { return o.id === freezeId; });
+      if (idx < 0) return { ok: false, error: "冻结单不存在" };
+      var fo = fos[idx];
+      if (fo.status !== "frozen") return { ok: false, error: "冻结单已 " + fo.status + "，无法 cancel" };
+
+      var wallets = readJson(KEY.wallets, defaultWallets);
+      var w = wallets[fo.walletKey];
+      if (!w) return { ok: false, error: "钱包不存在" };
+
+      var ts = (function () {
+        var d = new Date();
+        function p(n) { return String(n).padStart(2,"0"); }
+        return d.getFullYear() + "-" + p(d.getMonth()+1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes());
+      })();
+      var voucherNo = "V-" + Date.now();
+
+      // 1) freeze_order: frozen → cancelled
+      fo.status = "cancelled";
+      fo.cancelled_at = ts;
+      fo.cancel_reason = opts.reason || "主动取消";
+      fos[idx] = fo;
+      writeJson(KEY.freezeOrders, fos);
+
+      // 2) 钱包：frozen -= amt + available += amt（资金回到可用）
+      w.frozen_balance    = Math.max(0, (w.frozen_balance    || 0) - fo.amount);
+      w.lockedAmount      = Math.max(0, (w.lockedAmount      || 0) - fo.amount);
+      w.available_balance = (w.available_balance || w.balance || 0) + fo.amount;
+      w.balance           = w.available_balance;
+      wallets[fo.walletKey] = w;
+      writeJson(KEY.wallets, wallets);
+
+      // 3) 解冻凭证：1001 可用余额 借 / 1002 冻结余额 贷
+      var flows = readJson(KEY.flows, defaultFlows);
+      flows.unshift({
+        id: "F-FRZ-X-" + Date.now(),
+        time: ts, type: "unlock",
+        desc: "订单取消解冻" + (fo.relatedDemand ? " - " + fo.relatedDemand : "") + "（" + (opts.reason || "主动取消") + "）",
+        account: fo.walletKey,
+        amount: fo.amount, operator: opts.operator || "system",
+        voucher_no: voucherNo, subject_code: "1001", direction: "debit",
+        related_freeze: freezeId, relatedDemand: fo.relatedDemand
+      });
+      flows.unshift({
+        id: "F-FRZ-X-OFFSET-" + Date.now(),
+        time: ts, type: "unlock",
+        desc: "（对手方）订单取消 - 冻结余额释放",
+        account: fo.walletKey,
+        amount: 0, _voucherAmt: fo.amount, operator: "system",
+        voucher_no: voucherNo, subject_code: "1002", direction: "credit",
+        related_freeze: freezeId, lockedNote: "对手方记账（贷方）"
+      });
+      writeJson(KEY.flows, flows);
+      return { ok: true, voucherNo: voucherNo };
+    },
+
+    // 划拨单（transfer_order）— B-2
+    getTransferOrders: function () { return readJson(KEY.transferOrders, defaultTransferOrders); },
+    setTransferOrders: function (v) { writeJson(KEY.transferOrders, v); },
+    addTransferOrder:  function (o) { var l = readJson(KEY.transferOrders, defaultTransferOrders); l.unshift(o); writeJson(KEY.transferOrders, l); },
+
+    // 提现单（withdraw_order）— B-4
+    getWithdrawOrders: function () { return readJson(KEY.withdrawOrders, defaultWithdrawOrders); },
+    setWithdrawOrders: function (v) { writeJson(KEY.withdrawOrders, v); },
+    addWithdrawOrder:  function (o) { var l = readJson(KEY.withdrawOrders, defaultWithdrawOrders); l.unshift(o); writeJson(KEY.withdrawOrders, l); },
 
     getFlows: function () { return readJson(KEY.flows, defaultFlows); },
     setFlows: function (v) { writeJson(KEY.flows, v); },

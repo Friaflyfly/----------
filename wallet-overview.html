@@ -64,8 +64,7 @@
 
     /* 页头 */
     .page-head { background: #fff; border-radius: 8px; padding: 18px 24px; margin-bottom: 14px; }
-    .page-head h1 { margin: 0 0 4px; font-size: 22px; }
-    .page-head .sub { color: #8c8c8c; font-size: 13px; }
+    .page-head h1 { margin: 0; font-size: 22px; }
 
     /* KPI 行 */
     .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 14px; }
@@ -323,12 +322,7 @@
     .btn.primary { background: #1890ff; border-color: #1890ff; color: #fff; }
     .btn.primary:hover { background: #40a9ff; border-color: #40a9ff; color: #fff; }
 
-    /* 上下文条（空间 + 角色） */
-    .context-banner { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 10px 16px; margin: -4px 0 14px; background: #f0f7ff; border: 1px solid #bae0ff; border-radius: 8px; font-size: 13px; color: #096dd9; }
-    .context-banner .ctx-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; background: #fff; border: 1px solid #91d5ff; border-radius: 12px; font-weight: 500; }
-    .context-banner .ctx-chip.role { color: #d46b08; border-color: #ffd591; }
-    .context-banner .ctx-arrow { color: #8c8c8c; }
-    .context-banner .ctx-rule { color: #595959; font-size: 12px; }
+    .fund-rule-note { margin: -4px 0 12px; padding: 0 4px; font-size: 12.5px; color: #8c8c8c; line-height: 1.55; }
 
     /* 页内功能 Tab */
     .role-tabs { display: flex; gap: 4px; padding: 6px; background: #fff; border-radius: 10px; margin-bottom: 14px; box-shadow: 0 2px 6px rgba(0,0,0,.04); overflow-x: auto; }
@@ -425,6 +419,29 @@
       .role-tabs.vertical button.active { border-left: none; box-shadow: inset 0 -2px 0 #1890ff; }
     }
 
+    /* 一/二期能力标记（对齐《统一账户与资金中心 一期架构设计方案》MVP 范围） */
+    .phase-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 500; padding: 2px 8px;
+      border-radius: 10px; margin-left: 6px; vertical-align: middle;
+      line-height: 1.4;
+    }
+    .phase-badge.p1 { background: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; }
+    .phase-badge.p2 { background: #fff7e6; color: #d46b08; border: 1px solid #ffd591; }
+    .phase-banner-p2 {
+      display: flex; align-items: flex-start; gap: 10px;
+      background: linear-gradient(90deg, #fff7e6, #fffbe6);
+      border: 1px solid #ffd591; border-radius: 8px;
+      padding: 10px 14px; margin: 0 0 14px 0; font-size: 12px;
+      color: #874d00; line-height: 1.6;
+    }
+    .phase-banner-p2 .pbp-tag {
+      flex-shrink: 0; background: #d46b08; color: #fff;
+      font-size: 11px; font-weight: 600;
+      padding: 2px 8px; border-radius: 10px;
+      margin-top: 1px;
+    }
+
     /* 冻结余额拆分 */
     .frozen-breakdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0; }
     .frozen-cell { background: #fff; border-radius: 8px; padding: 12px 14px; border: 1px solid #f0f0f0; }
@@ -433,6 +450,31 @@
     .frozen-cell.refund .fc-value { color: #cf1322; }
     .frozen-cell.dispute .fc-value { color: #722ed1; }
     .frozen-cell .fc-meta { font-size: 11px; color: #8c8c8c; }
+
+    /* B-4：提现申请卡片 */
+    .wd-card { background:#fff; border:1px solid #f0f0f0; border-radius:8px; padding:12px 14px; margin-bottom:8px; border-left-width:3px; }
+    .wd-card.wd-pending   { border-left-color:#faad14; }
+    .wd-card.wd-reviewing { border-left-color:#1890ff; }
+    .wd-card.wd-approved  { border-left-color:#52c41a; }
+    .wd-card.wd-success   { border-left-color:#52c41a; background:#f6ffed; }
+    .wd-card.wd-rejected  { border-left-color:#ff4d4f; background:#fff1f0; }
+    .wd-card-head { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .wd-status-pill { font-size:11px; padding:2px 8px; border-radius:4px; font-weight:500; }
+    .wd-status-pill.wd-pending   { background:#fffbe6; color:#d48806; border:1px solid #ffe58f; }
+    .wd-status-pill.wd-reviewing { background:#e6f7ff; color:#0958d9; border:1px solid #91caff; }
+    .wd-status-pill.wd-approved  { background:#f6ffed; color:#389e0d; border:1px solid #b7eb8f; }
+    .wd-status-pill.wd-success   { background:#f6ffed; color:#389e0d; border:1px solid #b7eb8f; }
+    .wd-status-pill.wd-rejected  { background:#fff1f0; color:#cf1322; border:1px solid #ffa39e; }
+    .wd-bank { font-size:12px; color:#595959; }
+    .wd-risk-high { font-size:11px; padding:1px 6px; border-radius:3px; background:#fff1f0; color:#cf1322; border:1px solid #ffa39e; }
+    .wd-amt { margin-left:auto; font-size:16px; font-weight:600; color:#cf1322; font-family:monospace; }
+    .wd-card-meta { font-size:12px; color:#8c8c8c; margin-top:6px; }
+    .wd-voucher { color:#1890ff; cursor:pointer; }
+    .wd-timeline { display:flex; align-items:center; gap:14px; margin-top:8px; padding-top:8px; border-top:1px dashed #f0f0f0; flex-wrap:wrap; }
+    .wd-timeline span { font-size:11px; color:#bfbfbf; position:relative; }
+    .wd-timeline span.on { color:#262626; font-weight:500; }
+    .wd-timeline span:not(:last-child)::after { content:"›"; color:#d9d9d9; margin-left:14px; font-weight:normal; }
+    .wd-reject-reason { margin-top:8px; font-size:12px; color:#cf1322; background:#fff1f0; border:1px solid #ffa39e; border-radius:4px; padding:6px 8px; }
 
     /* 承制方收入卡 */
     .income-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
@@ -464,7 +506,7 @@
     .simple-list .sl-amt.in { color: #389e0d; }
     .simple-list .sl-amt.out { color: #cf1322; }
 
-    /* 升级版账务流水 - 多行结构 */
+    /* 升级版账务流水 - 多行结构（保留兼容，表格版见 .flow-table） */
     .flow-row.acct { grid-template-columns: 50px 1.4fr 1.6fr 130px 130px; }
     .flow-row.acct.head { font-size: 12px; }
     .flow-acct-meta { font-size: 11px; color: #8c8c8c; margin-top: 4px; line-height: 1.5; }
@@ -474,6 +516,81 @@
     .flow-acct-meta .ctx-link:hover { text-decoration: underline; }
     .flow-balance { font-size: 11px; color: #8c8c8c; line-height: 1.5; }
     .flow-balance .bal-after { color: #262626; font-weight: 600; font-size: 13px; }
+
+    /* 收支记录 · 表格视图 */
+    .flow-table-wrap { overflow-x: auto; }
+    .flow-table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+    .flow-table thead th { background: #fafafa; color: #595959; font-size: 12px; font-weight: 500; padding: 10px 14px; text-align: left; border-bottom: 1px solid #e8e8e8; white-space: nowrap; }
+    .flow-table tbody td { padding: 12px 14px; border-bottom: 1px solid #f5f5f5; vertical-align: top; line-height: 1.5; }
+    .flow-table tbody tr:last-child td { border-bottom: none; }
+    .flow-table tbody tr:hover { background: #fafcff; }
+    .flow-table .ft-type-pill { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; line-height: 1.6; }
+    .flow-table .ft-type-pill.recharge { background: #f6ffed; color: #389e0d; }
+    .flow-table .ft-type-pill.lock     { background: #fff7e6; color: #d46b08; }
+    .flow-table .ft-type-pill.unlock   { background: #e6fffb; color: #08979c; }
+    .flow-table .ft-type-pill.allocate { background: #e6f7ff; color: #096dd9; }
+    .flow-table .ft-type-pill.settle   { background: #f9f0ff; color: #531dab; }
+    .flow-table .ft-type-pill.refund   { background: #fff1f0; color: #cf1322; }
+    .flow-table .ft-type-pill.withdraw { background: #fff0f6; color: #c41d7f; }
+    .flow-table .ft-type-pill.invoice  { background: #f0f5ff; color: #2f54eb; }
+    .flow-table .ctx-link { color: #1890ff; text-decoration: none; font-size: 12px; }
+    .flow-table .ctx-link:hover { text-decoration: underline; }
+    .flow-table .ft-biz-id { color: #595959; font-size: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .flow-table .ft-time { color: #595959; font-size: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .flow-table .ft-party { color: #262626; font-weight: 500; }
+    .flow-table .ft-party-sub { color: #8c8c8c; font-size: 11px; margin-top: 3px; }
+    .flow-table .ft-status { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 11px; line-height: 1.5; }
+    .flow-table .ft-status.ok       { background: #f6ffed; color: #389e0d; border: 1px solid #b7eb8f; }
+    .flow-table .ft-status.lock     { background: #fff7e6; color: #d46b08; border: 1px solid #ffd591; }
+    .flow-table .ft-status.unlock   { background: #e6fffb; color: #08979c; border: 1px solid #87e8de; }
+    .flow-table .ft-status.pending  { background: #fffbe6; color: #ad8b00; border: 1px solid #ffe58f; }
+    .flow-table .ft-status.rejected { background: #fff1f0; color: #cf1322; border: 1px solid #ffa39e; }
+    .flow-table .ft-status.info     { background: #f0f5ff; color: #2f54eb; border: 1px solid #adc6ff; }
+    .flow-table .ft-amount        { font-size: 14px; font-weight: 600; }
+    .flow-table .ft-amount.in     { color: #389e0d; }
+    .flow-table .ft-amount.out    { color: #cf1322; }
+    .flow-table .ft-amount.lock   { color: #d46b08; }
+    .flow-table .ft-amount.zero   { color: #8c8c8c; font-size: 12px; font-weight: 500; }
+    .flow-table .ft-amount-sub    { color: #8c8c8c; font-size: 11px; margin-top: 4px; font-weight: 400; }
+    .flow-table .ft-operator      { color: #595959; }
+    .flow-table .ft-empty td      { padding: 60px 16px; text-align: center; color: #8c8c8c; }
+    .flow-table .ft-order-link { background: none; border: none; padding: 0; cursor: pointer; text-align: left; font: inherit; }
+    .flow-table .ft-order-link.ctx { color: #1890ff; }
+    .flow-table .ft-order-link.ctx:hover { text-decoration: underline; }
+    .flow-table .ft-order-link.biz { color: #595959; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+    .flow-table .ft-order-link.biz:hover { color: #1890ff; }
+
+    /* 关联订单预览抽屉 */
+    .op-hero { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: linear-gradient(135deg, #f0f5ff, #fafafa); border: 1px solid #d6e4ff; border-radius: 10px; margin-bottom: 16px; }
+    .op-hero-icon { font-size: 28px; line-height: 1; }
+    .op-hero-id { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 14px; font-weight: 600; color: #262626; }
+    .op-hero-sub { font-size: 12px; color: #8c8c8c; margin-top: 4px; }
+    .op-status-pill { display: inline-block; margin-top: 8px; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; }
+    .op-status-pill.ok { background: #f6ffed; color: #389e0d; border: 1px solid #b7eb8f; }
+    .op-status-pill.pending { background: #fffbe6; color: #ad8b00; border: 1px solid #ffe58f; }
+    .op-status-pill.rejected { background: #fff1f0; color: #cf1322; border: 1px solid #ffa39e; }
+    .op-status-pill.lock { background: #fff7e6; color: #d46b08; border: 1px solid #ffd591; }
+    .op-status-pill.info { background: #f0f5ff; color: #2f54eb; border: 1px solid #adc6ff; }
+    .op-kv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; margin-bottom: 18px; }
+    .op-kv { font-size: 12px; }
+    .op-kv .k { color: #8c8c8c; margin-bottom: 4px; }
+    .op-kv .v { color: #262626; font-weight: 500; word-break: break-all; }
+    .op-sec-title { font-size: 12px; font-weight: 600; color: #595959; margin: 0 0 10px; text-transform: none; }
+    .op-timeline { list-style: none; margin: 0 0 18px; padding: 0 0 0 4px; border-left: 2px solid #e8e8e8; }
+    .op-timeline li { position: relative; padding: 0 0 14px 18px; font-size: 12px; }
+    .op-timeline li:last-child { padding-bottom: 0; }
+    .op-timeline li::before { content: ""; position: absolute; left: -7px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #fff; border: 2px solid #d9d9d9; }
+    .op-timeline li.done::before { border-color: #52c41a; background: #52c41a; }
+    .op-timeline li.active::before { border-color: #1890ff; background: #1890ff; box-shadow: 0 0 0 3px rgba(24,144,255,.2); }
+    .op-timeline li.fail::before { border-color: #ff4d4f; background: #ff4d4f; }
+    .op-timeline .tl-label { color: #262626; font-weight: 500; }
+    .op-timeline .tl-time { color: #8c8c8c; margin-top: 2px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11px; }
+    .op-timeline .tl-note { color: #8c8c8c; margin-top: 2px; font-size: 11px; }
+    .op-flow-mini { border: 1px solid #f0f0f0; border-radius: 8px; overflow: hidden; margin-bottom: 16px; }
+    .op-flow-mini .ofm-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; font-size: 12px; border-bottom: 1px solid #f5f5f5; }
+    .op-flow-mini .ofm-row:last-child { border-bottom: none; }
+    .op-flow-mini .ofm-amt.in { color: #389e0d; font-weight: 600; }
+    .op-flow-mini .ofm-amt.out { color: #cf1322; font-weight: 600; }
 
     /* 异常 / 边界状态 banner */
     .state-banner { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; line-height: 1.55; border-left: 4px solid transparent; }
@@ -511,7 +628,7 @@
     .actions-tier .tier-more { margin-left: auto; position: relative; }
     .actions-tier .tier-more-trigger { background: rgba(255,255,255,.15); color: #fff; border: 1px solid rgba(255,255,255,.3); padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
     .actions-tier .tier-more-trigger:hover { background: rgba(255,255,255,.25); }
-    .actions-tier .tier-more-menu { display: none; position: absolute; right: 0; top: calc(100% + 6px); min-width: 220px; background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,.15); padding: 6px; z-index: 50; }
+    .actions-tier .tier-more-menu { display: none; position: fixed; min-width: 260px; background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,.15); padding: 6px; z-index: 9999; }
     .actions-tier .tier-more-menu.open { display: block; }
     .actions-tier .tier-more-menu a { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 6px; color: #262626; text-decoration: none; font-size: 13px; cursor: pointer; }
     .actions-tier .tier-more-menu a:hover { background: #f0f7ff; color: #1890ff; }
@@ -701,17 +818,7 @@
     <main class="main">
       <section class="page-head">
         <h1>💰 我的钱包</h1>
-        <div class="sub">骋风天合采用「统一账号 + 多工作空间 + 分层资金账户」体系。<strong>工作空间</strong>决定花谁的钱，<strong>角色视角</strong>决定看哪类菜单 / 待办 / 指标。</div>
       </section>
-
-      <!-- 上下文条：当前空间 + 当前角色（统一显示） -->
-      <div class="context-banner" id="contextBanner">
-        <span>📍 当前上下文</span>
-        <span class="ctx-chip">🏢 <span id="ctxWsName">骋风天合 · 短剧制作中心</span></span>
-        <span class="ctx-arrow">×</span>
-        <span class="ctx-chip role" id="ctxRoleChip">📥 <span id="ctxRoleName">需求方视角</span></span>
-        <span class="ctx-rule" id="ctxRuleNote">本空间下发起的订单，将默认从「短剧制作中心 - 团队预算账户」中扣款或冻结资金。</span>
-      </div>
 
       <!-- 管理员引导：钱包是空间视角，治理性操作请去管理后台 -->
       <div id="adminGovHint" style="display:none;background:linear-gradient(90deg,#f9f0ff,#fff);border-left:3px solid #722ed1;border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12.5px;line-height:1.65;color:#262626">
@@ -723,11 +830,13 @@
       <!-- ============ Tab 1：概览 ============ -->
       <section class="panel active" id="panel-overview">
         <!-- 当前空间绑定账户（仪表盘 hero） -->
-        <div class="section-head">当前空间绑定账户 <span class="section-sub">切换顶部空间，下方卡片实时变化</span></div>
+        <div class="section-head">当前空间绑定账户</div>
+        <p class="fund-rule-note" id="fundRuleNote">本空间下发起的订单，将默认从「短剧制作中心 - 团队预算账户」中扣款或冻结资金。</p>
         <div class="current-card team-budget" id="currentCard">
           <div class="cc-label">当前工作空间：<span id="ccWsName">骋风天合 · 短剧制作中心</span></div>
           <div class="cc-name" id="ccAccountName">短剧制作中心 - 团队预算账户</div>
           <div class="cc-balance" id="ccBalance">¥185,000</div>
+          <div class="cc-balance-sub" id="ccBalanceSub" style="font-size:12px;opacity:.75;margin-top:-4px;margin-bottom:8px;position:relative;z-index:2"></div>
           <div class="cc-meta" id="ccMeta">
             <div class="cc-meta-item"><div class="cc-meta-label">已锁定（订单中）</div><div class="cc-meta-value" id="ccLocked">¥28,000</div></div>
             <div class="cc-meta-item"><div class="cc-meta-label">总预算</div><div class="cc-meta-value" id="ccAllocated">¥200,000</div></div>
@@ -813,6 +922,13 @@
         <!-- 冻结余额拆分（订单 / 退款 / 纠纷） -->
         <div class="section-head" style="margin-top:18px">🔒 冻结余额拆分 <span class="section-sub">本空间绑定账户的冻结资金分布</span></div>
         <div class="frozen-breakdown" id="frozenBreakdown"></div>
+
+        <!-- B-4：我的提现申请（withdraw_order 状态机） -->
+        <div class="section-head" style="margin-top:18px">
+          💸 我的提现申请
+          <span class="section-sub">提交后会经过风控初筛与财务复核，到账银行卡通常在 1～2 个工作日内</span>
+        </div>
+        <div id="withdrawOrdersList"></div>
 
         <!-- 团队预算使用率（个人空间隐藏） -->
         <div id="budgetUsageWrap">
@@ -923,14 +1039,33 @@
               </select>
             </div>
           </div>
-          <div class="flow-row acct head">
-            <div></div>
-            <div>类型 / 关联订单 / 时间</div>
-            <div>付款 → 收款 / 上下文</div>
-            <div>金额 / 操作人</div>
-            <div>变动前 → 变动后</div>
+          <div class="flow-table-wrap">
+            <table class="flow-table">
+              <colgroup>
+                <col style="width:8%">
+                <col style="width:16%">
+                <col style="width:11%">
+                <col style="width:14%">
+                <col style="width:14%">
+                <col style="width:10%">
+                <col style="width:15%">
+                <col style="width:12%">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>类型</th>
+                  <th>关联订单</th>
+                  <th>时间</th>
+                  <th>付款方</th>
+                  <th>收款方</th>
+                  <th>资金状态</th>
+                  <th style="text-align:right">金额</th>
+                  <th>操作人</th>
+                </tr>
+              </thead>
+              <tbody id="flowList"></tbody>
+            </table>
           </div>
-          <div id="flowList"></div>
         </section>
       </section>
 
@@ -1031,12 +1166,19 @@
   <div class="drawer" id="allocateDrawer" data-drawer="allocate">
     <div class="drawer-head">
       <div>
-        <h3>📤 团队预算划拨</h3>
+        <h3>📤 团队预算划拨 <span class="phase-badge p2">二期能力</span></h3>
         <p class="dh-sub">从企业总账户划拨预算到指定团队预算账户</p>
       </div>
       <button class="dh-close" data-close-drawer>×</button>
     </div>
     <div class="drawer-body">
+      <div class="phase-banner-p2">
+        <span class="pbp-tag">P2</span>
+        <span>
+          <strong>团队预算划拨为二期能力。</strong>
+          仅企业管理员可操作，划拨成功后立即在目标团队预算账户生效。
+        </span>
+      </div>
       <div class="info-tip">
         仅企业管理员可操作。划拨后，对应团队成员在该团队空间下下单时将优先消耗该预算账户。
       </div>
@@ -1077,6 +1219,30 @@
     </div>
   </div>
 
+  <!-- 主动退款抽屉（按 recharge_order 维度，对齐《统一账户与资金中心》5.3 节） -->
+  <div class="drawer" id="refundDrawer" data-drawer="refund">
+    <div class="drawer-head">
+      <div>
+        <h3>↩️ 主动退款 <span class="phase-badge p2">二期能力</span></h3>
+        <p class="dh-sub" id="refundAccountName">按充值订单退回，仅可退还充值本金部分</p>
+      </div>
+      <button class="dh-close" data-close-drawer>×</button>
+    </div>
+    <div class="drawer-body">
+      <div class="phase-banner-p2">
+        <span class="pbp-tag">P2</span>
+        <span>
+          <strong>主动退款按充值单回退本金。</strong>
+          每张充值单显示剩余可退额度，仅可退回原渠道（支付宝 / 微信 / 对公），且不超过该剩余额度。
+        </span>
+      </div>
+      <div id="refundRechargeList" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+    <div class="drawer-foot">
+      <button class="btn" data-close-drawer>关闭</button>
+    </div>
+  </div>
+
   <!-- 提现抽屉 -->
   <div class="drawer" id="withdrawDrawer" data-drawer="withdraw">
     <div class="drawer-head">
@@ -1097,14 +1263,14 @@
       </div>
       <div class="form-field">
         <label>到账银行卡</label>
-        <select>
+        <select id="withdrawBankCard">
           <option>中国建设银行 储蓄卡 (尾号 8826) · 默认</option>
           <option>+ 添加新银行卡（去「钱包设置 → 银行卡」）</option>
         </select>
       </div>
       <div class="form-field">
         <label>备注（可选）</label>
-        <input type="text" placeholder="如：本月稿酬 / 项目结款">
+        <input type="text" id="withdrawMemo" placeholder="如：本月稿酬 / 项目结款">
       </div>
     </div>
     <div class="drawer-foot">
@@ -1162,6 +1328,23 @@
     <div class="drawer-foot">
       <button class="btn" data-close-drawer>取消</button>
       <button class="btn primary" id="invoiceConfirmBtn">提交开票申请</button>
+    </div>
+  </div>
+
+  <!-- 关联订单 / 业务单预览抽屉 -->
+  <div class="drawer" id="orderPreviewDrawer" data-drawer="orderPreview">
+    <div class="drawer-head">
+      <div>
+        <h3 id="opTitle">业务单详情</h3>
+        <p class="dh-sub" id="opSubtitle">—</p>
+      </div>
+      <button class="dh-close" data-close-drawer>×</button>
+    </div>
+    <div class="drawer-body" id="opBody"></div>
+    <div class="drawer-foot">
+      <button class="btn" data-close-drawer>关闭</button>
+      <button class="btn primary" id="opGoDetailBtn" style="display:none">前往详情</button>
+      <button class="btn" id="opFilterFlowsBtn" style="display:none">在收支记录中筛选</button>
     </div>
   </div>
 
@@ -1247,7 +1430,7 @@
   </style>
 
   <!-- 共享底座 -->
-  <script src="_shared.js"></script>
+  <script src="_shared.js?v=20260528j"></script>
   <script>
     SharedHeader.mount({ activeNav: "wallet" });
     // wallet-overview.html 的 wallet chip 显示当前空间钱包真实余额（而不是 ws.accountBalance）
@@ -1285,21 +1468,13 @@
     const $ = (id) => document.getElementById(id);
 
     // ============================================================
-    // P0-1：上下文条 + 角色 / 视图 Tab + 身份切换拦截
+    // P0-1：扣款规则说明 + 管理员治理入口
     // ============================================================
-    function renderContextBanner() {
+    function renderFundRuleNote() {
       const ws = window.demoApp.getCurrentWorkspace();
       const id = window.demoApp.getCurrentIdentity();
-      $("ctxWsName").textContent = ws.name;
-      const roleName = id === "contractor" ? "承制方视角" : "需求方视角";
-      const roleIcon = id === "contractor" ? "🛠 " : "📥 ";
-      $("ctxRoleName").textContent = roleName;
-      const roleChip = $("ctxRoleChip");
-      if (roleChip && roleChip.firstChild) roleChip.firstChild.textContent = roleIcon;
-      // 管理员视角提示：进入 cf-admin 空间时展示治理入口
       const govHint = $("adminGovHint");
       if (govHint) govHint.style.display = (ws.id === "cf-admin") ? "block" : "none";
-      // P2-12 规则说明
       let rule = "";
       const wallets = window.demoApp.getWallets();
       if (id === "contractor") {
@@ -1315,7 +1490,8 @@
         const wname = w ? w.name : ws.accountType;
         rule = "本空间下发起的订单，将默认从「" + wname + "」中扣款或冻结资金。";
       }
-      $("ctxRuleNote").textContent = rule;
+      const el = $("fundRuleNote");
+      if (el) el.textContent = rule;
     }
 
     // ============================================================
@@ -1414,7 +1590,7 @@
       document.querySelectorAll(".panel").forEach(p => p.classList.toggle("active", p.id === "panel-" + name));
       // 各 Tab 切换时按需重渲染
       if (name === "overview") renderMiniFlows("overviewMiniFlows", "all");
-      if (name === "accounts") { renderAccountsActionBar(); renderFrozenBreakdown(); renderMiniFlows("accountsMiniFlows", "current"); }
+      if (name === "accounts") { renderAccountsActionBar(); renderFrozenBreakdown(); renderWithdrawOrders(); renderMiniFlows("accountsMiniFlows", "current"); }
       if (name === "points")   { renderPointsBalance(); renderPointsPackages(); renderPointsConsumptions(); renderPointsExchanges(); }
       if (name === "flows") renderFlows();
       if (name === "invoice") renderInvoicePanel();
@@ -1460,7 +1636,7 @@
       e.preventDefault();
       window.demoApp.setCurrentIdentity(next);
       document.querySelectorAll("#identitySwitch button").forEach(x => x.classList.toggle("active", x === b));
-      renderContextBanner();
+      renderFundRuleNote();
       renderCurrentCard();
       renderKPIs();
       // 当前 Tab 也刷新一遍（特别是发票，需求方/承制方默认子签不同）
@@ -1529,42 +1705,70 @@
       $("ccAccountName").textContent = wallet ? wallet.name.replace("企业主账户", "企业总账户") : ws.payer.name;
       $("ccBalance").textContent = window.fmtMoney(wallet ? wallet.balance : 0);
 
-      // ---- meta：按账户类型差异化 ----
+      // ---- meta：按账户类型差异化（v2：对齐《统一账户与资金中心》字段语义）----
+      // 个人/承制方：突出"可用余额 / 冻结 / 充值余额 / 累计收益 / 可提现 / 积分"
+      // 团队预算：突出"总预算 / 可用 / 冻结 / 已使用 / 积分"，并标注"不可提现"
+      // 企业总：突出"企业总可用 / 充值本金 / 已分配 / 待审核充值（动态）"
       const fmt = window.fmtMoney;
+      const cell = function (label, value, hint) {
+        var hintHtml = hint ? ' <span class="cc-meta-hint" title="' + hint + '" style="opacity:.6;cursor:help">ⓘ</span>' : '';
+        return '<div class="cc-meta-item"><div class="cc-meta-label">' + label + hintHtml + '</div><div class="cc-meta-value">' + value + '</div></div>';
+      };
       let metaHtml = "";
       if (ws.payer.type === "personal") {
-        // 个人：可用 / 冻结 / 近30天充值 / 近30天支出
-        const last30 = computeLast30(wallets, "personal-account-lixueqin");
+        const available = wallet.available_balance != null ? wallet.available_balance : wallet.balance;
+        const frozen    = wallet.frozen_balance != null    ? wallet.frozen_balance    : (wallet.lockedAmount || 0);
+        const recharge  = wallet.recharge_balance || 0;
+        const earnings  = wallet.total_earnings   || 0;
+        const withdrawable = window.demoApp.getWithdrawableAmount(ws.walletKey);
         metaHtml = ''
-          + '<div class="cc-meta-item"><div class="cc-meta-label">可用余额</div><div class="cc-meta-value">' + fmt(wallet.balance) + '</div></div>'
-          + '<div class="cc-meta-item"><div class="cc-meta-label">冻结余额</div><div class="cc-meta-value">' + fmt(wallet.lockedAmount || 0) + '</div></div>'
-          + '<div class="cc-meta-item"><div class="cc-meta-label">近 30 天充值</div><div class="cc-meta-value">' + fmt(last30.in) + '</div></div>'
-          + '<div class="cc-meta-item"><div class="cc-meta-label">近 30 天支出</div><div class="cc-meta-value">' + fmt(last30.out) + '</div></div>';
+          + cell("可用余额", fmt(available), "available_balance：含充值余额 + 累计收益，未冻结部分")
+          + cell("冻结余额", fmt(frozen), "frozen_balance：当前在途订单 TCC 锁定（同步自冻结单）")
+          + cell("充值余额", fmt(recharge), "recharge_balance：可发起退款的本金（≤可用余额）")
+          + cell("累计收益", fmt(earnings), "total_earnings：作为承制方累计入账金额")
+          + cell("可提现金额 <span style=\"color:#52c41a\">★</span>", '<span style="color:#fff;font-weight:700">' + fmt(withdrawable) + '</span>', "withdrawable = total_earnings − total_withdrawn − pending_withdraw")
+          + cell("积分余额", (wallet.points_balance || 0).toLocaleString() + " 分", "points_balance：积分用于 AI 工具调用");
       } else if (ws.payer.type === "team-budget") {
-        // 团队：总预算 / 已使用 / 已冻结 / 剩余 / 本团队订单数
         const allocated = wallet.allocated || 0;
-        const balance = wallet.balance;
-        const locked = wallet.lockedAmount || 0;
-        const spent = Math.max(0, allocated - balance - locked);
-        const orderCount = countOrdersByAccount(ws.walletKey);
+        const available = wallet.available_balance != null ? wallet.available_balance : wallet.balance;
+        const frozen    = wallet.frozen_balance != null    ? wallet.frozen_balance    : (wallet.lockedAmount || 0);
+        const spent = Math.max(0, allocated - available - frozen);
         metaHtml = ''
-          + '<div class="cc-meta-item"><div class="cc-meta-label">总预算</div><div class="cc-meta-value">' + fmt(allocated) + '</div></div>'
-          + '<div class="cc-meta-item"><div class="cc-meta-label">已使用</div><div class="cc-meta-value">' + fmt(spent) + '</div></div>'
-          + '<div class="cc-meta-item"><div class="cc-meta-label">已冻结</div><div class="cc-meta-value">' + fmt(locked) + '</div></div>'
-          + '<div class="cc-meta-item"><div class="cc-meta-label">剩余</div><div class="cc-meta-value">' + fmt(balance) + '</div></div>'
-          + '<div class="cc-meta-item"><div class="cc-meta-label">本团队订单</div><div class="cc-meta-value">' + orderCount + ' 笔</div></div>';
+          + cell("总预算", fmt(allocated), "由企业管理员从企业主账户划拨")
+          + cell("当前可用", fmt(available), "available_balance：未冻结、未结算部分")
+          + cell("已冻结", fmt(frozen) + ' <span style="font-size:11px;opacity:.7">(' + window.demoApp.getActiveFreezeOrders(ws.walletKey).length + ' 张冻结单)</span>', "frozen_balance：来自当前进行中订单的 TCC 冻结")
+          + cell("已使用", fmt(spent), "spent = allocated − available − frozen，含已结算消耗")
+          + cell("积分余额", (wallet.points_balance || 0).toLocaleString() + " 分", "团队池积分")
+          + cell('<span style="opacity:.65">提现</span>', '<span style="font-size:13px;opacity:.65">不适用 · 仅个人/承制方可提现</span>');
       } else if (ws.payer.type === "enterprise-main") {
-        // 企业总账户：总可用 / 已分配各团队 / 待审核充值 / 待处理退款 / 待处理提现 + 开票
+        const available = wallet.available_balance != null ? wallet.available_balance : wallet.balance;
+        const recharge  = wallet.recharge_balance || 0;
         const allocatedToTeams = ["team-budget-cf-drama", "team-budget-cf-marketing"]
-          .reduce((s, k) => s + ((wallets[k] && wallets[k].allocated) || 0), 0);
+          .reduce(function (s, k) { return s + ((wallets[k] && wallets[k].allocated) || 0); }, 0);
+        const pendingRcs = window.demoApp.getRechargeOrders().filter(function (r) { return r.walletKey === ws.walletKey && r.status === "pending"; });
+        const pendingAmt = pendingRcs.reduce(function (s, r) { return s + r.amount; }, 0);
         metaHtml = ''
-          + '<div class="cc-meta-item"><div class="cc-meta-label">企业总可用</div><div class="cc-meta-value">' + fmt(wallet.balance) + '</div></div>'
-          + '<div class="cc-meta-item"><div class="cc-meta-label">已分配给团队</div><div class="cc-meta-value">' + fmt(allocatedToTeams) + '</div></div>'
-          + '<div class="cc-meta-item"><div class="cc-meta-label">待审核充值</div><div class="cc-meta-value">1 笔 · ¥200,000</div></div>'
-          + '<div class="cc-meta-item"><div class="cc-meta-label">待处理退款</div><div class="cc-meta-value">0 笔</div></div>'
-          + '<div class="cc-meta-item"><div class="cc-meta-label">待开票</div><div class="cc-meta-value">3 笔</div></div>';
+          + cell("企业总可用", fmt(available), "可立即用于划拨 / 支付的余额")
+          + cell("充值本金", fmt(recharge), "充值进入企业账户、且仍可发起退款的部分")
+          + cell("已分配给团队", fmt(allocatedToTeams), "已划拨至团队预算账户的累计金额")
+          + cell("待审核充值", pendingRcs.length + " 笔 · " + fmt(pendingAmt), "对公转账提交后由财务审核中，未到账")
+          + cell("积分余额", (wallet.points_balance || 0).toLocaleString() + " 分", "企业池积分");
       }
       $("ccMeta").innerHTML = metaHtml;
+
+      // v2: 主余额下方的语义说明（available_balance 含义提示）
+      var subEl = $("ccBalanceSub");
+      if (subEl) {
+        if (ws.payer.type === "personal") {
+          subEl.textContent = "可用余额 = 充值余额 + 累计收益 − 已使用 − 冻结";
+        } else if (ws.payer.type === "team-budget") {
+          subEl.textContent = "团队预算可用 · 仅供本团队下单消费 · 不可提现";
+        } else if (ws.payer.type === "enterprise-main") {
+          subEl.textContent = "企业主账户可用 · 用于划拨给团队 / 平台合规支付";
+        } else {
+          subEl.textContent = "";
+        }
+      }
 
       // ---- P2-15：分层动作（主操作 + 二级"管理动作"抽屉）----
       let primary = "", more = [];
@@ -1574,25 +1778,26 @@
         more = [
           { label: "查看完整流水", onclick: "document.querySelector('[data-tab=flows]').click()" },
           { label: "申请开票", onclick: "window.openInvoice()" },
-          { label: "导出对账单 (CSV)", onclick: "window.demoToast('演示环境，未实现导出', 'warn')" }
+          { label: "↩️ 主动退款（按充值单）", phase: "P2", onclick: "window.openRefund('" + ws.walletKey + "')" },
+          { label: "导出对账单 (CSV)", phase: "P2", onclick: "window.demoToast('对账模块属二期范围（reconciliation_log + 渠道对账），演示环境未实现导出', 'warn')" }
         ];
       } else if (ws.payer.type === "team-budget") {
-        primary = '<button class="cc-btn ghost" onclick="window.demoToast(\'团队成员可申请增加预算 →\', \'info\')">📥 申请追加预算</button>'
+        primary = '<button class="cc-btn ghost" onclick="window.demoToast(\'子钱包/团队预算池属二期范围（multi-tenant 钱包），目前演示先以「申请额度划拨」流程承接\', \'info\')">📥 申请追加预算 <span class="phase-badge p2" style="vertical-align:baseline">P2</span></button>'
                 + '<button class="cc-btn ghost" onclick="document.querySelector(\'[data-tab=flows]\').click()">📊 查看团队消费</button>';
         more = [
           { label: "查看预算规则", onclick: "window.demoToast('预算规则：季度初由企业管理员划拨；不足时可申请追加', 'info')" },
           { label: "查看来源账户（企业总账户）", onclick: "window.demoToast('企业总账户由企业管理员维护，团队成员仅可见已划拨额度', 'info')" }
         ];
-        if (ws.canAdjustBudget) more.push({ label: "调整团队预算（仅管理员）", onclick: "window.demoToast('团队预算调整需企业管理员操作', 'warn')" });
+        if (ws.canAdjustBudget) more.push({ label: "调整团队预算（仅管理员）", phase: "P2", onclick: "window.demoToast('多团队预算池及调整审批属二期范围，演示环境仅做提示', 'warn')" });
       } else if (ws.payer.type === "enterprise-main") {
         primary = '<button class="cc-btn" onclick="window.openRecharge(\'' + ws.walletKey + '\')">💳 企业充值</button>'
-                + '<button class="cc-btn ghost" onclick="window.openAllocate()">📤 划拨预算给团队</button>';
+                + '<button class="cc-btn ghost" onclick="window.openAllocate()">📤 划拨预算给团队 <span class="phase-badge p2" style="vertical-align:baseline">P2</span></button>';
         more = [
           { label: "审核充值（待审 1 笔）", onclick: "location.href='admin-finance.html?from=wallet&tab=recharges'" },
           { label: "处理提现申请", onclick: "location.href='admin-finance.html?from=wallet&tab=withdrawals'" },
           { label: "处理开票申请", onclick: "location.href='admin-finance.html?from=wallet&tab=invoices'" },
           { label: "查看订单结算明细", onclick: "location.href='admin-finance.html?from=wallet&tab=settlements'" },
-          { label: "导出对账单 (CSV)", onclick: "window.demoToast('演示环境，未实现导出', 'warn')" },
+          { label: "导出对账单 (CSV)", phase: "P2", onclick: "window.demoToast('对账模块属二期范围（reconciliation_log + 渠道对账），演示环境未实现导出', 'warn')" },
           { label: "配置账户 / 规则", onclick: "location.href='admin-console.html'" }
         ];
       }
@@ -1611,12 +1816,29 @@
       }
       wrap.style.display = "";
       menu.innerHTML = '<div class="menu-label">管理 / 二级动作</div>'
-        + items.map(it => '<a onclick="' + it.onclick.replace(/"/g, "&quot;") + '">▸ ' + it.label + '</a>').join("");
+        + items.map(it => {
+            const phaseTag = it.phase === "P2"
+              ? ' <span class="phase-badge p2" style="font-size:10px;padding:1px 6px">' + it.phase + '</span>'
+              : (it.phase === "P1" ? ' <span class="phase-badge p1" style="font-size:10px;padding:1px 6px">' + it.phase + '</span>' : "");
+            return '<a onclick="' + it.onclick.replace(/"/g, "&quot;") + '">▸ ' + it.label + phaseTag + '</a>';
+          }).join("");
     }
     document.addEventListener("click", function (e) {
       const trig = e.target.closest("#ccMoreTrigger");
       const menu = document.getElementById("ccMoreMenu");
-      if (trig) { e.stopPropagation(); menu && menu.classList.toggle("open"); return; }
+      if (trig) {
+        e.stopPropagation();
+        if (menu) {
+          menu.classList.toggle("open");
+          if (menu.classList.contains("open")) {
+            // 因为 .current-card 设置了 overflow:hidden，menu 改用 position:fixed 锚定到 trigger 右下角
+            const rect = trig.getBoundingClientRect();
+            menu.style.top  = (rect.bottom + 6) + "px";
+            menu.style.left = (rect.right - 260) + "px"; // 260 = min-width
+          }
+        }
+        return;
+      }
       if (menu && !e.target.closest("#ccMoreMenu")) menu.classList.remove("open");
     });
 
@@ -1733,11 +1955,37 @@
 
         const balanceHtml = item.isUnset
           ? '<div class="ac-balance unset">未配置</div>'
-          : '<div class="ac-balance">' + fmt(item.wallet.balance) + '</div>';
-        const meta = item.isUnset
-          ? '<div class="ac-meta"><span>说明</span><span class="ac-meta-val" style="color:#cf1322">下单将回退至企业总账户</span></div>'
-          : '<div class="ac-meta"><span>已冻结</span><span class="ac-meta-val">' + fmt(item.wallet.lockedAmount || 0) + '</span></div>'
-            + (item.wallet.allocated ? '<div class="ac-meta"><span>总预算</span><span class="ac-meta-val">' + fmt(item.wallet.allocated) + '</span></div>' : '');
+          : '<div class="ac-balance">' + fmt(item.wallet.available_balance != null ? item.wallet.available_balance : item.wallet.balance) + '</div>';
+
+        // v2: meta 按账户类型分组，体现"可用 / 冻结 / 可提现 / 充值"语义
+        let meta = "";
+        if (item.isUnset) {
+          meta = '<div class="ac-meta"><span>说明</span><span class="ac-meta-val" style="color:#cf1322">下单将回退至企业总账户</span></div>';
+        } else if (item.type === "personal") {
+          const w = item.wallet;
+          const wd = window.demoApp.getWithdrawableAmount(item.key);
+          meta = ''
+            + '<div class="ac-meta"><span>已冻结 <span style="font-size:11px;color:#bfbfbf">(TCC)</span></span><span class="ac-meta-val">' + fmt(w.frozen_balance != null ? w.frozen_balance : (w.lockedAmount || 0)) + '</span></div>'
+            + '<div class="ac-meta"><span>充值余额 <span style="font-size:11px;color:#bfbfbf">(可退)</span></span><span class="ac-meta-val">' + fmt(w.recharge_balance || 0) + '</span></div>'
+            + '<div class="ac-meta"><span>累计收益</span><span class="ac-meta-val">' + fmt(w.total_earnings || 0) + '</span></div>'
+            + '<div class="ac-meta" style="background:#f6ffed;margin:4px -4px 0;padding:6px 8px;border-radius:4px"><span style="color:#389e0d">可提现金额 ★</span><span class="ac-meta-val" style="color:#389e0d;font-weight:600">' + fmt(wd) + '</span></div>';
+        } else if (item.type === "team-budget") {
+          const w = item.wallet;
+          const frozen = w.frozen_balance != null ? w.frozen_balance : (w.lockedAmount || 0);
+          const fzCount = window.demoApp.getActiveFreezeOrders(item.key).length;
+          meta = ''
+            + '<div class="ac-meta"><span>已冻结 <span style="font-size:11px;color:#bfbfbf">(' + fzCount + ' 张冻结单)</span></span><span class="ac-meta-val">' + fmt(frozen) + '</span></div>'
+            + (w.allocated ? '<div class="ac-meta"><span>总预算</span><span class="ac-meta-val">' + fmt(w.allocated) + '</span></div>' : '')
+            + '<div class="ac-meta"><span style="color:#bfbfbf;font-size:11px">提现 · 不适用</span><span class="ac-meta-val" style="color:#bfbfbf;font-size:11px">仅个人 / 承制方可提现</span></div>';
+        } else if (item.type === "enterprise-main") {
+          const w = item.wallet;
+          const pendingRcs = window.demoApp.getRechargeOrders().filter(function (r) { return r.walletKey === item.key && r.status === "pending"; });
+          const pendingAmt = pendingRcs.reduce(function (s, r) { return s + r.amount; }, 0);
+          meta = ''
+            + '<div class="ac-meta"><span>充值本金 <span style="font-size:11px;color:#bfbfbf">(可退)</span></span><span class="ac-meta-val">' + fmt(w.recharge_balance || 0) + '</span></div>'
+            + (pendingRcs.length ? '<div class="ac-meta"><span style="color:#fa8c16">待审核充值</span><span class="ac-meta-val" style="color:#fa8c16">' + pendingRcs.length + ' 笔 · ' + fmt(pendingAmt) + '</span></div>' : '')
+            + '<div class="ac-meta"><span>已冻结</span><span class="ac-meta-val">' + fmt(w.frozen_balance != null ? w.frozen_balance : (w.lockedAmount || 0)) + '</span></div>';
+        }
 
         return '<div class="' + cls + '">'
           + '<div class="ac-head"><div><div class="ac-title">' + item.title + (isCurrent ? ' <span style="color:#1890ff;font-size:11px">· 当前</span>' : '') + '</div>' + (item.subtitle ? '<div style="font-size:11px;color:#8c8c8c;margin-top:2px">' + item.subtitle + '</div>' : '') + '</div><span class="ac-type ' + item.type + '">' + typeLabel + '</span></div>'
@@ -1979,6 +2227,317 @@
       return m ? m[1] : null;
     }
 
+    // 推导"关联订单"列要显示的内容
+    // 业务单优先级：
+    //   1. 业务订单 / 需求（OD-/DM-）：可点击跳转到项目空间 / 需求详情
+    //   2. 充值单 / 提现单 / 划拨单 / 冻结单：纯文本展示业务单号（财务/对账线索）
+    function deriveRelatedOrder(f) {
+      const desc = f.desc || "";
+      // 1) 资金类业务单（与流水强绑定，优先展示）
+      if (f.related_recharge) return { id: f.related_recharge, kind: "recharge", icon: "💳", label: "充值单" };
+      if (f.related_withdraw) return { id: f.related_withdraw, kind: "withdraw", icon: "💸", label: "提现单" };
+      if (f.related_transfer) return { id: f.related_transfer, kind: "transfer", icon: "📤", label: "划拨单" };
+      if (f.related_freeze)   return { id: f.related_freeze,   kind: "freeze",   icon: "🔒", label: "冻结单" };
+      // 2) 业务订单 / 需求：OD-xxx / DM-xxx
+      const m = desc.match(/(OD|DM)-\d+/);
+      if (m) {
+        const id = m[0];
+        const titleMatch = desc.match(/「([^」]+)」/);
+        const kind = id.indexOf("OD-") === 0 ? "order" : "demand";
+        return { id: id, title: titleMatch ? titleMatch[1] : null, kind: kind, icon: "🔗" };
+      }
+      // 3) 兜底从 desc 中找业务单号
+      const m2 = desc.match(/(RC|WD|TF|FRZ)-\d+/);
+      if (m2) {
+        const prefix = m2[1];
+        const kindMap = { RC: "recharge", WD: "withdraw", TF: "transfer", FRZ: "freeze" };
+        const label  = prefix === "RC" ? "充值单" : prefix === "WD" ? "提现单" : prefix === "TF" ? "划拨单" : "冻结单";
+        const icon   = prefix === "RC" ? "💳"   : prefix === "WD" ? "💸"   : prefix === "TF" ? "📤"   : "🔒";
+        return { id: m2[0], kind: kindMap[prefix] || prefix.toLowerCase(), icon: icon, label: label };
+      }
+      return null;
+    }
+
+    // —— 关联订单预览抽屉 ——
+    var _opPreviewCtx = { kind: "", id: "" };
+
+    function walletDisplayName(key) {
+      var wallets = window.demoApp.getWallets();
+      var w = wallets[key];
+      return w ? w.name.replace("企业主账户", "企业总账户") : (key || "—");
+    }
+
+    function opStatusPill(label, cls) {
+      return '<span class="op-status-pill ' + (cls || "") + '">' + label + '</span>';
+    }
+
+    function opKv(label, value) {
+      return '<div class="op-kv"><div class="k">' + label + '</div><div class="v">' + (value || "—") + '</div></div>';
+    }
+
+    function opTimelineHtml(steps) {
+      return '<h4 class="op-sec-title">处理进度</h4><ul class="op-timeline">'
+        + steps.map(function (s) {
+          var cls = s.fail ? "fail" : (s.active ? "active" : (s.done ? "done" : ""));
+          return '<li class="' + cls + '">'
+            + '<div class="tl-label">' + s.label + '</div>'
+            + (s.time ? '<div class="tl-time">' + s.time + '</div>' : '')
+            + (s.note ? '<div class="tl-note">' + s.note + '</div>' : '')
+            + '</li>';
+        }).join("")
+        + '</ul>';
+    }
+
+    function flowsForBizOrder(kind, id) {
+      var flows = window.demoApp.getFlows().filter(function (f) {
+        if (isCounterpartyLedgerNote(f)) return false;
+        if (kind === "recharge" && f.related_recharge === id) return true;
+        if (kind === "withdraw" && f.related_withdraw === id) return true;
+        if (kind === "transfer" && f.related_transfer === id) return true;
+        if (kind === "freeze" && f.related_freeze === id) return true;
+        if ((kind === "order" || kind === "demand") && (f.desc || "").indexOf(id) >= 0) return true;
+        return false;
+      });
+      return flows.slice(0, 6);
+    }
+
+    function opRelatedFlowsHtml(kind, id) {
+      var flows = flowsForBizOrder(kind, id);
+      if (!flows.length) return "";
+      var TYPE_LABEL = { recharge: "充值", withdraw: "提现", lock: "锁定", unlock: "解冻", allocate: "划拨", settle: "结算", refund: "退款" };
+      return '<h4 class="op-sec-title">关联收支流水（' + flows.length + ' 条）</h4>'
+        + '<div class="op-flow-mini">'
+        + flows.map(function (f) {
+          var amt = f.amount === 0 ? "—" : ((f.amount > 0 ? "+" : "") + window.fmtMoney(f.amount));
+          var cls = f.amount > 0 ? "in" : (f.amount < 0 ? "out" : "");
+          return '<div class="ofm-row">'
+            + '<span>' + (TYPE_LABEL[f.type] || f.type) + ' · ' + (f.time || "").slice(5, 16) + '</span>'
+            + '<span class="ofm-amt ' + cls + '">' + amt + '</span>'
+            + '</div>';
+        }).join("")
+        + '</div>';
+    }
+
+    function renderRechargePreview(rc) {
+      var st = rc.status;
+      var stLabel = st === "success" ? "已到账" : st === "pending" ? "待财务审核" : st === "failed" ? "已拒绝" : st;
+      var stCls = st === "success" ? "ok" : st === "pending" ? "pending" : "rejected";
+      var steps;
+      if (st === "success") {
+        steps = [
+          { label: "提交充值申请", time: rc.time, done: true },
+          { label: "财务审核通过", time: rc.recharge_time || rc.success_time || rc.time, done: true },
+          { label: "资金到账", time: rc.success_time || rc.recharge_time || rc.time, done: true }
+        ];
+      } else if (st === "failed") {
+        steps = [
+          { label: "提交充值申请", time: rc.time, done: true },
+          { label: "财务审核未通过", time: rc.rejected_at || rc.time, done: true, fail: true, note: rc.reject_reason || "" },
+          { label: "资金到账", time: null, done: false }
+        ];
+      } else {
+        steps = [
+          { label: "提交充值申请", time: rc.time, done: true },
+          { label: "财务审核中", time: rc.time, done: true, active: true, note: rc.auditNote || "预计 1 个工作日内完成" },
+          { label: "资金到账", time: null, done: false }
+        ];
+      }
+      return {
+        title: "💳 充值单",
+        subtitle: rc.out_recharge_no || rc.id,
+        status: opStatusPill(stLabel, stCls),
+        body: '<div class="op-kv-grid">' + opKv("充值单号", rc.id) + opKv("充值渠道", rc.channelLabel || rc.channel)
+          + opKv("充值金额", window.fmtMoney(rc.amount))
+          + opKv("入账账户", walletDisplayName(rc.walletKey))
+          + opKv("剩余可退", window.fmtMoney(rc.remaining_refundable != null ? rc.remaining_refundable : rc.amount))
+          + '</div>' + opTimelineHtml(steps) + opRelatedFlowsHtml("recharge", rc.id)
+      };
+    }
+
+    function renderWithdrawPreview(wd) {
+      var WD_ST = {
+        pending: ["待风控", "pending"], reviewing: ["风控审核", "pending"], approved: ["审核通过 · 出账中", "pending"],
+        success: ["已到账", "ok"], rejected: ["已拒绝", "rejected"]
+      };
+      var st = WD_ST[wd.status] || [wd.status, ""];
+      var steps = [
+        { label: "提交提现申请", time: wd.submitted_at || wd.time, done: !!wd.submitted_at },
+        { label: "风控初筛", time: wd.risk_check_at, done: !!wd.risk_check_at, note: wd.risk_level === "high" ? "高金额 · 加强审核" : "" },
+        { label: wd.status === "rejected" ? "财务复核拒绝" : "财务复核", time: wd.reviewed_at, done: !!wd.reviewed_at, fail: wd.status === "rejected", note: wd.reject_reason || (wd.reviewer ? "复核人：" + wd.reviewer : "") },
+        { label: "银行卡到账", time: wd.arrived_at, done: !!wd.arrived_at, active: wd.status === "approved" }
+      ];
+      if (wd.status === "reviewing") {
+        steps[1].active = true;
+      }
+      return {
+        title: "💸 提现单",
+        subtitle: wd.out_withdraw_no || wd.id,
+        status: opStatusPill(st[0], st[1]),
+        body: '<div class="op-kv-grid">' + opKv("提现单号", wd.id) + opKv("提现金额", window.fmtMoney(wd.amount))
+          + opKv("来源账户", walletDisplayName(wd.walletKey))
+          + opKv("到账银行卡", wd.bank_card || "—")
+          + opKv("备注", wd.memo || "—")
+          + '</div>' + opTimelineHtml(steps) + opRelatedFlowsHtml("withdraw", wd.id)
+      };
+    }
+
+    function renderTransferPreview(tf) {
+      var steps = [
+        { label: "发起划拨", time: tf.time, done: true },
+        { label: "双方账户余额更新", time: tf.time, done: true },
+        { label: "划拨完成", time: tf.time, done: true }
+      ];
+      return {
+        title: "📤 划拨单",
+        subtitle: tf.out_transfer_no || tf.id,
+        status: opStatusPill("已完成", "ok"),
+        body: '<div class="op-kv-grid">' + opKv("划拨单号", tf.id) + opKv("划拨金额", window.fmtMoney(tf.amount))
+          + opKv("划出账户", walletDisplayName(tf.from_walletKey))
+          + opKv("划入账户", walletDisplayName(tf.to_walletKey))
+          + opKv("操作人", tf.operator || "—")
+          + opKv("备注", tf.memo || "—")
+          + '</div>' + opTimelineHtml(steps) + opRelatedFlowsHtml("transfer", tf.id)
+      };
+    }
+
+    function renderFreezePreview(frz) {
+      var BIZ = { cash_consume: "订单/需求冻结", refund_lock: "退款冻结", dispute_lock: "纠纷冻结" };
+      var stMap = { frozen: ["冻结中", "lock"], confirmed: ["已结算确认", "ok"], cancelled: ["已取消解冻", "info"] };
+      var st = stMap[frz.status] || [frz.status, ""];
+      var steps = [{ label: "下单冻结（TCC Try）", time: frz.created_at, done: true }];
+      if (frz.status === "frozen") {
+        steps.push({ label: "等待验收 / 到期", time: frz.expire_at, done: false, active: true, note: frz.note || "" });
+        steps.push({ label: "结算确认或取消", time: null, done: false });
+      } else if (frz.status === "confirmed") {
+        steps.push({ label: "验收结算（TCC Confirm）", time: frz.confirmed_at, done: true });
+      } else {
+        steps.push({ label: "取消订单 · 资金退回", time: frz.cancelled_at, done: true, note: frz.cancel_reason || "" });
+      }
+      var rel = [];
+      if (frz.relatedDemand) rel.push("需求 " + frz.relatedDemand);
+      if (frz.relatedOrder) rel.push("订单 " + frz.relatedOrder);
+      return {
+        title: "🔒 冻结单",
+        subtitle: frz.out_freeze_no || frz.id,
+        status: opStatusPill(st[0], st[1]),
+        body: '<div class="op-kv-grid">' + opKv("冻结单号", frz.id) + opKv("冻结类型", BIZ[frz.biz_type] || frz.biz_type)
+          + opKv("冻结金额", window.fmtMoney(frz.amount))
+          + opKv("冻结账户", walletDisplayName(frz.walletKey))
+          + opKv("关联业务", rel.join(" · ") || "—")
+          + '</div>' + opTimelineHtml(steps) + opRelatedFlowsHtml("freeze", frz.id)
+      };
+    }
+
+    var DEMAND_STATUS = {
+      "auto-approved": "自动通过", quoting: "报价中", matching: "匹配中", "in-progress": "进行中",
+      completed: "已完成", auditing: "审核中", cancelled: "已取消"
+    };
+    var ORDER_STATUS = {
+      "review-v3": "验收中", completed: "已完成", cancelled: "已取消", "in-progress": "进行中"
+    };
+
+    function renderDemandPreview(dm) {
+      var steps = [
+        { label: "需求发布", time: dm.createTime, done: true },
+        { label: "平台审核", time: dm.auditedAt, done: !!dm.auditedAt, note: dm.auditMode === "auto" ? "自动通过" : (dm.auditedBy || "") },
+        { label: "承制匹配 / 报价", time: null, done: dm.status !== "auditing", active: dm.status === "quoting" || dm.status === "matching" },
+        { label: "项目交付", time: null, done: dm.status === "completed" || dm.status === "in-progress", active: dm.status === "in-progress" }
+      ];
+      return {
+        title: "📋 需求单",
+        subtitle: dm.title,
+        status: opStatusPill(DEMAND_STATUS[dm.status] || dm.status, dm.status === "completed" ? "ok" : "info"),
+        body: '<div class="op-kv-grid">' + opKv("需求编号", dm.id) + opKv("预算", window.fmtMoney(dm.budget))
+          + opKv("工作空间", dm.workspaceName || dm.workspace)
+          + opKv("承制方", dm.contractor || "—")
+          + opKv("截止时间", dm.deadline || "—")
+          + '</div>' + opTimelineHtml(steps) + opRelatedFlowsHtml("demand", dm.id),
+        goHref: "demand-list.html?from=wallet&demandId=" + dm.id,
+        goLabel: "前往需求详情"
+      };
+    }
+
+    function renderOrderPreviewOd(od) {
+      var steps = [
+        { label: "创建项目订单", time: od.createTime, done: true },
+        { label: "资金锁定", time: od.createTime, done: true },
+        { label: od.status === "completed" ? "验收完成" : "履约 / 验收", time: null, done: od.status === "completed", active: od.status !== "completed" }
+      ];
+      return {
+        title: "🔗 项目订单",
+        subtitle: od.projectName,
+        status: opStatusPill(ORDER_STATUS[od.status] || od.status, od.status === "completed" ? "ok" : "pending"),
+        body: '<div class="op-kv-grid">' + opKv("订单编号", od.id) + opKv("关联需求", od.demandId || "—")
+          + opKv("订单金额", window.fmtMoney(od.amount))
+          + opKv("付款账户", od.payerName || walletDisplayName(od.payerWalletKey))
+          + opKv("承制方", od.contractor || "—")
+          + '</div>' + opTimelineHtml(steps) + opRelatedFlowsHtml("order", od.id),
+        goHref: "project-space.html?from=wallet&orderId=" + od.id,
+        goLabel: "前往项目空间"
+      };
+    }
+
+    window.openOrderPreview = function (kind, id) {
+      if (!kind || !id) return;
+      _opPreviewCtx = { kind: kind, id: id };
+      var pack = null;
+      if (kind === "recharge") {
+        var rc = window.demoApp.getRechargeOrders().find(function (r) { return r.id === id; });
+        if (rc) pack = renderRechargePreview(rc);
+      } else if (kind === "withdraw") {
+        var wd = window.demoApp.getWithdrawOrders().find(function (w) { return w.id === id; });
+        if (wd) pack = renderWithdrawPreview(wd);
+      } else if (kind === "transfer") {
+        var tf = window.demoApp.getTransferOrders().find(function (t) { return t.id === id; });
+        if (tf) pack = renderTransferPreview(tf);
+      } else if (kind === "freeze") {
+        var frz = window.demoApp.getFreezeOrders().find(function (x) { return x.id === id; });
+        if (frz) pack = renderFreezePreview(frz);
+      } else if (kind === "demand") {
+        var dm = window.demoApp.getDemands().find(function (d) { return d.id === id; });
+        if (dm) pack = renderDemandPreview(dm);
+      } else if (kind === "order") {
+        var od = window.demoApp.getOrders().find(function (o) { return o.id === id; });
+        if (od) pack = renderOrderPreviewOd(od);
+      }
+      if (!pack) {
+        window.demoToast("未找到业务单 " + id, "warn");
+        return;
+      }
+      $("opTitle").textContent = pack.title;
+      $("opSubtitle").textContent = pack.subtitle;
+      var heroIcon = (pack.title.match(/^[^\s]+/) || ["📄"])[0];
+      $("opBody").innerHTML = '<div class="op-hero">'
+        + '<div class="op-hero-icon">' + heroIcon + '</div>'
+        + '<div><div class="op-hero-id">' + id + '</div><div class="op-hero-sub">' + pack.subtitle + '</div>' + pack.status + '</div>'
+        + '</div>' + pack.body;
+
+      var goBtn = document.getElementById("opGoDetailBtn");
+      var flBtn = document.getElementById("opFilterFlowsBtn");
+      if (pack.goHref) {
+        goBtn.style.display = "";
+        goBtn.textContent = pack.goLabel || "前往详情";
+        goBtn.onclick = function () { location.href = pack.goHref; };
+      } else {
+        goBtn.style.display = "none";
+      }
+      flBtn.style.display = "";
+      flBtn.onclick = function () {
+        closeAllDrawers();
+        document.querySelector('[data-tab="flows"]').click();
+        if (kind === "recharge") flowType = "recharge";
+        else if (kind === "withdraw") flowType = "withdraw";
+        else if (kind === "allocate" || kind === "transfer") flowType = "allocate";
+        else if (kind === "freeze") flowType = "lock";
+        else flowType = "all";
+        var ftSel = $("flowTypeFilter");
+        if (ftSel) { ftSel.value = flowType; }
+        renderFlows();
+        window.demoToast("已筛选关联流水", "info");
+      };
+      openDrawer("orderPreview");
+    };
+
     // 推导 付款方 → 收款方 + 锁定/解冻/退款上下文
     function deriveCounterparty(f, accountName) {
       const t = f.type;
@@ -2039,6 +2598,29 @@
       return { payer, payee, context, badges };
     }
 
+    // 会计科目（subject_code）映射，对齐《统一账户与资金中心》"凭证 / 借贷方向" 部分
+    // 会计科目（对齐《统一账户与资金中心》3.4 节 account_subject 表）
+    // 1xxx = 资产 / 2xxx = 负债 / 3xxx = 待结算 / 5xxx = 费用 / 6xxx = 收入
+    const SUBJECT_NAMES = {
+      "1001": "1001 · 可用余额（资产）",
+      "1002": "1002 · 冻结余额 TCC（资产）",
+      "1003": "1003 · 在途充值（资产）",
+      "2001": "2001 · 用户应付（负债）",
+      "2002": "2002 · 待退款（负债）",
+      "3001": "3001 · 待提现 / 提现（待结算）",
+      "5001": "5001 · 已结算消耗（费用）",
+      "6001": "6001 · 平台收入 / 服务费（收入）"
+    };
+    function formatSubject(code) {
+      if (!code) return "—";
+      return SUBJECT_NAMES[code] || code;
+    }
+    function formatDirection(dir) {
+      if (dir === "debit")  return '<span style="color:#389e0d;font-weight:500">借方</span>';
+      if (dir === "credit") return '<span style="color:#cf1322;font-weight:500">贷方</span>';
+      return '<span style="color:#bfbfbf">—</span>';
+    }
+
     // 计算每条流水的"变动前 → 变动后"余额（基于当前快照倒推）
     function computeBalanceTrails(flows, wallets) {
       // flows 是按时间倒序（newest first）排列；从当前余额向前倒推
@@ -2057,60 +2639,101 @@
     }
 
     let flowAccount = "all", flowType = "all";
+    // 用户侧不展示「对手方记账」类的凭证完整性条目（属于会计/对账视角，留给管理后台）。
+    // 这些条目在 lockedNote 里以"对手方记账"开头，amount === 0，对用户没有阅读价值。
+    function isCounterpartyLedgerNote(f) {
+      return f && f.amount === 0 && typeof f.lockedNote === "string" && f.lockedNote.indexOf("对手方") === 0;
+    }
+    // 流水的"资金状态"派生：把 type / amount / lockedNote 揉成用户能秒懂的状态标签。
+    function deriveFundStatus(f) {
+      const note = (f.lockedNote || "").trim();
+      if (note) {
+        if (note.indexOf("已拒绝") === 0 || note.indexOf("被拒") === 0) return { label: "已拒绝", icon: "⛔", cls: "rejected" };
+        if (note.indexOf("审核中") !== -1 || note.indexOf("财务审核") !== -1 || note.indexOf("平台审核") !== -1) return { label: "审核中", icon: "⏳", cls: "pending" };
+      }
+      switch (f.type) {
+        case "recharge":
+          if (f.amount > 0) return { label: "已到账", icon: "✅", cls: "ok" };
+          if (f.amount === 0) return { label: note ? note.split(" ")[0] : "审核中", icon: "⏳", cls: "pending" };
+          return { label: "已退款", icon: "↩️", cls: "info" };
+        case "withdraw":
+          if (f.amount < 0) return { label: "已出账", icon: "✅", cls: "ok" };
+          if (f.amount === 0) return { label: "审核中", icon: "⏳", cls: "pending" };
+          return { label: "事件", icon: "•", cls: "" };
+        case "lock":     return { label: "已锁定", icon: "🔒", cls: "lock" };
+        case "unlock":   return { label: "已解冻", icon: "🔓", cls: "unlock" };
+        case "allocate": return { label: f.amount < 0 ? "已划出" : "已划入", icon: "📤", cls: "info" };
+        case "settle":   return { label: "已结算", icon: "✅", cls: "ok" };
+        case "refund":   return { label: "已退款", icon: "↩️", cls: "ok" };
+        case "invoice":  return { label: note || "已提交", icon: "🧾", cls: "info" };
+        default:
+          return f.amount === 0 ? { label: "事件", icon: "•", cls: "" } : { label: "已完成", icon: "✅", cls: "ok" };
+      }
+    }
+
     function renderFlows() {
       const allFlows = window.demoApp.getFlows();
       const wallets = window.demoApp.getWallets();
       const trails = computeBalanceTrails(allFlows, wallets);
-      let flows = allFlows;
+      let flows = allFlows.filter(f => !isCounterpartyLedgerNote(f));
       if (flowAccount !== "all") flows = flows.filter(f => f.account === flowAccount);
-      if (flowType !== "all")   flows = flows.filter(f => f.type === flowType);
+      if (flowType !== "all")    flows = flows.filter(f => f.type === flowType);
       $("flowCount").textContent = flows.length;
+
+      if (flows.length === 0) {
+        $("flowList").innerHTML = '<tr class="ft-empty"><td colspan="8">'
+          + '<div style="font-size:24px;margin-bottom:6px">📒</div>'
+          + '<div style="color:#262626;font-weight:500;margin-bottom:4px">没有匹配的流水</div>'
+          + '<div style="font-size:12px">尝试调整账户 / 类型筛选，或先在本空间下发起一笔交易。</div>'
+          + '</td></tr>';
+        return;
+      }
+
       const html = flows.map(f => {
         const cfg = TYPE_CONFIG[f.type] || { icon: "•", label: f.type, className: "" };
         const accountName = wallets[f.account] ? (wallets[f.account].name.replace("企业主账户", "企业总账户")) : f.account;
         const cp = deriveCounterparty(f, accountName);
-        const orderId = extractOrderId(f.desc);
-        const orderTitle = extractOrderTitle(f.desc);
-        const amtCls = f.type === "lock" ? "lock" : f.amount > 0 ? "in" : f.amount < 0 ? "out" : "";
-        const amtDisplay = f.amount === 0 ? (f.lockedNote || "—") : (f.amount > 0 ? "+" : "") + window.fmtMoney(f.amount);
+        const status = deriveFundStatus(f);
         const trail = trails[f.id] || { before: null, after: null };
 
-        const orderHref = orderId && orderId.indexOf("OD-") === 0
-          ? "project-space.html?from=wallet&orderId=" + orderId
-          : (orderId ? "demand-list.html?from=wallet&demandId=" + orderId : null);
-        const orderLine = orderHref
-          ? '<a class="ctx-link" href="' + orderHref + '">🔗 ' + orderId + (orderTitle ? '「' + orderTitle + '」' : '') + '</a>'
-          : '<span style="color:#bfbfbf">无关联订单</span>';
-        const badgesHtml = cp.badges.map(b => '<span class="acct-tag">' + b + '</span>').join("");
+        const rel = deriveRelatedOrder(f);
+        let orderCell;
+        if (!rel) {
+          orderCell = '<span style="color:#bfbfbf">—</span>';
+        } else {
+          var relText = rel.icon + ' ' + rel.id + (rel.title ? '「' + rel.title + '」' : '');
+          var relCls = rel.kind === "order" || rel.kind === "demand" ? "ft-order-link ctx" : "ft-order-link biz";
+          orderCell = '<button type="button" class="' + relCls + '" title="点击查看详情" onclick="window.openOrderPreview(\'' + rel.kind + '\',\'' + rel.id + '\')">' + relText + '</button>';
+        }
 
-        const balanceCell = (f.amount === 0)
-          ? '<div style="font-size:11px;color:#8c8c8c">余额未变（事件流水）</div>'
-          : '<div class="flow-balance">' + window.fmtMoney(trail.before) + ' <span class="acct-arrow">→</span> <span class="bal-after">' + window.fmtMoney(trail.after) + '</span></div>';
+        // 金额列
+        let amtHtml;
+        if (f.amount === 0) {
+          amtHtml = '<div class="ft-amount zero">—</div>'
+                  + '<div class="ft-amount-sub">余额未变</div>';
+        } else {
+          const amtCls = f.type === "lock" ? "lock" : f.amount > 0 ? "in" : "out";
+          const amtText = (f.amount > 0 ? "+" : "") + window.fmtMoney(f.amount);
+          const balText = trail.before != null
+            ? window.fmtMoney(trail.before) + ' → ' + window.fmtMoney(trail.after)
+            : '';
+          amtHtml = '<div class="ft-amount ' + amtCls + '">' + amtText + '</div>'
+                  + (balText ? '<div class="ft-amount-sub">余额：' + balText + '</div>' : '');
+        }
 
-        return '<div class="flow-row acct">'
-          + '<div class="flow-icon">' + cfg.icon + '</div>'
-          + '<div>'
-            + '<span class="flow-type-pill ' + cfg.className + '">' + cfg.label + '</span>'
-            + '<div class="flow-acct-meta">' + orderLine + '</div>'
-            + '<div style="font-size:11px;color:#8c8c8c;margin-top:3px">' + f.time + '</div>'
-          + '</div>'
-          + '<div>'
-            + '<div style="font-size:13px">' + f.desc + '</div>'
-            + '<div class="flow-acct-meta">'
-              + '<strong style="color:#262626">' + cp.payer + '</strong>'
-              + '<span class="acct-arrow">→</span>'
-              + '<strong style="color:#262626">' + cp.payee + '</strong>'
-              + (cp.context ? '<div style="margin-top:2px">' + cp.context + '</div>' : '')
-              + (badgesHtml ? '<div style="margin-top:4px">' + badgesHtml + '</div>' : '')
-            + '</div>'
-          + '</div>'
-          + '<div>'
-            + '<div class="flow-amt ' + amtCls + '" style="text-align:left;' + (f.amount === 0 ? "color:#8c8c8c;font-size:11px" : "") + '">' + amtDisplay + '</div>'
-            + '<div style="font-size:11px;color:#8c8c8c;margin-top:3px">操作人：' + f.operator + '</div>'
-          + '</div>'
-          + '<div>' + balanceCell + '</div>'
-          + '</div>';
-      }).join("") || '<div class="empty-state"><div class="es-icon">📒</div><div class="es-title">没有匹配的流水</div><div class="es-sub">尝试调整账户 / 类型筛选，或先在本空间下发起一笔交易。</div></div>';
+        return '<tr>'
+          + '<td><span class="ft-type-pill ' + cfg.className + '">' + cfg.icon + ' ' + cfg.label + '</span></td>'
+          + '<td>' + orderCell + '</td>'
+          + '<td><div class="ft-time">' + (f.time || '—') + '</div></td>'
+          + '<td><div class="ft-party">' + cp.payer + '</div></td>'
+          + '<td><div class="ft-party">' + cp.payee + '</div>'
+            + (cp.context ? '<div class="ft-party-sub">' + cp.context + '</div>' : '')
+          + '</td>'
+          + '<td><span class="ft-status ' + status.cls + '">' + status.icon + ' ' + status.label + '</span></td>'
+          + '<td style="text-align:right">' + amtHtml + '</td>'
+          + '<td><div class="ft-operator">' + (f.operator || '—') + '</div></td>'
+          + '</tr>';
+      }).join("");
       $("flowList").innerHTML = html;
     }
     $("flowAccountFilter").addEventListener("change", e => { flowAccount = e.target.value; renderFlows(); });
@@ -2144,31 +2767,149 @@
       bar.innerHTML = html;
     }
 
+    // v2：按 freeze_orders 真实 biz_type 分组，替代硬切 72/20/8 比例
     function renderFrozenBreakdown() {
       const ws = window.demoApp.getCurrentWorkspace();
-      const wallets = window.demoApp.getWallets();
-      const w = wallets[ws.walletKey] || wallets["enterprise-main-cf"];
-      const fmt = window.fmtMoney;
-      const totalLocked = w ? (w.lockedAmount || 0) : 0;
-      const orderLock = Math.round(totalLocked * 0.72);
-      const refundLock = Math.round(totalLocked * 0.20);
-      const disputeLock = Math.max(0, totalLocked - orderLock - refundLock);
-      const frozen = [
-        { cls: "", label: "📦 订单冻结", value: orderLock, meta: "订单履约中，验收完成后释放或结算" },
-        { cls: "refund", label: "↩️ 退款冻结", value: refundLock, meta: "退款审核中，到原付款账户后释放" },
-        { cls: "dispute", label: "⚖ 纠纷冻结", value: disputeLock, meta: "争议处理中，由平台介入裁决" }
-      ];
       const target = document.getElementById("frozenBreakdown");
       if (!target) return;
-      target.innerHTML = totalLocked === 0
-        ? '<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">🔓</div><div class="es-title">当前账户无冻结资金</div><div class="es-sub">下单或退款发生后会在此分类展示</div></div>'
-        : frozen.map(c => '<div class="frozen-cell ' + c.cls + '">'
-            + '<div class="fc-label">' + c.label + '</div>'
-            + '<div class="fc-value">' + fmt(c.value) + '</div>'
-            + '<div class="fc-meta">' + c.meta + '</div>'
-            + '<a style="font-size:11px;color:#1890ff;cursor:pointer;display:inline-block;margin-top:6px" onclick="document.querySelector(\'[data-tab=flows]\').click()">在收支记录中查看 →</a>'
-            + '</div>').join("");
+
+      const fmt = window.fmtMoney;
+      const activeFreezes = window.demoApp.getActiveFreezeOrders(ws.walletKey);
+      const totalFrozen = activeFreezes.reduce((s, f) => s + (f.amount || 0), 0);
+
+      if (totalFrozen === 0) {
+        target.innerHTML = '<div class="empty-state" style="grid-column:1/-1">'
+          + '<div class="es-icon">🔓</div>'
+          + '<div class="es-title">当前账户无冻结资金</div>'
+          + '<div class="es-sub">下单或退款发生后会在此分类展示</div>'
+          + '</div>';
+        return;
+      }
+
+      const groups = [
+        { key: "cash_consume", cls: "",        label: "📦 订单/需求冻结", meta: "下单 TCC 锁定，验收完成后结算或取消时回退到可用余额" },
+        { key: "refund_lock",  cls: "refund",  label: "↩️ 退款冻结",     meta: "退款审核中，回退到原付款账户（充值余额或上游账户）后释放" },
+        { key: "dispute_lock", cls: "dispute", label: "⚖ 纠纷冻结",      meta: "争议处理中，由平台仲裁裁决资金归属" }
+      ];
+      // 按 biz_type 分桶
+      const byType = activeFreezes.reduce((m, f) => {
+        (m[f.biz_type] = m[f.biz_type] || []).push(f);
+        return m;
+      }, {});
+
+      // 把不在三大分类内的 biz_type 拢到"其他冻结"
+      const known = new Set(groups.map(g => g.key));
+      const otherList = Object.keys(byType).filter(k => !known.has(k)).flatMap(k => byType[k]);
+      if (otherList.length) {
+        groups.push({ key: "__other", cls: "", label: "📎 其他冻结", meta: "其他 biz_type 冻结（保留扩展）" });
+        byType["__other"] = otherList;
+      }
+
+      target.innerHTML = groups.map(g => {
+        const list = byType[g.key] || [];
+        const sum = list.reduce((s, f) => s + (f.amount || 0), 0);
+        const empty = list.length === 0;
+        // 冻结单条目列表（最多展示 3 条，超出折叠）
+        const itemsHtml = list.slice(0, 3).map(f => {
+          const rel = f.relatedOrder || f.relatedDemand || "—";
+          const expire = f.expire_at ? '<span style="color:#bfbfbf">·到期 ' + f.expire_at.slice(5, 10) + '</span>' : '';
+          // B-3：每个冻结单提供"取消订单 → 解冻"演示按钮（cash_consume 类型）
+          const cancelBtn = (f.biz_type === "cash_consume")
+            ? ' <a class="phase-badge p2" style="font-size:10px;cursor:pointer;margin-left:4px" onclick="event.stopPropagation(); window._handleCancelFreeze && window._handleCancelFreeze(\'' + f.id + '\')" title="演示 TCC Cancel：释放冻结回到可用">↩️ 取消订单 · 解冻</a>'
+            : '';
+          return '<div style="font-size:11px;color:#595959;margin-top:6px;line-height:1.5">'
+              + '<span style="font-family:monospace;color:#1890ff">' + f.id + '</span> '
+              + '<span style="color:#8c8c8c">→ ' + rel + '</span> '
+              + expire
+              + cancelBtn
+              + '<br><span style="color:#8c8c8c">¥' + (f.amount || 0).toLocaleString() + '</span>'
+              + '</div>';
+        }).join("");
+        const more = list.length > 3
+          ? '<div style="font-size:11px;color:#8c8c8c;margin-top:4px">还有 ' + (list.length - 3) + ' 张未展示</div>'
+          : "";
+        return '<div class="frozen-cell ' + g.cls + '" style="' + (empty ? "opacity:.45" : "") + '">'
+          + '<div class="fc-label">' + g.label + ' <span style="font-size:11px;color:#bfbfbf">(' + list.length + ' 张)</span></div>'
+          + '<div class="fc-value">' + fmt(sum) + '</div>'
+          + '<div class="fc-meta">' + g.meta + '</div>'
+          + itemsHtml
+          + more
+          + (empty ? "" : '<a style="font-size:11px;color:#1890ff;cursor:pointer;display:inline-block;margin-top:8px" onclick="document.querySelector(\'[data-tab=flows]\').click()">在收支记录中查看冻结流水 →</a>')
+          + '</div>';
+      }).join("");
     }
+
+    // ============================================================
+    // B-4：我的提现申请（按当前空间绑定账户筛选）
+    // 状态机：pending → reviewing → approved/rejected → success
+    // ============================================================
+    const WD_STATUS_CFG = {
+      pending:   { label: "待风控", cls: "wd-pending",   icon: "⏳" },
+      reviewing: { label: "风控审核", cls: "wd-reviewing", icon: "🔎" },
+      approved:  { label: "审核通过 · 出账中", cls: "wd-approved",  icon: "🟢" },
+      success:   { label: "已到账",  cls: "wd-success",   icon: "✅" },
+      rejected:  { label: "已拒绝",  cls: "wd-rejected",  icon: "⛔" }
+    };
+    function renderWithdrawOrders() {
+      const target = document.getElementById("withdrawOrdersList");
+      if (!target) return;
+      const ws = window.demoApp.getCurrentWorkspace();
+      const wallets = window.demoApp.getWallets();
+      let orders = window.demoApp.getWithdrawOrders();
+      // 提现是 account_user 维度的能力（团队预算不可提现），所以无论当前空间是个人还是团队，
+      // 都应展示该用户名下所有 personal/contractor 钱包的提现单。
+      // Demo：只过滤掉非个人/承制方钱包发起的（按 wallet.type）
+      if (ws.id !== "cf-admin") {
+        orders = orders.filter(o => {
+          const w = wallets[o.walletKey];
+          return w && (w.type === "personal" || w.type === "contractor");
+        });
+      }
+      if (!orders.length) {
+        target.innerHTML = '<div class="empty-state"><div class="es-icon">💸</div>'
+          + '<div class="es-title">暂无提现申请</div>'
+          + '<div class="es-sub">个人/承制方账户在「累计收益」下方点「提现」即可发起申请</div></div>';
+        return;
+      }
+      // 倒序展示
+      orders = orders.slice().sort((a,b) => (b.time||"").localeCompare(a.time||""));
+      const fmt = window.fmtMoney;
+      target.innerHTML = orders.slice(0, 8).map(o => {
+        const cfg = WD_STATUS_CFG[o.status] || { label: o.status, cls: "", icon: "•" };
+        const wname = (wallets[o.walletKey] && wallets[o.walletKey].name) || o.walletKey;
+        const risk = o.risk_level === "high" ? '<span class="wd-risk-high">高金额 · 强风控</span>' : '';
+        const timeline = '<div class="wd-timeline">'
+          + '<span class="' + (o.submitted_at ? 'on' : '') + '">📤 提交 ' + (o.submitted_at ? o.submitted_at.slice(5,16) : '—') + '</span>'
+          + '<span class="' + (o.risk_check_at ? 'on' : '') + '">🔎 风控 ' + (o.risk_check_at ? o.risk_check_at.slice(5,16) : '—') + '</span>'
+          + '<span class="' + (o.reviewed_at ? 'on' : '') + '">' + (o.status === 'rejected' ? '⛔ 拒绝' : '✔ 复核') + ' ' + (o.reviewed_at ? o.reviewed_at.slice(5,16) : '—') + '</span>'
+          + '<span class="' + (o.arrived_at ? 'on' : '') + '">💰 到账 ' + (o.arrived_at ? o.arrived_at.slice(5,16) : '—') + '</span>'
+          + '</div>';
+        const reject = o.reject_reason
+          ? '<div class="wd-reject-reason">⛔ ' + o.reject_reason + '</div>'
+          : '';
+        const voucher = '';
+        return '<div class="wd-card ' + cfg.cls + '">'
+          + '<div class="wd-card-head">'
+            + '<span class="wd-status-pill ' + cfg.cls + '">' + cfg.icon + ' ' + cfg.label + '</span>'
+            + '<span style="font-family:monospace;color:#1890ff;font-size:12px">' + o.id + '</span>'
+            + '<span class="wd-bank">→ ' + (o.bank_card || '—') + '</span>'
+            + risk
+            + '<span class="wd-amt">' + fmt(o.amount || 0) + '</span>'
+          + '</div>'
+          + '<div class="wd-card-meta">'
+            + '🏦 ' + wname + ' · 申请 ' + (o.time || '').slice(5,16)
+            + voucher
+            + (o.memo ? ' · 备注：' + o.memo : '')
+          + '</div>'
+          + timeline
+          + reject
+          + '</div>';
+      }).join("");
+      if (orders.length > 8) {
+        target.innerHTML += '<div style="font-size:12px;color:#8c8c8c;text-align:center;margin-top:8px">仅展示最近 8 条 · 完整记录请见「收支记录」过滤 type=withdraw</div>';
+      }
+    }
+    window.renderWithdrawOrders = renderWithdrawOrders;
 
     // ============================================================
     // 迷你流水（概览 / 账户 用）
@@ -2179,7 +2920,7 @@
       if (!target) return;
       const ws = window.demoApp.getCurrentWorkspace();
       const wallets = window.demoApp.getWallets();
-      let flows = window.demoApp.getFlows();
+      let flows = window.demoApp.getFlows().filter(f => !isCounterpartyLedgerNote(f));
       if (scope === "current") {
         flows = flows.filter(f => f.account === ws.walletKey);
       } else if (ws.id !== "cf-admin") {
@@ -2554,32 +3295,163 @@
     document.querySelectorAll("#rechargeDrawer .quick-amt button").forEach(btn => {
       btn.addEventListener("click", () => { $("rechargeAmount").value = btn.getAttribute("data-amt"); updateRechargePreview(); });
     });
+    // B-1：充值真实落 recharge_order + 双向凭证（资产 1001 借方 / 负债 2001 贷方）
+    // 跟随《统一账户与资金中心》5.2 节：充值订单是退款的事实数据源
+    const RECHARGE_CHANNEL_MAP = {
+      "online-alipay":  { channel: "alipay",   label: "支付宝",   instant: true  },
+      "online-wechat":  { channel: "wechat",   label: "微信",     instant: true  },
+      "online-unionpay":{ channel: "unionpay", label: "银联",     instant: true  },
+      "bank-transfer":  { channel: "bank",     label: "对公转账", instant: false },
+    };
+
+    // 把一笔成功的充值真实写入：recharge_order(success) + 钱包余额 +amt + 双向凭证
+    // 暴露为 window.applySuccessRecharge，便于管理后台/Demo URL 复用
+    window.applySuccessRecharge = function (walletKey, amt, channelInfo, opts) {
+      const ts = now();
+      const ymd = ts.slice(0,10).replace(/-/g,"");
+      const seq = String(Date.now()).slice(-4);
+      const rcId = "RC-" + Date.now();
+      const voucherNo = "V-" + Date.now();
+      const operator = (opts && opts.operator) || "昭岚";
+      const desc = (opts && opts.desc) || (channelInfo.label + "充值");
+
+      // 1) 钱包：available_balance + recharge_balance + balance（兼容字段）+amt
+      const wallets = window.demoApp.getWallets();
+      const w = wallets[walletKey]; if (!w) return null;
+      w.available_balance = (w.available_balance || w.balance || 0) + amt;
+      w.recharge_balance  = (w.recharge_balance  || 0) + amt;
+      w.balance           = w.available_balance;
+      wallets[walletKey] = w;
+      window.demoApp.setWallets(wallets);
+
+      // 2) recharge_order 入库（remaining_refundable = amt，可作主动退款来源）
+      window.demoApp.addRechargeOrder({
+        id: rcId,
+        out_recharge_no: "RC_" + ymd + "_" + seq,
+        time: ts,
+        walletKey: walletKey,
+        amount: amt,
+        refunded_amount: 0,
+        remaining_refundable: amt,
+        status: "success",
+        channel: channelInfo.channel,
+        channelLabel: channelInfo.label,
+        voucher_no: voucherNo
+      });
+
+      // 3) 双向凭证：资产端 1001 可用余额（借方 +amt） / 负债端 2001 用户应付（贷方 +amt）
+      window.demoApp.addFlow({
+        id: "F-RCG-" + Date.now(),
+        time: ts, type: "recharge",
+        desc: desc, account: walletKey,
+        amount: amt, operator: operator,
+        voucher_no: voucherNo,
+        subject_code: "1001",
+        direction: "debit",
+        related_recharge: rcId
+      });
+      window.demoApp.addFlow({
+        id: "F-RCG-OFFSET-" + Date.now(),
+        time: ts, type: "recharge",
+        desc: "（对手方）充值 - 用户应付负债增加",
+        account: walletKey,
+        amount: 0, _voucherAmt: amt,
+        operator: "system",
+        voucher_no: voucherNo,
+        subject_code: "2001",
+        direction: "credit",
+        related_recharge: rcId,
+        lockedNote: "对手方记账（贷方）"
+      });
+
+      return { rcId: rcId, voucherNo: voucherNo };
+    }
+
     $("rechargeConfirmBtn").addEventListener("click", () => {
       const amt = Number($("rechargeAmount").value);
       if (!amt || amt < 100) { window.demoToast("请输入有效金额（最低 ¥100）", "err"); return; }
       const method = $("rechargeMethod").value;
-      const wallets = window.demoApp.getWallets();
-      if (method === "bank-transfer") {
-        window.demoApp.addFlow({ id: "F-" + Date.now(), time: now(), type: "recharge", desc: "对公转账充值（待审核 - " + window.fmtMoney(amt) + "）", account: rechargeWalletKey, amount: 0, operator: "昭岚", lockedNote: "财务审核中" });
-        window.demoToast("✅ 对公转账凭证已提交，财务审核中（约 1 个工作日到账）", "info");
-        closeAllDrawers();
-        setTimeout(() => {
-          const w2 = window.demoApp.getWallets();
-          w2[rechargeWalletKey].balance += amt;
-          window.demoApp.setWallets(w2);
-          window.demoApp.addFlow({ id: "F-" + Date.now(), time: now(), type: "recharge", desc: "对公转账充值（财务审核通过）", account: rechargeWalletKey, amount: amt, operator: "财务" });
-          window.demoToast("💰 对公转账已审核通过，余额到账 " + window.fmtMoney(amt), "ok");
-          window.refreshAll();
-        }, 3000);
-      } else {
-        wallets[rechargeWalletKey].balance += amt;
-        window.demoApp.setWallets(wallets);
-        const methodLabel = { "online-alipay": "支付宝", "online-wechat": "微信", "online-unionpay": "银联" }[method] || "在线";
-        window.demoApp.addFlow({ id: "F-" + Date.now(), time: now(), type: "recharge", desc: methodLabel + "充值", account: rechargeWalletKey, amount: amt, operator: "昭岚" });
-        window.demoToast("✅ 充值成功 " + window.fmtMoney(amt), "ok");
+      const channelInfo = RECHARGE_CHANNEL_MAP[method] || RECHARGE_CHANNEL_MAP["online-alipay"];
+
+      if (channelInfo.instant) {
+        // 实时到账渠道：直接落 success
+        const r = window.applySuccessRecharge(rechargeWalletKey, amt, channelInfo, { desc: channelInfo.label + "充值（实时到账）" });
+        if (!r) { window.demoToast("钱包不存在", "err"); return; }
+        window.demoToast("✅ 充值成功 " + window.fmtMoney(amt) + " 已到账", "ok");
         closeAllDrawers();
         window.refreshAll();
+        return;
       }
+
+      // 对公转账：先落 pending，钱包不动，写"待审核"事件流水（amount=0，避免误读为已到账）
+      const ts = now();
+      const ymd = ts.slice(0,10).replace(/-/g,"");
+      const seq = String(Date.now()).slice(-4);
+      const rcId = "RC-" + Date.now();
+      window.demoApp.addRechargeOrder({
+        id: rcId,
+        out_recharge_no: "RC_" + ymd + "_" + seq,
+        time: ts, walletKey: rechargeWalletKey,
+        amount: amt, refunded_amount: 0, remaining_refundable: 0,
+        status: "pending", channel: channelInfo.channel, channelLabel: channelInfo.label,
+        voucher_no: null, auditNote: "财务审核中"
+      });
+      window.demoApp.addFlow({
+        id: "F-RCG-PEND-" + Date.now(),
+        time: ts, type: "recharge",
+        desc: "对公转账充值（待财务审核 - " + window.fmtMoney(amt) + "）",
+        account: rechargeWalletKey,
+        amount: 0, operator: "昭岚",
+        lockedNote: "财务审核中",
+        related_recharge: rcId
+      });
+      window.demoToast("✅ 对公转账凭证已提交（" + rcId + "），财务审核中，约 1 个工作日到账", "info");
+      closeAllDrawers();
+      window.refreshAll();
+
+      // Demo：3 秒后自动审核通过（真实环境由管理后台 admin-console 操作）
+      setTimeout(() => {
+        const orders = window.demoApp.getRechargeOrders();
+        const idx = orders.findIndex(o => o.id === rcId);
+        if (idx < 0 || orders[idx].status !== "pending") return; // 已被管理员手动处理则跳过
+
+        // 把 pending 单转 success：补 voucher_no、补 remaining_refundable、写双向凭证、钱包 +amt
+        const ts2 = now();
+        const voucherNo = "V-" + Date.now();
+        orders[idx].status = "success";
+        orders[idx].voucher_no = voucherNo;
+        orders[idx].remaining_refundable = amt;
+        orders[idx].audit_pass_time = ts2;
+        orders[idx].auditNote = "财务审核通过";
+        window.demoApp.setRechargeOrders(orders);
+
+        // 钱包 +amt（available + recharge）
+        const wallets = window.demoApp.getWallets();
+        const w = wallets[rechargeWalletKey];
+        w.available_balance = (w.available_balance || w.balance || 0) + amt;
+        w.recharge_balance  = (w.recharge_balance  || 0) + amt;
+        w.balance           = w.available_balance;
+        window.demoApp.setWallets(wallets);
+
+        // 双向凭证（与 instant 路径相同）
+        window.demoApp.addFlow({
+          id: "F-RCG-PASS-" + Date.now(), time: ts2, type: "recharge",
+          desc: "对公转账充值（财务审核通过 - " + rcId + "）",
+          account: rechargeWalletKey, amount: amt, operator: "财务",
+          voucher_no: voucherNo, subject_code: "1001", direction: "debit",
+          related_recharge: rcId
+        });
+        window.demoApp.addFlow({
+          id: "F-RCG-PASS-OFFSET-" + Date.now(), time: ts2, type: "recharge",
+          desc: "（对手方）对公充值 - 用户应付负债增加",
+          account: rechargeWalletKey, amount: 0, _voucherAmt: amt, operator: "system",
+          voucher_no: voucherNo, subject_code: "2001", direction: "credit",
+          related_recharge: rcId, lockedNote: "对手方记账（贷方）"
+        });
+
+        window.demoToast("💰 对公充值 " + rcId + " 已审核通过，余额到账 " + window.fmtMoney(amt), "ok");
+        window.refreshAll();
+      }, 3000);
     });
 
     // ============================================================
@@ -2605,36 +3477,134 @@
       $("allocAmtPreview").textContent = "−" + window.fmtMoney(amt);
     }
     $("allocateAmount").addEventListener("input", updateAllocPreview);
+    $("allocateAmount").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); $("allocConfirmBtn").click(); } });
     $("allocateTarget").addEventListener("change", updateAllocPreview);
     document.querySelectorAll("#allocateDrawer .quick-amt button").forEach(btn => {
       btn.addEventListener("click", () => { $("allocateAmount").value = btn.getAttribute("data-amt"); updateAllocPreview(); });
     });
-    $("allocConfirmBtn").addEventListener("click", () => {
-      const amt = Number($("allocateAmount").value);
-      if (!amt || amt < 1000) { window.demoToast("划拨金额需 ≥ ¥1,000", "err"); return; }
+    // B-2：划拨真实落 transfer_order + 四方凭证
+    // 业务语义：企业总账户 → 团队预算账户
+    //   资产侧：源 1001 贷 -amt + 目标 1001 借 +amt
+    //   负债侧：源 2001 借 -amt + 目标 2001 贷 +amt（用户应付随预算分配跟随转移）
+    // 凭证条件：4 条 entry 借贷各 2*amt，自动平衡
+    // 抽出为 window.doAllocate(toKey, amt, opts)，方便管理后台直接调用
+    window.doAllocate = function (toKey, amt, opts) {
+      opts = opts || {};
+      if (!amt || amt < 1000) { window.demoToast("划拨金额需 ≥ ¥1,000", "err"); return false; }
+
       const wallets = window.demoApp.getWallets();
-      const fromBal = wallets["enterprise-main-cf"].balance;
-      if (amt > fromBal) { window.demoToast("企业总账户余额不足", "err"); return; }
-      const toKey = $("allocateTarget").value;
-      const teamMap = { "team-budget-cf-drama": { ws: "cf-drama", teamName: "短剧制作中心" }, "team-budget-cf-marketing": { ws: "cf-marketing", teamName: "市场宣传组" }, "team-budget-cf-ip": { ws: "cf-ip", teamName: "IP 孵化组" } };
+      const fromKey = "enterprise-main-cf";
+      const fromW = wallets[fromKey];
+      const fromAvail = (fromW.available_balance != null ? fromW.available_balance : fromW.balance) || 0;
+      if (amt > fromAvail) { window.demoToast("企业总账户可用余额不足（当前可用 " + window.fmtMoney(fromAvail) + "）", "err"); return false; }
+      const teamMap = {
+        "team-budget-cf-drama":     { ws: "cf-drama",     teamName: "短剧制作中心" },
+        "team-budget-cf-marketing": { ws: "cf-marketing", teamName: "市场宣传组" },
+        "team-budget-cf-ip":        { ws: "cf-ip",        teamName: "IP 孵化组" }
+      };
       const team = teamMap[toKey];
       if (!wallets[toKey]) {
-        wallets[toKey] = { type: "team-budget", name: team.teamName + " - 团队预算账户", balance: 0, lockedAmount: 0, allocated: 0, owner: team.ws };
+        // 团队预算账户首次开通
+        wallets[toKey] = {
+          type: "team-budget", name: team.teamName + " - 团队预算账户",
+          owner: team.ws,
+          balance: 0, lockedAmount: 0, allocated: 0,
+          available_balance: 0, frozen_balance: 0, recharge_balance: 0,
+          total_earnings: 0, total_withdrawn: 0, pending_withdraw: 0,
+          points_balance: 0, points_frozen: 0
+        };
       }
-      wallets["enterprise-main-cf"].balance -= amt;
-      wallets[toKey].balance += amt;
-      wallets[toKey].allocated = (wallets[toKey].allocated || 0) + amt;
+
+      // 1) 钱包余额：源 −amt，目标 +amt（available + balance），allocated 累加
+      fromW.available_balance = (fromW.available_balance || fromW.balance || 0) - amt;
+      fromW.balance           = fromW.available_balance;
+      // 源的 recharge_balance 同步扣减（划拨不可退；本金从企业池转出后变成团队池可用预算）
+      fromW.recharge_balance  = Math.max(0, (fromW.recharge_balance || 0) - amt);
+      const toW = wallets[toKey];
+      toW.available_balance = (toW.available_balance || toW.balance || 0) + amt;
+      toW.balance           = toW.available_balance;
+      toW.allocated         = (toW.allocated || 0) + amt;
       window.demoApp.setWallets(wallets);
-      window.demoApp.addFlow({ id: "F-" + Date.now() + "a", time: now(), type: "allocate", desc: "从企业总账户划拨至 " + team.teamName, account: "enterprise-main-cf", amount: -amt, operator: "昭岚（企业管理员）" });
-      window.demoApp.addFlow({ id: "F-" + Date.now() + "b", time: now(), type: "allocate", desc: "企业管理员划拨预算 → " + team.teamName, account: toKey, amount: amt, operator: "昭岚（企业管理员）" });
-      window.demoToast("✅ 已划拨 " + window.fmtMoney(amt) + " 至 " + team.teamName, "ok");
+
+      // 2) transfer_order 入库
+      const ts = now();
+      const ymd = ts.slice(0,10).replace(/-/g,"");
+      const seq = String(Date.now()).slice(-4);
+      const tfId = "TF-" + Date.now();
+      const voucherNo = "V-" + Date.now();
+      window.demoApp.addTransferOrder({
+        id: tfId, out_transfer_no: "TF_" + ymd + "_" + seq,
+        time: ts,
+        from_walletKey: fromKey, to_walletKey: toKey,
+        amount: amt, biz_type: "budget_allocate",
+        status: "success", operator: "昭岚（企业管理员）",
+        memo: "划拨至 " + team.teamName,
+        voucher_no: voucherNo
+      });
+
+      // 3) 四方凭证：F-TF-S0（源 1001 贷 -amt 主显）/ F-TF-S1（源 2001 借 隐藏对手方）
+      //              F-TF-T0（目标 1001 借 +amt 主显）/ F-TF-T1（目标 2001 贷 隐藏对手方）
+      const t0 = Date.now();
+      window.demoApp.addFlow({
+        id: "F-TF-S0-" + t0,
+        time: ts, type: "allocate",
+        desc: "划拨给 " + team.teamName + "（企业总账户出账）",
+        account: fromKey,
+        amount: -amt, operator: "昭岚（企业管理员）",
+        voucher_no: voucherNo, subject_code: "1001", direction: "credit",
+        related_transfer: tfId
+      });
+      window.demoApp.addFlow({
+        id: "F-TF-S1-" + (t0 + 1),
+        time: ts, type: "allocate",
+        desc: "（对手方）企业池用户应付负债注销",
+        account: fromKey,
+        amount: 0, _voucherAmt: amt, operator: "system",
+        voucher_no: voucherNo, subject_code: "2001", direction: "debit",
+        related_transfer: tfId,
+        lockedNote: "对手方记账（借方）"
+      });
+      window.demoApp.addFlow({
+        id: "F-TF-T0-" + (t0 + 2),
+        time: ts, type: "allocate",
+        desc: "收到企业总账户预算划拨",
+        account: toKey,
+        amount: amt, operator: "昭岚（企业管理员）",
+        voucher_no: voucherNo, subject_code: "1001", direction: "debit",
+        related_transfer: tfId
+      });
+      window.demoApp.addFlow({
+        id: "F-TF-T1-" + (t0 + 3),
+        time: ts, type: "allocate",
+        desc: "（对手方）团队池用户应付负债增加",
+        account: toKey,
+        amount: 0, _voucherAmt: amt, operator: "system",
+        voucher_no: voucherNo, subject_code: "2001", direction: "credit",
+        related_transfer: tfId,
+        lockedNote: "对手方记账（贷方）"
+      });
+
+      window.demoToast("✅ 已划拨 " + window.fmtMoney(amt) + " 至 " + team.teamName + "（划拨单 " + tfId + "）", "ok");
       closeAllDrawers();
       window.refreshAll();
-      if (toKey === "team-budget-cf-ip") setTimeout(() => window.demoToast("提示：IP 孵化组已开通预算账户，下次该空间下单不再回退至企业总账户", "info"), 800);
+      if (toKey === "team-budget-cf-ip") {
+        setTimeout(() => window.demoToast("提示：IP 孵化组已开通预算账户，下次该空间下单不再回退至企业总账户", "info"), 800);
+      }
+      return { ok: true, transferId: tfId, voucherNo: voucherNo };
+    };
+
+    $("allocConfirmBtn").addEventListener("click", () => {
+      const amt = Number($("allocateAmount").value);
+      const toKey = $("allocateTarget").value;
+      window.doAllocate(toKey, amt);
     });
 
     // ============================================================
-    // 提现抽屉
+    // 提现抽屉（v2，对齐《统一账户与资金中心》5.2 节）
+    //   1. 仅 type=personal 钱包可提现（团队预算 / 企业主账户均拒绝）
+    //   2. 可提现 = total_earnings − total_withdrawn − pending_withdraw
+    //   3. 必须实名等级 ≥ liveness_verified（中级），否则跳实名页拦截
+    //   4. 提交后：pending_withdraw += amt，钱包余额不立刻动；财务审核通过再走出账
     // ============================================================
     let withdrawWalletKey = null;
     window.openWithdraw = function (walletKey) {
@@ -2642,23 +3612,425 @@
       const wallets = window.demoApp.getWallets();
       const wallet = wallets[walletKey];
       if (!wallet) { window.demoToast("当前账户不可提现", "warn"); return; }
-      $("withdrawAccountName").textContent = wallet.name;
-      $("withdrawableAmount").textContent = window.fmtMoney(wallet.balance);
+
+      // 账户类型守卫：只有 personal 可提现
+      if (wallet.type !== "personal") {
+        window.demoToast("仅个人 / 承制方账户可提现；团队预算 / 企业总账户不可提现", "warn");
+        return;
+      }
+
+      // 实名等级守卫：未达中级实名，拦截到账号中心
+      if (!window.demoApp.canWithdraw()) {
+        const status = window.demoApp.getRealNameStatus();
+        const tip = (status === "basic_verified")
+          ? "提现需中级实名（人脸活体认证）。当前实名等级：基础（二要素核验）。"
+          : "提现需中级实名（人脸活体认证）。请先完成实名认证。";
+        window._showWithdrawRealNameGate(tip);
+        return;
+      }
+
+      const withdrawable = window.demoApp.getWithdrawableAmount(walletKey);
+      $("withdrawAccountName").textContent = wallet.name + "（仅可提现「累计收益」部分）";
+      $("withdrawableAmount").textContent = window.fmtMoney(withdrawable);
       $("withdrawAmount").value = "";
+      $("withdrawAmount").setAttribute("max", String(withdrawable));
       openDrawer("withdraw");
     };
+
+    // B-4：提现状态机推进（页面加载后会自动 catch up，避免 setTimeout 因刷新丢失）
+    // 单步推进：pending → reviewing → approved/rejected → success
+    // 风控规则（demo）：金额 ≥ ¥50,000 → 30% 拒绝率；其他自动通过
+    function _stepWithdraw(wdId) {
+      const orders = window.demoApp.getWithdrawOrders();
+      const i = orders.findIndex(o => o.id === wdId);
+      if (i < 0) return;
+      const o = orders[i];
+      if (o.status === "pending") {
+        o.status = "reviewing";
+        o.risk_check_at = now();
+        o.risk_level = (o.amount >= 50000) ? "high" : "low";
+        o.next_tick_at = Date.now() + 1500;
+        window.demoApp.setWithdrawOrders(orders);
+        window.demoToast("🔎 提现单 " + wdId + " 进入风控审核（" + (o.risk_level === "high" ? "高金额" : "常规") + "）", "info");
+        window.refreshAll();
+        setTimeout(() => _stepWithdraw(wdId), 1500);
+        return;
+      }
+      if (o.status === "reviewing") {
+        const isHigh = o.risk_level === "high";
+        const rejected = isHigh && Math.random() < 0.3;
+        const ts2 = now();
+        if (rejected) {
+          const w2 = window.demoApp.getWallets();
+          const ww = w2[o.walletKey];
+          ww.pending_withdraw = Math.max(0, (ww.pending_withdraw || 0) - o.amount);
+          w2[o.walletKey] = ww;
+          window.demoApp.setWallets(w2);
+          o.status = "rejected";
+          o.reviewed_at = ts2;
+          o.reject_reason = "风控审核未通过：高金额提现需补充更详细的资金来源说明";
+          o.reviewer = "风控-自动";
+          o.next_tick_at = null;
+          window.demoApp.setWithdrawOrders(orders);
+          window.demoApp.addFlow({
+            id: "F-WD-REJ-" + Date.now(),
+            time: ts2, type: "withdraw",
+            desc: "提现申请被拒 - " + wdId + "（风控审核未通过）",
+            account: o.walletKey,
+            amount: 0, _voucherAmt: o.amount,
+            operator: "风控",
+            lockedNote: "已拒绝 · 资金已退回可提现额度",
+            voucher_no: null, subject_code: "3001", direction: "credit",
+            related_withdraw: wdId
+          });
+          window.demoToast("⛔ 提现单 " + wdId + " 被风控拒绝，资金已退回可提现额度", "err");
+          window.refreshAll();
+          return;
+        }
+        o.status = "approved";
+        o.reviewed_at = ts2;
+        o.reviewer = "风控-自动 + 财务审核";
+        o.next_tick_at = Date.now() + 1500;
+        window.demoApp.setWithdrawOrders(orders);
+        window.demoToast("🟢 提现单 " + wdId + " 风控通过，出账中…", "info");
+        window.refreshAll();
+        setTimeout(() => _stepWithdraw(wdId), 1500);
+        return;
+      }
+      if (o.status === "approved") {
+        const ts3 = now();
+        const voucherNo = "V-" + Date.now();
+        o.status = "success";
+        o.arrived_at = ts3;
+        o.voucher_no = voucherNo;
+        o.next_tick_at = null;
+        window.demoApp.setWithdrawOrders(orders);
+        const w3 = window.demoApp.getWallets();
+        const w3w = w3[o.walletKey];
+        const amt = o.amount;
+        w3w.total_earnings    = Math.max(0, (w3w.total_earnings    || 0) - amt);
+        w3w.total_withdrawn   = (w3w.total_withdrawn   || 0) + amt;
+        w3w.pending_withdraw  = Math.max(0, (w3w.pending_withdraw  || 0) - amt);
+        w3w.available_balance = Math.max(0, (w3w.available_balance || w3w.balance || 0) - amt);
+        w3w.balance           = w3w.available_balance;
+        w3[o.walletKey] = w3w;
+        window.demoApp.setWallets(w3);
+        window.demoApp.addFlow({
+          id: "F-WD-SUC-" + Date.now(),
+          time: ts3, type: "withdraw",
+          desc: "提现到账 - " + wdId + " · " + (o.bank_card || "—"),
+          account: o.walletKey,
+          amount: -amt, operator: "财务",
+          voucher_no: voucherNo, subject_code: "1001", direction: "credit",
+          related_withdraw: wdId
+        });
+        window.demoApp.addFlow({
+          id: "F-WD-SUC-OFFSET-" + Date.now(),
+          time: ts3, type: "withdraw",
+          desc: "（对手方）提现 - 待提现负债注销",
+          account: o.walletKey,
+          amount: 0, _voucherAmt: amt, operator: "system",
+          voucher_no: voucherNo, subject_code: "3001", direction: "debit",
+          related_withdraw: wdId, lockedNote: "对手方记账（借方）"
+        });
+        window.demoToast("💰 提现 " + window.fmtMoney(amt) + " 已到账银行卡", "ok");
+        window.refreshAll();
+        return;
+      }
+    }
+    window._stepWithdraw = _stepWithdraw;
+
+    // 页面加载后给所有未完成的提现单 schedule 推进；已经过期的立即触发
+    setTimeout(function _scheduleWithdrawTicks() {
+      const orders = window.demoApp.getWithdrawOrders();
+      orders.forEach(o => {
+        if (o.status === "success" || o.status === "rejected") return;
+        if (!o.next_tick_at) return; // 旧种子单（无 next_tick_at）保持演示样态，不自动推进
+        const delay = Math.max(0, o.next_tick_at - Date.now());
+        setTimeout(() => _stepWithdraw(o.id), delay);
+      });
+    }, 600);
+
     $("withdrawConfirmBtn").addEventListener("click", () => {
       const amt = Number($("withdrawAmount").value);
       const wallets = window.demoApp.getWallets();
       const wallet = wallets[withdrawWalletKey];
+      const withdrawable = window.demoApp.getWithdrawableAmount(withdrawWalletKey);
       if (!amt || amt < 1) { window.demoToast("请输入有效金额", "err"); return; }
-      if (amt > wallet.balance) { window.demoToast("超过可提现金额", "err"); return; }
+      if (amt > withdrawable) {
+        window.demoToast("超过可提现金额（¥" + withdrawable.toLocaleString() + "）。提现仅限「累计收益 − 已提现 − 处理中」部分。", "err");
+        return;
+      }
       if (amt > 100000) { window.demoToast("单笔提现 ≤ ¥100,000，请拆笔提现", "err"); return; }
-      window.demoApp.addFlow({ id: "F-" + Date.now(), time: now(), type: "withdraw", desc: "提现申请提交（财务审核中）", account: withdrawWalletKey, amount: 0, operator: "昭岚", lockedNote: "财务审核中" });
-      window.demoToast("✅ 提现申请已提交，财务审核中（1-3 个工作日到账）", "info");
+
+      // 1) 钱包：pending_withdraw += amt（钱包余额暂不动，等审核通过再扣 total_earnings）
+      wallet.pending_withdraw = (wallet.pending_withdraw || 0) + amt;
+      wallets[withdrawWalletKey] = wallet;
+      window.demoApp.setWallets(wallets);
+
+      // 2) withdraw_order 入库（status=pending）+ "在途凭证"流水（amount=0 事件流水）
+      const ts = now();
+      const ymd = ts.slice(0,10).replace(/-/g,"");
+      const seq = String(Date.now()).slice(-4);
+      const wdId = "WD-" + Date.now();
+      const bankSel = $("withdrawBankCard");
+      const bankCard = bankSel ? (bankSel.options[bankSel.selectedIndex].text) : "默认银行卡";
+      const memo = ($("withdrawMemo") && $("withdrawMemo").value) || "";
+
+      window.demoApp.addWithdrawOrder({
+        id: wdId, out_withdraw_no: "WD_" + ymd + "_" + seq,
+        time: ts,
+        walletKey: withdrawWalletKey,
+        amount: amt,
+        status: "pending", risk_level: null,
+        bank_card: bankCard,
+        memo: memo,
+        submitted_at: ts,
+        operator: "昭岚",
+        next_tick_at: Date.now() + 1500
+      });
+      window.demoApp.addFlow({
+        id: "F-WD-PEND-" + Date.now(),
+        time: ts, type: "withdraw",
+        desc: "提现申请提交 - " + wdId + "（待风控审核）",
+        account: withdrawWalletKey,
+        amount: 0, _voucherAmt: amt,
+        operator: "昭岚",
+        lockedNote: "审核中 ¥" + amt.toLocaleString() + " → " + bankCard,
+        voucher_no: null, subject_code: "3001", direction: "debit",
+        related_withdraw: wdId
+      });
+      window.demoToast("✅ 提现单 " + wdId + " 已提交，风控审核中…", "info");
       closeAllDrawers();
       window.refreshAll();
+      setTimeout(() => window._stepWithdraw && window._stepWithdraw(wdId), 1500);
     });
+
+    // ============================================================
+    // 主动退款抽屉（按 recharge_order 维度，二期能力 Demo）
+    // ============================================================
+    window.openRefund = function (walletKey) {
+      const allRcs = window.demoApp.getRechargeOrders();
+      const wallets = window.demoApp.getWallets();
+      const wallet = wallets[walletKey];
+      const myRcs = allRcs.filter(r => r.walletKey === walletKey && r.status === "success" && (r.remaining_refundable || 0) > 0);
+      const fmt = window.fmtMoney;
+
+      $("refundAccountName").textContent = (wallet ? wallet.name : walletKey) + " · 仅展示可退本金的充值单";
+      const wrap = document.getElementById("refundRechargeList");
+      if (myRcs.length === 0) {
+        wrap.innerHTML = '<div class="empty-state"><div class="es-icon">📭</div><div class="es-title">该账户暂无可退款的充值单</div><div class="es-sub">仅成功到账、且仍有剩余可退额度的充值单可发起退款</div></div>';
+        openDrawer("refund");
+        return;
+      }
+      wrap.innerHTML = myRcs.map(r => {
+        const refundedPct = r.amount > 0 ? Math.round(((r.refunded_amount || 0) / r.amount) * 100) : 0;
+        const channelLabel = r.channelLabel || ({
+          "alipay": "支付宝",
+          "wechat": "微信",
+          "unionpay": "银联",
+          "bank": "对公转账",
+          "online-alipay": "支付宝",
+          "online-wechat": "微信",
+          "online-unionpay": "银联",
+          "bank-transfer": "对公转账"
+        })[r.channel] || (r.channel || "渠道未知");
+        const rechargeTime = r.recharge_time || r.time || "—";
+        return '<div style="border:1px solid #e8e8e8;border-radius:10px;padding:14px 16px;background:#fff">'
+          + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">'
+          +   '<div>'
+          +     '<div style="font-family:monospace;color:#1890ff;font-size:13px;font-weight:600">' + r.id + '</div>'
+          +     '<div style="font-size:11px;color:#8c8c8c;margin-top:3px">' + rechargeTime + ' · ' + channelLabel + '</div>'
+          +   '</div>'
+          +   '<div style="text-align:right">'
+          +     '<div style="font-size:11px;color:#8c8c8c">充值金额</div>'
+          +     '<div style="font-size:16px;font-weight:600;color:#262626">' + fmt(r.amount) + '</div>'
+          +   '</div>'
+          + '</div>'
+          + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:8px 0;border-top:1px dashed #f0f0f0;border-bottom:1px dashed #f0f0f0;margin-bottom:10px">'
+          +   '<div><div style="font-size:11px;color:#8c8c8c">已退款</div><div style="font-size:13px;color:#cf1322">' + fmt(r.refunded_amount || 0) + '</div></div>'
+          +   '<div><div style="font-size:11px;color:#8c8c8c">剩余可退</div><div style="font-size:13px;color:#52c41a;font-weight:600">' + fmt(r.remaining_refundable || 0) + '</div></div>'
+          +   '<div><div style="font-size:11px;color:#8c8c8c">退款进度</div><div style="font-size:13px;color:#262626">' + refundedPct + '%</div></div>'
+          + '</div>'
+          + '<div style="display:flex;gap:8px;align-items:center">'
+          +   '<input type="number" placeholder="退款金额 ≤ ¥' + (r.remaining_refundable || 0).toLocaleString() + '" data-rc="' + r.id + '" '
+          +     'style="flex:1;height:36px;border:1px solid #d9d9d9;border-radius:6px;padding:0 10px;font-size:13px" min="1" max="' + (r.remaining_refundable || 0) + '">'
+          +   '<button onclick="window._handleRefund(\'' + r.id + '\')" '
+          +     'style="height:36px;border:none;background:linear-gradient(135deg,#fa541c,#fa8c16);color:#fff;border-radius:6px;padding:0 18px;font-size:13px;cursor:pointer;font-weight:500">↩️ 退款到原渠道</button>'
+          + '</div>'
+          + '<div style="font-size:11px;color:#bfbfbf;margin-top:6px">退款原路返回到「' + channelLabel + '」，预计 1-3 个工作日到账</div>'
+          + '</div>';
+      }).join("");
+      openDrawer("refund");
+    };
+
+    window._handleRefund = function (rechargeId) {
+      const input = document.querySelector('#refundRechargeList input[data-rc="' + rechargeId + '"]');
+      if (!input) return;
+      const amt = Number(input.value);
+      const rcs = window.demoApp.getRechargeOrders();
+      const rc = rcs.find(r => r.id === rechargeId);
+      if (!rc) return;
+      if (!amt || amt < 1) { window.demoToast("请输入退款金额", "err"); return; }
+      if (amt > (rc.remaining_refundable || 0)) {
+        window.demoToast("退款金额不能超过剩余可退额度 ¥" + (rc.remaining_refundable || 0).toLocaleString(), "err");
+        return;
+      }
+      const result = window.demoApp.refundByRechargeOrder(rechargeId, amt);
+      if (!result || !result.ok) {
+        window.demoToast("退款失败：" + ((result && result.error) || "充值单不存在或额度不足"), "err");
+        return;
+      }
+
+      // _shared.js 已扣减 recharge_balance / available_balance / remaining_refundable，
+      // 这里只追加凭证流水（资产端：1001 可用余额贷方 -amt；负债端：2001 用户应付贷方 -amt）
+      const ts = now();
+      const refundVoucher = "V-RFND-" + Date.now();
+      window.demoApp.addFlow({
+        id: "F-RFND-" + Date.now(),
+        time: ts,
+        type: "refund",
+        desc: "主动退款 - 充值单 " + rechargeId + " 退回原渠道",
+        account: rc.walletKey,
+        amount: -amt,
+        operator: "昭岚",
+        voucher_no: refundVoucher,
+        subject_code: "1001",
+        direction: "credit",
+        related_recharge: rechargeId
+      });
+      // 复式记账对手方：负债端 2001 用户应付（借方 -amt）
+      // amount=0 避免在 flows 列表里被用户误读为"二次扣减"，凭证浮层用 _voucherAmt 显示真实借方金额
+      window.demoApp.addFlow({
+        id: "F-RFND-OFFSET-" + Date.now(),
+        time: ts,
+        type: "refund",
+        desc: "（对手方）用户应付负债注销 - 充值单 " + rechargeId,
+        account: rc.walletKey,
+        amount: 0,
+        _voucherAmt: amt,
+        operator: "system",
+        voucher_no: refundVoucher,
+        subject_code: "2001",
+        direction: "debit",
+        related_recharge: rechargeId,
+        lockedNote: "对手方记账（借方）"
+      });
+
+      window.demoToast("✅ 退款 ¥" + amt.toLocaleString() + " 已发起，预计 1-3 个工作日到账", "ok");
+      closeAllDrawers();
+      window.refreshAll();
+    };
+
+    // B-3：TCC Cancel 演示入口（钱包"账户与预算"页冻结分桶里的"取消订单 · 解冻"按钮）
+    window._handleCancelFreeze = function (freezeId) {
+      const fos = window.demoApp.getFreezeOrders();
+      const fo = fos.find(o => o.id === freezeId);
+      if (!fo) { window.demoToast("冻结单不存在", "err"); return; }
+      if (fo.status !== "frozen") { window.demoToast("冻结单已 " + fo.status + "，无法取消", "warn"); return; }
+      if (!confirm("确认取消冻结单 " + freezeId + "？\n金额 ¥" + (fo.amount || 0).toLocaleString() + " 将释放回 " + (fo.walletKey) + " 的可用余额（TCC Cancel）")) return;
+      const r = window.demoApp.tccCancel(freezeId, { reason: "Demo：用户主动取消订单", operator: "昭岚" });
+      if (!r.ok) { window.demoToast("解冻失败：" + r.error, "err"); return; }
+      // 同步取消关联订单
+      if (fo.relatedOrder) {
+        try { window.demoApp.updateOrder(fo.relatedOrder, { status: "cancelled", cancelledTime: now() }); } catch (e) {}
+      }
+      if (fo.relatedDemand) {
+        try { window.demoApp.updateDemand(fo.relatedDemand, { status: "cancelled" }); } catch (e) {}
+      }
+      window.demoToast("✅ 订单已取消，资金 ¥" + (fo.amount || 0).toLocaleString() + " 已退回可用余额", "ok");
+      window.refreshAll();
+    };
+
+    // 凭证详情浮层：展示同一 voucher_no 下的所有 entry（借贷双方），证明流水满足复式记账
+    window.showVoucherDetail = function (voucherNo) {
+      if (!voucherNo) return;
+      const all = window.demoApp.getFlows().filter(f => f.voucher_no === voucherNo);
+      const old = document.getElementById("voucherOverlay");
+      if (old) old.remove();
+      const overlay = document.createElement("div");
+      overlay.id = "voucherOverlay";
+      overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;display:flex;align-items:center;justify-content:center";
+      let debitSum = 0, creditSum = 0;
+      const rows = all.map(e => {
+        const amt = Math.abs(e.amount || e._voucherAmt || 0);
+        if (e.direction === "debit") debitSum += amt;
+        if (e.direction === "credit") creditSum += amt;
+        return '<tr>'
+          + '<td style="padding:6px 8px;font-family:monospace;color:#1890ff">' + e.id + '</td>'
+          + '<td style="padding:6px 8px">' + (e.account || "—") + '</td>'
+          + '<td style="padding:6px 8px">' + formatSubject(e.subject_code) + '</td>'
+          + '<td style="padding:6px 8px;text-align:center">' + formatDirection(e.direction) + '</td>'
+          + '<td style="padding:6px 8px;text-align:right;font-family:monospace">' + (amt ? "¥" + amt.toLocaleString() : "—") + '</td>'
+          + '</tr>';
+      }).join("");
+      const balanced = debitSum === creditSum;
+      overlay.innerHTML = '<div style="background:#fff;border-radius:14px;max-width:760px;width:96%;max-height:80vh;overflow:auto;box-shadow:0 8px 30px rgba(0,0,0,.2)">'
+        + '<div style="padding:18px 22px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:flex-start">'
+        +   '<div>'
+        +     '<div style="font-size:13px;color:#8c8c8c;margin-bottom:4px">凭证号 voucher_no</div>'
+        +     '<div style="font-size:20px;font-weight:700;font-family:monospace;color:#1890ff">' + voucherNo + '</div>'
+        +     '<div style="font-size:11px;color:#bfbfbf;margin-top:6px">一期 MVP 范围 · 对齐《统一账户与资金中心》voucher + voucher_entry</div>'
+        +   '</div>'
+        +   '<button id="voucherCloseBtn" style="border:none;background:transparent;font-size:24px;cursor:pointer;color:#8c8c8c;line-height:1">×</button>'
+        + '</div>'
+        + '<div style="padding:18px 22px">'
+        +   '<table style="width:100%;font-size:13px;border-collapse:collapse">'
+        +     '<thead><tr style="background:#fafafa;color:#8c8c8c;font-size:12px">'
+        +       '<th style="padding:8px;text-align:left">流水 ID</th>'
+        +       '<th style="padding:8px;text-align:left">钱包账户</th>'
+        +       '<th style="padding:8px;text-align:left">会计科目</th>'
+        +       '<th style="padding:8px;text-align:center">借/贷</th>'
+        +       '<th style="padding:8px;text-align:right">金额</th>'
+        +     '</tr></thead>'
+        +     '<tbody>' + rows + '</tbody>'
+        +     '<tfoot><tr style="background:#f6ffed;font-weight:600">'
+        +       '<td colspan="3" style="padding:8px;color:#595959">合计</td>'
+        +       '<td style="padding:8px;text-align:center">借 ¥' + debitSum.toLocaleString() + ' / 贷 ¥' + creditSum.toLocaleString() + '</td>'
+        +       '<td style="padding:8px;text-align:right">' + (balanced ? '<span style="color:#52c41a">✓ 平衡</span>' : '<span style="color:#cf1322">⚠ 单边记账（demo 数据未补齐对方）</span>') + '</td>'
+        +     '</tr></tfoot>'
+        +   '</table>'
+        +   '<div style="margin-top:14px;padding:10px 14px;background:#f0f5ff;border-radius:6px;font-size:12px;color:#1890ff;line-height:1.7">'
+        +     '💡 该凭证的所有 entry 共享同一 voucher_no；后端要求借贷双方金额必须相等才能落账。本演示界面仅做展示，真实环境由 voucher 服务保证强一致。'
+        +   '</div>'
+        + '</div>'
+        + '</div>';
+      document.body.appendChild(overlay);
+      document.getElementById("voucherCloseBtn").onclick = function () { overlay.remove(); };
+      overlay.addEventListener("click", function (e) { if (e.target === overlay) overlay.remove(); });
+    };
+
+    // 中级实名拦截浮层（提现 / 大额支付等高风险动作复用）
+    window._showWithdrawRealNameGate = function (tip) {
+      const old = document.getElementById("rnGateOverlay");
+      if (old) old.remove();
+      const overlay = document.createElement("div");
+      overlay.id = "rnGateOverlay";
+      overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;display:flex;align-items:center;justify-content:center";
+      overlay.innerHTML = '<div style="background:#fff;border-radius:16px;max-width:460px;width:92%;padding:28px 24px;box-shadow:0 8px 30px rgba(0,0,0,.18);text-align:center">'
+        + '<div style="font-size:48px;margin-bottom:12px">🆔</div>'
+        + '<div style="font-size:18px;font-weight:700;margin-bottom:8px">请先完成中级实名</div>'
+        + '<div style="font-size:13px;color:#8c8c8c;line-height:1.7;margin-bottom:6px">' + (tip || "") + '</div>'
+        + '<div style="font-size:11px;color:#bfbfbf;line-height:1.7;margin-bottom:18px">依据《非银行支付机构客户尽职调查办法》，单笔提现需完成"人脸活体核验"</div>'
+        + '<div style="display:flex;gap:10px;justify-content:center">'
+        +   '<button id="rnGateClose" style="height:36px;border:1px solid #d9d9d9;background:#fff;border-radius:8px;padding:0 20px;font-size:13px;cursor:pointer;color:#595959">稍后再说</button>'
+        +   '<button id="rnGateGo" style="height:36px;border:none;background:linear-gradient(135deg,#1890ff,#722ed1);border-radius:8px;padding:0 20px;font-size:13px;cursor:pointer;color:#fff;font-weight:500">🆔 立即完成中级实名</button>'
+        +   '<button id="rnGateSkip" style="height:36px;border:1px solid #52c41a;background:#f6ffed;border-radius:8px;padding:0 20px;font-size:13px;cursor:pointer;color:#389e0d">⏩ Demo 跳过</button>'
+        + '</div>'
+        + '</div>';
+      document.body.appendChild(overlay);
+      document.getElementById("rnGateClose").onclick = function () { overlay.remove(); };
+      overlay.addEventListener("click", function (e) { if (e.target === overlay) overlay.remove(); });
+      document.getElementById("rnGateGo").onclick = function () {
+        location.href = "account-center.html?tab=realname&from=withdraw";
+      };
+      document.getElementById("rnGateSkip").onclick = function () {
+        window.demoApp.setRealNameStatus("liveness_verified", { real_name_verified_at: now(), real_name_method: "liveness", real_name_vendor: "aliyun-faceid" });
+        overlay.remove();
+        window.demoToast("✅ 已模拟通过中级实名认证（Demo 跳过）", "ok");
+        setTimeout(() => window.openWithdraw(withdrawWalletKey), 250);
+      };
+    };
 
     // ============================================================
     // 申请开票抽屉
@@ -2716,7 +4088,7 @@
 
     window.refreshAll = function () {
       window.refreshTopbar();
-      renderContextBanner();
+      renderFundRuleNote();
       renderLiveBanners();
       renderCurrentCard();
       renderAccountsGrid();
@@ -2726,7 +4098,7 @@
       const activeTab = document.querySelector("#roleTabs button.active");
       const tabName = activeTab ? activeTab.getAttribute("data-tab") : "overview";
       if (tabName === "overview") renderMiniFlows("overviewMiniFlows", "all");
-      if (tabName === "accounts") { renderAccountsActionBar(); renderFrozenBreakdown(); renderMiniFlows("accountsMiniFlows", "current"); }
+      if (tabName === "accounts") { renderAccountsActionBar(); renderFrozenBreakdown(); renderWithdrawOrders(); renderMiniFlows("accountsMiniFlows", "current"); }
       if (tabName === "flows") renderFlows();
       if (tabName === "invoice") renderInvoicePanel();
       if (tabName === "settings") renderSettingsPanel();
@@ -2734,7 +4106,7 @@
     window.onWorkspaceChanged = window.refreshAll;
 
     // 初次渲染（Tab 无关）
-    renderContextBanner();
+    renderFundRuleNote();
     renderLiveBanners();
     renderCurrentCard();
     renderAccountsGrid();
@@ -2753,6 +4125,46 @@
         } catch (e) {}
       }
       setActiveTab(target);
+    })();
+
+    // Demo 触发：URL ?demoAction=allocate&toKey=xxx&amt=10000
+    // 用于二期与后端联调前的演示场景；管理后台也可调用相同的 window.doAllocate
+    (function runDemoActionFromUrl() {
+      const p = new URL(location).searchParams;
+      const action = p.get("demoAction");
+      if (!action) return;
+      setTimeout(() => {
+        if (action === "allocate") {
+          const toKey = p.get("toKey") || "team-budget-cf-marketing";
+          const amt = Number(p.get("amt") || 10000);
+          window.doAllocate(toKey, amt);
+        }
+        if (action === "recharge") {
+          // 直接走实时充值 demo 演示
+          const walletKey = p.get("walletKey") || "personal-account-lixueqin";
+          const amt = Number(p.get("amt") || 5000);
+          const channel = p.get("channel") || "alipay";
+          const channelMap = { alipay: { channel: "alipay", label: "支付宝", instant: true }, wechat: { channel: "wechat", label: "微信", instant: true }, unionpay: { channel: "unionpay", label: "银联", instant: true } };
+          if (typeof window.applySuccessRecharge === "function" && channelMap[channel]) {
+            window.applySuccessRecharge(walletKey, amt, channelMap[channel], { desc: channelMap[channel].label + "充值（Demo URL 触发）" });
+            window.demoToast("✅ Demo 充值 " + window.fmtMoney(amt), "ok");
+            window.refreshAll();
+          }
+        }
+        if (action === "withdraw") {
+          // ?demoAction=withdraw&walletKey=personal-account-lixueqin&amt=500
+          // amt < 50,000 → 低风险自动通过（pending → reviewing → approved → success）
+          // amt ≥ 50,000 → 高风险 30% 概率拒绝
+          const walletKey = p.get("walletKey") || "personal-account-lixueqin";
+          const amt = Number(p.get("amt") || 500);
+          window.openWithdraw && window.openWithdraw(walletKey);
+          setTimeout(() => {
+            const inp = document.getElementById("withdrawAmount");
+            if (inp) inp.value = String(amt);
+            window.demoToast("Demo 已预填提现金额 ¥" + amt.toLocaleString() + "，点「提交提现申请」即可观察状态机", "info");
+          }, 200);
+        }
+      }, 300);
     })();
 
     // ============================================================

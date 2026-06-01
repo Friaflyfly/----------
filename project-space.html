@@ -1094,24 +1094,49 @@
     }
 
     function executeSettlement() {
-      // 真实更新 mock 数据：释放锁定金额、写流水、更新订单状态
+      // B-3：TCC Confirm — 用 freeze_order 状态机替代直接的 lockedAmount 操作
       const orders = window.demoApp.getOrders();
       const o = orders.find(x => x.id === orderId);
-      if (o) {
-        const wallets = window.demoApp.getWallets();
-        if (wallets[o.payerWalletKey || "team-budget-cf-drama"]) {
-          const w = wallets[o.payerWalletKey || "team-budget-cf-drama"];
-          w.lockedAmount = Math.max(0, (w.lockedAmount || 0) - orderAmount);
-          window.demoApp.setWallets(wallets);
+      const now = new Date();
+      const tStr = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0") + " " + String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
+
+      let confirmedFreezeId = null;
+      if (o && o.freezeId) {
+        // 走 TCC Confirm（含 5001 借 / 1002 贷 + 释放冻结余额）
+        const r = window.demoApp.tccConfirm(o.freezeId, { orderId: orderId, operator: "系统" });
+        if (r.ok) confirmedFreezeId = o.freezeId;
+      } else {
+        // 兼容旧 demo 数据：通过 relatedOrder 反查
+        const fos = window.demoApp.getFreezeOrders();
+        const fo = fos.find(x => x.relatedOrder === orderId && x.status === "frozen");
+        if (fo) {
+          const r = window.demoApp.tccConfirm(fo.id, { orderId: orderId, operator: "系统" });
+          if (r.ok) confirmedFreezeId = fo.id;
+        } else {
+          // 退化分支：旧 demo 数据无 freeze_order，仍按旧版只调 lockedAmount + 写一条 settle flow
+          const wallets = window.demoApp.getWallets();
+          const payerKey = (o && o.payerWalletKey) || "team-budget-cf-drama";
+          if (wallets[payerKey]) {
+            const w = wallets[payerKey];
+            w.lockedAmount    = Math.max(0, (w.lockedAmount    || 0) - orderAmount);
+            w.frozen_balance  = Math.max(0, (w.frozen_balance  || 0) - orderAmount);
+            window.demoApp.setWallets(wallets);
+          }
+          window.demoApp.addFlow({ id: "F-S" + Date.now(), time: tStr, type: "settle", desc: "订单结算分账 - " + orderId + "「新剧 IP 海报系列」", account: payerKey, amount: -orderAmount, operator: "系统", subject_code: "5001", direction: "debit" });
         }
+      }
+
+      // 订单 + 需求状态推进
+      if (o) {
         window.demoApp.updateOrder(orderId, { status: "completed", completedTime: new Date().toLocaleString("zh-CN") });
         window.demoApp.updateDemand(o.demandId || "DM-2026042103", { status: "completed" });
       }
-      const now = new Date();
-      const tStr = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0") + " " + String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
-      window.demoApp.addFlow({ id: "F-S" + Date.now(), time: tStr, type: "settle", desc: "订单结算分账 - " + orderId + "「新剧 IP 海报系列」", account: "team-budget-cf-drama", amount: -orderAmount, operator: "系统" });
-      window.demoApp.addFlow({ id: "F-S" + Date.now() + "c", time: tStr, type: "settle", desc: "承制方实际入账（订单 " + orderId + "）", account: "team-budget-cf-drama", amount: 0, lockedNote: "→ 星辰创作 " + window.fmtMoney(contractorIncome), operator: "系统" });
-      window.demoApp.addFlow({ id: "F-S" + Date.now() + "p", time: tStr, type: "settle", desc: "平台服务费 5% - " + orderId, account: "enterprise-main-cf", amount: 0, lockedNote: "→ 平台服务费 " + window.fmtMoney(platformFee), operator: "系统" });
+
+      // 分账提示流水（承制方入账 + 平台服务费）— 真实场景下是 contractor 钱包 + 平台账户的入账，这里以 amount=0 事件流水呈现
+      const payerWalletKey = (o && o.payerWalletKey) || "team-budget-cf-drama";
+      window.demoApp.addFlow({ id: "F-S-INC-" + Date.now(), time: tStr, type: "settle", desc: "承制方入账（订单 " + orderId + "）", account: payerWalletKey, amount: 0, _voucherAmt: contractorIncome, lockedNote: "→ 星辰创作 " + window.fmtMoney(contractorIncome), operator: "系统", subject_code: "2001", direction: "credit", related_freeze: confirmedFreezeId });
+      window.demoApp.addFlow({ id: "F-S-FEE-" + Date.now(), time: tStr, type: "settle", desc: "平台服务费 5% - " + orderId, account: "enterprise-main-cf", amount: 0, _voucherAmt: platformFee, lockedNote: "→ 平台服务费 " + window.fmtMoney(platformFee), operator: "系统", subject_code: "6001", direction: "credit", related_freeze: confirmedFreezeId });
+
       $("step3Time").textContent = tStr;
     }
 

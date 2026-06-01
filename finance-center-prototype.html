@@ -1,0 +1,2365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>资金中心原型 V2 - 骋风天合</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --surface: rgba(255,255,255,.9);
+      --surface-2: #ffffff;
+      --line: rgba(18, 28, 52, .08);
+      --text: #182236;
+      --muted: #69758d;
+      --brand: #1f57ff;
+      --brand-2: #00a6a6;
+      --brand-3: #6f46ff;
+      --ok: #17803d;
+      --warn: #d97706;
+      --danger: #cf2e2e;
+      --ink-soft: #eff4ff;
+      --shadow: 0 18px 50px rgba(30, 45, 82, .10);
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --serif: "Noto Serif SC", "Songti SC", "STSong", serif;
+      --sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(31, 87, 255, .14), transparent 32%),
+        radial-gradient(circle at top right, rgba(0, 166, 166, .12), transparent 28%),
+        linear-gradient(180deg, #fbfcff 0%, #f3f6fc 100%);
+    }
+
+    .shell { min-height: 100vh; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 18px 28px;
+      border-bottom: 1px solid rgba(18, 28, 52, .06);
+      backdrop-filter: blur(18px);
+      background: rgba(248, 250, 255, .88);
+    }
+
+    .brand {
+      min-width: 220px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .brand-kicker {
+      font-size: 11px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--brand);
+      font-weight: 800;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1;
+      font-family: var(--serif);
+    }
+
+    .brand p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .topbar-tools {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .selector,
+    .meta-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.82);
+      box-shadow: 0 10px 28px rgba(18, 28, 52, .04);
+    }
+
+    .selector label,
+    .meta-pill span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .selector select {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .meta-pill strong {
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .status-pill {
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      border: 1px solid rgba(23, 128, 61, .14);
+      background: rgba(23, 128, 61, .08);
+      color: var(--ok);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 270px 1fr;
+      gap: 24px;
+      padding: 24px 28px 32px;
+    }
+
+    .sidebar,
+    .panel,
+    .surface,
+    .hero-card {
+      background: var(--surface);
+      border: 1px solid rgba(18, 28, 52, .07);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 94px;
+      align-self: start;
+      border-radius: var(--radius-xl);
+      padding: 18px 16px;
+    }
+
+    .nav-group + .nav-group {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(18, 28, 52, .06);
+    }
+
+    .nav-title {
+      padding: 0 12px 10px;
+      font-size: 11px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .nav-btn {
+      width: 100%;
+      border: none;
+      background: transparent;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-radius: 15px;
+      cursor: pointer;
+      text-align: left;
+      color: var(--text);
+      font-size: 14px;
+      transition: transform .15s ease, background .15s ease, color .15s ease;
+    }
+
+    .nav-btn:hover {
+      background: rgba(31, 87, 255, .08);
+      color: var(--brand);
+      transform: translateX(2px);
+    }
+
+    .nav-btn.active {
+      background: linear-gradient(135deg, rgba(31, 87, 255, .14), rgba(0, 166, 166, .10));
+      color: var(--brand);
+      font-weight: 800;
+    }
+
+    .nav-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,.88);
+      border: 1px solid rgba(18, 28, 52, .06);
+      font-size: 16px;
+    }
+
+    .sidebar-block {
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(31, 87, 255, .07), rgba(0, 166, 166, .06));
+    }
+
+    .sidebar-block strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .sidebar-block span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .content { min-width: 0; }
+
+    .panel {
+      display: none;
+      border-radius: 34px;
+      padding: 26px;
+    }
+
+    .panel.active { display: block; }
+
+    .page-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .page-head h2 {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.1;
+      font-family: var(--serif);
+    }
+
+    .page-head p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+      max-width: 760px;
+    }
+
+    .page-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      height: 42px;
+      padding: 0 16px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.92);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      border-color: transparent;
+      color: #fff;
+      background: linear-gradient(135deg, var(--brand), #3a6bff);
+    }
+
+    .btn.secondary {
+      color: #075b5b;
+      border-color: rgba(0,166,166,.10);
+      background: linear-gradient(135deg, rgba(0,166,166,.16), rgba(0,166,166,.08));
+    }
+
+    .hero-card {
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      margin-bottom: 18px;
+      color: #fff;
+      background:
+        radial-gradient(circle at right top, rgba(255,255,255,.18), transparent 32%),
+        linear-gradient(135deg, #183a9e 0%, #1f57ff 46%, #00a6a6 100%);
+      overflow: hidden;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(320px, 1.1fr) .9fr;
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .hero-kicker {
+      font-size: 12px;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      opacity: .78;
+      margin-bottom: 10px;
+    }
+
+    .hero-title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .hero-balance {
+      margin-top: 14px;
+      font-size: 54px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .hero-caption {
+      margin-top: 10px;
+      font-size: 13px;
+      line-height: 1.7;
+      opacity: .88;
+      max-width: 680px;
+    }
+
+    .hero-meta {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .hero-meta-card,
+    .hero-side-card {
+      border-radius: 18px;
+      padding: 14px 15px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .hero-meta-card .label,
+    .hero-side-card .label {
+      font-size: 12px;
+      opacity: .74;
+    }
+
+    .hero-meta-card .value,
+    .hero-side-card .value {
+      margin-top: 6px;
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .hero-side {
+      display: grid;
+      gap: 12px;
+    }
+
+    .hero-side-card .sub {
+      margin-top: 6px;
+      font-size: 12px;
+      line-height: 1.6;
+      opacity: .86;
+    }
+
+    .grid-2, .grid-3, .grid-4 {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .surface {
+      border-radius: 24px;
+      padding: 18px;
+    }
+
+    .surface-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .surface-head h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .surface-head p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .metric-card .metric-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .03em;
+    }
+
+    .metric-card .metric-value {
+      margin-top: 10px;
+      font-size: 34px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .metric-card .metric-foot {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .chip-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .chip, .tag {
+      display: inline-flex;
+      align-items: center;
+      height: 28px;
+      padding: 0 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .chip { background: rgba(31,87,255,.08); color: var(--brand); }
+    .tag.blue { background: rgba(31,87,255,.10); color: var(--brand); }
+    .tag.teal { background: rgba(0,166,166,.10); color: #0b6b6b; }
+    .tag.green { background: rgba(23,128,61,.10); color: var(--ok); }
+    .tag.orange { background: rgba(217,119,6,.12); color: var(--warn); }
+    .tag.red { background: rgba(207,46,46,.10); color: var(--danger); }
+    .tag.purple { background: rgba(111,70,255,.10); color: var(--brand-3); }
+
+    .notice-list, .record-list, .list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .notice-item, .record-item, .list-item, .timeline-item, .queue-item {
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(18,28,52,.05);
+      background: rgba(245, 248, 255, .95);
+    }
+
+    .notice-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .notice-item.warn { background: rgba(255, 246, 232, .95); }
+    .notice-item.danger { background: rgba(255, 241, 241, .95); }
+    .notice-item.ok { background: rgba(240, 251, 245, .95); }
+
+    .notice-main strong,
+    .record-item strong,
+    .list-item strong,
+    .queue-item strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .notice-main span,
+    .record-item span,
+    .list-item span,
+    .queue-item span,
+    .timeline-meta,
+    .tiny {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .record-item {
+      display: grid;
+      grid-template-columns: 120px 1fr 120px 100px;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .split-metric {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .split-metric .cell {
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(245,248,255,.96);
+    }
+
+    .split-metric .cell .label {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .split-metric .cell .value {
+      margin-top: 6px;
+      font-size: 16px;
+      font-weight: 900;
+    }
+
+    .account-card {
+      border-radius: 22px;
+      padding: 18px;
+      border: 1px solid rgba(18,28,52,.07);
+      background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(245,248,255,.94));
+    }
+
+    .account-card.current {
+      box-shadow: 0 16px 32px rgba(31,87,255,.10);
+      border-color: rgba(31,87,255,.18);
+    }
+
+    .account-card h4 {
+      margin: 10px 0 6px;
+      font-size: 18px;
+    }
+
+    .account-card .sub {
+      color: var(--muted);
+      font-size: 12px;
+      min-height: 18px;
+    }
+
+    .account-card .amount {
+      margin-top: 14px;
+      font-size: 38px;
+      font-weight: 900;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border-radius: 18px;
+      border: 1px solid rgba(18,28,52,.06);
+      background: rgba(255,255,255,.94);
+    }
+
+    table {
+      width: 100%;
+      min-width: 900px;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 14px 14px;
+      border-bottom: 1px solid rgba(18,28,52,.06);
+      text-align: left;
+      vertical-align: top;
+      font-size: 13px;
+    }
+
+    th {
+      background: rgba(247,249,255,.96);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    .amt-in { color: var(--ok); font-weight: 900; }
+    .amt-out { color: var(--danger); font-weight: 900; }
+    .amt-warn { color: var(--warn); font-weight: 900; }
+
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      height: 34px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.94);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .chart-box {
+      padding: 12px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(250,252,255,.96), rgba(244,247,255,.92));
+      border: 1px solid rgba(18,28,52,.05);
+    }
+
+    .chart-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      flex-wrap: wrap;
+    }
+
+    .chart-meta strong {
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 10px;
+    }
+
+    .stack-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 120px;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .stack-name {
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .stack-bar {
+      height: 14px;
+      border-radius: 999px;
+      background: rgba(18,28,52,.06);
+      overflow: hidden;
+      display: flex;
+    }
+
+    .stack-a { background: linear-gradient(90deg, #1f57ff, #4c7bff); }
+    .stack-b { background: linear-gradient(90deg, #00a6a6, #32c4c4); }
+    .stack-c { background: linear-gradient(90deg, #ffb347, #ff8c42); }
+    .stack-d { background: linear-gradient(90deg, #6f46ff, #9372ff); }
+
+    .method-card {
+      border-radius: 22px;
+      padding: 18px;
+      border: 1px solid rgba(18,28,52,.07);
+      background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(244,248,255,.94));
+    }
+
+    .method-card h4 {
+      margin: 10px 0 6px;
+      font-size: 18px;
+    }
+
+    .method-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .method-card .big {
+      margin-top: 16px;
+      font-size: 30px;
+      font-weight: 900;
+    }
+
+    .field {
+      margin-top: 14px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .field input, .field select {
+      width: 100%;
+      height: 40px;
+      border-radius: 12px;
+      border: 1px solid rgba(18,28,52,.10);
+      padding: 0 12px;
+      background: rgba(255,255,255,.96);
+      outline: none;
+      font-size: 14px;
+    }
+
+    .security-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .security-card {
+      border-radius: 22px;
+      padding: 20px;
+      border: 1px solid rgba(18,28,52,.07);
+      background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(244,247,255,.94));
+    }
+
+    .security-card h4 {
+      margin: 0 0 6px;
+      font-size: 18px;
+    }
+
+    .security-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .security-state {
+      margin-top: 16px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(244,247,255,.95);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .timeline {
+      position: relative;
+      display: grid;
+      gap: 12px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 17px;
+      top: 6px;
+      bottom: 6px;
+      width: 2px;
+      background: rgba(31,87,255,.14);
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-left: 48px;
+      background: rgba(247,249,255,.96);
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: 10px;
+      top: 18px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      border: 4px solid var(--brand);
+      box-sizing: border-box;
+    }
+
+    .timeline-item.done::before { border-color: var(--ok); }
+    .timeline-item.warn::before { border-color: var(--warn); }
+
+    .timeline-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .queue {
+      display: grid;
+      gap: 12px;
+    }
+
+    .queue-item {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr .7fr .7fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    @media (max-width: 1280px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+      .hero-grid, .grid-2, .grid-3, .grid-4, .security-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 760px) {
+      .topbar, .layout { padding-left: 16px; padding-right: 16px; }
+      .panel { padding: 18px; border-radius: 24px; }
+      .hero-card { padding: 20px; }
+      .hero-balance { font-size: 40px; }
+      .hero-meta { grid-template-columns: 1fr 1fr; }
+      .record-item, .queue-item, .stack-row { grid-template-columns: 1fr; }
+      .split-metric { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-kicker">Finance Center Prototype V2</div>
+        <h1>资金中心</h1>
+        <p>团队预算、订单资金、后台财务一体化原型</p>
+      </div>
+      <div class="topbar-tools">
+        <div class="selector">
+          <label for="teamSelect">当前团队</label>
+          <select id="teamSelect"></select>
+        </div>
+        <div class="meta-pill"><span>预算口径</span><strong id="topAccountLabel">团队预算账户</strong></div>
+        <div class="meta-pill"><span>本月净支出</span><strong id="topMonthlyBurn">¥ 0</strong></div>
+        <div class="status-pill" id="topStatus">团队预算正常</div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="nav-group">
+          <div class="nav-title">前台</div>
+          <button class="nav-btn active" data-panel="overview"><span class="nav-icon">◎</span><span>资金总览</span></button>
+          <button class="nav-btn" data-panel="accounts"><span class="nav-icon">◌</span><span>账户</span></button>
+          <button class="nav-btn" data-panel="transactions"><span class="nav-icon">↹</span><span>交易流水</span></button>
+          <button class="nav-btn" data-panel="bills"><span class="nav-icon">◫</span><span>账单中心</span></button>
+          <button class="nav-btn" data-panel="invoices"><span class="nav-icon">▣</span><span>发票中心</span></button>
+          <button class="nav-btn" data-panel="recharge"><span class="nav-icon">＋</span><span>充值中心</span></button>
+          <button class="nav-btn" data-panel="withdraw"><span class="nav-icon">－</span><span>提现中心</span></button>
+          <button class="nav-btn" data-panel="security"><span class="nav-icon">⌘</span><span>支付与安全</span></button>
+        </div>
+        <div class="nav-group">
+          <div class="nav-title">订单</div>
+          <button class="nav-btn" data-panel="orderDetail"><span class="nav-icon">≣</span><span>订单资金详情</span></button>
+        </div>
+        <div class="nav-group">
+          <div class="nav-title">后台</div>
+          <button class="nav-btn" data-panel="adminOverview"><span class="nav-icon">◍</span><span>财务总览</span></button>
+          <button class="nav-btn" data-panel="adminBudget"><span class="nav-icon">▤</span><span>预算管理</span></button>
+          <button class="nav-btn" data-panel="adminAudit"><span class="nav-icon">▥</span><span>审核中心</span></button>
+          <button class="nav-btn" data-panel="adminSettlement"><span class="nav-icon">▦</span><span>结算与发票</span></button>
+        </div>
+        <div class="sidebar-block">
+          <strong>本版范围</strong>
+          <span>前台页面、订单资金详情、后台财务视图都放在同一个文件里，方便你先整体评审信息架构和视觉方向。</span>
+        </div>
+      </aside>
+
+      <main class="content">
+        <section class="panel active" id="panel-overview">
+          <div class="page-head">
+            <div>
+              <h2>资金总览</h2>
+              <p>聚焦团队预算、当月节奏、待处理事项和最近交易。</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn primary">去充值</button>
+              <button class="btn secondary">查看账单</button>
+              <button class="btn">查看流水</button>
+            </div>
+          </div>
+          <div id="overviewMount"></div>
+        </section>
+
+        <section class="panel" id="panel-accounts">
+          <div class="page-head">
+            <div>
+              <h2>账户</h2>
+              <p>按账户看资金归属与结构。</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn primary">充值到当前账户</button>
+              <button class="btn">查看账户流水</button>
+            </div>
+          </div>
+          <div id="accountsMount"></div>
+        </section>
+
+        <section class="panel" id="panel-transactions">
+          <div class="page-head">
+            <div>
+              <h2>交易流水</h2>
+              <p>逐笔展示充值、锁资、退款、结算、划拨和提现。</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn primary">导出流水</button>
+              <button class="btn">按订单查看</button>
+            </div>
+          </div>
+          <div id="transactionsMount"></div>
+        </section>
+
+        <section class="panel" id="panel-bills">
+          <div class="page-head">
+            <div>
+              <h2>账单中心</h2>
+              <p>按月聚合收入、支出、退款回补、服务费和待开票额。</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn primary">下载账单</button>
+              <button class="btn">查看当月流水</button>
+            </div>
+          </div>
+          <div id="billsMount"></div>
+        </section>
+
+        <section class="panel" id="panel-invoices">
+          <div class="page-head">
+            <div>
+              <h2>发票中心</h2>
+              <p>可开票订单、申请记录、已开具发票与抬头信息集中处理。</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn primary">申请开票</button>
+              <button class="btn">管理抬头</button>
+            </div>
+          </div>
+          <div id="invoicesMount"></div>
+        </section>
+
+        <section class="panel" id="panel-recharge">
+          <div class="page-head">
+            <div>
+              <h2>充值中心</h2>
+              <p>在线充值、对公转账、企业总池划拨统一承接。</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn primary">立即充值</button>
+              <button class="btn">上传转账凭证</button>
+            </div>
+          </div>
+          <div id="rechargeMount"></div>
+        </section>
+
+        <section class="panel" id="panel-withdraw">
+          <div class="page-head">
+            <div>
+              <h2>提现中心</h2>
+              <p>仅面向个人收益账户，展示可提现余额与申请记录。</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn primary">提交提现</button>
+              <button class="btn">查看到账记录</button>
+            </div>
+          </div>
+          <div id="withdrawMount"></div>
+        </section>
+
+        <section class="panel" id="panel-security">
+          <div class="page-head">
+            <div>
+              <h2>支付与安全</h2>
+              <p>支付工具、支付密码、限额与二次校验。</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn primary">新增银行卡</button>
+              <button class="btn">修改支付密码</button>
+            </div>
+          </div>
+          <div id="securityMount"></div>
+        </section>
+
+        <section class="panel" id="panel-orderDetail">
+          <div class="page-head">
+            <div>
+              <h2>订单资金详情</h2>
+              <p>订单视角查看金额、付款主体、锁资轨迹、结算与发票。</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn primary">查看订单详情</button>
+              <button class="btn">查看关联流水</button>
+            </div>
+          </div>
+          <div id="orderDetailMount"></div>
+        </section>
+
+        <section class="panel" id="panel-adminOverview">
+          <div class="page-head">
+            <div>
+              <h2>财务总览</h2>
+              <p>企业总池、预算分配、待审核事项与当月支出趋势。</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn primary">导出企业报表</button>
+              <button class="btn">查看异常事件</button>
+            </div>
+          </div>
+          <div id="adminOverviewMount"></div>
+        </section>
+
+        <section class="panel" id="panel-adminBudget">
+          <div class="page-head">
+            <div>
+              <h2>预算管理</h2>
+              <p>查看各团队预算分配、使用率、冻结额和追加动作。</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn primary">新增划拨</button>
+              <button class="btn">回收预算</button>
+            </div>
+          </div>
+          <div id="adminBudgetMount"></div>
+        </section>
+
+        <section class="panel" id="panel-adminAudit">
+          <div class="page-head">
+            <div>
+              <h2>审核中心</h2>
+              <p>集中承接对公充值审核与提现打款审核。</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn primary">批量通过</button>
+              <button class="btn">导出待审列表</button>
+            </div>
+          </div>
+          <div id="adminAuditMount"></div>
+        </section>
+
+        <section class="panel" id="panel-adminSettlement">
+          <div class="page-head">
+            <div>
+              <h2>结算与发票</h2>
+              <p>查看待结算订单、平台服务费、待开发票与已回传票据。</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn primary">执行结算</button>
+              <button class="btn">开票处理</button>
+            </div>
+          </div>
+          <div id="adminSettlementMount"></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const data = {
+      drama: {
+        name: "短剧制作中心",
+        accountLabel: "团队预算账户",
+        status: "团队预算正常",
+        monthlyBurn: 156240,
+        overview: {
+          title: "短剧制作中心 - 团队预算账户",
+          available: 2140064,
+          frozen: 186200,
+          pending: 48200,
+          invoiceReady: 79195,
+          caption: "当前团队预算充足，5 月集中支出来自 3 个在制项目与 1 笔争议冻结。",
+          metrics: [
+            { label: "本月支出", value: "¥ 168,240", foot: "较上月 +12.8%" },
+            { label: "本月已结算", value: "¥ 92,510", foot: "7 笔" },
+            { label: "待开票金额", value: "¥ 79,195", foot: "3 笔订单" },
+            { label: "异常冻结", value: "¥ 12,000", foot: "1 笔争议" }
+          ],
+          trendLabels: ["01", "02", "03", "04", "05", "06"],
+          trendIn: [42000, 36000, 58000, 18000, 42000, 30000],
+          trendOut: [98000, 102000, 88000, 132880, 168240, 74100],
+          composition: [
+            { name: "短视频制作", values: [62, 22, 10, 6], meta: "制作 62%" },
+            { name: "海报与视觉", values: [48, 28, 14, 10], meta: "视觉 48%" },
+            { name: "配音与后期", values: [35, 40, 12, 13], meta: "后期 35%" }
+          ],
+          pending: [
+            { kind: "warn", title: "4 笔锁资超过 7 天", meta: "涉及 OD-2026052607、OD-2026051902、OD-2026051809、OD-2026051702。", action: "查看订单" },
+            { kind: "danger", title: "Q2 剩余预算低于安全阈值", meta: "若 6 月维持当前消耗节奏，预计 23 天后触碰阈值。", action: "申请追加" },
+            { kind: "ok", title: "3 笔订单进入可开票池", meta: "合计 ¥79,195，可批量申请专票。", action: "去开票" }
+          ],
+          recent: [
+            ["2026-05-26 18:14", "订单锁资", "三集短剧解说视频", "-¥ 48,000", "锁资中", "OD-2026052607"],
+            ["2026-05-25 15:08", "预算划拨", "企业总池追加预算", "+¥ 200,000", "已到账", "AL-2026052502"],
+            ["2026-05-24 11:41", "订单结算", "IP 海报系列", "-¥ 28,000", "已结算", "OD-2026051809"],
+            ["2026-05-21 16:00", "退款回补", "海报重制争议", "+¥ 6,000", "处理中", "RF-2026052103"]
+          ]
+        },
+        accounts: [
+          { name: "短剧制作中心 - 团队预算账户", badge: "当前团队主账户", amount: "¥ 2,140,064", sub: "业务消费、锁资、退款回补", current: true, stats: [["可用余额", "¥ 2,140,064"], ["冻结金额", "¥ 186,200"], ["本月已用", "¥ 168,240"], ["待入账", "¥ 48,200"]] },
+          { name: "昭岚 - 个人收益账户", badge: "个人收益账户", amount: "¥ 29,800", sub: "结算收入与提现", current: false, stats: [["可提现", "¥ 21,000"], ["审核中提现", "¥ 8,000"], ["本月收入", "¥ 17,800"], ["结算单数", "4 笔"]] },
+          { name: "骋风天合 - 企业总池", badge: "企业总池", amount: "¥ 12,500,000", sub: "预算来源与统一补给", current: false, stats: [["已分配预算", "¥ 4,560,000"], ["待审核充值", "¥ 300,000"], ["团队数", "6 个"], ["本月划拨", "¥ 850,000"]] }
+        ],
+        accountStructure: [
+          { name: "可用余额", values: [68, 18, 9, 5], meta: "可用 / 锁资 / 待入账 / 争议冻结" },
+          { name: "预算来源", values: [72, 14, 14, 0], meta: "企业划拨 / 在线充值 / 回补" },
+          { name: "支出构成", values: [62, 18, 11, 9], meta: "制作 / 视觉 / 后期 / 服务费" }
+        ],
+        transactions: {
+          totals: [["收入与回补", "¥ 206,000"], ["支出与结算", "¥ 88,000"], ["锁资中", "¥ 48,000"]],
+          rows: [
+            ["2026-05-26 18:14", "锁资", "短剧制作中心 - 团队预算账户", "平台锁资池", "锁资中", "-¥ 48,000", "OD-2026052607", "voucher_8012"],
+            ["2026-05-25 15:08", "预算划拨", "企业总池", "短剧制作中心 - 团队预算账户", "已到账", "+¥ 200,000", "AL-2026052502", "voucher_7998"],
+            ["2026-05-24 11:41", "结算", "短剧制作中心 - 团队预算账户", "星辰创作工作室", "已结算", "-¥ 28,000", "OD-2026051809", "voucher_7984"],
+            ["2026-05-21 16:00", "退款", "平台退款池", "短剧制作中心 - 团队预算账户", "处理中", "+¥ 6,000", "RF-2026052103", "voucher_7941"],
+            ["2026-05-20 09:33", "锁资", "短剧制作中心 - 团队预算账户", "平台锁资池", "已解冻", "-¥ 12,000", "OD-2026051702", "voucher_7927"]
+          ],
+          selected: {
+            title: "voucher_8012",
+            type: "锁资",
+            time: "2026-05-26 18:14",
+            accountOut: "短剧制作中心 - 团队预算账户",
+            accountIn: "平台锁资池",
+            amount: "-¥ 48,000",
+            order: "OD-2026052607 / 三集短剧解说视频",
+            operator: "昭岚",
+            stateFlow: ["创建锁资单", "余额校验通过", "冻结团队预算", "等待履约推进"]
+          }
+        },
+        bills: {
+          summary: [["本月支出", "¥ 168,240"], ["退款回补", "¥ 12,000"], ["平台服务费", "¥ 11,840"], ["本月净支出", "¥ 156,240"]],
+          trendLabels: ["2025-12", "2026-01", "2026-02", "2026-03", "2026-04", "2026-05"],
+          trendValues: [88000, 92000, 76000, 98000, 132880, 168240],
+          segments: [
+            { name: "短视频制作", values: [62, 22, 10, 6], meta: "主支出" },
+            { name: "海报与视觉", values: [48, 28, 14, 10], meta: "设计费用" },
+            { name: "配音与后期", values: [35, 40, 12, 13], meta: "后期处理" }
+          ],
+          monthly: [
+            ["2026-05", "¥ 42,000", "¥ 168,240", "¥ 12,000", "¥ 11,840", "¥ -126,240", "¥ 79,195"],
+            ["2026-04", "¥ 18,000", "¥ 132,880", "¥ 0", "¥ 9,420", "¥ -124,300", "¥ 58,000"],
+            ["2026-03", "¥ 0", "¥ 98,000", "¥ 15,500", "¥ 7,100", "¥ -89,600", "¥ 44,200"]
+          ]
+        },
+        invoices: {
+          summary: [["可开票金额", "¥ 79,195"], ["已申请开票", "¥ 26,800"], ["已开票金额", "¥ 112,000"], ["待补资料", "2 笔"]],
+          orderList: [
+            ["OD-2026051809", "IP 海报系列", "2026-05-24", "¥ 28,000", "骋风天合（北京）文化传媒有限公司"],
+            ["OD-2026051105", "角色海报重绘", "2026-05-19", "¥ 16,300", "骋风天合（北京）文化传媒有限公司"],
+            ["OD-2026050203", "预告片后期包装", "2026-05-12", "¥ 34,895", "骋风天合（北京）文化传媒有限公司"]
+          ],
+          records: [
+            ["2026-05-24 16:32", "INV-2026052402", "专票", "¥ 26,800", "审核中", "OD-2026051105 / OD-2026050203"],
+            ["2026-05-10 11:08", "INV-2026051001", "普票", "¥ 18,400", "已开具", "OD-2026042604"]
+          ],
+          issued: [
+            ["051002600412", "骋风天合（北京）文化传媒有限公司", "专票", "¥ 18,400", "2026-05-12", "电子票已回传"],
+            ["051002600301", "骋风天合（北京）文化传媒有限公司", "普票", "¥ 12,000", "2026-04-16", "纸票已寄出"]
+          ],
+          titles: [
+            ["骋风天合（北京）文化传媒有限公司", "91110108MA01XXXXXX", "专票默认抬头"],
+            ["骋风天合数字内容中心", "91110108MA01YYYYYY", "普票备用抬头"]
+          ]
+        },
+        recharge: {
+          target: "短剧制作中心 - 团队预算账户",
+          balance: "¥ 2,140,064",
+          methods: [
+            ["企业总池划拨", "当前推荐", "适合团队预算追加"],
+            ["在线充值", "实时到账", "适合紧急补单"],
+            ["对公转账", "财务审核", "适合大额补充"]
+          ],
+          records: [
+            ["2026-05-25 15:08", "企业总池划拨", "¥ 200,000", "已到账"],
+            ["2026-05-12 09:32", "对公转账", "¥ 300,000", "审核中"],
+            ["2026-05-03 20:05", "在线充值", "¥ 50,000", "已到账"]
+          ]
+        },
+        withdraw: {
+          available: "¥ 21,000",
+          account: "昭岚 - 个人收益账户",
+          summary: [["累计收益", "¥ 29,800"], ["已提现", "¥ 8,800"], ["处理中", "¥ 8,000"], ["本次可提", "¥ 21,000"]],
+          records: [
+            ["2026-05-21 14:02", "WD-2026052101", "¥ 8,000", "审核中", "中国建设银行 8826"],
+            ["2026-05-08 10:20", "WD-2026050802", "¥ 6,000", "已到账", "招商银行 2091"],
+            ["2026-04-27 18:44", "WD-2026042701", "¥ 4,500", "已驳回", "中国建设银行 8826"]
+          ]
+        },
+        security: [
+          ["支付方式", "已绑定 2 张银行卡与 1 个企业对公账户。", "已配置"],
+          ["支付密码", "最近修改 2026-04-21。", "已开启"],
+          ["支付限额", "单笔支付上限 ¥200,000。", "运行中"],
+          ["二次校验", "大额与异常设备会触发短信校验。", "已开启"]
+        ],
+        orderDetail: {
+          orderNo: "OD-2026052607",
+          title: "三集短剧解说视频（修仙题材）",
+          amount: "¥ 48,000",
+          payer: "短剧制作中心 - 团队预算账户",
+          contractor: "星辰创作工作室",
+          status: "锁资中",
+          summary: [["订单金额", "¥ 48,000"], ["已锁资", "¥ 48,000"], ["已结算", "¥ 0"], ["可开票", "¥ 0"]],
+          timeline: [
+            { state: "done", title: "创建订单", time: "2026-05-26 18:10", meta: "订单创建成功，付款主体已锁定到短剧制作中心。" },
+            { state: "done", title: "发起锁资", time: "2026-05-26 18:14", meta: "冻结团队预算 ¥48,000，生成 voucher_8012。" },
+            { state: "warn", title: "等待履约推进", time: "进行中", meta: "当前处于创作阶段，尚未进入验收与结算。" },
+            { state: "", title: "验收后结算", time: "待发生", meta: "结算后将进入承制方收益账户，并产生可开票金额。" }
+          ],
+          vouchers: [
+            ["voucher_8012", "锁资", "-¥ 48,000", "2026-05-26 18:14", "已生效"],
+            ["voucher_8013", "服务费预估", "¥ 2,880", "2026-05-26 18:14", "待结算"]
+          ]
+        }
+      },
+      marketing: {
+        name: "市场宣传组",
+        accountLabel: "团队预算账户",
+        status: "待补预算",
+        monthlyBurn: 76210,
+        overview: {
+          title: "市场宣传组 - 团队预算账户",
+          available: 624300,
+          frozen: 82000,
+          pending: 16000,
+          invoiceReady: 31880,
+          caption: "5 月营销支出更加碎片化，以多笔小额锁资和快速结算为主。",
+          metrics: [
+            { label: "本月支出", value: "¥ 84,210", foot: "较上月 +6.3%" },
+            { label: "本月已结算", value: "¥ 71,600", foot: "9 笔" },
+            { label: "待开票金额", value: "¥ 31,880", foot: "2 笔订单" },
+            { label: "异常冻结", value: "¥ 0", foot: "无争议冻结" }
+          ],
+          trendLabels: ["01", "02", "03", "04", "05", "06"],
+          trendIn: [8000, 12000, 0, 0, 6000, 4000],
+          trendOut: [62000, 70000, 64300, 76330, 84210, 31000],
+          composition: [
+            { name: "短视频投放", values: [58, 22, 11, 9], meta: "投放 58%" },
+            { name: "视觉物料", values: [46, 34, 10, 10], meta: "物料 46%" },
+            { name: "传播文案", values: [29, 51, 8, 12], meta: "文案 29%" }
+          ],
+          pending: [
+            { kind: "warn", title: "可用余额接近安全阈值", meta: "若下周继续上线 2 个视频包，预计需追加预算 ¥80,000。", action: "去充值" },
+            { kind: "ok", title: "2 笔订单进入可开票池", meta: "合计 ¥31,880，可在月末合并开票。", action: "去开票" }
+          ],
+          recent: [
+            ["2026-05-26 09:20", "订单结算", "营销短视频制作包", "-¥ 22,000", "已结算", "OD-2026052603"],
+            ["2026-05-24 13:50", "退款回补", "视频改版取消", "+¥ 8,000", "处理中", "RF-2026052401"],
+            ["2026-05-22 10:03", "订单锁资", "海报素材包", "-¥ 12,000", "锁资中", "OD-2026052202"]
+          ]
+        },
+        accounts: [
+          { name: "市场宣传组 - 团队预算账户", badge: "当前团队主账户", amount: "¥ 624,300", sub: "营销投放、素材采购、活动支出", current: true, stats: [["可用余额", "¥ 624,300"], ["冻结金额", "¥ 82,000"], ["本月已用", "¥ 84,210"], ["待入账", "¥ 16,000"]] },
+          { name: "市场素材采购个人收益账户", badge: "个人收益账户", amount: "¥ 9,200", sub: "个人收益提现", current: false, stats: [["可提现", "¥ 9,200"], ["审核中提现", "¥ 0"], ["本月收入", "¥ 3,100"], ["结算单数", "2 笔"]] },
+          { name: "骋风天合 - 企业总池", badge: "企业总池", amount: "¥ 12,500,000", sub: "统一预算来源", current: false, stats: [["已分配预算", "¥ 4,560,000"], ["待审核充值", "¥ 300,000"], ["团队数", "6 个"], ["本月划拨", "¥ 850,000"]] }
+        ],
+        accountStructure: [
+          { name: "可用余额", values: [61, 20, 12, 7], meta: "可用 / 锁资 / 待入账 / 预留" },
+          { name: "预算来源", values: [77, 9, 14, 0], meta: "企业划拨 / 在线充值 / 回补" },
+          { name: "支出构成", values: [58, 22, 12, 8], meta: "投放 / 视觉 / 文案 / 服务费" }
+        ],
+        transactions: {
+          totals: [["收入与回补", "¥ 8,000"], ["支出与结算", "¥ 22,000"], ["锁资中", "¥ 12,000"]],
+          rows: [
+            ["2026-05-26 09:20", "结算", "市场宣传组 - 团队预算账户", "内容承接方", "已结算", "-¥ 22,000", "OD-2026052603", "voucher_9102"],
+            ["2026-05-24 13:50", "退款", "平台退款池", "市场宣传组 - 团队预算账户", "处理中", "+¥ 8,000", "RF-2026052401", "voucher_9070"],
+            ["2026-05-22 10:03", "锁资", "市场宣传组 - 团队预算账户", "平台锁资池", "锁资中", "-¥ 12,000", "OD-2026052202", "voucher_9021"]
+          ],
+          selected: {
+            title: "voucher_9102",
+            type: "结算",
+            time: "2026-05-26 09:20",
+            accountOut: "市场宣传组 - 团队预算账户",
+            accountIn: "内容承接方收益账户",
+            amount: "-¥ 22,000",
+            order: "OD-2026052603 / 营销短视频制作包",
+            operator: "陈思齐",
+            stateFlow: ["锁资完成", "交付验收通过", "平台服务费拆分", "结算完成"]
+          }
+        },
+        bills: {
+          summary: [["本月支出", "¥ 84,210"], ["退款回补", "¥ 8,000"], ["平台服务费", "¥ 5,260"], ["本月净支出", "¥ 76,210"]],
+          trendLabels: ["2025-12", "2026-01", "2026-02", "2026-03", "2026-04", "2026-05"],
+          trendValues: [62000, 70000, 64300, 70080, 76330, 84210],
+          segments: [
+            { name: "短视频投放", values: [58, 22, 11, 9], meta: "主支出" },
+            { name: "视觉物料", values: [46, 34, 10, 10], meta: "设计物料" },
+            { name: "传播文案", values: [29, 51, 8, 12], meta: "文案执行" }
+          ],
+          monthly: [
+            ["2026-05", "¥ 6,000", "¥ 84,210", "¥ 8,000", "¥ 5,260", "¥ -78,210", "¥ 31,880"],
+            ["2026-04", "¥ 0", "¥ 76,330", "¥ 0", "¥ 4,820", "¥ -81,150", "¥ 26,300"]
+          ]
+        },
+        invoices: {
+          summary: [["可开票金额", "¥ 31,880"], ["已申请开票", "¥ 12,000"], ["已开票金额", "¥ 86,000"], ["待补资料", "0 笔"]],
+          orderList: [
+            ["OD-2026052603", "营销短视频制作包", "2026-05-26", "¥ 22,000", "骋风天合（北京）文化传媒有限公司"],
+            ["OD-2026051904", "海报素材包", "2026-05-19", "¥ 9,880", "骋风天合（北京）文化传媒有限公司"]
+          ],
+          records: [["2026-05-20 15:20", "INV-2026052001", "普票", "¥ 12,000", "已开具", "OD-2026051101"]],
+          issued: [["051002601115", "骋风天合（北京）文化传媒有限公司", "普票", "¥ 12,000", "2026-05-21", "电子票已回传"]],
+          titles: [["骋风天合（北京）文化传媒有限公司", "91110108MA01XXXXXX", "普票默认抬头"]]
+        },
+        recharge: {
+          target: "市场宣传组 - 团队预算账户",
+          balance: "¥ 624,300",
+          methods: [
+            ["企业总池划拨", "当前推荐", "月度预算补充"],
+            ["在线充值", "实时到账", "临时补充"],
+            ["对公转账", "财务审核", "大额补给"]
+          ],
+          records: [
+            ["2026-05-14 10:08", "企业总池划拨", "¥ 100,000", "已到账"],
+            ["2026-05-09 08:32", "在线充值", "¥ 20,000", "已到账"]
+          ]
+        },
+        withdraw: {
+          available: "¥ 9,200",
+          account: "市场素材采购个人收益账户",
+          summary: [["累计收益", "¥ 9,200"], ["已提现", "¥ 3,000"], ["处理中", "¥ 0"], ["本次可提", "¥ 9,200"]],
+          records: [["2026-05-06 11:12", "WD-2026050601", "¥ 3,000", "已到账", "招商银行 2091"]]
+        },
+        security: [
+          ["支付方式", "已绑定 1 张银行卡与企业对公账户。", "已配置"],
+          ["支付密码", "最近修改 2026-03-18。", "已开启"],
+          ["支付限额", "单笔支付上限 ¥100,000。", "运行中"],
+          ["二次校验", "超过 ¥50,000 自动通知团队负责人。", "已开启"]
+        ],
+        orderDetail: {
+          orderNo: "OD-2026052603",
+          title: "营销短视频制作包",
+          amount: "¥ 22,000",
+          payer: "市场宣传组 - 团队预算账户",
+          contractor: "内容承接方",
+          status: "已结算",
+          summary: [["订单金额", "¥ 22,000"], ["已锁资", "¥ 22,000"], ["已结算", "¥ 22,000"], ["可开票", "¥ 22,000"]],
+          timeline: [
+            { state: "done", title: "创建订单", time: "2026-05-18 10:06", meta: "确认付款主体为市场宣传组。" },
+            { state: "done", title: "完成锁资", time: "2026-05-18 10:10", meta: "冻结团队预算 ¥22,000。" },
+            { state: "done", title: "验收通过", time: "2026-05-25 17:20", meta: "交付验收通过，进入结算。" },
+            { state: "done", title: "结算完成", time: "2026-05-26 09:20", meta: "承接方收益入账，可开票金额同步生成。" }
+          ],
+          vouchers: [
+            ["voucher_9098", "锁资", "-¥ 22,000", "2026-05-18 10:10", "已生效"],
+            ["voucher_9102", "结算", "-¥ 22,000", "2026-05-26 09:20", "已结算"]
+          ]
+        }
+      },
+      admin: {
+        summary: [["企业总池可用", "¥ 12,500,000"], ["已分配预算", "¥ 4,560,000"], ["待审核充值", "¥ 300,000"], ["待审核提现", "¥ 86,000"]],
+        trendLabels: ["01", "02", "03", "04", "05", "06"],
+        trendValues: [312000, 288000, 352000, 404000, 468000, 252000],
+        teams: [
+          ["短剧制作中心", "¥ 2,140,064", "¥ 186,200", "¥ 168,240", "18%", "追加中"],
+          ["市场宣传组", "¥ 624,300", "¥ 82,000", "¥ 84,210", "9%", "正常"],
+          ["IP 孵化组", "¥ 210,000", "¥ 0", "¥ 32,800", "5%", "低使用率"],
+          ["品牌合作组", "¥ 870,000", "¥ 44,000", "¥ 121,900", "26%", "正常"]
+        ],
+        queues: {
+          recharge: [
+            ["RC-2026051201", "对公转账充值", "¥ 300,000", "短剧制作中心", "待财务审核"],
+            ["RC-2026051103", "对公转账充值", "¥ 120,000", "品牌合作组", "待补凭证"]
+          ],
+          withdraw: [
+            ["WD-2026052101", "昭岚", "¥ 8,000", "中国建设银行 8826", "待打款"],
+            ["WD-2026052004", "陈思齐", "¥ 12,000", "招商银行 2091", "待风控复核"]
+          ],
+          settlement: [
+            ["SET-2026052601", "OD-2026052607", "¥ 48,000", "短剧制作中心", "待验收后结算"],
+            ["SET-2026052503", "OD-2026052202", "¥ 12,000", "市场宣传组", "待退款处理"]
+          ],
+          invoice: [
+            ["INV-2026052402", "骋风天合（北京）文化传媒有限公司", "¥ 26,800", "专票", "待开票"],
+            ["INV-2026052307", "骋风天合数字内容中心", "¥ 18,400", "普票", "待回传电子票"]
+          ]
+        }
+      }
+    };
+
+    const navButtons = [...document.querySelectorAll(".nav-btn")];
+    const panels = [...document.querySelectorAll(".panel")];
+    const teamSelect = document.getElementById("teamSelect");
+
+    Object.entries(data).filter(([key]) => key !== "admin").forEach(([key, item]) => {
+      const option = document.createElement("option");
+      option.value = key;
+      option.textContent = item.name;
+      teamSelect.appendChild(option);
+    });
+
+    function fmtMoney(value) {
+      return "¥ " + Number(value).toLocaleString("zh-CN");
+    }
+
+    function lineChartSVG(labels, arrA, arrB, colorA, colorB) {
+      const width = 560;
+      const height = 220;
+      const padX = 26;
+      const padTop = 18;
+      const padBottom = 34;
+      const padRight = 20;
+      const max = Math.max(...arrA, ...(arrB || arrA)) * 1.12;
+      const usableW = width - padX - padRight;
+      const usableH = height - padTop - padBottom;
+
+      function point(idx, val) {
+        const x = padX + (usableW / Math.max(labels.length - 1, 1)) * idx;
+        const y = padTop + usableH - (val / max) * usableH;
+        return [x, y];
+      }
+
+      function poly(values) {
+        return values.map((val, idx) => point(idx, val).join(",")).join(" ");
+      }
+
+      function area(values) {
+        const pts = values.map((val, idx) => point(idx, val));
+        const start = `${pts[0][0]},${height - padBottom}`;
+        const end = `${pts[pts.length - 1][0]},${height - padBottom}`;
+        return [start, ...pts.map(p => p.join(",")), end].join(" ");
+      }
+
+      const grid = [0, .25, .5, .75, 1].map(step => {
+        const y = padTop + usableH - usableH * step;
+        return `<line x1="${padX}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="rgba(18,28,52,.08)" stroke-dasharray="4 6"/>`;
+      }).join("");
+
+      const labelsSvg = labels.map((label, idx) => {
+        const [x] = point(idx, 0);
+        return `<text x="${x}" y="${height - 12}" text-anchor="middle" fill="#69758d" font-size="11">${label}</text>`;
+      }).join("");
+
+      const second = arrB ? `
+        <polygon points="${area(arrB)}" fill="rgba(0,166,166,.10)"></polygon>
+        <polyline points="${poly(arrB)}" fill="none" stroke="${colorB}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
+      ` : "";
+
+      return `
+        <svg viewBox="0 0 ${width} ${height}" width="100%" height="220" role="img" aria-label="趋势图">
+          ${grid}
+          <polygon points="${area(arrA)}" fill="rgba(31,87,255,.12)"></polygon>
+          <polyline points="${poly(arrA)}" fill="none" stroke="${colorA}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></polyline>
+          ${second}
+          ${labelsSvg}
+        </svg>
+      `;
+    }
+
+    function donutSVG(segments) {
+      const size = 220;
+      const r = 78;
+      const c = 2 * Math.PI * r;
+      let offset = 0;
+      const colors = ["#1f57ff", "#00a6a6", "#ff9b45", "#6f46ff"];
+      const circles = segments.map((value, idx) => {
+        const dash = c * value / 100;
+        const node = `<circle cx="110" cy="110" r="${r}" fill="none" stroke="${colors[idx]}" stroke-width="20" stroke-linecap="round" stroke-dasharray="${dash} ${c - dash}" stroke-dashoffset="${-offset}" transform="rotate(-90 110 110)"></circle>`;
+        offset += dash;
+        return node;
+      }).join("");
+      return `
+        <svg viewBox="0 0 ${size} ${size}" width="100%" height="220" role="img" aria-label="占比图">
+          <circle cx="110" cy="110" r="${r}" fill="none" stroke="rgba(18,28,52,.06)" stroke-width="20"></circle>
+          ${circles}
+          <text x="110" y="102" text-anchor="middle" font-size="14" fill="#69758d">预算结构</text>
+          <text x="110" y="128" text-anchor="middle" font-size="26" font-weight="800" fill="#182236">${segments[0]}%</text>
+        </svg>
+      `;
+    }
+
+    function renderOverview(team) {
+      const el = document.getElementById("overviewMount");
+      el.innerHTML = `
+        <div class="hero-card">
+          <div class="hero-grid">
+            <div>
+              <div class="hero-kicker">Current Team Budget</div>
+              <h3 class="hero-title">${team.overview.title}</h3>
+              <div class="hero-balance">${fmtMoney(team.overview.available)}</div>
+              <div class="hero-caption">${team.overview.caption}</div>
+              <div class="hero-meta">
+                <div class="hero-meta-card"><div class="label">冻结金额</div><div class="value">${fmtMoney(team.overview.frozen)}</div></div>
+                <div class="hero-meta-card"><div class="label">待入账</div><div class="value">${fmtMoney(team.overview.pending)}</div></div>
+                <div class="hero-meta-card"><div class="label">待开票</div><div class="value">${fmtMoney(team.overview.invoiceReady)}</div></div>
+                <div class="hero-meta-card"><div class="label">本月净支出</div><div class="value">${fmtMoney(team.monthlyBurn)}</div></div>
+              </div>
+            </div>
+            <div class="hero-side">
+              <div class="hero-side-card">
+                <div class="label">本月审批队列</div>
+                <div class="value">7 笔</div>
+                <div class="sub">4 笔锁资待推进，2 笔发票待处理，1 笔退款回补处理中。</div>
+              </div>
+              <div class="hero-side-card">
+                <div class="label">下个预算阈值</div>
+                <div class="value">18%</div>
+                <div class="sub">预计在 23 天后触碰安全阈值，系统将自动通知团队负责人。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-4">
+          ${team.overview.metrics.map(item => `
+            <div class="surface metric-card">
+              <div class="metric-label">${item.label}</div>
+              <div class="metric-value">${item.value}</div>
+              <div class="metric-foot">${item.foot}</div>
+            </div>
+          `).join("")}
+        </div>
+        <div class="grid-2" style="margin-top:16px;">
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>收支趋势</h3><p>收入回补与支出并行展示</p></div>
+              <div class="chip-row"><span class="chip">收入回补</span><span class="chip">支出</span></div>
+            </div>
+            <div class="chart-box">
+              ${lineChartSVG(team.overview.trendLabels, team.overview.trendOut, team.overview.trendIn, "#1f57ff", "#00a6a6")}
+            </div>
+            <div class="chart-meta">
+              <span>最近 6 个统计期</span>
+              <strong>本期支出峰值 ${team.overview.metrics[0].value}</strong>
+            </div>
+          </div>
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>支出构成</h3><p>按主费用项拆分</p></div>
+              <span class="tag blue">当前月份</span>
+            </div>
+            <div class="grid-2">
+              <div class="chart-box">${donutSVG(team.overview.composition[0].values)}</div>
+              <div class="stack">
+                ${team.overview.composition.map(item => `
+                  <div class="stack-row">
+                    <div class="stack-name">${item.name}</div>
+                    <div class="stack-bar">
+                      <span class="stack-a" style="width:${item.values[0]}%"></span>
+                      <span class="stack-b" style="width:${item.values[1]}%"></span>
+                      <span class="stack-c" style="width:${item.values[2]}%"></span>
+                      <span class="stack-d" style="width:${item.values[3]}%"></span>
+                    </div>
+                    <div class="tiny">${item.meta}</div>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-2" style="margin-top:16px;">
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>待处理事项</h3><p>高优先级异常与待办</p></div>
+              <span class="tag orange">需要处理</span>
+            </div>
+            <div class="notice-list">
+              ${team.overview.pending.map(item => `
+                <div class="notice-item ${item.kind}">
+                  <div class="notice-main"><strong>${item.title}</strong><span>${item.meta}</span></div>
+                  <span class="tag ${item.kind === "danger" ? "red" : item.kind === "warn" ? "orange" : "green"}">${item.action}</span>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>最近交易</h3><p>最近 4 笔</p></div>
+              <span class="tag blue">查看全部</span>
+            </div>
+            <div class="record-list">
+              ${team.overview.recent.map(row => `
+                <div class="record-item">
+                  <div><strong>${row[0]}</strong><span>${row[1]}</span></div>
+                  <div><strong>${row[2]}</strong><span>${row[5]}</span></div>
+                  <div class="${row[3].startsWith("+") ? "amt-in" : "amt-out"}">${row[3]}</div>
+                  <span class="tag ${row[4].includes("处理中") ? "orange" : row[4].includes("锁资") ? "blue" : "green"}">${row[4]}</span>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAccounts(team) {
+      const el = document.getElementById("accountsMount");
+      el.innerHTML = `
+        <div class="grid-3">
+          ${team.accounts.map(item => `
+            <div class="account-card ${item.current ? "current" : ""}">
+              <span class="tag ${item.current ? "blue" : "teal"}">${item.badge}</span>
+              <h4>${item.name}</h4>
+              <div class="sub">${item.sub}</div>
+              <div class="amount">${item.amount}</div>
+              <div class="split-metric">
+                ${item.stats.map(stat => `
+                  <div class="cell">
+                    <div class="label">${stat[0]}</div>
+                    <div class="value">${stat[1]}</div>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+          `).join("")}
+        </div>
+        <div class="grid-2" style="margin-top:16px;">
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>账户结构</h3><p>当前团队主账户结构</p></div>
+            </div>
+            <div class="stack">
+              ${team.accountStructure.map(item => `
+                <div class="stack-row">
+                  <div class="stack-name">${item.name}</div>
+                  <div class="stack-bar">
+                    <span class="stack-a" style="width:${item.values[0]}%"></span>
+                    <span class="stack-b" style="width:${item.values[1]}%"></span>
+                    <span class="stack-c" style="width:${item.values[2]}%"></span>
+                    <span class="stack-d" style="width:${item.values[3]}%"></span>
+                  </div>
+                  <div class="tiny">${item.meta}</div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>账户职责</h3><p>各账户承担的业务角色</p></div>
+            </div>
+            <div class="list">
+              ${team.accounts.map(item => `
+                <div class="list-item">
+                  <strong>${item.name}</strong>
+                  <span>${item.sub}</span>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTransactions(team) {
+      const selected = team.transactions.selected;
+      const el = document.getElementById("transactionsMount");
+      el.innerHTML = `
+        <div class="filter-bar">
+          <span class="filter-chip">近 30 天</span>
+          <span class="filter-chip">当前团队主账户</span>
+          <span class="filter-chip">全部类型</span>
+          <span class="filter-chip">全部状态</span>
+          <span class="filter-chip">按订单号搜索</span>
+        </div>
+        <div class="grid-3">
+          ${team.transactions.totals.map(item => `
+            <div class="surface metric-card">
+              <div class="metric-label">${item[0]}</div>
+              <div class="metric-value">${item[1]}</div>
+              <div class="metric-foot">当前筛选条件</div>
+            </div>
+          `).join("")}
+        </div>
+        <div class="grid-2" style="margin-top:16px;">
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>交易明细</h3><p>逐笔账务事实</p></div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>时间</th>
+                    <th>类型</th>
+                    <th>付款账户</th>
+                    <th>收款账户</th>
+                    <th>状态</th>
+                    <th>金额</th>
+                    <th>关联单号</th>
+                    <th>凭证号</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${team.transactions.rows.map(row => `
+                    <tr>
+                      <td>${row[0]}</td>
+                      <td>${row[1]}</td>
+                      <td>${row[2]}</td>
+                      <td>${row[3]}</td>
+                      <td><span class="tag ${row[4].includes("处理中") ? "orange" : row[4].includes("锁资") ? "blue" : "green"}">${row[4]}</span></td>
+                      <td class="${row[5].startsWith("+") ? "amt-in" : row[1] === "锁资" ? "amt-warn" : "amt-out"}">${row[5]}</td>
+                      <td>${row[6]}</td>
+                      <td>${row[7]}</td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>凭证详情</h3><p>当前选中</p></div>
+              <span class="tag purple">${selected.type}</span>
+            </div>
+            <div class="list">
+              <div class="list-item"><strong>${selected.title}</strong><span>${selected.time}</span></div>
+              <div class="list-item"><strong>付款账户</strong><span>${selected.accountOut}</span></div>
+              <div class="list-item"><strong>收款账户</strong><span>${selected.accountIn}</span></div>
+              <div class="list-item"><strong>金额</strong><span>${selected.amount}</span></div>
+              <div class="list-item"><strong>关联订单</strong><span>${selected.order}</span></div>
+              <div class="list-item"><strong>操作人</strong><span>${selected.operator}</span></div>
+            </div>
+            <div class="surface-head" style="margin-top:18px;margin-bottom:10px;">
+              <div><h3>状态流转</h3></div>
+            </div>
+            <div class="list">
+              ${selected.stateFlow.map(step => `<div class="list-item"><strong>${step}</strong><span>凭证状态推进节点</span></div>`).join("")}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderBills(team) {
+      const el = document.getElementById("billsMount");
+      el.innerHTML = `
+        <div class="grid-4">
+          ${team.bills.summary.map(item => `
+            <div class="surface metric-card">
+              <div class="metric-label">${item[0]}</div>
+              <div class="metric-value">${item[1]}</div>
+              <div class="metric-foot">当前月份</div>
+            </div>
+          `).join("")}
+        </div>
+        <div class="grid-2" style="margin-top:16px;">
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>月度趋势</h3><p>最近 6 个月总支出</p></div>
+            </div>
+            <div class="chart-box">
+              ${lineChartSVG(team.bills.trendLabels, team.bills.trendValues, null, "#1f57ff")}
+            </div>
+          </div>
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>账单构成</h3><p>按费用项拆解</p></div>
+            </div>
+            <div class="stack">
+              ${team.bills.segments.map(item => `
+                <div class="stack-row">
+                  <div class="stack-name">${item.name}</div>
+                  <div class="stack-bar">
+                    <span class="stack-a" style="width:${item.values[0]}%"></span>
+                    <span class="stack-b" style="width:${item.values[1]}%"></span>
+                    <span class="stack-c" style="width:${item.values[2]}%"></span>
+                    <span class="stack-d" style="width:${item.values[3]}%"></span>
+                  </div>
+                  <div class="tiny">${item.meta}</div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+        <div class="surface" style="margin-top:16px;">
+          <div class="surface-head">
+            <div><h3>账单列表</h3><p>按月下钻</p></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>月份</th>
+                  <th>收入</th>
+                  <th>支出</th>
+                  <th>退款回补</th>
+                  <th>平台服务费</th>
+                  <th>净额</th>
+                  <th>待开票金额</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${team.bills.monthly.map(row => `
+                  <tr>
+                    <td>${row[0]}</td>
+                    <td>${row[1]}</td>
+                    <td>${row[2]}</td>
+                    <td>${row[3]}</td>
+                    <td>${row[4]}</td>
+                    <td class="${row[5].includes("-") ? "amt-out" : "amt-in"}">${row[5]}</td>
+                    <td>${row[6]}</td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderInvoices(team) {
+      const el = document.getElementById("invoicesMount");
+      el.innerHTML = `
+        <div class="grid-4">
+          ${team.invoices.summary.map(item => `
+            <div class="surface metric-card">
+              <div class="metric-label">${item[0]}</div>
+              <div class="metric-value">${item[1]}</div>
+              <div class="metric-foot">当前团队</div>
+            </div>
+          `).join("")}
+        </div>
+        <div class="grid-2" style="margin-top:16px;">
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>可开票订单</h3><p>进入申请池</p></div>
+              <span class="tag blue">订单维度</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>订单号</th>
+                    <th>订单名称</th>
+                    <th>结算时间</th>
+                    <th>可开票金额</th>
+                    <th>开票主体</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${team.invoices.orderList.map(row => `
+                    <tr>
+                      <td>${row[0]}</td>
+                      <td>${row[1]}</td>
+                      <td>${row[2]}</td>
+                      <td>${row[3]}</td>
+                      <td>${row[4]}</td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>申请记录</h3><p>开票申请单</p></div>
+              <span class="tag orange">申请单据</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>申请时间</th>
+                    <th>申请单号</th>
+                    <th>票种</th>
+                    <th>金额</th>
+                    <th>状态</th>
+                    <th>关联订单</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${team.invoices.records.map(row => `
+                    <tr>
+                      <td>${row[0]}</td>
+                      <td>${row[1]}</td>
+                      <td>${row[2]}</td>
+                      <td>${row[3]}</td>
+                      <td><span class="tag ${row[4].includes("审核") ? "orange" : "green"}">${row[4]}</span></td>
+                      <td>${row[5]}</td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="grid-2" style="margin-top:16px;">
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>已开具发票</h3><p>票据归档</p></div>
+              <span class="tag green">已回传</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>发票号</th>
+                    <th>抬头</th>
+                    <th>票种</th>
+                    <th>金额</th>
+                    <th>开票日期</th>
+                    <th>状态</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${team.invoices.issued.map(row => `
+                    <tr>
+                      <td>${row[0]}</td>
+                      <td>${row[1]}</td>
+                      <td>${row[2]}</td>
+                      <td>${row[3]}</td>
+                      <td>${row[4]}</td>
+                      <td><span class="tag green">${row[5]}</span></td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>抬头管理</h3><p>默认可选项</p></div>
+              <span class="tag purple">抬头库</span>
+            </div>
+            <div class="list">
+              ${team.invoices.titles.map(item => `
+                <div class="list-item">
+                  <strong>${item[0]}</strong>
+                  <span>${item[1]} · ${item[2]}</span>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderRecharge(team) {
+      const el = document.getElementById("rechargeMount");
+      el.innerHTML = `
+        <div class="grid-2">
+          <div class="method-card">
+            <span class="tag blue">当前目标账户</span>
+            <h4>${team.recharge.target}</h4>
+            <p>当前账户余额 ${team.recharge.balance}</p>
+            <div class="big">¥ 50,000</div>
+            <div class="field"><label>充值金额</label><input type="text" value="50,000"></div>
+            <div class="field"><label>充值方式</label><select>${team.recharge.methods.map(item => `<option>${item[0]}｜${item[1]}</option>`).join("")}</select></div>
+            <div class="field"><label>备注</label><input type="text" value="5 月下旬锁资补充"></div>
+          </div>
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>方式选择</h3><p>不同补钱路径</p></div>
+            </div>
+            <div class="list">
+              ${team.recharge.methods.map(item => `
+                <div class="list-item">
+                  <strong>${item[0]}</strong>
+                  <span>${item[1]} · ${item[2]}</span>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+        <div class="surface" style="margin-top:16px;">
+          <div class="surface-head">
+            <div><h3>充值与划拨记录</h3><p>到账状态追踪</p></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>时间</th>
+                  <th>方式</th>
+                  <th>金额</th>
+                  <th>状态</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${team.recharge.records.map(row => `
+                  <tr>
+                    <td>${row[0]}</td>
+                    <td>${row[1]}</td>
+                    <td>${row[2]}</td>
+                    <td><span class="tag ${row[3].includes("审核") ? "orange" : "green"}">${row[3]}</span></td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderWithdraw(team) {
+      const el = document.getElementById("withdrawMount");
+      el.innerHTML = `
+        <div class="grid-2">
+          <div class="method-card">
+            <span class="tag orange">收益账户</span>
+            <h4>${team.withdraw.account}</h4>
+            <p>当前可提现余额 ${team.withdraw.available}</p>
+            <div class="big">${team.withdraw.available}</div>
+            <div class="field"><label>提现金额</label><input type="text" value="8,000"></div>
+            <div class="field"><label>到账银行卡</label><select><option>中国建设银行 8826</option><option>招商银行 2091</option></select></div>
+            <div class="field"><label>备注</label><input type="text" value="5 月收益提现"></div>
+          </div>
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>收益余额</h3><p>提现口径</p></div>
+            </div>
+            <div class="grid-2">
+              ${team.withdraw.summary.map(item => `
+                <div class="surface metric-card">
+                  <div class="metric-label">${item[0]}</div>
+                  <div class="metric-value" style="font-size:28px;">${item[1]}</div>
+                  <div class="metric-foot">个人收益账户</div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+        <div class="surface" style="margin-top:16px;">
+          <div class="surface-head">
+            <div><h3>提现记录</h3><p>申请单状态</p></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>申请时间</th>
+                  <th>提现单号</th>
+                  <th>金额</th>
+                  <th>状态</th>
+                  <th>到账账户</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${team.withdraw.records.map(row => `
+                  <tr>
+                    <td>${row[0]}</td>
+                    <td>${row[1]}</td>
+                    <td>${row[2]}</td>
+                    <td><span class="tag ${row[3].includes("驳回") ? "red" : row[3].includes("审核") ? "orange" : "green"}">${row[3]}</span></td>
+                    <td>${row[4]}</td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSecurity(team) {
+      const el = document.getElementById("securityMount");
+      el.innerHTML = `
+        <div class="security-grid">
+          ${team.security.map(item => `
+            <div class="security-card">
+              <h4>${item[0]}</h4>
+              <p>${item[1]}</p>
+              <div class="security-state">${item[2]}</div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderOrderDetail(team) {
+      const detail = team.orderDetail;
+      const el = document.getElementById("orderDetailMount");
+      el.innerHTML = `
+        <div class="hero-card">
+          <div class="hero-grid">
+            <div>
+              <div class="hero-kicker">Order Finance Detail</div>
+              <h3 class="hero-title">${detail.orderNo} · ${detail.title}</h3>
+              <div class="hero-balance">${detail.amount}</div>
+              <div class="hero-caption">付款主体：${detail.payer}｜承接方：${detail.contractor}｜当前状态：${detail.status}</div>
+              <div class="hero-meta">
+                ${detail.summary.map(item => `<div class="hero-meta-card"><div class="label">${item[0]}</div><div class="value">${item[1]}</div></div>`).join("")}
+              </div>
+            </div>
+            <div class="hero-side">
+              <div class="hero-side-card">
+                <div class="label">当前阶段</div>
+                <div class="value">${detail.status}</div>
+                <div class="sub">完整保留锁资、结算、开票相关凭证与时间节点。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>资金时间轴</h3><p>锁资 → 验收 → 结算 → 开票</p></div>
+            </div>
+            <div class="timeline">
+              ${detail.timeline.map(item => `
+                <div class="timeline-item ${item.state}">
+                  <div class="timeline-head"><strong>${item.title}</strong><span class="tag ${item.state === "done" ? "green" : item.state === "warn" ? "orange" : "blue"}">${item.time}</span></div>
+                  <div class="timeline-meta">${item.meta}</div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>关联凭证</h3><p>订单资金凭证列表</p></div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>凭证号</th>
+                    <th>类型</th>
+                    <th>金额</th>
+                    <th>时间</th>
+                    <th>状态</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${detail.vouchers.map(row => `
+                    <tr>
+                      <td>${row[0]}</td>
+                      <td>${row[1]}</td>
+                      <td class="${row[2].startsWith("-") ? "amt-out" : "amt-in"}">${row[2]}</td>
+                      <td>${row[3]}</td>
+                      <td><span class="tag ${row[4].includes("待") ? "orange" : "green"}">${row[4]}</span></td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAdminOverview() {
+      const admin = data.admin;
+      const el = document.getElementById("adminOverviewMount");
+      el.innerHTML = `
+        <div class="grid-4">
+          ${admin.summary.map(item => `
+            <div class="surface metric-card">
+              <div class="metric-label">${item[0]}</div>
+              <div class="metric-value">${item[1]}</div>
+              <div class="metric-foot">企业财务总览</div>
+            </div>
+          `).join("")}
+        </div>
+        <div class="grid-2" style="margin-top:16px;">
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>企业支出趋势</h3><p>最近 6 个统计期</p></div>
+            </div>
+            <div class="chart-box">
+              ${lineChartSVG(admin.trendLabels, admin.trendValues, null, "#6f46ff")}
+            </div>
+          </div>
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>待审核队列</h3><p>充值 / 提现 / 结算 / 发票</p></div>
+            </div>
+            <div class="list">
+              <div class="list-item"><strong>对公充值</strong><span>2 笔待审核，合计 ¥420,000</span></div>
+              <div class="list-item"><strong>提现打款</strong><span>2 笔待处理，合计 ¥20,000</span></div>
+              <div class="list-item"><strong>待结算订单</strong><span>2 笔，合计 ¥60,000</span></div>
+              <div class="list-item"><strong>待开发票</strong><span>2 笔申请等待开具或回票</span></div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAdminBudget() {
+      const admin = data.admin;
+      const el = document.getElementById("adminBudgetMount");
+      el.innerHTML = `
+        <div class="surface">
+          <div class="surface-head">
+            <div><h3>团队预算矩阵</h3><p>可用、冻结、当月已用、剩余阈值</p></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>团队</th>
+                  <th>可用余额</th>
+                  <th>冻结金额</th>
+                  <th>本月已用</th>
+                  <th>剩余阈值</th>
+                  <th>状态</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${admin.teams.map(row => `
+                  <tr>
+                    <td>${row[0]}</td>
+                    <td>${row[1]}</td>
+                    <td>${row[2]}</td>
+                    <td>${row[3]}</td>
+                    <td>${row[4]}</td>
+                    <td><span class="tag ${row[5].includes("追加") ? "orange" : row[5].includes("低") ? "purple" : "green"}">${row[5]}</span></td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="grid-2" style="margin-top:16px;">
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>追加预算建议</h3><p>系统预警</p></div>
+            </div>
+            <div class="list">
+              <div class="list-item"><strong>短剧制作中心</strong><span>建议追加 ¥300,000，用于 6 月项目锁资。</span></div>
+              <div class="list-item"><strong>市场宣传组</strong><span>建议追加 ¥80,000，覆盖 2 个短视频包与活动物料。</span></div>
+            </div>
+          </div>
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>本月划拨记录</h3><p>最新动作</p></div>
+            </div>
+            <div class="list">
+              <div class="list-item"><strong>AL-2026052502</strong><span>企业总池 → 短剧制作中心，¥200,000，已到账。</span></div>
+              <div class="list-item"><strong>AL-2026051401</strong><span>企业总池 → 市场宣传组，¥100,000，已到账。</span></div>
+              <div class="list-item"><strong>AL-2026050602</strong><span>企业总池 → 品牌合作组，¥180,000，已到账。</span></div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAdminAudit() {
+      const admin = data.admin;
+      const el = document.getElementById("adminAuditMount");
+      el.innerHTML = `
+        <div class="grid-2">
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>对公充值审核</h3><p>待财务处理</p></div>
+            </div>
+            <div class="queue">
+              ${admin.queues.recharge.map(row => `
+                <div class="queue-item">
+                  <div><strong>${row[0]}</strong><span>${row[1]}</span></div>
+                  <div>${row[2]}</div>
+                  <div>${row[3]}</div>
+                  <div><span class="tag orange">${row[4]}</span></div>
+                  <button class="btn">查看凭证</button>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>提现审核与打款</h3><p>待风控 / 待出纳</p></div>
+            </div>
+            <div class="queue">
+              ${admin.queues.withdraw.map(row => `
+                <div class="queue-item">
+                  <div><strong>${row[0]}</strong><span>${row[1]}</span></div>
+                  <div>${row[2]}</div>
+                  <div>${row[3]}</div>
+                  <div><span class="tag orange">${row[4]}</span></div>
+                  <button class="btn">去处理</button>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAdminSettlement() {
+      const admin = data.admin;
+      const el = document.getElementById("adminSettlementMount");
+      el.innerHTML = `
+        <div class="grid-2">
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>待结算订单</h3><p>订单结算队列</p></div>
+            </div>
+            <div class="queue">
+              ${admin.queues.settlement.map(row => `
+                <div class="queue-item">
+                  <div><strong>${row[0]}</strong><span>${row[1]}</span></div>
+                  <div>${row[2]}</div>
+                  <div>${row[3]}</div>
+                  <div><span class="tag blue">${row[4]}</span></div>
+                  <button class="btn">执行结算</button>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+          <div class="surface">
+            <div class="surface-head">
+              <div><h3>发票处理队列</h3><p>开票与回票</p></div>
+            </div>
+            <div class="queue">
+              ${admin.queues.invoice.map(row => `
+                <div class="queue-item">
+                  <div><strong>${row[0]}</strong><span>${row[1]}</span></div>
+                  <div>${row[2]}</div>
+                  <div>${row[3]}</div>
+                  <div><span class="tag purple">${row[4]}</span></div>
+                  <button class="btn">去处理</button>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTeam(key) {
+      const team = data[key];
+      document.getElementById("topAccountLabel").textContent = team.accountLabel;
+      document.getElementById("topMonthlyBurn").textContent = fmtMoney(team.monthlyBurn);
+      document.getElementById("topStatus").textContent = team.status;
+      document.getElementById("topStatus").style.color = team.status.includes("待补") ? "#d97706" : "#17803d";
+      document.getElementById("topStatus").style.background = team.status.includes("待补") ? "rgba(217,119,6,.10)" : "rgba(23,128,61,.08)";
+      document.getElementById("topStatus").style.borderColor = team.status.includes("待补") ? "rgba(217,119,6,.16)" : "rgba(23,128,61,.14)";
+
+      renderOverview(team);
+      renderAccounts(team);
+      renderTransactions(team);
+      renderBills(team);
+      renderInvoices(team);
+      renderRecharge(team);
+      renderWithdraw(team);
+      renderSecurity(team);
+      renderOrderDetail(team);
+      renderAdminOverview();
+      renderAdminBudget();
+      renderAdminAudit();
+      renderAdminSettlement();
+    }
+
+    navButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        navButtons.forEach(item => item.classList.remove("active"));
+        panels.forEach(panel => panel.classList.remove("active"));
+        button.classList.add("active");
+        document.getElementById("panel-" + button.dataset.panel).classList.add("active");
+      });
+    });
+
+    teamSelect.addEventListener("change", event => renderTeam(event.target.value));
+
+    teamSelect.value = "drama";
+    renderTeam("drama");
+  </script>
+</body>
+</html>

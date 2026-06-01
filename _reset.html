@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>reset</title></head><body>
+<p id="msg">Clearing demo state…</p>
+<script>
+  Object.keys(localStorage).filter(k => k.startsWith('demo')).forEach(k => localStorage.removeItem(k));
+  var params = new URL(location).searchParams;
+  var ws = params.get('ws');
+  var identity = params.get('identity');
+  if (ws) localStorage.setItem('demoCurrentWorkspace', ws);
+  if (identity) localStorage.setItem('demoCurrentIdentity', identity);
+  document.getElementById('msg').textContent = '✓ Cleared. Redirecting…';
+  setTimeout(() => location.replace(params.get('to') || 'wallet-overview.html'), 200);
+</script>
+</body></html>

@@ -172,6 +172,58 @@
     @media (max-width: 900px) {
       .entry-grid { grid-template-columns: 1fr; }
     }
+
+    /* B-5：实名认证页面 */
+    .rn-hero {
+      background: linear-gradient(135deg, #722ed1 0%, #1890ff 100%);
+      border-radius: 12px; padding: 22px 26px; color: #fff; margin-bottom: 16px;
+      display: flex; gap: 24px; align-items: center;
+    }
+    .rn-hero-left { flex: 1; }
+    .rn-hero-eyebrow { font-size: 12px; opacity: .85; }
+    .rn-hero-title { font-size: 22px; font-weight: 600; margin: 4px 0; }
+    .rn-hero-meta { font-size: 12px; opacity: .9; }
+    .rn-hero-progress { display: flex; gap: 6px; margin-top: 12px; }
+    .rn-hero-progress .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.35); }
+    .rn-hero-progress .dot.on { background: #fff; }
+    .rn-hero-right { text-align: right; font-size: 12px; opacity: .9; }
+    .rn-hero-uid { background: rgba(255,255,255,.18); padding: 3px 10px; border-radius: 12px; display: inline-block; }
+    .rn-hero-name { margin-top: 6px; font-family: monospace; opacity: .9; }
+
+    .rn-tier-list { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 16px; }
+    .rn-tier-card {
+      background: #fff; border-radius: 10px; padding: 18px 22px;
+      border: 1px solid #f0f0f0; border-left-width: 4px;
+      display: grid; grid-template-columns: 56px 1fr auto; gap: 16px; align-items: center;
+    }
+    .rn-tier-card.tier-done   { border-left-color: #52c41a; background: #f6ffed; }
+    .rn-tier-card.tier-active { border-left-color: #1890ff; }
+    .rn-tier-card.tier-locked { border-left-color: #d9d9d9; opacity: .85; }
+    .rn-tier-card .tier-icon { font-size: 36px; line-height: 1; text-align: center; }
+    .rn-tier-card .tier-title { font-size: 15px; font-weight: 600; color: #262626; }
+    .rn-tier-card .tier-status { font-size: 12px; padding: 2px 8px; border-radius: 4px; margin-left: 8px; font-weight: 500; }
+    .rn-tier-card .tier-status.s-done   { background: #f6ffed; color: #389e0d; border: 1px solid #b7eb8f; }
+    .rn-tier-card .tier-status.s-active { background: #e6f7ff; color: #0958d9; border: 1px solid #91caff; }
+    .rn-tier-card .tier-status.s-locked { background: #fafafa; color: #8c8c8c; border: 1px solid #e8e8e8; }
+    .rn-tier-card .tier-desc { font-size: 12px; color: #8c8c8c; margin-top: 4px; line-height: 1.6; }
+    .rn-tier-card .tier-meta { font-size: 11px; color: #595959; margin-top: 6px; font-family: monospace; }
+    .rn-tier-card .tier-grants { font-size: 11px; color: #595959; margin-top: 6px; }
+    .rn-tier-card .tier-grants b { color: #389e0d; }
+    .rn-tier-card .tier-action button {
+      height: 36px; padding: 0 18px; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500;
+      color: #fff; background: linear-gradient(135deg, #1890ff, #096dd9);
+    }
+    .rn-tier-card .tier-action button:hover { opacity: .92; }
+    .rn-tier-card .tier-action button.outlined { background: #fff; color: #1890ff; border: 1px solid #91caff; }
+    .rn-tier-card .tier-action button.outlined:hover { background: #f0f7ff; }
+    .rn-tier-card .tier-action button[disabled] { background: #f0f0f0; color: #bfbfbf; cursor: not-allowed; }
+
+    .rn-explain {
+      background: #fafafa; border: 1px solid #f0f0f0; border-radius: 8px;
+      padding: 14px 18px; font-size: 12.5px; color: #595959; line-height: 1.8;
+    }
+    .rn-explain ul { margin: 8px 0 0; padding-left: 18px; }
+    .rn-explain li { margin-bottom: 4px; }
   </style>
 </head>
 <body>
@@ -194,6 +246,7 @@
 
         <div class="submenu-group-title">身份</div>
         <a href="account-basic-info-prototype-platform-style.html">👤 基本资料</a>
+        <a href="account-center.html?tab=realname" id="navRealname">📇 实名认证</a>
         <a href="enterprise-verification-prototype.html">🏢 企业认证</a>
 
         <div class="submenu-group-title">安全</div>
@@ -213,7 +266,7 @@
         <div class="sub">管理你的身份、认证、安全与偏好设置。账号中心管"我是谁"，钱包管"我有什么"。</div>
       </section>
 
-      <div class="ac-content">
+      <div class="ac-content" id="acOverview">
           <!-- 用户卡片 -->
           <div class="user-hero">
             <img src="https://api.dicebear.com/9.x/lorelei/svg?seed=account" alt="头像">
@@ -311,10 +364,41 @@
             。两个模块互相独立、彼此不嵌套，避免心智混淆。
           </div>
         </div>
+
+      <!-- B-5：实名认证（?tab=realname） -->
+      <div class="ac-content" id="acRealname" style="display:none">
+        <div id="rnFromBanner" style="display:none;margin-bottom:14px;padding:12px 16px;background:#fff7e6;border-left:3px solid #faad14;border-radius:6px;font-size:13px;color:#874d00;line-height:1.6">
+          ⚠️ 你刚刚从 <strong id="rnFromLabel">提现</strong> 流程被引导至此 — 完成中级实名（人脸活体核验）后即可继续操作。
+        </div>
+
+        <section class="rn-hero">
+          <div class="rn-hero-left">
+            <div class="rn-hero-eyebrow">📇 实名认证</div>
+            <div class="rn-hero-title" id="rnCurrentLabel">基础实名（二要素核验）</div>
+            <div class="rn-hero-meta" id="rnCurrentMeta">已通过 · 2026-04-10 09:30 · 阿里云实名（identity-002）</div>
+            <div class="rn-hero-progress" id="rnProgressDots"></div>
+          </div>
+          <div class="rn-hero-right">
+            <div class="rn-hero-uid">UID: <span id="rnUid">AU-100</span></div>
+            <div class="rn-hero-name" id="rnMaskedName">昭** · 1101**********1234</div>
+          </div>
+        </section>
+
+        <div class="rn-tier-list" id="rnTierList"></div>
+
+        <div class="rn-explain">
+          <strong>为什么要做分档实名？</strong>
+          <ul>
+            <li><strong>基础（二要素核验）</strong>：覆盖发布需求 / 接单 / 在站内消费等"低风险"行为。</li>
+            <li><strong>中级（人脸活体）</strong>：发起提现、单笔大额支付（≥ ¥10,000）、修改银行卡时强制要求；依据《非银行支付机构客户尽职调查办法》。</li>
+            <li><strong>高级（企业资质）</strong>：开通企业总账户、对公收付、增值税专票等"主体行为"；与《工商登记主体》对齐。</li>
+          </ul>
+        </div>
+      </div>
     </main>
   </div>
 
-  <script src="_shared.js"></script>
+  <script src="_shared.js?v=20260528d"></script>
   <script>
     SharedHeader.mount({ activeNav: "account" });
 
@@ -326,6 +410,190 @@
           document.getElementById("curWs").textContent = ws.name;
         }
       } catch (e) {}
+    })();
+
+    // ============================================================
+    // B-5：?tab=realname 实名认证三档
+    // unverified → basic_verified → liveness_verified → enterprise_verified
+    // ============================================================
+    (function realNameTab() {
+      const params = new URLSearchParams(location.search);
+      const tab = params.get("tab");
+      const from = params.get("from"); // "withdraw" / "large-payment" / null
+      const overview = document.getElementById("acOverview");
+      const realnamePanel = document.getElementById("acRealname");
+      if (tab !== "realname") return;
+
+      // Demo：?demoReset=unverified|basic|liveness 用于演示三档
+      const demoReset = params.get("demoReset");
+      const presets = {
+        unverified: { real_name_status: "unverified", real_name_method: null, real_name_vendor: null, real_name_biz_id: null, real_name_verified_at: null, id_card_name_masked: "—", id_card_number_masked: "—" },
+        basic:      { real_name_status: "basic_verified", real_name_method: "identity", real_name_vendor: "aliyun", real_name_biz_id: "ALI-RN-2026041030001", real_name_verified_at: "2026-04-10 09:30", id_card_name_masked: "昭**", id_card_number_masked: "1101**********1234" },
+        liveness:   { real_name_status: "liveness_verified", real_name_method: "liveness", real_name_vendor: "aliyun-faceid", real_name_biz_id: "ALI-FACEID-2026042811050", real_name_verified_at: "2026-04-28 11:05", id_card_name_masked: "昭**", id_card_number_masked: "1101**********1234" }
+      };
+      if (demoReset && presets[demoReset]) {
+        const u0 = window.demoApp.getAccountUser();
+        Object.assign(u0, presets[demoReset]);
+        const KEY = window.demoApp.KEY;
+        localStorage.setItem(KEY.accountUser, JSON.stringify(u0));
+        // 清除 URL 参数避免重复重置
+        const newUrl = location.pathname + "?tab=realname" + (from ? "&from=" + from : "");
+        history.replaceState(null, "", newUrl);
+      }
+
+      function pad(n) { return String(n).padStart(2, "0"); }
+      function now() {
+        const t = new Date();
+        return t.getFullYear() + "-" + pad(t.getMonth() + 1) + "-" + pad(t.getDate()) + " " + pad(t.getHours()) + ":" + pad(t.getMinutes());
+      }
+      // 切到实名 tab
+      overview.style.display = "none";
+      realnamePanel.style.display = "";
+      // 顶导侧栏激活
+      document.querySelectorAll(".sidebar .ac-nav a").forEach(a => a.classList.remove("active"));
+      const navRn = document.getElementById("navRealname");
+      if (navRn) navRn.classList.add("active");
+
+      if (from === "withdraw" || from === "large-payment") {
+        document.getElementById("rnFromBanner").style.display = "block";
+        document.getElementById("rnFromLabel").textContent = (from === "withdraw") ? "提现" : "大额支付";
+      }
+
+      const TIERS = [
+        {
+          key: "basic_verified", level: 1,
+          title: "基础实名（二要素核验）",
+          icon: "📇",
+          desc: "上传姓名 + 身份证号，由公安部 eID / 阿里云 / 腾讯云做名实校验。完成后可发布需求、接单、消费余额。",
+          grants: "解锁：发布需求、接单、消费、转账给他人",
+          method: "identity",
+          ctaLabel: "📇 开始基础实名",
+          // 1.5s 模拟通过
+          run: function (done) {
+            window.demoToast("正在调用 阿里云·实名核验 接口…", "info");
+            setTimeout(() => {
+              window.demoApp.setRealNameStatus("basic_verified", {
+                real_name_method: "identity",
+                real_name_vendor: "aliyun",
+                real_name_biz_id: "ALI-RN-" + Date.now(),
+                real_name_verified_at: now(),
+                reject_reason: null
+              });
+              done();
+            }, 1500);
+          }
+        },
+        {
+          key: "liveness_verified", level: 2,
+          title: "中级实名（人脸活体核验）",
+          icon: "🆔",
+          desc: "调取摄像头/相机做「摇头眨眼」活体识别 + 与身份证大头照比对。完成后可发起提现 / 单笔大额支付。",
+          grants: "解锁：💸 提现、单笔 ≥ ¥10,000 支付、修改银行卡",
+          method: "liveness",
+          ctaLabel: "🆔 开始活体识别",
+          run: function (done) {
+            window.demoToast("📷 正在调用 阿里云·人脸活体（FaceID） SDK…", "info");
+            setTimeout(() => window.demoToast("👀 请正对镜头眨眼摇头…", "info"), 600);
+            setTimeout(() => {
+              window.demoApp.setRealNameStatus("liveness_verified", {
+                real_name_method: "liveness",
+                real_name_vendor: "aliyun-faceid",
+                real_name_biz_id: "ALI-FACEID-" + Date.now(),
+                real_name_verified_at: now()
+              });
+              done();
+            }, 2200);
+          }
+        },
+        {
+          key: "enterprise_verified", level: 3,
+          title: "高级实名（企业资质）",
+          icon: "🏢",
+          desc: "上传营业执照、对公账户验证、企业管理员资质。仅企业管理员需要做。",
+          grants: "解锁：开通企业总账户、对公收付、开具增值税专票",
+          method: "enterprise",
+          ctaLabel: "🏢 去做企业认证",
+          gotoUrl: "enterprise-verification-prototype.html"
+        }
+      ];
+
+      function render() {
+        const u = window.demoApp.getAccountUser();
+        const status = u.real_name_status || "unverified";
+        const curLevel = window.demoApp.realNameLevel(status);
+
+        document.getElementById("rnUid").textContent = u.id || "AU-100";
+        document.getElementById("rnMaskedName").textContent = (u.id_card_name_masked || "—") + " · " + (u.id_card_number_masked || "—");
+
+        // 当前最高档展示
+        const curTier = TIERS.slice().reverse().find(t => curLevel >= t.level);
+        document.getElementById("rnCurrentLabel").textContent = curTier ? curTier.title : "未实名";
+        document.getElementById("rnCurrentMeta").textContent = curTier
+          ? "已通过 · " + (u.real_name_verified_at || "—") + " · " + (u.real_name_vendor || "—") + (u.real_name_biz_id ? "（" + u.real_name_biz_id + "）" : "")
+          : "尚未完成任何实名认证";
+
+        // 进度点
+        document.getElementById("rnProgressDots").innerHTML = TIERS.map((t, i) =>
+          '<span class="dot ' + (curLevel >= t.level ? 'on' : '') + '"></span>'
+        ).join("");
+
+        // 三档卡片
+        document.getElementById("rnTierList").innerHTML = TIERS.map(t => {
+          const done   = curLevel >= t.level;
+          const active = !done && (t.level === curLevel + 1);
+          const locked = !done && !active;
+          const cls = done ? "tier-done" : active ? "tier-active" : "tier-locked";
+          const status = done
+            ? '<span class="tier-status s-done">✓ 已通过</span>'
+            : active
+              ? '<span class="tier-status s-active">→ 推荐下一步</span>'
+              : '<span class="tier-status s-locked">⏳ 需先完成上一档</span>';
+          let actionHtml = "";
+          if (done) {
+            actionHtml = '<button class="outlined" onclick="window.demoToast(\'已通过的档位不需要重复认证\',\'info\')">已通过</button>';
+          } else if (locked) {
+            actionHtml = '<button disabled>请先完成上一档</button>';
+          } else if (t.gotoUrl) {
+            actionHtml = '<button onclick="location.href=\'' + t.gotoUrl + '\'">' + t.ctaLabel + ' →</button>';
+          } else {
+            actionHtml = '<button data-rn-tier="' + t.key + '">' + t.ctaLabel + '</button>';
+          }
+          const meta = done ? '<div class="tier-meta">业务流水号：' + (u.real_name_biz_id || "—") + ' · ' + (u.real_name_method || "—") + '</div>' : '';
+          return '<div class="rn-tier-card ' + cls + '">'
+            + '<div class="tier-icon">' + t.icon + '</div>'
+            + '<div>'
+              + '<div class="tier-title">' + t.title + status + '</div>'
+              + '<div class="tier-desc">' + t.desc + '</div>'
+              + '<div class="tier-grants">✅ <b>' + t.grants + '</b></div>'
+              + meta
+            + '</div>'
+            + '<div class="tier-action">' + actionHtml + '</div>'
+          + '</div>';
+        }).join("");
+
+        // 绑定动作
+        document.querySelectorAll("[data-rn-tier]").forEach(btn => {
+          btn.addEventListener("click", function () {
+            const key = btn.getAttribute("data-rn-tier");
+            const tier = TIERS.find(x => x.key === key);
+            if (!tier || !tier.run) return;
+            btn.disabled = true; btn.textContent = "处理中…";
+            tier.run(function () {
+              window.demoToast("✅ " + tier.title + " 已通过！", "ok");
+              render();
+              // 如果是从提现 / 大额支付来的，且已经达到中级实名，引导回去
+              if ((from === "withdraw" || from === "large-payment") && key === "liveness_verified") {
+                setTimeout(() => {
+                  window.demoToast("正在带你返回钱包并继续提现 →", "info");
+                  setTimeout(() => location.href = "wallet-overview.html#accounts", 1200);
+                }, 600);
+              }
+            });
+          });
+        });
+      }
+      render();
+      window._rnRender = render;
     })();
   </script>
 </body>

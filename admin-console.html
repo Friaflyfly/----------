@@ -280,6 +280,63 @@
     .fund-sub { font-size: 11px; color: #8c8c8c; }
     .fund-amount { font-size: 15px; font-weight: 600; }
     .fund-amount.main { color: #722ed1; }
+
+    /* B-6 资金治理：KPI / sub-tab / 审核行 */
+    .phase-badge { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: 500; vertical-align: middle; }
+    .phase-badge.p2 { background: linear-gradient(135deg,#722ed1,#1890ff); color: #fff; }
+
+    .fund-kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 6px; }
+    .fund-kpi-card { background: #fff; border: 1px solid #f0f0f0; border-radius: 8px; padding: 14px 16px; }
+    .fund-kpi-card .label { font-size: 12px; color: #8c8c8c; }
+    .fund-kpi-card .value { font-size: 22px; font-weight: 600; color: #262626; margin-top: 4px; font-family: monospace; }
+    .fund-kpi-card .value.warn { color: #d48806; }
+    .fund-kpi-card .value.danger { color: #cf1322; }
+    .fund-kpi-card .value.ok { color: #389e0d; }
+    .fund-kpi-card .meta { font-size: 11px; color: #8c8c8c; margin-top: 4px; }
+
+    .fund-sec-tabs { display: flex; gap: 4px; border-bottom: 1px solid #f0f0f0; margin-bottom: 12px; }
+    .fst-btn {
+      border: none; background: transparent; padding: 10px 16px; cursor: pointer;
+      font-size: 13.5px; color: #595959; font-weight: 500;
+      border-bottom: 2px solid transparent;
+    }
+    .fst-btn:hover { color: #1890ff; }
+    .fst-btn.active { color: #1890ff; border-bottom-color: #1890ff; }
+    .fst-cnt {
+      display: inline-block; padding: 0 6px; border-radius: 8px;
+      background: #ffece6; color: #d4380d; font-size: 11px; margin-left: 4px; font-weight: 600;
+    }
+    .fst-cnt.zero { background: #f5f5f5; color: #bfbfbf; }
+    .fst-panel { display: none; }
+    .fst-panel.active { display: block; }
+
+    .fund-review-row {
+      background: #fff; border: 1px solid #f0f0f0; border-radius: 8px;
+      padding: 14px 16px; margin-bottom: 8px;
+      display: grid; grid-template-columns: 1fr auto auto; gap: 16px; align-items: center;
+      border-left: 3px solid #faad14;
+    }
+    .fund-review-row.success    { border-left-color: #52c41a; }
+    .fund-review-row.rejected   { border-left-color: #ff4d4f; }
+    .fund-review-row.processing { border-left-color: #1890ff; }
+    .fund-review-row .frr-id { font-family: monospace; color: #1890ff; font-size: 12px; }
+    .fund-review-row .frr-title { font-size: 14px; font-weight: 500; color: #262626; margin-top: 2px; }
+    .fund-review-row .frr-meta { font-size: 12px; color: #8c8c8c; margin-top: 4px; }
+    .fund-review-row .frr-amt { font-size: 18px; font-weight: 600; color: #262626; font-family: monospace; }
+    .fund-review-row .frr-actions { display: flex; gap: 6px; }
+    .fund-review-row .frr-actions button {
+      height: 30px; padding: 0 12px; border-radius: 6px; cursor: pointer; font-size: 12px; border: 1px solid #d9d9d9; background: #fff; color: #595959;
+    }
+    .fund-review-row .frr-actions button.approve { background: #52c41a; color: #fff; border: 1px solid #52c41a; }
+    .fund-review-row .frr-actions button.reject  { background: #fff;    color: #cf1322; border: 1px solid #ffa39e; }
+    .fund-review-row .frr-actions button.approve:hover { background: #389e0d; }
+    .fund-review-row .frr-actions button.reject:hover  { background: #fff1f0; }
+    .fund-review-row .frr-status-pill { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 500; margin-left: 8px; }
+    .fund-review-row .frr-status-pill.s-pending  { background: #fffbe6; color: #d48806; border: 1px solid #ffe58f; }
+    .fund-review-row .frr-status-pill.s-success  { background: #f6ffed; color: #389e0d; border: 1px solid #b7eb8f; }
+    .fund-review-row .frr-status-pill.s-rejected { background: #fff1f0; color: #cf1322; border: 1px solid #ffa39e; }
+    .fund-review-row .frr-status-pill.s-active   { background: #e6f7ff; color: #0958d9; border: 1px solid #91caff; }
+    .fund-review-row .frr-empty { text-align: center; color: #bfbfbf; padding: 28px 0; font-size: 13px; }
     .modal-mask { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 900; align-items: center; justify-content: center; }
     .modal-mask.open { display: flex; }
     .modal { width: min(92vw, 540px); background: #fff; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.22); overflow: hidden; }
@@ -442,13 +499,21 @@
       <!-- Tab 3: 资金与预算 -->
       <div class="tab-panel" id="panel3">
         <div style="background:#f0f5ff;border-left:3px solid #1890ff;border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12.5px;color:#262626;line-height:1.7">
-          <strong style="color:#1890ff">📊 全企业资金鸟瞰 · 治理视角</strong><br>
-          此处为<strong>企业级治理</strong>：预算分配、对公充值审核、开票汇总。<strong>日常的充值 / 提现 / 流水 / 个人发票</strong>请前往
+          <strong style="color:#1890ff">📊 全企业资金鸟瞰 · 治理视角</strong>
+          <span class="phase-badge p2" style="margin-left:6px">P2</span><br>
+          此处为<strong>企业级治理</strong>：预算分配、对公充值审核、提现风控复审、开票汇总。<strong>日常的充值 / 提现 / 流水 / 个人发票</strong>请前往
           <a href="wallet-overview.html" style="color:#1890ff;font-weight:500">我的钱包 →</a>。
         </div>
-        <div class="toolbar">
+
+        <!-- B-6 KPI 行 -->
+        <div class="fund-kpi-row" id="fundKpiRow"></div>
+
+        <!-- 账户余额表 -->
+        <div class="section-head" style="margin-top:10px;margin-bottom:8px;font-size:13px;font-weight:600;color:#262626">
+          🏦 账户与预算余额
+        </div>
+        <div class="toolbar" style="margin-bottom:8px">
           <button class="btn blue" onclick="openModal('allocModal')">💸 划拨预算</button>
-          <button class="btn" onclick="toast('对公转账后由财务上传凭证，此处用于审核到账（下版本研发）', 'info')">📥 充值审核<span class="badge-todo">待研发</span></button>
           <button class="btn" onclick="switchTab(4)">🛡 消费审核</button>
           <button class="btn" onclick="toast('企业级开票汇总：销售 / 采购发票汇总报表（下版本研发）', 'info')">🧾 开票汇总<span class="badge-todo">待研发</span></button>
           <span style="margin-left:auto;font-size:12px;color:#8c8c8c">
@@ -457,6 +522,18 @@
           </span>
         </div>
         <div id="fundRows"></div>
+
+        <!-- B-6 三区块：充值审核 / 划拨记录 / 提现审核 -->
+        <div class="fund-sec-tabs" style="margin-top:18px">
+          <button class="fst-btn active" data-fst="recharge">📥 充值审核 <span class="fst-cnt" id="fstCntRecharge">0</span></button>
+          <button class="fst-btn" data-fst="transfer">📤 划拨记录 <span class="fst-cnt" id="fstCntTransfer">0</span></button>
+          <button class="fst-btn" data-fst="withdraw">💸 提现审核 <span class="fst-cnt" id="fstCntWithdraw">0</span></button>
+        </div>
+        <div class="fund-sec-list">
+          <div id="fstPanelRecharge" class="fst-panel active"></div>
+          <div id="fstPanelTransfer" class="fst-panel"></div>
+          <div id="fstPanelWithdraw" class="fst-panel"></div>
+        </div>
       </div>
 
       <!-- Tab 4: 消费审核 -->
@@ -849,7 +926,7 @@
   </div>
 
   <div id="toastWrap" class="toasts"></div>
-  <script src="_shared.js"></script>
+  <script src="_shared.js?v=20260528d"></script>
   <script>
     SharedHeader.mount({ activeNav: "admin", brandHref: "admin-console.html", brandLabel: "👑 管理员后台", brandSub: "骋风天合 · 平台治理" });
 
@@ -1011,6 +1088,305 @@
       container.innerHTML = html;
     }
 
+    // ========================================================================
+    // B-6：管理后台资金治理视图
+    // 三个子签：充值审核（pending recharge_order）/ 划拨记录（transfer_order）/ 提现审核（pending+reviewing withdraw_order）
+    // ========================================================================
+    function _now() {
+      var t = new Date();
+      var pad = function (n) { return String(n).padStart(2, '0'); };
+      return t.getFullYear() + '-' + pad(t.getMonth() + 1) + '-' + pad(t.getDate()) + ' ' + pad(t.getHours()) + ':' + pad(t.getMinutes());
+    }
+    function fundFmtMoney(n) { return window.fmtMoney(n || 0); }
+
+    function renderFundKpis() {
+      var rcs = window.demoApp.getRechargeOrders();
+      var tfs = window.demoApp.getTransferOrders();
+      var wds = window.demoApp.getWithdrawOrders();
+      var pendRcAmt = rcs.filter(function (r) { return r.status === 'pending'; }).reduce(function (s, r) { return s + (r.amount || 0); }, 0);
+      var pendRcCnt = rcs.filter(function (r) { return r.status === 'pending'; }).length;
+      var pendWdCnt = wds.filter(function (w) { return w.status === 'pending' || w.status === 'reviewing'; }).length;
+      var pendWdAmt = wds.filter(function (w) { return w.status === 'pending' || w.status === 'reviewing'; }).reduce(function (s, w) { return s + (w.amount || 0); }, 0);
+      var totalTransfer = tfs.reduce(function (s, t) { return s + (t.amount || 0); }, 0);
+      var totalWds = wds.filter(function (w) { return w.status === 'success'; }).reduce(function (s, w) { return s + (w.amount || 0); }, 0);
+
+      var html = ''
+        + '<div class="fund-kpi-card">'
+          + '<div class="label">📥 待审核充值</div>'
+          + '<div class="value ' + (pendRcCnt ? 'warn' : '') + '">' + pendRcCnt + '</div>'
+          + '<div class="meta">' + fundFmtMoney(pendRcAmt) + ' 在审 · 对公转账</div>'
+        + '</div>'
+        + '<div class="fund-kpi-card">'
+          + '<div class="label">📤 累计划拨（本季）</div>'
+          + '<div class="value">' + fundFmtMoney(totalTransfer) + '</div>'
+          + '<div class="meta">' + tfs.length + ' 笔（含本期与历史）</div>'
+        + '</div>'
+        + '<div class="fund-kpi-card">'
+          + '<div class="label">💸 待审核提现</div>'
+          + '<div class="value ' + (pendWdCnt ? 'warn' : '') + '">' + pendWdCnt + '</div>'
+          + '<div class="meta">' + fundFmtMoney(pendWdAmt) + ' 在审 · pending/reviewing</div>'
+        + '</div>'
+        + '<div class="fund-kpi-card">'
+          + '<div class="label">✅ 累计提现已到账</div>'
+          + '<div class="value ok">' + fundFmtMoney(totalWds) + '</div>'
+          + '<div class="meta">' + wds.filter(function (w) { return w.status === 'success'; }).length + ' 笔历史出账</div>'
+        + '</div>';
+      document.getElementById('fundKpiRow').innerHTML = html;
+
+      document.getElementById('fstCntRecharge').textContent = pendRcCnt;
+      document.getElementById('fstCntRecharge').classList.toggle('zero', !pendRcCnt);
+      document.getElementById('fstCntTransfer').textContent = tfs.length;
+      document.getElementById('fstCntTransfer').classList.toggle('zero', !tfs.length);
+      document.getElementById('fstCntWithdraw').textContent = pendWdCnt;
+      document.getElementById('fstCntWithdraw').classList.toggle('zero', !pendWdCnt);
+    }
+
+    function renderFundRechargePanel() {
+      var rcs = window.demoApp.getRechargeOrders();
+      var pending = rcs.filter(function (r) { return r.status === 'pending'; });
+      var recent  = rcs.filter(function (r) { return r.status !== 'pending'; }).slice(0, 5);
+      var html = '';
+      if (!pending.length) {
+        html += '<div class="fund-review-row success"><div class="frr-empty">✅ 当前无待审核充值（pending=0）</div><div></div><div></div></div>';
+      } else {
+        pending.forEach(function (r) {
+          html += '<div class="fund-review-row">'
+            + '<div>'
+              + '<span class="frr-id">' + r.id + '</span>'
+              + '<span class="frr-status-pill s-pending">⏳ 待财务审核</span>'
+              + '<div class="frr-title">📥 ' + (r.channelLabel || r.channel || '对公转账') + ' → ' + (r.walletKey || '—') + '</div>'
+              + '<div class="frr-meta">申请 ' + (r.recharge_time || r.time || '—') + ' · 申请人 ' + (r.operator || '—') + ' · 备注：' + (r.memo || '无') + '</div>'
+            + '</div>'
+            + '<div class="frr-amt">' + fundFmtMoney(r.amount) + '</div>'
+            + '<div class="frr-actions">'
+              + '<button class="approve" onclick="adminApproveRecharge(\'' + r.id + '\')">✅ 通过</button>'
+              + '<button class="reject"  onclick="adminRejectRecharge(\'' + r.id + '\')">⛔ 拒绝</button>'
+            + '</div>'
+          + '</div>';
+        });
+      }
+      // 历史 5 条
+      if (recent.length) {
+        html += '<div style="margin-top:14px;font-size:12px;color:#8c8c8c">最近已处理（5 条）</div>';
+        recent.forEach(function (r) {
+          var cls = r.status === 'failed' ? 'rejected' : 'success';
+          var pill = r.status === 'success' ? 's-success' : 's-rejected';
+          html += '<div class="fund-review-row ' + cls + '">'
+            + '<div>'
+              + '<span class="frr-id">' + r.id + '</span>'
+              + '<span class="frr-status-pill ' + pill + '">' + (r.status === 'success' ? '✅ 已到账' : '⛔ 已拒绝') + '</span>'
+              + '<div class="frr-title">' + (r.channelLabel || r.channel || '—') + ' → ' + (r.walletKey || '—') + '</div>'
+              + '<div class="frr-meta">' + (r.recharge_time || r.time || '—') + ' · 凭证 ' + (r.voucher_no || '—') + '</div>'
+            + '</div>'
+            + '<div class="frr-amt">' + fundFmtMoney(r.amount) + '</div>'
+            + '<div class="frr-actions"><span style="font-size:11px;color:#bfbfbf">已结案</span></div>'
+          + '</div>';
+        });
+      }
+      document.getElementById('fstPanelRecharge').innerHTML = html;
+    }
+
+    function renderFundTransferPanel() {
+      var tfs = window.demoApp.getTransferOrders();
+      var html = '';
+      if (!tfs.length) {
+        html += '<div class="fund-review-row"><div class="frr-empty">📭 暂无划拨记录</div><div></div><div></div></div>';
+      } else {
+        tfs.slice().sort(function (a, b) { return (b.time || '').localeCompare(a.time || ''); }).slice(0, 12).forEach(function (t) {
+          html += '<div class="fund-review-row success">'
+            + '<div>'
+              + '<span class="frr-id">' + (t.id || '—') + '</span>'
+              + '<span class="frr-status-pill s-success">✅ 已生效</span>'
+              + '<div class="frr-title">📤 ' + (t.from_name || t.from || '企业总账户') + ' → ' + (t.to_name || t.to || '—') + '</div>'
+              + '<div class="frr-meta">' + (t.time || '—') + ' · 操作人 ' + (t.operator || '—') + ' · 凭证 ' + (t.voucher_no || '—') + (t.memo ? ' · 备注：' + t.memo : '') + '</div>'
+            + '</div>'
+            + '<div class="frr-amt">' + fundFmtMoney(t.amount) + '</div>'
+            + '<div class="frr-actions"><span style="font-size:11px;color:#bfbfbf">已记账</span></div>'
+          + '</div>';
+        });
+      }
+      document.getElementById('fstPanelTransfer').innerHTML = html;
+    }
+
+    function renderFundWithdrawPanel() {
+      var wds = window.demoApp.getWithdrawOrders();
+      var pending = wds.filter(function (w) { return w.status === 'pending' || w.status === 'reviewing'; });
+      var recent  = wds.filter(function (w) { return w.status === 'success' || w.status === 'rejected' || w.status === 'approved'; }).slice(0, 5);
+      var html = '';
+      if (!pending.length) {
+        html += '<div class="fund-review-row success"><div class="frr-empty">✅ 当前无待审核提现</div><div></div><div></div></div>';
+      } else {
+        pending.forEach(function (w) {
+          var risk = w.risk_level === 'high' ? '<span class="frr-status-pill s-rejected">⚠️ 高金额 · 强风控</span>' : '';
+          var statusPill = w.status === 'pending'
+            ? '<span class="frr-status-pill s-pending">⏳ pending（待风控）</span>'
+            : '<span class="frr-status-pill s-active">🔎 reviewing（风控复审）</span>';
+          html += '<div class="fund-review-row processing">'
+            + '<div>'
+              + '<span class="frr-id">' + w.id + '</span>'
+              + statusPill
+              + risk
+              + '<div class="frr-title">💸 ' + (w.walletKey || '—') + ' → ' + (w.bank_card || '—') + '</div>'
+              + '<div class="frr-meta">申请 ' + (w.submitted_at || w.time || '—') + ' · ' + (w.memo ? '备注：' + w.memo : '无备注') + ' · 操作 ' + (w.operator || '—') + '</div>'
+            + '</div>'
+            + '<div class="frr-amt">' + fundFmtMoney(w.amount) + '</div>'
+            + '<div class="frr-actions">'
+              + '<button class="approve" onclick="adminApproveWithdraw(\'' + w.id + '\')">✅ 通过 · 出账</button>'
+              + '<button class="reject"  onclick="adminRejectWithdraw(\'' + w.id + '\')">⛔ 拒绝 · 退回</button>'
+            + '</div>'
+          + '</div>';
+        });
+      }
+      if (recent.length) {
+        html += '<div style="margin-top:14px;font-size:12px;color:#8c8c8c">最近已处理（5 条）</div>';
+        recent.forEach(function (w) {
+          var cls = w.status === 'rejected' ? 'rejected' : 'success';
+          var pill = w.status === 'success'
+            ? '<span class="frr-status-pill s-success">✅ 已到账</span>'
+            : w.status === 'rejected'
+              ? '<span class="frr-status-pill s-rejected">⛔ 已拒绝</span>'
+              : '<span class="frr-status-pill s-active">🟢 已通过 · 出账中</span>';
+          html += '<div class="fund-review-row ' + cls + '">'
+            + '<div>'
+              + '<span class="frr-id">' + w.id + '</span>'
+              + pill
+              + '<div class="frr-title">💸 ' + (w.walletKey || '—') + ' → ' + (w.bank_card || '—') + '</div>'
+              + '<div class="frr-meta">' + (w.arrived_at || w.reviewed_at || w.time || '—') + (w.voucher_no ? ' · 凭证 ' + w.voucher_no : '') + (w.reject_reason ? ' · ' + w.reject_reason : '') + '</div>'
+            + '</div>'
+            + '<div class="frr-amt">' + fundFmtMoney(w.amount) + '</div>'
+            + '<div class="frr-actions"><span style="font-size:11px;color:#bfbfbf">已结案</span></div>'
+          + '</div>';
+        });
+      }
+      document.getElementById('fstPanelWithdraw').innerHTML = html;
+    }
+
+    // 充值审核：通过 → recharge_order.status = success + 钱包 +amt + 双向凭证
+    window.adminApproveRecharge = function (rcId) {
+      var rcs = window.demoApp.getRechargeOrders();
+      var i = rcs.findIndex(function (r) { return r.id === rcId; });
+      if (i < 0 || rcs[i].status !== 'pending') return;
+      var r = rcs[i];
+      var ts = _now();
+      var voucherNo = 'V-' + Date.now();
+      r.status = 'success';
+      r.success_time = ts;
+      r.recharge_time = r.recharge_time || ts;
+      r.voucher_no = voucherNo;
+      r.remaining_refundable = (r.remaining_refundable == null) ? r.amount : r.remaining_refundable;
+      window.demoApp.setRechargeOrders(rcs);
+
+      // 钱包：available_balance += amt; recharge_balance += amt
+      var wallets = window.demoApp.getWallets();
+      var w = wallets[r.walletKey];
+      if (w) {
+        w.available_balance = (w.available_balance || w.balance || 0) + r.amount;
+        w.recharge_balance  = (w.recharge_balance  || 0) + r.amount;
+        w.balance = w.available_balance;
+        wallets[r.walletKey] = w;
+        window.demoApp.setWallets(wallets);
+      }
+      // 流水：1001 借 / 2001 贷
+      window.demoApp.addFlow({ id: 'F-RC-OK-' + Date.now(), time: ts, type: 'recharge', desc: '对公转账充值（财务审核通过）- ' + rcId, account: r.walletKey, amount: r.amount, operator: '财务（管理后台）', voucher_no: voucherNo, subject_code: '1001', direction: 'debit', related_recharge: rcId });
+      window.demoApp.addFlow({ id: 'F-RC-OK-OFF-' + Date.now(), time: ts, type: 'recharge', desc: '（对手方）用户应付负债增加', account: r.walletKey, amount: 0, _voucherAmt: r.amount, operator: 'system', voucher_no: voucherNo, subject_code: '2001', direction: 'credit', related_recharge: rcId, lockedNote: '对手方记账（贷方）' });
+
+      toast('✅ 充值单 ' + rcId + ' 已审核通过，钱包到账 ' + fundFmtMoney(r.amount) + '（凭证 ' + voucherNo + '）', 'ok');
+      renderFundsAll();
+    };
+    // 充值审核：拒绝 → recharge_order.status = failed
+    window.adminRejectRecharge = function (rcId) {
+      var rcs = window.demoApp.getRechargeOrders();
+      var i = rcs.findIndex(function (r) { return r.id === rcId; });
+      if (i < 0 || rcs[i].status !== 'pending') return;
+      rcs[i].status = 'failed';
+      rcs[i].rejected_at = _now();
+      rcs[i].reject_reason = '财务审核未通过：对公转账凭证不完整或与申请金额不符';
+      window.demoApp.setRechargeOrders(rcs);
+      window.demoApp.addFlow({ id: 'F-RC-REJ-' + Date.now(), time: _now(), type: 'recharge', desc: '充值审核拒绝 - ' + rcId, account: rcs[i].walletKey, amount: 0, operator: '财务（管理后台）', voucher_no: null, subject_code: '1001', direction: 'credit', related_recharge: rcId, lockedNote: '已拒绝 · ' + fundFmtMoney(rcs[i].amount) });
+      toast('⛔ 充值单 ' + rcId + ' 已拒绝，资金未到账', 'warn');
+      renderFundsAll();
+    };
+
+    // 提现审核：通过 → 把 reviewing/pending 直接推进到 success（出账 + 双向凭证）
+    window.adminApproveWithdraw = function (wdId) {
+      var wds = window.demoApp.getWithdrawOrders();
+      var i = wds.findIndex(function (w) { return w.id === wdId; });
+      if (i < 0) return;
+      var w = wds[i];
+      if (w.status !== 'pending' && w.status !== 'reviewing') return;
+      var ts = _now();
+      var voucherNo = 'V-' + Date.now();
+      w.status = 'success';
+      w.reviewed_at = ts;
+      w.arrived_at = ts;
+      w.voucher_no = voucherNo;
+      w.reviewer = '财务（管理后台）';
+      w.next_tick_at = null;
+      window.demoApp.setWithdrawOrders(wds);
+
+      // 钱包：total_earnings -= amt; total_withdrawn += amt; pending_withdraw -= amt; available_balance -= amt
+      var wallets = window.demoApp.getWallets();
+      var ww = wallets[w.walletKey];
+      if (ww) {
+        ww.total_earnings    = Math.max(0, (ww.total_earnings    || 0) - w.amount);
+        ww.total_withdrawn   = (ww.total_withdrawn   || 0) + w.amount;
+        ww.pending_withdraw  = Math.max(0, (ww.pending_withdraw  || 0) - w.amount);
+        ww.available_balance = Math.max(0, (ww.available_balance || ww.balance || 0) - w.amount);
+        ww.balance = ww.available_balance;
+        wallets[w.walletKey] = ww;
+        window.demoApp.setWallets(wallets);
+      }
+      // 双向凭证：1001 贷 -amt / 3001 借 -amt（待提现负债注销）
+      window.demoApp.addFlow({ id: 'F-WD-ADM-OK-' + Date.now(), time: ts, type: 'withdraw', desc: '提现审核通过 - 出账到账 ' + wdId + ' · ' + (w.bank_card || '—'), account: w.walletKey, amount: -w.amount, operator: '财务（管理后台）', voucher_no: voucherNo, subject_code: '1001', direction: 'credit', related_withdraw: wdId });
+      window.demoApp.addFlow({ id: 'F-WD-ADM-OK-OFF-' + Date.now(), time: ts, type: 'withdraw', desc: '（对手方）提现 - 待提现负债注销', account: w.walletKey, amount: 0, _voucherAmt: w.amount, operator: 'system', voucher_no: voucherNo, subject_code: '3001', direction: 'debit', related_withdraw: wdId, lockedNote: '对手方记账（借方）' });
+      toast('💰 提现 ' + fundFmtMoney(w.amount) + ' 已审核通过 → ' + (w.bank_card || '—') + '（凭证 ' + voucherNo + '）', 'ok');
+      renderFundsAll();
+    };
+    // 提现审核：拒绝 → 释放 pending_withdraw + status=rejected
+    window.adminRejectWithdraw = function (wdId) {
+      var wds = window.demoApp.getWithdrawOrders();
+      var i = wds.findIndex(function (w) { return w.id === wdId; });
+      if (i < 0) return;
+      var w = wds[i];
+      if (w.status !== 'pending' && w.status !== 'reviewing') return;
+      var ts = _now();
+      var wallets = window.demoApp.getWallets();
+      var ww = wallets[w.walletKey];
+      if (ww) {
+        ww.pending_withdraw = Math.max(0, (ww.pending_withdraw || 0) - w.amount);
+        wallets[w.walletKey] = ww;
+        window.demoApp.setWallets(wallets);
+      }
+      w.status = 'rejected';
+      w.reviewed_at = ts;
+      w.reject_reason = '财务复核未通过：请补充更详细的资金来源说明 / 收款人一致性证明';
+      w.reviewer = '财务（管理后台）';
+      w.next_tick_at = null;
+      window.demoApp.setWithdrawOrders(wds);
+      window.demoApp.addFlow({ id: 'F-WD-ADM-REJ-' + Date.now(), time: ts, type: 'withdraw', desc: '提现审核拒绝 - ' + wdId + '（财务驳回，资金已退回可提现额度）', account: w.walletKey, amount: 0, _voucherAmt: w.amount, operator: '财务（管理后台）', voucher_no: null, subject_code: '3001', direction: 'credit', related_withdraw: wdId, lockedNote: '已拒绝 · 资金已退回' });
+      toast('⛔ 提现单 ' + wdId + ' 被拒绝，资金已退回可提现额度', 'warn');
+      renderFundsAll();
+    };
+
+    // sub-tab 切换
+    document.querySelectorAll('.fst-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var key = btn.getAttribute('data-fst');
+        document.querySelectorAll('.fst-btn').forEach(function (b) { b.classList.toggle('active', b === btn); });
+        document.querySelectorAll('.fst-panel').forEach(function (p) { p.classList.remove('active'); });
+        document.getElementById('fstPanel' + key.charAt(0).toUpperCase() + key.slice(1)).classList.add('active');
+      });
+    });
+
+    function renderFundsAll() {
+      renderFunds();
+      renderFundKpis();
+      renderFundRechargePanel();
+      renderFundTransferPanel();
+      renderFundWithdrawPanel();
+    }
+    window.renderFundsAll = renderFundsAll;
+
     window.doAllocate = function () {
       var target = document.getElementById('allocTarget').value;
       var amount = Number(document.getElementById('allocAmount').value);
@@ -1030,7 +1406,7 @@
       window.demoApp.addFlow({ id: 'F-A' + Date.now(), time: new Date().toISOString().slice(0, 16).replace('T', ' '), type: 'allocate', desc: '管理员划拨预算 → ' + (ws ? ws.shortName : target) + (note ? '（' + note + '）' : ''), account: tgtKey || target, amount: amount, operator: '昭岚（企业管理员）' });
       window.demoApp.addFlow({ id: 'F-A' + Date.now() + 'o', time: new Date().toISOString().slice(0, 16).replace('T', ' '), type: 'allocate', desc: '从企业主账户划拨至 ' + (ws ? ws.shortName : target), account: mainKey, amount: -amount, operator: '昭岚（企业管理员）' });
       closeModal('allocModal');
-      renderFunds();
+      renderFundsAll();
       renderWorkspaces();
       document.getElementById('kpiBalance').textContent = window.fmtMoney(wallets[mainKey].balance);
       toast('已从企业主账户划拨 ' + window.fmtMoney(amount) + ' 至 ' + (ws ? ws.name : target), 'ok');
@@ -1046,7 +1422,7 @@
     renderMembers();
     renderWorkspaces();
     renderRoles();
-    renderFunds();
+    renderFundsAll();
 
     // ============================================================
     // 邀请管理（Tab 5）

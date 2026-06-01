@@ -608,11 +608,23 @@
       if (!$("agreeCheck").checked) { window.demoToast("请先勾选同意服务协议", "err"); return; }
       const q = QUOTES.find(x => x.id === selectedId); if (!q) return;
       const ws = window.demoApp.getCurrentWorkspace();
-      const ok = window.demoApp.lockBudget(ws.walletKey, q.price);
-      if (!ok) { window.demoToast("余额不足，锁定失败", "err"); return; }
-      // 创建订单
+
+      // B-3：TCC Try 阶段：写真实 freeze_order + 双向凭证（1002 借 / 1001 贷）
       const ts = new Date();
       const orderId = "OD-" + ts.getFullYear() + String(ts.getMonth() + 1).padStart(2, "0") + String(ts.getDate()).padStart(2, "0") + String(Math.floor(Math.random() * 90 + 10));
+
+      const tcc = window.demoApp.tccTry({
+        walletKey: ws.walletKey,
+        amount: q.price,
+        demandId: demand.id,
+        orderId: orderId,
+        orderTitle: demand.title,
+        biz_type: "cash_consume",
+        operator: "昭岚"
+      });
+      if (!tcc.ok) { window.demoToast(tcc.error || "锁定失败，请检查余额", "err"); return; }
+
+      // freeze_order 反向回填 orderId（tccTry 已记 demandId/orderId）
       const wallets = window.demoApp.getWallets();
       const wallet = wallets[ws.walletKey];
       window.demoApp.addOrder({
@@ -621,16 +633,19 @@
         workspace: ws.id, workspaceName: ws.name,
         payerType: ws.payer.type, payerName: wallet ? wallet.name : ws.payer.name, payerWalletKey: ws.walletKey,
         amount: q.price, status: "in-progress",
+        // B-3：订单关联 TCC 冻结单（项目空间结算时用 freezeId 调 tccConfirm）
+        freezeId: tcc.freezeId,
+        voucher_no: tcc.voucherNo,
         createTime: ts.getFullYear() + "-" + String(ts.getMonth() + 1).padStart(2, "0") + "-" + String(ts.getDate()).padStart(2, "0") + " " + String(ts.getHours()).padStart(2, "0") + ":" + String(ts.getMinutes()).padStart(2, "0")
       });
       // 更新需求
       window.demoApp.updateDemand(demand.id, { status: "in-progress", contractor: q.name });
       $("orderModal").classList.remove("open");
-      window.demoToast("✅ 下单成功！订单 " + orderId + "，" + window.fmtMoney(q.price) + " 已从 " + (wallet ? wallet.name : ws.payer.name) + " 锁定", "ok");
+      window.demoToast("✅ 下单成功！订单 " + orderId + "，" + window.fmtMoney(q.price) + " 已从 " + (wallet ? wallet.name : ws.payer.name) + " 冻结（冻结单 " + tcc.freezeId + "）", "ok");
       // 跳钱包让用户看变化
       setTimeout(() => {
-        window.demoToast("提示：可前往「钱包」查看锁定记录", "info");
-        setTimeout(() => location.href = "wallet-overview.html", 2000);
+        window.demoToast("提示：可前往「钱包」查看锁定记录与凭证 " + tcc.voucherNo, "info");
+        setTimeout(() => location.href = "wallet-overview.html#flows", 2000);
       }, 1500);
     });
 
