@@ -6,13 +6,13 @@
       title: "原型总览",
       desc: "这是一套独立于现有站点导航的资金中心原型目录。先拆成多页面，再逐页深化到可评审状态。",
       actions: [
-        { label: "进入资金总览", href: "overview.html", tone: "primary" },
+        { label: "进入资金首页", href: "overview.html", tone: "primary" },
         { label: "查看深化计划", href: "PAGE-ENRICHMENT-PLAN.md", tone: "" }
       ],
       section: "landing"
     },
     overview: {
-      title: "资金总览",
+      title: "资金首页",
       desc: "聚焦团队预算、当月节奏、待处理事项和最近交易。",
       actions: [
         { label: "去充值", href: "recharge.html", tone: "primary" },
@@ -22,7 +22,7 @@
       section: "front"
     },
     accounts: {
-      title: "账户",
+      title: "账户总览",
       desc: "按账户看资金归属与结构。",
       actions: [
         { label: "充值", modal: "action", tone: "primary" },
@@ -58,7 +58,7 @@
       desc: "管理积分余额、余额兑换积分、充值并兑换积分，以及 AIGC token 消费记录。",
       actions: [
         { label: "兑换积分", modal: "pointsExchange", tone: "primary" },
-        { label: "充值并兑换", href: "recharge.html", tone: "" }
+        { label: "充值并兑换", modal: "pointsRechargeExchange", tone: "" }
       ],
       section: "front"
     },
@@ -77,7 +77,7 @@
       section: "front"
     },
     withdraw: {
-      title: "提现中心",
+      title: "提现管理",
       desc: "仅面向个人收益账户，展示可提现余额与申请记录。",
       actions: [
         { label: "提交提现", tone: "primary", modalType: "withdraw", modalValue: "action" }
@@ -85,7 +85,7 @@
       section: "front"
     },
     security: {
-      title: "支付与安全",
+      title: "账户设置",
       desc: "支付工具、支付密码、限额与二次校验。",
       actions: [
         { label: "新增银行卡", href: "#", tone: "primary" },
@@ -141,17 +141,27 @@
   };
 
   const NAV = {
-    front: [
-      ["overview", "资金总览", "◎"],
-      ["accounts", "账户", "◌"],
-      ["transactions", "交易流水", "↹"],
-      ["fundFlows", "资金流水", "≋"],
-      ["bills", "账单明细", "◫"],
-      ["recharge", "充值中心", "＋"],
-      ["points", "积分中心", "◒"],
-      ["invoices", "发票中心", "▣"],
-      ["withdraw", "提现中心", "－"],
-      ["security", "支付与安全", "⌘"]
+    finance: [
+      { title: "资金首页", items: [
+        ["overview", "资金首页", "◎"]
+      ] },
+      { title: "账户与余额", items: [
+        ["accounts", "账户总览", "◌"],
+        ["recharge", "充值中心", "＋"],
+        ["withdraw", "提现管理", "－"]
+      ] },
+      { title: "明细与流水", items: [
+        ["bills", "账单明细", "◫"],
+        ["transactions", "交易流水", "↹"],
+        ["fundFlows", "资金流水", "≋"]
+      ] },
+      { title: "积分与发票", items: [
+        ["points", "积分中心", "◒"],
+        ["invoices", "发票中心", "▣"]
+      ] },
+      { title: "设置", items: [
+        ["security", "账户设置", "⌘"]
+      ] }
     ],
     order: [
       ["orderDetail", "订单资金详情", "≣"]
@@ -882,21 +892,21 @@
   function buildBillDetailRows(team) {
     if (team.name.includes("短剧")) {
       return [
-        { time: "2026-05-26 18:14", title: "发布需求冻结预算", type: "冻结", relatedBiz: "OD-2026052607 / 三集短剧解说视频", direction: "冻结", amount: "冻结 ¥48,000", status: "冻结中", statusTone: "blue", desc: "需求发布后，系统已冻结对应团队预算。", fundNo: "FF-2026052601 / FF-2026052602", tradeNo: "FL-2026052601", account: "短剧制作中心 - 团队预算账户", counterparty: "平台锁资池" },
-        { time: "2026-05-25 15:08", title: "团队预算到账", type: "充值", relatedBiz: "AL-2026052502 / 企业预算补充", direction: "收入", amount: "+¥ 200,000", status: "成功", statusTone: "green", desc: "企业总池划拨预算到账，可用于后续订单支付和预算冻结。", fundNo: "FF-2026052501", tradeNo: "FL-2026052502", account: "短剧制作中心 - 团队预算账户", counterparty: "企业总池" },
-        { time: "2026-05-24 11:41", title: "订单验收结算", type: "消费", relatedBiz: "OD-2026051809 / IP 海报系列", direction: "支出", amount: "-¥ 28,000", status: "成功", statusTone: "green", desc: "订单验收通过后，冻结预算完成结算并支付给承制方。", fundNo: "FF-2026052401", tradeNo: "FL-2026052403", account: "短剧制作中心 - 团队预算账户", counterparty: "星辰创作工作室" },
-        { time: "2026-05-21 16:00", title: "退款到账", type: "退款", relatedBiz: "RF-2026052103 / 海报重制争议退款", direction: "收入", amount: "+¥ 6,000", status: "处理中", statusTone: "orange", desc: "订单争议退款正在处理，退款金额将回补到团队预算账户。", fundNo: "FF-2026052101", tradeNo: "FL-2026052104", account: "短剧制作中心 - 团队预算账户", counterparty: "平台退款池" },
-        { time: "2026-05-18 09:32", title: "充值成功", type: "充值", relatedBiz: "RC-2026051801 / 团队预算充值", direction: "收入", amount: "+¥ 50,000", status: "成功", statusTone: "green", desc: "在线充值支付成功，充值金额已进入团队预算账户。", fundNo: "FF-2026051801", tradeNo: "FL-2026051806", account: "短剧制作中心 - 团队预算账户", counterparty: "招商银行尾号 2048" },
-        { time: "2026-05-18 09:36", title: "积分兑换成功", type: "消费", relatedBiz: "PT-2026051801 / 团队积分兑换", direction: "支出", amount: "-¥ 2,000", status: "成功", statusTone: "green", desc: "团队可用余额兑换为平台积分，积分已入账。", fundNo: "FF-2026051802", tradeNo: "FL-2026051807", account: "短剧制作中心 - 团队预算账户", counterparty: "平台积分账户" }
+        { time: "2026-05-26 18:14", title: "发布需求冻结预算", type: "冻结", relatedBiz: "OD-2026052607 / 三集短剧解说视频", direction: "冻结", amount: "冻结 ¥48,000", status: "冻结中", statusTone: "blue", desc: "需求发布后，系统已冻结对应团队预算。", fundNo: "FF-2026052601 / FF-2026052602", tradeNo: "FL-2026052601", account: "短剧制作中心 - 团队预算账户", counterparty: "平台锁资池", refundAction: "申请退款", refundHint: "该订单仍处于锁资中，可从原订单发起取消或退款申请。" },
+        { time: "2026-05-25 15:08", title: "团队预算到账", type: "充值", relatedBiz: "AL-2026052502 / 企业预算补充", direction: "收入", amount: "+¥ 200,000", status: "成功", statusTone: "green", desc: "企业总池划拨预算到账，可用于后续订单支付和预算冻结。", fundNo: "FF-2026052501", tradeNo: "FL-2026052502", account: "短剧制作中心 - 团队预算账户", counterparty: "企业总池", refundAction: "不可退款", refundHint: "预算划拨入账不支持在账单内申请退款。" },
+        { time: "2026-05-24 11:41", title: "订单验收结算", type: "消费", relatedBiz: "OD-2026051809 / IP 海报系列", direction: "支出", amount: "-¥ 28,000", status: "成功", statusTone: "green", desc: "订单验收通过后，冻结预算完成结算并支付给承制方。", fundNo: "FF-2026052401", tradeNo: "FL-2026052403", account: "短剧制作中心 - 团队预算账户", counterparty: "星辰创作工作室", refundAction: "联系客服退款", refundHint: "该订单已结算，自助退款不可用，如有争议请联系客服处理。" },
+        { time: "2026-05-21 16:00", title: "退款到账", type: "退款", relatedBiz: "RF-2026052103 / 海报重制争议退款", direction: "收入", amount: "+¥ 6,000", status: "处理中", statusTone: "orange", desc: "订单争议退款正在处理，退款金额将回补到团队预算账户。", fundNo: "FF-2026052101", tradeNo: "FL-2026052104", account: "短剧制作中心 - 团队预算账户", counterparty: "平台退款池", refundAction: "查看退款进度", refundHint: "退款正在处理，可查看退款单进度。" },
+        { time: "2026-05-18 09:32", title: "充值成功", type: "充值", relatedBiz: "RC-2026051801 / 团队预算充值", direction: "收入", amount: "+¥ 50,000", status: "成功", statusTone: "green", desc: "在线充值支付成功，充值金额已进入团队预算账户。", fundNo: "FF-2026051801", tradeNo: "FL-2026051806", account: "短剧制作中心 - 团队预算账户", counterparty: "招商银行尾号 2048", refundAction: "联系客服退款", refundHint: "充值异常或重复充值可联系客服处理，已消费或已冻结金额不可直接退回。" },
+        { time: "2026-05-18 09:36", title: "积分兑换成功", type: "消费", relatedBiz: "PT-2026051801 / 团队积分兑换", direction: "支出", amount: "-¥ 2,000", status: "成功", statusTone: "green", desc: "团队可用余额兑换为平台积分，积分已入账。", fundNo: "FF-2026051802", tradeNo: "FL-2026051807", account: "短剧制作中心 - 团队预算账户", counterparty: "平台积分账户", refundAction: "不可退款", refundHint: "积分兑换成功后不支持退现金。" }
       ];
     }
 
     return [
-      { time: "2026-05-26 09:20", title: "订单验收结算", type: "消费", relatedBiz: "OD-2026052603 / 营销短视频制作包", direction: "支出", amount: "-¥ 22,000", status: "成功", statusTone: "green", desc: "订单验收通过后，团队预算完成结算扣款。", fundNo: "FF-2026052603", tradeNo: "FL-2026052609", account: "市场宣传组 - 团队预算账户", counterparty: "内容承接方" },
-      { time: "2026-05-24 13:50", title: "退款到账", type: "退款", relatedBiz: "RF-2026052401 / 视频改版取消退款", direction: "收入", amount: "+¥ 8,000", status: "处理中", statusTone: "orange", desc: "取消改版后发起退款，退款金额回补团队预算。", fundNo: "FF-2026052402", tradeNo: "FL-2026052410", account: "市场宣传组 - 团队预算账户", counterparty: "平台退款池" },
-      { time: "2026-05-22 10:03", title: "发布需求冻结预算", type: "冻结", relatedBiz: "OD-2026052202 / 海报素材包", direction: "冻结", amount: "冻结 ¥12,000", status: "冻结中", statusTone: "blue", desc: "需求发布后冻结对应预算，等待履约推进。", fundNo: "FF-2026052201", tradeNo: "FL-2026052211", account: "市场宣传组 - 团队预算账户", counterparty: "平台锁资池" },
-      { time: "2026-05-14 10:08", title: "充值成功", type: "充值", relatedBiz: "RC-2026051401 / 团队预算充值", direction: "收入", amount: "+¥ 100,000", status: "成功", statusTone: "green", desc: "企业总池划拨预算到账。", fundNo: "FF-2026051401", tradeNo: "FL-2026051412", account: "市场宣传组 - 团队预算账户", counterparty: "企业总池" },
-      { time: "2026-05-14 10:12", title: "积分兑换成功", type: "消费", relatedBiz: "PT-2026051401 / 团队积分兑换", direction: "支出", amount: "-¥ 1,000", status: "成功", statusTone: "green", desc: "团队可用余额兑换为平台积分，积分已入账。", fundNo: "FF-2026051402", tradeNo: "FL-2026051413", account: "市场宣传组 - 团队预算账户", counterparty: "平台积分账户" }
+      { time: "2026-05-26 09:20", title: "订单验收结算", type: "消费", relatedBiz: "OD-2026052603 / 营销短视频制作包", direction: "支出", amount: "-¥ 22,000", status: "成功", statusTone: "green", desc: "订单验收通过后，团队预算完成结算扣款。", fundNo: "FF-2026052603", tradeNo: "FL-2026052609", account: "市场宣传组 - 团队预算账户", counterparty: "内容承接方", refundAction: "联系客服退款", refundHint: "该订单已结算，自助退款不可用，如有争议请联系客服处理。" },
+      { time: "2026-05-24 13:50", title: "退款到账", type: "退款", relatedBiz: "RF-2026052401 / 视频改版取消退款", direction: "收入", amount: "+¥ 8,000", status: "处理中", statusTone: "orange", desc: "取消改版后发起退款，退款金额回补团队预算。", fundNo: "FF-2026052402", tradeNo: "FL-2026052410", account: "市场宣传组 - 团队预算账户", counterparty: "平台退款池", refundAction: "查看退款进度", refundHint: "退款正在处理，可查看退款单进度。" },
+      { time: "2026-05-22 10:03", title: "发布需求冻结预算", type: "冻结", relatedBiz: "OD-2026052202 / 海报素材包", direction: "冻结", amount: "冻结 ¥12,000", status: "冻结中", statusTone: "blue", desc: "需求发布后冻结对应预算，等待履约推进。", fundNo: "FF-2026052201", tradeNo: "FL-2026052211", account: "市场宣传组 - 团队预算账户", counterparty: "平台锁资池", refundAction: "申请退款", refundHint: "该订单仍处于锁资中，可从原订单发起取消或退款申请。" },
+      { time: "2026-05-14 10:08", title: "充值成功", type: "充值", relatedBiz: "RC-2026051401 / 团队预算充值", direction: "收入", amount: "+¥ 100,000", status: "成功", statusTone: "green", desc: "企业总池划拨预算到账。", fundNo: "FF-2026051401", tradeNo: "FL-2026051412", account: "市场宣传组 - 团队预算账户", counterparty: "企业总池", refundAction: "不可退款", refundHint: "企业总池划拨不支持在账单内申请退款。" },
+      { time: "2026-05-14 10:12", title: "积分兑换成功", type: "消费", relatedBiz: "PT-2026051401 / 团队积分兑换", direction: "支出", amount: "-¥ 1,000", status: "成功", statusTone: "green", desc: "团队可用余额兑换为平台积分，积分已入账。", fundNo: "FF-2026051402", tradeNo: "FL-2026051413", account: "市场宣传组 - 团队预算账户", counterparty: "平台积分账户", refundAction: "不可退款", refundHint: "积分兑换成功后不支持退现金。" }
     ];
   }
 
@@ -1103,7 +1113,7 @@
             <div class="hero-caption">已拆成独立页面，便于逐页打磨细节，而不是继续在单页大文件里堆内容。</div>
           </div>
           <div class="hero-side">
-            <div class="hero-side-card"><div class="label">前台页面</div><div class="value">10 页</div><div class="sub">总览、账户、交易流水、资金流水、账单明细、充值、积分、发票、提现、安全。</div></div>
+            <div class="hero-side-card"><div class="label">用户端页面</div><div class="value">10 页</div><div class="sub">资金首页、账户总览、账单流水、交易流水、资金流水、充值、积分、发票、提现、账户设置。</div></div>
             <div class="hero-side-card"><div class="label">三层流水</div><div class="value">交易 / 资金 / 账单</div><div class="sub">交易事件、余额变化、用户账单三层分离展示。</div></div>
             <div class="hero-side-card"><div class="label">补充页面</div><div class="value">5 页</div><div class="sub">订单资金详情 + 4 个后台财务页面。</div></div>
           </div>
@@ -1111,19 +1121,19 @@
       </div>
       <div class="grid-2">
         <div class="surface">
-          <div class="surface-head"><div><h3>前台页面</h3><p>面向团队、项目负责人、承接者</p></div></div>
+          <div class="surface-head"><div><h3>用户端资金中心</h3><p>面向团队、项目负责人、承接者</p></div></div>
           <div class="card-link-grid">
             ${[
-              ["overview.html", "资金总览", "团队预算首页"],
-              ["accounts.html", "账户", "资金归属与结构"],
+              ["overview.html", "资金首页", "团队预算首页"],
+              ["accounts.html", "账户总览", "资金归属与结构"],
               ["transactions.html", "交易流水", "记录交易事件"],
               ["fund-flows.html", "资金流水", "记录余额真实变化"],
               ["bills.html", "账单明细", "用户可读账单记录"],
               ["recharge.html", "充值中心", "补钱与到账状态"],
               ["points.html", "积分中心", "积分兑换与 AIGC 消费"],
               ["invoices.html", "发票中心", "可开票与发票归档"],
-              ["withdraw.html", "提现中心", "收益提现记录"],
-              ["security.html", "支付与安全", "支付工具与校验"]
+              ["withdraw.html", "提现管理", "收益提现记录"],
+              ["security.html", "账户设置", "支付工具与校验"]
             ].map(item => `<a class="card-link" href="${item[0]}"><strong>${item[1]}</strong><span>${item[2]}</span></a>`).join("")}
           </div>
         </div>
@@ -1586,9 +1596,9 @@
     return `
       <div class="info-banner">
         <ul>
-          <li>账单明细是面向用户展示的资金结果，不等同于底层真实资金流水。</li>
-          <li>冻结、解冻、退款、提现等动作，底层可能会产生多条资金流水，但账单页可以聚合为一条用户可理解的记录。</li>
-          <li>如果要追查具体记账过程，请跳转到交易流水或资金流水查看。</li>
+          <li>账单明细用于查看当前账户的充值、消费、冻结、退款、提现等资金记录。</li>
+          <li>如对某笔账单有疑问，可在账单详情里查看关联业务、下载凭证或联系客服处理。</li>
+          <li>符合条件的订单退款，可从原订单或账单详情发起申请。</li>
         </ul>
       </div>
       <div class="form-card compact-filters" data-filter-panel="bills">
@@ -1677,12 +1687,13 @@
             <div class="detail-item"><span class="detail-label">关联业务</span><strong class="detail-value" data-bill-detail-field="relatedBiz">${firstBill.relatedBiz}</strong></div>
             <div class="detail-item"><span class="detail-label">关联交易流水号</span><strong class="detail-value" data-bill-detail-field="tradeNo">${firstBill.tradeNo}</strong></div>
             <div class="detail-item"><span class="detail-label">关联资金流水号</span><strong class="detail-value" data-bill-detail-field="fundNo">${firstBill.fundNo}</strong></div>
-            <div class="detail-item"><span class="detail-label">是否可联系客服</span><strong class="detail-value">是</strong></div>
+            <div class="detail-item"><span class="detail-label">退款处理</span><strong class="detail-value" data-bill-detail-field="refundHint">${firstBill.refundHint}</strong></div>
           </div>
           <div class="summary-actions" style="margin-top:16px;">
+            <button class="btn mini primary" type="button" data-bill-detail-field="refundAction">${firstBill.refundAction}</button>
             <button class="btn mini" type="button">联系客服</button>
             <button class="btn mini" type="button">下载凭证</button>
-            <button class="btn mini primary" type="button" data-close-bill-modal="detail">关闭</button>
+            <button class="btn mini" type="button" data-close-bill-modal="detail">关闭</button>
           </div>
         </div>
       </div>
@@ -1690,10 +1701,42 @@
     `;
   }
 
-  function renderPoints(team, accountScope = "team") {
+  function getPointsRechargeContext(team, accountScope = "team", mode = "direct") {
     const view = getPointsView(team, accountScope);
-    const exchangeAmount = accountScope === "personal" ? "500" : "2,000";
-    const exchangePoints = parseMoney(exchangeAmount) * 10;
+    const availableBalance = accountScope === "personal" ? getPersonalAccountView(team).available : team.recharge.accountInfo.available;
+    const availableNumber = parseMoney(availableBalance);
+    const targetExchangeAmount = accountScope === "personal" ? 12000 : 800000;
+    const shortage = Math.max(targetExchangeAmount - availableNumber, 0);
+    const directRechargeAmount = accountScope === "personal" ? 1200 : 50000;
+    const isShortageMode = mode === "shortage" && shortage > 0;
+    const rechargeAmount = isShortageMode ? shortage : directRechargeAmount;
+    const exchangeAmount = isShortageMode ? targetExchangeAmount : directRechargeAmount;
+
+    return {
+      view,
+      availableBalance,
+      availableNumber,
+      targetExchangeAmount,
+      targetExchangePoints: targetExchangeAmount * 10,
+      shortage,
+      directRechargeAmount,
+      rechargeAmount,
+      exchangeAmount,
+      exchangePoints: exchangeAmount * 10,
+      modeLabel: isShortageMode ? "补差充值并兑换" : "充值并兑换积分",
+      subtitle: isShortageMode
+        ? `本次仅补差充值 ¥ ${shortage.toLocaleString("zh-CN")}，支付后合并当前余额兑换 ¥ ${targetExchangeAmount.toLocaleString("zh-CN")}。`
+        : "充值后自动兑换为积分，支付成功后积分进入当前积分账户。",
+      cardDesc: isShortageMode
+        ? `当前可用余额：${availableBalance}，还差 ¥ ${shortage.toLocaleString("zh-CN")}。`
+        : `当前可用余额：${availableBalance}，充值后将自动兑换为积分。`
+    };
+  }
+
+  function renderPoints(team, accountScope = "team") {
+    const exchangeContext = getPointsRechargeContext(team, accountScope, "shortage");
+    const directContext = getPointsRechargeContext(team, accountScope, "direct");
+    const { view, availableBalance, targetExchangeAmount, targetExchangePoints, shortage } = exchangeContext;
     return `
       <div class="points-hero">
         <div>
@@ -1702,7 +1745,7 @@
           <p>积分可通过余额兑换或充值后兑换获得，并可在天合 AIGC 平台消费 token。积分不等同现金余额，提现和发票口径后续单独确认。</p>
           <div class="points-hero-actions">
             <button class="btn primary" type="button" data-open-recharge-modal="pointsExchange">兑换积分</button>
-            <a class="btn" href="recharge.html">充值并兑换</a>
+            <button class="btn" type="button" data-open-recharge-modal="pointsRechargeExchange" data-points-recharge-mode="direct">充值并兑换</button>
           </div>
         </div>
         <div class="points-balance-card">
@@ -1712,36 +1755,20 @@
         </div>
       </div>
 
+      <div class="info-banner">
+        <ul>
+          <li>积分可用于天合 AIGC 平台的 token 消费，支持文案生成、脚本扩写、图片提示词和分镜生成等场景。</li>
+          <li>积分可通过余额兑换或充值并兑换获得；兑换成功后不支持退现金。</li>
+          <li>AIGC 任务失败时仅回补积分，不退回现金余额。</li>
+        </ul>
+      </div>
+
       <div class="summary-strip" style="grid-template-columns:repeat(5,minmax(0,1fr));">
         <div class="summary-box"><div class="kicker">积分账户</div><div class="big">${view.accountName}</div></div>
         <div class="summary-box"><div class="kicker">本月获得积分</div><div class="big">${view.earned.toLocaleString("zh-CN")}</div></div>
         <div class="summary-box"><div class="kicker">本月消耗积分</div><div class="big">${view.used.toLocaleString("zh-CN")}</div></div>
         <div class="summary-box"><div class="kicker">预计可用 token</div><div class="big">${view.tokenEstimate.toLocaleString("zh-CN")}</div></div>
         <div class="summary-box"><div class="kicker">处理中积分</div><div class="big">${view.pending.toLocaleString("zh-CN")}</div></div>
-      </div>
-
-      <div class="grid-2">
-        <div class="surface">
-          <div class="surface-head"><div><h3>积分兑换</h3><p>使用当前账户可用余额兑换积分</p></div><span class="tag blue">10 积分 / ¥1</span></div>
-          <div class="point-rule-grid">
-            <div><span>兑换账户</span><strong>${view.accountName}</strong></div>
-            <div><span>积分账户 ID</span><strong>${view.accountId}</strong></div>
-            <div><span>默认兑换金额</span><strong>¥ ${exchangeAmount}</strong></div>
-            <div><span>预计获得积分</span><strong>${exchangePoints.toLocaleString("zh-CN")} 分</strong></div>
-          </div>
-          <div class="summary-actions" style="margin-top:16px;">
-            <button class="btn primary" type="button" data-open-recharge-modal="pointsExchange">立即兑换</button>
-            <a class="btn" href="recharge.html">余额不足先充值</a>
-          </div>
-        </div>
-        <div class="surface">
-          <div class="surface-head"><div><h3>AIGC token 使用规则</h3><p>积分在 AIGC 平台消费 token</p></div></div>
-          <div class="notice-list">
-            <div class="notice-item ok"><div class="notice-main"><strong>消费对象</strong><span>文案生成、脚本扩写、图片提示词、分镜生成等 AIGC 能力。</span></div></div>
-            <div class="notice-item warn"><div class="notice-main"><strong>失败退回</strong><span>模型超时、任务失败时，系统生成退回记录并回补积分。</span></div></div>
-            <div class="notice-item ok"><div class="notice-main"><strong>使用范围</strong><span>积分当前用于天合 AIGC 平台，不支持提现，退款退回以页面状态为准。</span></div></div>
-          </div>
-        </div>
       </div>
 
       <div class="form-card compact-filters" data-filter-panel="points" style="margin-top:16px;">
@@ -1802,18 +1829,50 @@
               <h4>${view.accountName}</h4>
               <p>积分账户 ID：${view.accountId}，当前积分余额：${view.balance.toLocaleString("zh-CN")} 分</p>
               <div class="detail-grid detail-grid-2 compact-detail-grid">
-                <div class="detail-item"><span class="detail-label">兑换金额</span><strong class="detail-value">¥ ${exchangeAmount}</strong></div>
-                <div class="detail-item"><span class="detail-label">预计到账积分</span><strong class="detail-value">${exchangePoints.toLocaleString("zh-CN")} 分</strong></div>
+                <div class="detail-item"><span class="detail-label">当前可用余额</span><strong class="detail-value">${availableBalance}</strong></div>
+                <div class="detail-item"><span class="detail-label">本次兑换金额</span><strong class="detail-value">¥ ${targetExchangeAmount.toLocaleString("zh-CN")}</strong></div>
+                <div class="detail-item"><span class="detail-label">预计到账积分</span><strong class="detail-value">${targetExchangePoints.toLocaleString("zh-CN")} 分</strong></div>
                 <div class="detail-item"><span class="detail-label">兑换比例</span><strong class="detail-value">¥1 = 10 积分</strong></div>
-                <div class="detail-item"><span class="detail-label">关联业务单</span><strong class="detail-value">PT-2026060101</strong></div>
               </div>
-              <div class="field"><label>兑换金额</label><input type="text" value="${exchangeAmount}"></div>
+              ${shortage > 0 ? `<div class="notice-item warn" style="margin-bottom:14px;"><div class="notice-main"><strong>余额不足，还差 ¥ ${shortage.toLocaleString("zh-CN")}</strong><span>可以直接改用「补差充值并兑换」，无需离开当前页面。</span></div></div>` : ""}
+              <div class="field"><label>兑换金额</label><input type="text" value="${targetExchangeAmount.toLocaleString("zh-CN")}"></div>
               <div class="field"><label>兑换说明</label><input type="text" value="${accountScope === "personal" ? "个人 AIGC 消费积分补充" : "团队 AIGC 消费积分补充"}"></div>
             </div>
           </div>
           <div class="config-modal-foot">
-            <button class="btn primary" type="button">确认兑换</button>
+            ${shortage > 0 ? `<button class="btn primary" type="button" data-close-recharge-modal="pointsExchange" data-open-recharge-modal="pointsRechargeExchange" data-points-recharge-mode="shortage">补差充值并兑换</button>` : `<button class="btn primary" type="button">确认兑换</button>`}
             <button class="btn" type="button" data-close-recharge-modal="pointsExchange">取消</button>
+          </div>
+        </div>
+      </div>
+      <div class="recharge-modal-mask" data-recharge-modal="pointsRechargeExchange" hidden>
+        <div class="recharge-modal">
+          <div class="config-modal-head">
+            <div><h3 data-points-recharge-field="modeLabel">${directContext.modeLabel}</h3><p data-points-recharge-field="subtitle">${directContext.subtitle}</p></div>
+            <button class="config-close" type="button" data-close-recharge-modal="pointsRechargeExchange">×</button>
+          </div>
+          <div class="recharge-modal-body">
+            <div class="method-card recharge-modal-card">
+              <span class="tag blue">${view.accountScope}</span>
+              <h4>${view.accountName}</h4>
+              <p data-points-recharge-field="cardDesc">${directContext.cardDesc}</p>
+              <div class="detail-grid detail-grid-2 compact-detail-grid">
+                <div class="detail-item"><span class="detail-label">本次充值金额</span><strong class="detail-value" data-points-recharge-field="rechargeAmount">¥ ${directContext.rechargeAmount.toLocaleString("zh-CN")}</strong></div>
+                <div class="detail-item"><span class="detail-label">支付后兑换金额</span><strong class="detail-value" data-points-recharge-field="exchangeAmount">¥ ${directContext.exchangeAmount.toLocaleString("zh-CN")}</strong></div>
+                <div class="detail-item"><span class="detail-label">预计到账积分</span><strong class="detail-value" data-points-recharge-field="exchangePoints">${directContext.exchangePoints.toLocaleString("zh-CN")} 分</strong></div>
+                <div class="detail-item"><span class="detail-label">支付渠道</span><strong class="detail-value">支付宝 / 微信</strong></div>
+                <div class="detail-item"><span class="detail-label">到账账户</span><strong class="detail-value">${view.accountName}</strong></div>
+              </div>
+              <div class="field"><label>充值金额</label><input type="text" value="${directContext.rechargeAmount.toLocaleString("zh-CN")}" data-points-recharge-field="rechargeInput"></div>
+              <div class="field" data-points-recharge-field="quickAmounts"><label>快捷充值金额</label><div class="chip-row">${(accountScope === "personal" ? ["100", "500", "1,000", "5,000"] : ["10,000", "50,000", "100,000", "300,000"]).map(amount => `<button class="chip-button" type="button">¥ ${amount}</button>`).join("")}</div></div>
+              <div class="field"><label>支付方式</label><select><option>在线支付</option></select></div>
+              <div class="field"><label>支付渠道</label><select><option>支付宝</option><option>微信</option></select></div>
+              <div class="field"><label>兑换说明</label><input type="text" value="${accountScope === "personal" ? "个人 AIGC 消费积分补充" : "团队 AIGC 消费积分补充"}"></div>
+            </div>
+          </div>
+          <div class="config-modal-foot">
+            <button class="btn primary" type="button">确认支付并兑换</button>
+            <button class="btn" type="button" data-close-recharge-modal="pointsRechargeExchange">取消</button>
           </div>
         </div>
       </div>
@@ -2380,6 +2439,11 @@
             <div class="list-item"><strong>锁资逻辑</strong><span>下单时优先冻结团队预算，确保履约期间有可用资金。</span></div>
             <div class="list-item"><strong>结算逻辑</strong><span>验收通过后结算给承接方收益账户，并同步结转平台服务费。</span></div>
             <div class="list-item"><strong>开票逻辑</strong><span>仅已结算金额进入可开票池，未结算订单不产生开票额度。</span></div>
+            <div class="list-item"><strong>退款处理</strong><span>未结算订单可申请取消并退回冻结预算；已结算订单如有争议请联系客服处理。</span></div>
+          </div>
+          <div class="summary-actions" style="margin-top:16px;">
+            <button class="btn primary" type="button">申请退款</button>
+            <button class="btn" type="button">查看退款进度</button>
           </div>
         </div>
       </div>
@@ -2441,17 +2505,21 @@
   }
 
   function buildNav(page, accountScope = "team") {
-    const frontItems = accountScope === "personal"
-      ? NAV.front.filter(item => item[0] !== "overview")
-      : NAV.front;
-    const front = frontItems.map(item => `<a class="nav-link ${page === item[0] ? "active" : ""}" href="${pageToFile(item[0])}"><span class="nav-icon">${item[2]}</span><span>${item[1]}</span></a>`).join("");
-    const order = NAV.order.map(item => `<a class="nav-link ${page === item[0] ? "active" : ""}" href="${pageToFile(item[0])}"><span class="nav-icon">${item[2]}</span><span>${item[1]}</span></a>`).join("");
-    const admin = NAV.admin.map(item => `<a class="nav-link ${page === item[0] ? "active" : ""}" href="${pageToFile(item[0])}"><span class="nav-icon">${item[2]}</span><span>${item[1]}</span></a>`).join("");
+    const groups = NAV.finance
+      .map(group => ({
+        ...group,
+        items: accountScope === "personal"
+          ? group.items.filter(item => item[0] !== "overview")
+          : group.items
+      }))
+      .filter(group => group.items.length > 0);
+    const finance = groups.map(group => {
+      const links = group.items.map(item => `<a class="nav-link ${page === item[0] ? "active" : ""}" href="${pageToFile(item[0])}"><span class="nav-icon">${item[2]}</span><span>${item[1]}</span></a>`).join("");
+      return `<div class="nav-group"><div class="nav-title">${group.title}</div>${links}</div>`;
+    }).join("");
     return `
-      <div class="nav-group"><div class="nav-title">前台</div>${front}</div>
-      <div class="nav-group"><div class="nav-title">订单</div>${order}</div>
-      <div class="nav-group"><div class="nav-title">后台</div>${admin}</div>
-      <div class="sidebar-block"><strong>当前阶段</strong><span>先拆多页面，再逐页补足高保真结构、筛选器、状态流转和空态。</span></div>
+      ${finance}
+      <div class="sidebar-block"><strong>菜单口径</strong><span>用户端资金中心只保留账户、余额、账单、流水、积分、发票和设置。</span></div>
     `;
   }
 
@@ -2608,6 +2676,37 @@
       const node = document.querySelector(`[data-bill-detail-field="${key}"]`);
       if (node) node.textContent = value;
     });
+    const refundButton = document.querySelector('[data-bill-detail-field="refundAction"]');
+    if (refundButton) {
+      refundButton.textContent = row.refundAction || "联系客服";
+      refundButton.disabled = row.refundAction === "不可退款";
+      refundButton.className = `btn mini ${row.refundAction === "申请退款" ? "primary" : ""}`;
+    }
+  }
+
+  function syncPointsRechargeExchangeModal(mode = "direct") {
+    const teamKey = getStoredTeam();
+    const team = TEAM_DATA[teamKey] || TEAM_DATA.drama;
+    const accountScope = getStoredAccountScope();
+    const context = getPointsRechargeContext(team, accountScope, mode);
+    const values = {
+      modeLabel: context.modeLabel,
+      subtitle: context.subtitle,
+      cardDesc: context.cardDesc,
+      rechargeAmount: `¥ ${context.rechargeAmount.toLocaleString("zh-CN")}`,
+      exchangeAmount: `¥ ${context.exchangeAmount.toLocaleString("zh-CN")}`,
+      exchangePoints: `${context.exchangePoints.toLocaleString("zh-CN")} 分`,
+      rechargeInput: context.rechargeAmount.toLocaleString("zh-CN")
+    };
+
+    Object.entries(values).forEach(([key, value]) => {
+      const node = document.querySelector(`[data-points-recharge-field="${key}"]`);
+      if (!node) return;
+      if ("value" in node) node.value = value;
+      else node.textContent = value;
+    });
+    const quickAmounts = document.querySelector('[data-points-recharge-field="quickAmounts"]');
+    if (quickAmounts) quickAmounts.hidden = mode === "shortage" && context.shortage > 0;
   }
 
   function openRechargeModal(type, options = {}) {
@@ -2618,6 +2717,9 @@
       const teamKey = getStoredTeam();
       const team = TEAM_DATA[teamKey] || TEAM_DATA.drama;
       syncRechargeDetailModal(team, Number(options.recordIndex || 0));
+    }
+    if (type === "pointsRechargeExchange") {
+      syncPointsRechargeExchangeModal(options.pointsMode || "direct");
     }
     const modal = document.querySelector(`[data-recharge-modal="${type}"]`);
     if (!modal) return;
@@ -2787,7 +2889,8 @@
     if (openRechargeBtn) {
       event.preventDefault();
       openRechargeModal(openRechargeBtn.getAttribute("data-open-recharge-modal"), {
-        recordIndex: openRechargeBtn.getAttribute("data-recharge-record")
+        recordIndex: openRechargeBtn.getAttribute("data-recharge-record"),
+        pointsMode: openRechargeBtn.getAttribute("data-points-recharge-mode")
       });
       return;
     }
@@ -2903,8 +3006,6 @@
                 <div class="topbar-tools">
                   <div class="selector" id="teamSelectorWrap"><label for="teamSelect">当前团队</label><select id="teamSelect"></select></div>
                   <div class="meta-pill"><span id="topAccountScopeLabel">预算口径</span><strong id="topAccountLabel">团队预算账户</strong></div>
-                  <div class="meta-pill"><span id="topAmountLabel">本月净支出</span><strong id="topMonthlyBurn">¥ 0</strong></div>
-                  <div class="status-pill" id="topStatus">团队预算正常</div>
                 </div>
               </div>
               <p id="topbarSubtitle">团队预算、订单资金、后台财务一体化原型</p>
@@ -2941,21 +3042,12 @@
         const personalAccount = getPersonalAccountView(team);
         const teamSelectorWrap = document.getElementById("teamSelectorWrap");
         const topAccountScopeLabel = document.getElementById("topAccountScopeLabel");
-        const topAmountLabel = document.getElementById("topAmountLabel");
         const topbarSubtitle = document.getElementById("topbarSubtitle");
         if (teamSelectorWrap) teamSelectorWrap.hidden = isPersonalScope;
         if (topbarSubtitle) topbarSubtitle.textContent = isPersonalScope ? "个人收益、提现、积分与账单统一管理" : "团队预算、订单资金、后台财务一体化原型";
         document.getElementById("sidebarNav").innerHTML = buildNav(page, accountScope);
         document.getElementById("topAccountLabel").textContent = isPersonalScope ? personalAccount.name : team.accountLabel;
-        document.getElementById("topMonthlyBurn").textContent = isPersonalScope ? personalAccount.available : fmtMoney(team.monthlyBurn);
         topAccountScopeLabel.textContent = isPersonalScope ? "账户口径" : "预算口径";
-        topAmountLabel.textContent = isPersonalScope ? "可提现余额" : "本月净支出";
-        const topStatus = document.getElementById("topStatus");
-        topStatus.textContent = isPersonalScope ? "个人账户正常" : team.status;
-        const isWarn = !isPersonalScope && team.status.includes("待补");
-        topStatus.style.color = isWarn ? "#d97706" : "#17803d";
-        topStatus.style.background = isWarn ? "rgba(217,119,6,.10)" : "rgba(23,128,61,.08)";
-        topStatus.style.borderColor = isWarn ? "rgba(217,119,6,.16)" : "rgba(23,128,61,.14)";
         document.getElementById("pageMount").innerHTML = renderPage(page, teamKey, accountScope);
         ["transactions", "fundFlows", "bills", "points"].forEach(applyColumnVisibility);
         bindPrototypeInteractions();
