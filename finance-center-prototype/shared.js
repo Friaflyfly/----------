@@ -1603,15 +1603,15 @@
       </div>
       <div class="form-card compact-filters" data-filter-panel="bills">
         <div class="form-grid" style="grid-template-columns:repeat(4,minmax(0,1fr));">
-          <div class="field"><label>统计周期</label><select><option>账单月份</option><option>天</option><option>明细</option></select></div>
+          <div class="field"><label>统计周期</label><select data-bill-stat-period><option value="month">按月</option><option value="day">按日</option></select></div>
+          <div class="field"><label>统计时间</label><select data-bill-stat-time><option>2026-05 ~ 2026-05</option></select></div>
           <div class="field"><label>账单标题</label><input type="text" value="" placeholder="请输入账单标题"></div>
           <div class="field"><label>账单类型</label><select><option>全部账单类型</option><option>充值</option><option>消费</option><option>冻结</option><option>解冻</option><option>收入</option><option>退款</option><option>提现</option><option>服务费</option><option>调账</option></select></div>
           <div class="field"><label>收支方向</label><select><option>全部方向</option><option>收入</option><option>支出</option><option>冻结</option><option>解冻</option><option>不计收支</option></select></div>
           <div class="field"><label>账单状态</label><select><option>全部账单状态</option><option>处理中</option><option>成功</option><option>失败</option><option>已关闭</option><option>已退款</option><option>冻结中</option><option>已解冻</option></select></div>
-          <div class="field"><label>账户主体名称</label><select><option>${team.name}</option></select></div>
+          <div class="field"><label>关联业务单号</label><input type="text" value="" placeholder="请输入关联业务单号"></div>
+          <div class="field advanced-filter"><label>账户主体名称</label><select><option>${team.name}</option></select></div>
           <div class="field advanced-filter"><label>关联业务类型</label><select><option>全部业务类型</option><option>订单</option><option>充值单</option><option>提现单</option><option>退款单</option><option>结算单</option></select></div>
-          <div class="field advanced-filter"><label>关联业务单号</label><input type="text" value="" placeholder="请输入关联业务单号"></div>
-          <div class="field advanced-filter"><label>发生时间范围</label><select><option>2026-05-01 ~ 2026-05-31</option></select></div>
         </div>
         <div class="form-actions">
           <a class="btn primary" href="#">搜索</a>
@@ -2820,6 +2820,24 @@
     }
   }
 
+  function syncBillStatTime(periodSelect) {
+    const panel = periodSelect.closest('[data-filter-panel="bills"]');
+    const timeSelect = panel ? panel.querySelector("[data-bill-stat-time]") : null;
+    if (!timeSelect) return;
+
+    const options = periodSelect.value === "day"
+      ? ["2026-05-01 ~ 2026-05-31", "2026-06-01 ~ 2026-06-15", "最近 7 天", "最近 30 天"]
+      : ["2026-05 ~ 2026-05", "2026-04 ~ 2026-05", "2026-01 ~ 2026-06", "最近 6 个月"];
+    timeSelect.innerHTML = options.map(option => `<option>${option}</option>`).join("");
+  }
+
+  function handlePrototypeChange(event) {
+    const billPeriodSelect = event.target.closest("[data-bill-stat-period]");
+    if (billPeriodSelect) {
+      syncBillStatTime(billPeriodSelect);
+    }
+  }
+
   function closeBillModal(type) {
     const modal = document.querySelector(`[data-bill-modal="${type}"]`);
     if (!modal) return;
@@ -2980,6 +2998,8 @@
     const app = document.getElementById("app");
     if (!app) return;
     app.onclick = handlePrototypeClick;
+    app.onchange = handlePrototypeChange;
+    app.querySelectorAll("[data-bill-stat-period]").forEach(syncBillStatTime);
   }
 
   function mount() {
