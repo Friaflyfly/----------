@@ -224,6 +224,40 @@
     /* 不可发布 banner */
     .block-banner { grid-column: 1 / -1; background: #fff7e6; border: 1px solid #ffd591; color: #d46b08; padding: 12px 16px; border-radius: 8px; font-size: 13px; display: flex; align-items: center; gap: 10px; }
 
+    /* 付款确认弹窗 */
+    .pay-modal-mask { position: fixed; inset: 0; background: rgba(15, 23, 42, .42); z-index: 700; display: none; align-items: center; justify-content: center; padding: 22px; }
+    .pay-modal-mask.open { display: flex; }
+    .pay-modal { width: min(960px, 100%); max-height: min(86vh, 760px); overflow: hidden; background: #fff; border-radius: 18px; box-shadow: 0 24px 80px rgba(15, 23, 42, .24); display: flex; flex-direction: column; }
+    .pay-modal-head { padding: 22px 26px 18px; border-bottom: 1px solid #eef2f7; display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; background: linear-gradient(135deg, #f8fbff 0%, #fff 62%); }
+    .pay-modal-kicker { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: #e6f7ff; color: #096dd9; font-size: 12px; font-weight: 600; margin-bottom: 8px; }
+    .pay-modal-title { margin: 0; font-size: 20px; line-height: 1.35; color: #172033; }
+    .pay-modal-sub { margin: 6px 0 0; color: #6b7890; font-size: 13px; line-height: 1.6; }
+    .pay-modal-close { width: 34px; height: 34px; border: 1px solid #e8edf5; background: #fff; border-radius: 50%; cursor: pointer; font-size: 20px; color: #536079; }
+    .pay-modal-body { padding: 22px 26px; overflow: auto; display: grid; gap: 18px; }
+    .pay-hero { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(260px, .85fr); gap: 16px; }
+    .pay-amount-card { border: 1px solid #d8e7ff; border-radius: 16px; padding: 20px; background: linear-gradient(135deg, #f0f7ff 0%, #fff 70%); }
+    .pay-amount-label { color: #6b7890; font-size: 13px; margin-bottom: 8px; }
+    .pay-amount { font-size: 34px; line-height: 1; color: #0f172a; font-weight: 800; letter-spacing: -.5px; }
+    .pay-amount-note { margin-top: 12px; color: #6b7890; font-size: 13px; line-height: 1.6; }
+    .pay-status-card { border-radius: 16px; padding: 18px; border: 1px solid #e8edf5; background: #fbfcff; display: flex; flex-direction: column; gap: 12px; }
+    .pay-status-pill { width: fit-content; padding: 5px 10px; border-radius: 999px; background: #f6ffed; border: 1px solid #b7eb8f; color: #389e0d; font-size: 12px; font-weight: 700; }
+    .pay-status-pill.warn { background: #fff7e6; border-color: #ffd591; color: #d46b08; }
+    .pay-status-pill.danger { background: #fff2f0; border-color: #ffccc7; color: #cf1322; }
+    .pay-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .pay-field { border: 1px solid #e8edf5; border-radius: 14px; padding: 13px 14px; background: #fbfcff; min-height: 76px; }
+    .pay-field .k { color: #6b7890; font-size: 12px; margin-bottom: 7px; }
+    .pay-field .v { color: #172033; font-size: 14px; font-weight: 700; line-height: 1.45; word-break: break-word; }
+    .pay-flow { border-radius: 16px; padding: 16px; background: #f8fafc; border: 1px dashed #cbd5e1; }
+    .pay-flow-title { font-weight: 700; color: #172033; margin-bottom: 12px; }
+    .pay-flow-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .pay-flow-step { position: relative; padding: 12px; border-radius: 12px; background: #fff; border: 1px solid #e8edf5; min-height: 92px; }
+    .pay-flow-step b { display: block; color: #172033; margin-bottom: 6px; font-size: 13px; }
+    .pay-flow-step span { color: #6b7890; font-size: 12px; line-height: 1.45; }
+    .pay-warning { display: none; border-radius: 12px; padding: 12px 14px; background: #fff7e6; border: 1px solid #ffd591; color: #ad6800; font-size: 13px; line-height: 1.6; }
+    .pay-warning.show { display: block; }
+    .pay-modal-foot { padding: 16px 26px; border-top: 1px solid #eef2f7; display: flex; align-items: center; justify-content: flex-end; gap: 10px; background: #fff; }
+    .pay-modal-foot .btn { min-width: 96px; }
+
     /* ===== Toast ===== */
     .toasts { position: fixed; top: 72px; right: 20px; width: min(90vw, 360px); display: grid; gap: 8px; z-index: 500; }
     .toast { background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; padding: 10px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.1); animation: slideIn .25s ease-out; }
@@ -253,6 +287,11 @@
       .mode-row { grid-template-columns: 1fr; }
       .spu-grid { grid-template-columns: 1fr; }
       .sku-grid { grid-template-columns: 1fr; }
+      .pay-modal-mask { padding: 10px; align-items: stretch; }
+      .pay-modal { max-height: calc(100vh - 20px); border-radius: 14px; }
+      .pay-hero, .pay-fields, .pay-flow-steps { grid-template-columns: 1fr; }
+      .pay-modal-foot { flex-wrap: wrap; justify-content: stretch; }
+      .pay-modal-foot .btn { flex: 1; }
     }
   </style>
 </head>
@@ -317,7 +356,7 @@
 
     <div class="identity-switch" id="identitySwitch"></div>
 
-    <a href="wallet-overview.html" class="wallet-chip" id="walletChip" title="点击进入钱包">
+    <a href="finance-center-prototype/accounts.html" class="wallet-chip" id="walletChip" title="点击进入资金中心">
       <span>💰</span>
       <span>
         <span class="wallet-amount" id="walletAmount">¥185,000</span>
@@ -335,7 +374,7 @@
         <a href="account-basic-info-prototype-platform-style.html"><span>👤</span> 账户基础信息</a>
         <a href="enterprise-verification-prototype.html"><span>🏢</span> 企业认证</a>
         <a href="account-security-prototype.html"><span>🔐</span> 账号安全</a>
-        <a href="wallet-overview.html"><span>💰</span> 我的钱包</a>
+        <a href="finance-center-prototype/accounts.html"><span>💰</span> 资金中心</a>
         <div class="divider"></div>
         <a href="#" onclick="event.preventDefault(); window.demoToast('演示环境，未实现退出', 'warn')"><span>🚪</span> 退出登录</a>
       </div>
@@ -369,7 +408,7 @@
         </div>
         <div class="menu-group">
           <div class="menu-group-title">账户</div>
-          <a href="wallet-overview.html"><span class="menu-icon">💰</span> 我的钱包</a>
+          <a href="finance-center-prototype/accounts.html"><span class="menu-icon">💰</span> 资金中心</a>
           <a href="account-center.html"><span class="menu-icon">⚙️</span> 账号中心</a>
         </div>
       </nav>
@@ -569,7 +608,7 @@
         <div class="summary-section">
           <div class="summary-key">发布到团队</div>
           <div class="summary-val" id="sumWs"><b>骋风天合 · 短剧制作中心</b></div>
-          <div class="summary-key" style="margin-top:8px;">下单后扣款主体（预估）</div>
+          <div class="summary-key" style="margin-top:8px;">提交后付款账户（预估）</div>
           <div class="summary-val" id="sumPayer">本团队预算账户</div>
         </div>
       </aside>
@@ -579,7 +618,7 @@
       <!-- 提交栏 -->
       <div class="submit-bar">
         <div class="audit-hint">
-          ⚠️ <span id="auditHintText">提交后，<b>此需求将进入平台审核核定环节</b>（约 2 小时内），核定通过后将自动撮合 3-5 家承制方报价。</span>
+          ⚠️ <span id="auditHintText">提交时先<b>确认付款并冻结预算</b>，锁资成功后需求进入后续审核或项目协同流程。</span>
         </div>
         <button class="btn ghost" id="btnDraft">暂存草稿</button>
         <button class="btn" id="btnReset">重置</button>
@@ -590,17 +629,67 @@
 
   <div id="toastWrap" class="toasts"></div>
 
+  <div class="pay-modal-mask" id="paymentModal" aria-hidden="true">
+    <div class="pay-modal" role="dialog" aria-modal="true" aria-labelledby="paymentModalTitle">
+      <div class="pay-modal-head">
+        <div>
+          <div class="pay-modal-kicker">资金确认</div>
+          <h2 class="pay-modal-title" id="paymentModalTitle">确认付款并提交需求</h2>
+          <p class="pay-modal-sub" id="paymentModalSub">提交前先冻结预算，后续取消、审核驳回或未成交时可按规则解冻回原账户。</p>
+        </div>
+        <button class="pay-modal-close" type="button" id="paymentModalClose" aria-label="关闭">×</button>
+      </div>
+      <div class="pay-modal-body">
+        <div class="pay-hero">
+          <div class="pay-amount-card">
+            <div class="pay-amount-label">本次需冻结预算</div>
+            <div class="pay-amount" id="payAmount">¥0</div>
+            <div class="pay-amount-note" id="payAmountNote">冻结不是最终结算，只是保证需求发布后资金可用。</div>
+          </div>
+          <div class="pay-status-card">
+            <span class="pay-status-pill" id="payStatusPill">余额充足</span>
+            <div class="pay-field" style="min-height:auto;">
+              <div class="k">当前可用余额</div>
+              <div class="v" id="payAvailable">¥0</div>
+            </div>
+            <div class="pay-field" style="min-height:auto;">
+              <div class="k">确认后账户变化</div>
+              <div class="v" id="payAfterBalance">可用余额 -¥0，冻结余额 +¥0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pay-fields">
+          <div class="pay-field"><div class="k">付款账户</div><div class="v" id="payAccount">—</div></div>
+          <div class="pay-field"><div class="k">支付方式</div><div class="v">余额支付</div></div>
+          <div class="pay-field"><div class="k">关联业务单号</div><div class="v" id="payBizNo">—</div></div>
+          <div class="pay-field"><div class="k">需求名称</div><div class="v" id="payDemandTitle">—</div></div>
+          <div class="pay-field"><div class="k">业务类型</div><div class="v" id="payBizType">发布需求冻结预算</div></div>
+          <div class="pay-field"><div class="k">资金去向</div><div class="v">平台锁资池，验收结算前不直接划给承制方</div></div>
+        </div>
+
+        <div class="pay-warning" id="payWarning"></div>
+      </div>
+      <div class="pay-modal-foot">
+        <a class="btn" id="payRechargeLink" href="finance-center-prototype/recharge.html">去充值</a>
+        <a class="btn" href="finance-center-prototype/accounts.html">查看资金中心</a>
+        <button class="btn ghost" type="button" id="paymentCancel">暂不付款</button>
+        <button class="btn primary" type="button" id="paymentConfirm">确认付款并提交</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== 共享底座 ===== -->
-  <script src="_shared.js"></script>
+  <script src="_shared.js?v=finance-nav-20260616"></script>
   <script>
     SharedHeader.mount({ activeNav: "publish" });
-    // 钱包页深链：?from=wallet 时给一句来源提示（常用于"锁资失败 → 调整订单金额"路径）
+    // 资金中心深链：?from=wallet 时给一句来源提示（常用于"锁资失败 → 调整订单金额"路径）
     (function () {
       try {
         var qp = new URLSearchParams(window.location.search);
         if (qp.get("from") !== "wallet") return;
         var did = qp.get("demandId") || "";
-        var msg = "📍 从钱包页跳入" + (did ? "需求 " + did + " 的编辑" : "发布需求") + " · 锁资失败后可调整金额或追加预算";
+        var msg = "📍 从资金中心跳入" + (did ? "需求 " + did + " 的编辑" : "发布需求") + " · 锁资失败后可调整金额或追加预算";
         setTimeout(function () { if (window.demoToast) window.demoToast(msg, "info"); }, 350);
       } catch (e) {}
     })();
@@ -957,7 +1046,7 @@
         if (dl) dl.innerHTML = '交付与周期<span class="req">*</span><span style="color:#8c8c8c;font-weight:400;font-size:12px">（默认取自套餐，可改文案备注）</span>';
         if (tip) tip.textContent = "套餐总价与交付节奏由 SKU 锁定；请填写标题与说明，必要时调整下方交期描述";
         if (st) st.textContent = "补充信息（Brief）";
-        if (audit) audit.innerHTML = "✅ 平台套餐 · <strong>提交后系统自动审核通过</strong>；按 <strong>SKU 快照</strong>锁价，<strong>项目协同空间将自动创建</strong>，可立即进入跟进。";
+        if (audit) audit.innerHTML = "✅ 平台套餐 · <strong>提交时先确认付款并冻结套餐总价</strong>；锁资成功后系统自动审核通过，并创建项目协同空间。";
         $("sumPackageSection").style.display = "";
       } else {
         if (budgetWrap) budgetWrap.style.display = "";
@@ -965,7 +1054,7 @@
         if (dl) dl.innerHTML = '期望交付时间<span class="req">*</span>';
         if (tip) tip.textContent = "所有类目通用";
         if (st) st.textContent = "基本信息 + 预算交期";
-        if (audit) audit.innerHTML = "提交后，<b>此需求将进入平台审核核定环节</b>（约 2 小时内）；核定通过后将<b>自动创建项目协同空间</b>并撮合 3-5 家承制方报价。";
+        if (audit) audit.innerHTML = "提交时先<b>确认付款并冻结预算上限</b>；锁资成功后需求进入平台审核核定环节，核定通过后创建项目协同空间并撮合报价。";
         $("sumPackageSection").style.display = "none";
       }
       $("modePackage").classList.toggle("active", pkg);
@@ -1477,6 +1566,202 @@
     refreshWsBlock();
 
     // ============================================================
+    // 提交前付款确认：发布需求 → 冻结预算 → 写资金链路
+    // ============================================================
+    let pendingPaymentDemand = null;
+
+    function makeNowStr() {
+      return new Date().toLocaleString("zh-CN", { hour12: false });
+    }
+
+    function makeDemandId() {
+      return "DM-" + new Date().toISOString().slice(0, 10).replace(/-/g, "") + Math.floor(Math.random() * 90 + 10);
+    }
+
+    function getWalletSnapshot(walletKey) {
+      const wallets = window.demoApp.getWallets ? window.demoApp.getWallets() : {};
+      return wallets[walletKey] || null;
+    }
+
+    function getAvailableBalance(wallet) {
+      if (!wallet) return 0;
+      return Number(wallet.available_balance != null ? wallet.available_balance : wallet.balance) || 0;
+    }
+
+    function buildDemandForPayment(ws, id, nowStr) {
+      if (form.publishMode === "package") {
+        const spu = PLATFORM_CATALOG[form.spuId];
+        const sku = form.skuSnapshot;
+        const projectSpaceId = "PS-" + new Date().toISOString().slice(0, 10).replace(/-/g, "") + Math.floor(Math.random() * 9000 + 1000);
+        return {
+          id,
+          requirementType: "PLATFORM_SKU",
+          spuId: form.spuId,
+          skuId: form.skuId,
+          skuSnapshot: JSON.parse(JSON.stringify(form.skuSnapshot)),
+          title: form.title.trim(),
+          category: `${spu.name} / ${sku.display_name}`,
+          l1: null, l2: null,
+          tags: {}, level: null, methods: [],
+          dyn: {},
+          desc: form.desc.trim(),
+          budget: sku.price.amount, budgetMin: sku.price.amount, budgetMax: sku.price.amount,
+          deadline: form.deadline.trim(),
+          refs: form.refs.slice(),
+          workspace: ws.id, workspaceName: ws.name,
+          walletKey: ws.walletKey,
+          payerLabel: ws.payerLabel,
+          payerAccountName: (ws.payer && ws.payer.name) || ws.payerLabel,
+          paymentStatus: "pending_lock",
+          // 平台套餐：付款锁资后系统自动审核通过 + 项目空间同步创建
+          status: "auto-approved",
+          auditMode: "auto",
+          auditedBy: "system-auto",
+          auditedAt: nowStr,
+          projectSpaceId: projectSpaceId,
+          projectSpaceCreatedAt: nowStr,
+          quotesCount: 0,
+          createTime: nowStr
+        };
+      }
+
+      const cat = CATEGORY_TREE[form.l1];
+      const min = Number(form.budgetMin);
+      const max = Number(form.budgetMax);
+      return {
+        id,
+        title: form.title.trim(),
+        requirementType: "CUSTOM",
+        category: `${cat.name} / ${cat.sub[form.l2]}`,
+        l1: form.l1, l2: form.l2,
+        tags: form.tags, level: form.level, methods: form.methods.slice(),
+        dyn: Object.assign({}, form.dyn),
+        desc: form.desc.trim(),
+        budget: max, budgetMin: min, budgetMax: max,
+        deadline: form.deadline,
+        refs: form.refs.slice(),
+        workspace: ws.id, workspaceName: ws.name,
+        walletKey: ws.walletKey,
+        payerLabel: ws.payerLabel,
+        payerAccountName: (ws.payer && ws.payer.name) || ws.payerLabel,
+        paymentStatus: "pending_lock",
+        // 自定义模式：付款锁资后进入人工审核队列
+        status: "auditing",
+        auditMode: "manual",
+        auditedBy: null,
+        auditedAt: null,
+        projectSpaceId: null,
+        projectSpaceCreatedAt: null,
+        quotesCount: 0,
+        createTime: nowStr
+      };
+    }
+
+    function openPaymentModal(demand) {
+      const modal = $("paymentModal");
+      const wallet = getWalletSnapshot(demand.walletKey);
+      const available = getAvailableBalance(wallet);
+      const amount = Number(demand.budget) || 0;
+      const shortage = Math.max(0, amount - available);
+      const enough = shortage <= 0;
+      pendingPaymentDemand = demand;
+
+      $("payAmount").textContent = fmtMoney(amount);
+      $("payAvailable").textContent = fmtMoney(available);
+      $("payAfterBalance").textContent = enough
+        ? `可用余额 ${fmtMoney(available)} → ${fmtMoney(available - amount)}，冻结余额 +${fmtMoney(amount)}`
+        : `还差 ${fmtMoney(shortage)}，请先充值或切换付款账户`;
+      $("payAccount").textContent = demand.payerAccountName || demand.payerLabel;
+      $("payBizNo").textContent = demand.id;
+      $("payDemandTitle").textContent = demand.title;
+      $("payBizType").textContent = demand.requirementType === "PLATFORM_SKU" ? "平台套餐锁价并冻结预算" : "自定义需求冻结预算上限";
+      $("payAmountNote").textContent = demand.requirementType === "PLATFORM_SKU"
+        ? "套餐总价已锁定，确认后冻结同等金额并自动提交需求。"
+        : "自定义需求按预算上限先冻结，后续未使用部分可按规则解冻。";
+
+      const pill = $("payStatusPill");
+      pill.className = "pay-status-pill" + (enough ? "" : " danger");
+      pill.textContent = enough ? "余额充足" : "余额不足";
+      const warning = $("payWarning");
+      warning.classList.toggle("show", !enough);
+      warning.innerHTML = !enough
+        ? `当前付款账户可用余额不足，还差 <b>${fmtMoney(shortage)}</b>。建议先去资金中心充值，或切换到有预算的团队账户后再提交。`
+        : "";
+      $("paymentConfirm").disabled = !enough;
+      $("payRechargeLink").style.display = enough ? "none" : "";
+      $("payRechargeLink").href = `finance-center-prototype/recharge.html?account=${encodeURIComponent(demand.walletKey)}&amount=${encodeURIComponent(shortage)}&from=demand-publish&demandId=${encodeURIComponent(demand.id)}`;
+      modal.classList.add("open");
+      modal.setAttribute("aria-hidden", "false");
+    }
+
+    function closePaymentModal() {
+      const modal = $("paymentModal");
+      modal.classList.remove("open");
+      modal.setAttribute("aria-hidden", "true");
+      pendingPaymentDemand = null;
+    }
+
+    function confirmPaymentAndSubmit() {
+      const demand = pendingPaymentDemand;
+      if (!demand) return;
+      const amount = Number(demand.budget) || 0;
+      if (!amount) {
+        window.demoToast("冻结金额异常，请检查预算后再提交", "err");
+        return;
+      }
+
+      $("paymentConfirm").disabled = true;
+      $("paymentConfirm").textContent = "处理中...";
+      const result = window.demoApp.tccTry({
+        walletKey: demand.walletKey,
+        amount: amount,
+        demandId: demand.id,
+        orderTitle: demand.title,
+        biz_type: "demand_budget_lock",
+        operator: "昭岚",
+        expireDays: 7
+      });
+
+      if (!result || !result.ok) {
+        $("paymentConfirm").disabled = false;
+        $("paymentConfirm").textContent = "确认付款并提交";
+        window.demoToast((result && result.error) || "付款冻结失败，请稍后重试", "err");
+        openPaymentModal(demand);
+        return;
+      }
+
+      demand.paymentStatus = "frozen";
+      demand.freezeOrderId = result.freezeId;
+      demand.voucherNo = result.voucherNo;
+      window.demoApp.addDemand(demand);
+      window.demoApp.clearDraft();
+
+      $("btnSubmit").disabled = true;
+      $("btnSubmit").textContent = "已付款提交";
+      closePaymentModal();
+      $("paymentConfirm").textContent = "确认付款并提交";
+
+      if (demand.requirementType === "PLATFORM_SKU") {
+        window.demoToast("✅ 付款成功，套餐预算已冻结", "ok");
+        setTimeout(() => window.demoToast("🤝 项目协同空间已创建（" + demand.projectSpaceId + "），可立即进入跟进", "info"), 900);
+      } else {
+        window.demoToast("✅ 付款成功，预算已冻结，需求进入平台审核", "ok");
+        setTimeout(() => window.demoToast("审核通过后，平台将自动创建项目空间并撮合承制方（约 2 小时内）", "info"), 900);
+      }
+      setTimeout(() => {
+        window.demoToast(`即将跳转「我的需求」查看 ${demand.id}`, "info");
+      }, 2000);
+      setTimeout(() => { location.href = "demand-list.html?highlight=" + demand.id + "&paid=1"; }, 3200);
+    }
+
+    $("paymentModalClose").addEventListener("click", closePaymentModal);
+    $("paymentCancel").addEventListener("click", closePaymentModal);
+    $("paymentModal").addEventListener("click", (e) => {
+      if (e.target === $("paymentModal")) closePaymentModal();
+    });
+    $("paymentConfirm").addEventListener("click", confirmPaymentAndSubmit);
+
+    // ============================================================
     // 暂存草稿 / 重置 / 提交
     // ============================================================
     $("btnDraft").addEventListener("click", () => {
@@ -1522,85 +1807,15 @@
       if (form.publishMode !== "package" && min > 0 && max > 0 && min > max) {
         window.demoToast("预算最低值不能大于最高值", "err"); return;
       }
+      if ((Number(form.budgetMax) || 0) <= 0) {
+        window.demoToast("请填写有效的预算金额", "err"); return;
+      }
 
       const ws = window.demoApp.getCurrentWorkspace();
-      const nowStr = new Date().toLocaleString("zh-CN", { hour12: false });
-      const id = "DM-" + new Date().toISOString().slice(0, 10).replace(/-/g, "") + Math.floor(Math.random() * 90 + 10);
-
-      let demand;
-      if (form.publishMode === "package") {
-        const spu = PLATFORM_CATALOG[form.spuId];
-        const sku = form.skuSnapshot;
-        const projectSpaceId = "PS-" + new Date().toISOString().slice(0, 10).replace(/-/g, "") + Math.floor(Math.random() * 9000 + 1000);
-        demand = {
-          id,
-          requirementType: "PLATFORM_SKU",
-          spuId: form.spuId,
-          skuId: form.skuId,
-          skuSnapshot: JSON.parse(JSON.stringify(form.skuSnapshot)),
-          title: form.title.trim(),
-          category: `${spu.name} / ${sku.display_name}`,
-          l1: null, l2: null,
-          tags: {}, level: null, methods: [],
-          dyn: {},
-          desc: form.desc.trim(),
-          budget: sku.price.amount, budgetMin: sku.price.amount, budgetMax: sku.price.amount,
-          deadline: form.deadline.trim(),
-          refs: form.refs.slice(),
-          workspace: ws.id, workspaceName: ws.name,
-          payerLabel: ws.payerLabel,
-          // 平台套餐：系统自动审核通过 + 项目空间同步创建
-          status: "auto-approved",
-          auditMode: "auto",
-          auditedBy: "system-auto",
-          auditedAt: nowStr,
-          projectSpaceId: projectSpaceId,
-          projectSpaceCreatedAt: nowStr,
-          quotesCount: 0,
-          createTime: nowStr
-        };
-      } else {
-        const cat = CATEGORY_TREE[form.l1];
-        demand = {
-          id, title: form.title.trim(),
-          requirementType: "CUSTOM",
-          category: `${cat.name} / ${cat.sub[form.l2]}`,
-          l1: form.l1, l2: form.l2,
-          tags: form.tags, level: form.level, methods: form.methods.slice(),
-          dyn: Object.assign({}, form.dyn),
-          desc: form.desc.trim(),
-          budget: max, budgetMin: min, budgetMax: max,
-          deadline: form.deadline,
-          refs: form.refs.slice(),
-          workspace: ws.id, workspaceName: ws.name,
-          payerLabel: ws.payerLabel,
-          // 自定义模式：进入人工审核队列
-          status: "auditing",
-          auditMode: "manual",
-          auditedBy: null,
-          auditedAt: null,
-          projectSpaceId: null,
-          projectSpaceCreatedAt: null,
-          quotesCount: 0,
-          createTime: nowStr
-        };
-      }
-      window.demoApp.addDemand(demand);
-      window.demoApp.clearDraft();
-
-      $("btnSubmit").disabled = true; $("btnSubmit").textContent = "提交中...";
-
-      if (form.publishMode === "package") {
-        window.demoToast("✅ 平台套餐 · 系统已自动审核通过", "ok");
-        setTimeout(() => window.demoToast("🤝 项目协同空间已创建（" + demand.projectSpaceId + "），可立即进入跟进", "info"), 900);
-      } else {
-        window.demoToast("✅ 已提交，需求已进入平台审核核定环节", "ok");
-        setTimeout(() => window.demoToast("审核通过后，平台将自动创建项目空间并撮合承制方（约 2 小时内）", "info"), 900);
-      }
-      setTimeout(() => {
-        window.demoToast(`即将跳转「我的需求」查看 ${id}`, "info");
-      }, 2000);
-      setTimeout(() => { location.href = "demand-list.html?highlight=" + id; }, 3200);
+      const nowStr = makeNowStr();
+      const id = makeDemandId();
+      const demand = buildDemandForPayment(ws, id, nowStr);
+      openPaymentModal(demand);
     });
 
     // ============================================================

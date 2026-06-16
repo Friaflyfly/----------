@@ -11,7 +11,7 @@
     .page-head h1 { margin: 0 0 4px; font-size: 22px; }
     .page-head .sub { color: #8c8c8c; font-size: 13px; }
 
-    /* 账号中心侧栏：取代业务主导航，避免双层菜单挤占空间（与钱包页同范式） */
+    /* 账号中心侧栏：取代业务主导航，避免双层菜单挤占空间（与资金中心同范式） */
     .sidebar .back-to-platform {
       padding: 4px 18px 12px; border-bottom: 1px solid #f0f0f0; margin-bottom: 6px;
     }
@@ -360,7 +360,7 @@
           <!-- 说明 -->
           <div style="margin-top:14px;padding:12px 16px;background:#f0f5ff;border-radius:8px;font-size:12px;color:#595959;line-height:1.7">
             <strong>说明：</strong>账号中心专注于"身份属性"维护，与资金相关的操作（支付密码、银行卡、限额、发票抬头）请前往
-            <a href="wallet-overview.html" style="color:#1890ff;font-weight:500">我的钱包 →</a>
+            <a href="finance-center-prototype/accounts.html" style="color:#1890ff;font-weight:500">资金中心 →</a>
             。两个模块互相独立、彼此不嵌套，避免心智混淆。
           </div>
         </div>
@@ -585,7 +585,7 @@
               if ((from === "withdraw" || from === "large-payment") && key === "liveness_verified") {
                 setTimeout(() => {
                   window.demoToast("正在带你返回钱包并继续提现 →", "info");
-                  setTimeout(() => location.href = "wallet-overview.html#accounts", 1200);
+                  setTimeout(() => location.href = "finance-center-prototype/accounts.html", 1200);
                 }, 600);
               }
             });

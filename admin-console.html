@@ -434,7 +434,7 @@
           <div class="menu-group-title">快捷入口</div>
           <a href="platform-home-demander.html"><span class="menu-icon">📥</span> 需求方工作台</a>
           <a href="platform-home-contractor.html"><span class="menu-icon">🛠</span> 承制方工作台</a>
-          <a href="wallet-overview.html"><span class="menu-icon">💳</span> 我的钱包</a>
+          <a href="finance-center-prototype/accounts.html"><span class="menu-icon">💳</span> 资金中心</a>
           <a href="demo-index.html"><span class="menu-icon">📋</span> Demo 导航</a>
         </div>
       </nav>
@@ -502,7 +502,7 @@
           <strong style="color:#1890ff">📊 全企业资金鸟瞰 · 治理视角</strong>
           <span class="phase-badge p2" style="margin-left:6px">P2</span><br>
           此处为<strong>企业级治理</strong>：预算分配、对公充值审核、提现风控复审、开票汇总。<strong>日常的充值 / 提现 / 流水 / 个人发票</strong>请前往
-          <a href="wallet-overview.html" style="color:#1890ff;font-weight:500">我的钱包 →</a>。
+          <a href="finance-center-prototype/accounts.html" style="color:#1890ff;font-weight:500">资金中心 →</a>。
         </div>
 
         <!-- B-6 KPI 行 -->
@@ -518,7 +518,7 @@
           <button class="btn" onclick="toast('企业级开票汇总：销售 / 采购发票汇总报表（下版本研发）', 'info')">🧾 开票汇总<span class="badge-todo">待研发</span></button>
           <span style="margin-left:auto;font-size:12px;color:#8c8c8c">
             想看具体流水？
-            <a href="wallet-overview.html#flows" style="color:#1890ff;text-decoration:none">→ 钱包·收支记录</a>
+            <a href="finance-center-prototype/fund-flows.html" style="color:#1890ff;text-decoration:none">→ 资金流水</a>
           </span>
         </div>
         <div id="fundRows"></div>
@@ -1072,8 +1072,8 @@
       accounts.forEach(function (a) {
         var w = wallets[a.key];
         if (!w) return;
-        // 跳到钱包·收支记录并按该账户过滤
-        var flowLink = 'wallet-overview.html#flows';
+        // 跳到资金流水并按该账户过滤
+        var flowLink = 'finance-center-prototype/fund-flows.html';
         html += '<div class="fund-row">'
           + '<div><div class="fund-name">' + a.icon + ' ' + w.name + '</div><div class="fund-sub">' + w.type + '</div></div>'
           + '<div class="fund-amount' + (a.type === 'main' ? ' main' : '') + '">' + window.fmtMoney(w.balance) + '</div>'

@@ -312,7 +312,7 @@
       <div class="ws-dropdown" id="wsDropdown"></div>
     </div>
     <div class="identity-switch" id="identitySwitch"></div>
-    <a href="wallet-overview.html" class="wallet-chip" id="walletChip">
+    <a href="finance-center-prototype/accounts.html" class="wallet-chip" id="walletChip">
       <span>💰</span>
       <span>
         <span class="wallet-amount" id="walletAmount">¥185,000</span>
@@ -329,7 +329,7 @@
         <a href="account-basic-info-prototype-platform-style.html"><span>👤</span> 账户基础信息</a>
         <a href="enterprise-verification-prototype.html"><span>🏢</span> 企业认证</a>
         <a href="account-security-prototype.html"><span>🔐</span> 账号安全</a>
-        <a href="wallet-overview.html"><span>💰</span> 我的钱包</a>
+        <a href="finance-center-prototype/accounts.html"><span>💰</span> 资金中心</a>
         <div class="divider"></div>
         <a href="#" onclick="event.preventDefault(); window.demoToast('演示环境，未实现退出', 'warn')"><span>🚪</span> 退出登录</a>
       </div>
@@ -362,7 +362,7 @@
         </div>
         <div class="menu-group">
           <div class="menu-group-title">账户</div>
-          <a href="wallet-overview.html"><span class="menu-icon">💰</span> 我的钱包</a>
+          <a href="finance-center-prototype/accounts.html"><span class="menu-icon">💰</span> 资金中心</a>
           <a href="account-center.html"><span class="menu-icon">⚙️</span> 账号中心</a>
         </div>
       </nav>
@@ -917,17 +917,17 @@
   <div id="toastWrap" class="toasts"></div>
 
   <!-- 共享底座 -->
-  <script src="_shared.js"></script>
+  <script src="_shared.js?v=finance-nav-20260616"></script>
   <script>SharedHeader.mount({ activeNav: "project-space" });</script>
   <script>
-    // 钱包页深链：?from=wallet 时给一句来源提示
+    // 资金中心深链：?from=wallet 时给一句来源提示
     (function () {
       try {
         var qp = new URLSearchParams(window.location.search);
         if (qp.get("from") !== "wallet") return;
         var oid = qp.get("orderId") || "";
         var action = qp.get("action") || "";
-        var msg = "📍 从钱包页跳入" + (oid ? "订单 " + oid : "项目协同空间")
+        var msg = "📍 从资金中心跳入" + (oid ? "订单 " + oid : "项目协同空间")
                 + (action === "appeal" ? " · 准备提交申诉材料" : "");
         setTimeout(function () { if (window.demoToast) window.demoToast(msg, "info"); }, 350);
       } catch (e) {}
@@ -1143,7 +1143,7 @@
     $("modalNextBtn").addEventListener("click", () => {
       if (currentStep === 1) { currentStep = 2; showStep(2); }
       else if (currentStep === 2) { executeSettlement(); currentStep = 3; showStep(3); }
-      else if (currentStep === 3) { closeModal(); window.demoToast("已结算 · 即将跳转钱包", "ok"); setTimeout(() => location.href = "wallet-overview.html", 800); }
+      else if (currentStep === 3) { closeModal(); window.demoToast("已结算 · 即将跳转钱包", "ok"); setTimeout(() => location.href = "finance-center-prototype/accounts.html", 800); }
     });
     $("modalCancelBtn").addEventListener("click", closeModal);
 

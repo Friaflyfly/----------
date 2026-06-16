@@ -3015,6 +3015,7 @@
       app.innerHTML = `
         <div class="shell">
           <header class="topbar">
+            <a class="platform-return" href="../platform-home-demander.html">← 接单平台</a>
             <div class="brand">
               <div class="brand-kicker">Finance Center Prototype V2</div>
               <div class="brand-row">

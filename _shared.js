@@ -473,7 +473,7 @@
   ];
 
   // ============================================================
-  // 默认资金流水（钱包页 / 项目空间结算分账演示用）
+  // 默认资金流水（资金中心 / 项目空间结算分账演示用）
   // v2 字段（对齐复式记账）：
   //   voucher_no    凭证号（一证至少两分录；同一凭证下多条 ledger 共用此号）
   //   subject_code  科目编码（见设计文档 6.5 节）
@@ -1084,7 +1084,7 @@
         price: pkg.price, points: pkg.points, operator: operator || "昭岚"
       });
       writeJson(KEY.pointsExchanges, exchanges);
-      // 同时写一笔资金流水（让钱包·收支记录里看得到）
+      // 同时写一笔资金流水（让资金流水里看得到）
       var flows = readJson(KEY.flows, defaultFlows);
       flows.unshift({
         id: "F-EX-" + Date.now(),
@@ -1292,7 +1292,7 @@
       +   '<button type="button" data-identity="admin"' + (identity === "admin" ? ' class="active"' : '') + '>👑 管理后台</button>'
       +   '<button type="button" data-identity="ops"' + (identity === "ops" ? ' class="active"' : '') + '>🔍 运营后台</button>'
       + '</div>'
-      + '<a href="wallet-overview.html" class="wallet-chip" id="walletChip" title="点击进入钱包">'
+      + '<a href="finance-center-prototype/accounts.html" class="wallet-chip" id="walletChip" title="点击进入资金中心">'
       +   '<span>💰</span>'
       +   '<span><span class="wallet-amount" id="walletAmount">¥0</span> <span class="wallet-account" id="walletAccount"></span></span>'
       + '</a>'
@@ -1304,7 +1304,7 @@
       +   '</div>'
       +   '<div class="avatar-dropdown" id="avatarDropdown">'
       +     '<a href="account-center.html"><span>⚙️</span> 账号中心</a>'
-      +     '<a href="wallet-overview.html"><span>💰</span> 我的钱包</a>'
+      +     '<a href="finance-center-prototype/accounts.html"><span>💰</span> 资金中心</a>'
       +     '<div class="divider"></div>'
       +     '<a href="admin-console.html"><span>👑</span> 管理后台</a>'
       +     '<a href="admin-demand-review.html"><span>🔍</span> 运营后台</a>'

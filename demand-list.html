@@ -181,7 +181,7 @@
       <div class="ws-dropdown" id="wsDropdown"></div>
     </div>
     <div class="identity-switch" id="identitySwitch"></div>
-    <a href="wallet-overview.html" class="wallet-chip" id="walletChip">
+    <a href="finance-center-prototype/accounts.html" class="wallet-chip" id="walletChip">
       <span>💰</span>
       <span>
         <span class="wallet-amount" id="walletAmount">¥185,000</span>
@@ -198,7 +198,7 @@
         <a href="account-basic-info-prototype-platform-style.html"><span>👤</span> 账户基础信息</a>
         <a href="enterprise-verification-prototype.html"><span>🏢</span> 企业认证</a>
         <a href="account-security-prototype.html"><span>🔐</span> 账号安全</a>
-        <a href="wallet-overview.html"><span>💰</span> 我的钱包</a>
+        <a href="finance-center-prototype/accounts.html"><span>💰</span> 资金中心</a>
         <div class="divider"></div>
         <a href="#" onclick="event.preventDefault(); window.demoToast('演示环境，未实现退出', 'warn')"><span>🚪</span> 退出登录</a>
       </div>
@@ -231,7 +231,7 @@
         </div>
         <div class="menu-group">
           <div class="menu-group-title">账户</div>
-          <a href="wallet-overview.html"><span class="menu-icon">💰</span> 我的钱包</a>
+          <a href="finance-center-prototype/accounts.html"><span class="menu-icon">💰</span> 资金中心</a>
           <a href="account-center.html"><span class="menu-icon">⚙️</span> 账号中心</a>
         </div>
       </nav>
@@ -286,16 +286,16 @@
   <div id="toastWrap" class="toasts"></div>
 
   <!-- 共享底座（demoApp / demoToast / fmtMoney / SharedHeader） -->
-  <script src="_shared.js"></script>
+  <script src="_shared.js?v=finance-nav-20260616"></script>
   <script>SharedHeader.mount({ activeNav: "my-demands" });</script>
   <script>
-    // 钱包页深链：?from=wallet 时给一句来源提示
+    // 资金中心深链：?from=wallet 时给一句来源提示
     (function () {
       try {
         var qp = new URLSearchParams(window.location.search);
         if (qp.get("from") !== "wallet") return;
         var did = qp.get("demandId") || "";
-        var msg = "📍 从钱包页跳入" + (did ? "需求 " + did : "我的需求");
+        var msg = "📍 从资金中心跳入" + (did ? "需求 " + did : "我的需求");
         setTimeout(function () { if (window.demoToast) window.demoToast(msg, "info"); }, 350);
       } catch (e) {}
     })();
@@ -394,6 +394,9 @@
         const ws = window.demoApp.WORKSPACES[d.workspace] || { name: d.workspaceName || d.workspace };
         const wsClass = "ws-pill " + d.workspace;
         const isHighlight = d.id === highlightId;
+        const payTrace = d.paymentStatus === "frozen"
+          ? '<div style="font-size:11px;color:#389e0d;margin-top:2px">资金：预算已冻结' + (d.freezeOrderId ? ' · ' + d.freezeOrderId : '') + '</div>'
+          : '';
 
         // 状态徽章：auto-approved 增加 ✓ 自动通过标识
         const autoMark = status.autoMark ? '<span class="auto-mark" title="平台套餐 · 系统自动审核通过">✓</span>' : '';
@@ -424,7 +427,7 @@
         return '<div class="list-row ' + (isHighlight ? "highlight" : "") + '">'
           + '<div><a class="demand-title" href="demand-detail.html?demandId=' + d.id + '" style="text-decoration:none">' + d.title + '</a><div class="demand-id">' + d.id + ' · ' + d.createTime + '</div>' + contractor + '</div>'
           + '<div style="font-size:13px;color:#595959">' + d.category + '</div>'
-          + '<div><span class="' + wsClass + '">' + ws.name + '</span><div style="font-size:11px;color:#8c8c8c;margin-top:2px">扣款：' + (d.payerLabel || "—") + '</div></div>'
+          + '<div><span class="' + wsClass + '">' + ws.name + '</span><div style="font-size:11px;color:#8c8c8c;margin-top:2px">扣款：' + (d.payerLabel || "—") + '</div>' + payTrace + '</div>'
           + '<div>' + badge + '<div style="font-size:11px;color:#8c8c8c;margin-top:2px">' + status.desc + '</div></div>'
           + '<div>' + quoteCell + '</div>'
           + '<div><div style="font-weight:500">' + window.fmtMoney(d.budget) + '</div><div style="font-size:11px;color:#8c8c8c">截止 ' + d.deadline + '</div></div>'
@@ -451,18 +454,22 @@
 
     // 提示新提交（区分套餐自动通过 vs 自定义审核中）
     if (highlightId) {
+      const paid = new URLSearchParams(location.search).get("paid") === "1";
       const all = window.demoApp.getDemands();
       const d = all.find((x) => x.id === highlightId);
       if (d) {
+        if (paid && d.paymentStatus === "frozen") {
+          setTimeout(() => window.demoToast("💰 预算已冻结：" + window.fmtMoney(d.budget) + "，冻结单 " + (d.freezeOrderId || "已生成"), "ok"), 300);
+        }
         if (d.status === "auto-approved") {
-          setTimeout(() => window.demoToast("✅ 需求 " + highlightId + " · 平台套餐已自动审核通过", "ok"), 300);
+          setTimeout(() => window.demoToast("✅ 需求 " + highlightId + " · 平台套餐已自动审核通过", "ok"), paid ? 900 : 300);
           if (d.projectSpaceId) {
-            setTimeout(() => window.demoToast("🤝 项目协同空间已创建：" + d.projectSpaceId + "，可立即进入跟进", "info"), 1100);
+            setTimeout(() => window.demoToast("🤝 项目协同空间已创建：" + d.projectSpaceId + "，可立即进入跟进", "info"), paid ? 1600 : 1100);
           }
         } else if (d.status === "auditing") {
-          setTimeout(() => window.demoToast("✅ 需求 " + highlightId + " 已提交，平台核定中（≤24h）", "ok"), 300);
+          setTimeout(() => window.demoToast("✅ 需求 " + highlightId + " 已提交，平台核定中（≤24h）", "ok"), paid ? 900 : 300);
         } else {
-          setTimeout(() => window.demoToast("✅ 需求 " + highlightId + " 已更新", "ok"), 300);
+          setTimeout(() => window.demoToast("✅ 需求 " + highlightId + " 已更新", "ok"), paid ? 900 : 300);
         }
       }
     }
