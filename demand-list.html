@@ -69,7 +69,7 @@
     .page-head .new-btn { float: right; }
 
     /* 状态卡片栏 */
-    .stat-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 14px; }
+    .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px; }
     .stat-card { background: #fff; border-radius: 8px; padding: 14px 16px; cursor: pointer; transition: all .2s; border: 1px solid transparent; }
     .stat-card:hover { border-color: #91d5ff; box-shadow: 0 2px 8px rgba(24,144,255,.1); }
     .stat-card.active { border-color: #1890ff; background: #e6f7ff; }
@@ -106,6 +106,7 @@
     .ws-pill.cf-admin { background: #f9f0ff; color: #531dab; }
 
     .status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 11px; font-size: 12px; font-weight: 500; }
+    .status-badge.pending-payment { background: #fff7e6; color: #d46b08; }
     .status-badge.auditing { background: #fff7e6; color: #d46b08; }
     .status-badge.matching { background: #e6f7ff; color: #1890ff; }
     .status-badge.auto-approved { background: #e6f7ff; color: #1890ff; position: relative; }
@@ -308,6 +309,7 @@
     const $ = (id) => document.getElementById(id);
 
     const STATUS_CONFIG = {
+      "pending-payment": { label: "💳 待付款", className: "pending-payment", desc: "余额不足，尚未冻结预算，不进入审核 / 撮合" },
       "auditing":     { label: "📋 审核中", className: "auditing", desc: "平台核定需求中（≤24h）" },
       "matching":     { label: "🔍 撮合中", className: "matching", desc: "已通过审核，承制方报价中" },
       "auto-approved":{ label: "🔍 撮合中", className: "auto-approved", desc: "平台套餐 · 系统自动通过 · 撮合中", autoMark: true },
@@ -321,6 +323,7 @@
     // 状态聚合卡片合并规则：matching 卡片同时统计 auto-approved（业务上等价）
     const STAT_GROUPS = {
       "all":         (d) => true,
+      "pending-payment": (d) => d.status === "pending-payment",
       "auditing":    (d) => d.status === "auditing",
       "matching":    (d) => d.status === "matching" || d.status === "auto-approved",
       "quoting":     (d) => d.status === "quoting",
@@ -338,6 +341,7 @@
       const filtered = activeScope === "current" ? all.filter((d) => d.workspace === window.demoApp.getCurrentWorkspaceId()) : all;
       const cards = [
         { key: "all",         label: "全部",         value: filtered.length },
+        { key: "pending-payment", label: "待付款", value: filtered.filter(STAT_GROUPS["pending-payment"]).length },
         { key: "auditing",    label: "审核中",       value: filtered.filter(STAT_GROUPS.auditing).length },
         { key: "matching",    label: "撮合中",       value: filtered.filter(STAT_GROUPS.matching).length },
         { key: "quoting",     label: "待选承制方",    value: filtered.filter(STAT_GROUPS.quoting).length },
@@ -396,6 +400,8 @@
         const isHighlight = d.id === highlightId;
         const payTrace = d.paymentStatus === "frozen"
           ? '<div style="font-size:11px;color:#389e0d;margin-top:2px">资金：预算已冻结' + (d.freezeOrderId ? ' · ' + d.freezeOrderId : '') + '</div>'
+          : d.status === "pending-payment"
+            ? '<div style="font-size:11px;color:#d46b08;margin-top:2px">资金：待付款，未冻结预算</div>'
           : '';
 
         // 状态徽章：auto-approved 增加 ✓ 自动通过标识
@@ -414,7 +420,10 @@
         }
         actions.push('<a class="btn-link" href="demand-detail.html?demandId=' + d.id + '">详情</a>');
         // 状态相关操作
-        if (d.status === "quoting") {
+        if (d.status === "pending-payment") {
+          actions.push('<button class="btn-link urgent" onclick="window.continueDemandPayment(\'' + d.id + '\')">继续付款</button>');
+          actions.push('<a class="btn-link" href="finance-center-prototype/recharge.html?from=demand-list&demandId=' + d.id + '">去补余额</a>');
+        } else if (d.status === "quoting") {
           actions.push('<a class="btn-link urgent" href="demand-quote-comparison.html?demandId=' + d.id + '">对比报价 (' + (d.quotesCount || 0) + ')</a>');
         } else if (d.status === "rejected") {
           actions.push('<a class="btn-link urgent" href="demand-publish.html">修改并重提</a>');
@@ -446,6 +455,83 @@
 
     function isHighlightInList(list) { return highlightId && list.some((d) => d.id === highlightId); }
 
+    function makeNowStr() {
+      return new Date().toLocaleString("zh-CN", { hour12: false });
+    }
+
+    function makeProjectSpaceId() {
+      return "PS-" + new Date().toISOString().slice(0, 10).replace(/-/g, "") + Math.floor(Math.random() * 9000 + 1000);
+    }
+
+    function getAvailableBalance(walletKey) {
+      const wallets = window.demoApp.getWallets ? window.demoApp.getWallets() : {};
+      const wallet = wallets[walletKey];
+      if (!wallet) return 0;
+      return Number(wallet.available_balance != null ? wallet.available_balance : wallet.balance) || 0;
+    }
+
+    window.continueDemandPayment = function (demandId) {
+      const demand = window.demoApp.getDemands().find((item) => item.id === demandId);
+      if (!demand) {
+        window.demoToast("未找到这条待付款需求", "err");
+        return;
+      }
+      const amount = Number(demand.budget) || 0;
+      const walletKey = demand.walletKey || (window.demoApp.WORKSPACES[demand.workspace] || {}).walletKey;
+      const available = getAvailableBalance(walletKey);
+      if (!walletKey || !amount) {
+        window.demoToast("付款账户或金额异常，请重新提交需求", "err");
+        return;
+      }
+      if (available < amount) {
+        const shortage = amount - available;
+        window.demoToast("余额仍不足，还差 " + window.fmtMoney(shortage) + "，请先补充余额或预算", "warn");
+        setTimeout(() => {
+          location.href = "finance-center-prototype/recharge.html?from=demand-list&demandId=" + encodeURIComponent(demandId) + "&amount=" + encodeURIComponent(shortage);
+        }, 900);
+        return;
+      }
+
+      const result = window.demoApp.tccTry({
+        walletKey,
+        amount,
+        demandId,
+        orderTitle: demand.title,
+        biz_type: "demand_budget_lock",
+        operator: "昭岚",
+        expireDays: 7
+      });
+      if (!result || !result.ok) {
+        window.demoToast((result && result.error) || "付款冻结失败，请稍后重试", "err");
+        return;
+      }
+
+      const nowStr = makeNowStr();
+      const partial = {
+        paymentStatus: "frozen",
+        paymentShortage: 0,
+        freezeOrderId: result.freezeId,
+        voucherNo: result.voucherNo
+      };
+      if (demand.requirementType === "PLATFORM_SKU") {
+        partial.status = "auto-approved";
+        partial.auditMode = "auto";
+        partial.auditedBy = "system-auto";
+        partial.auditedAt = nowStr;
+        partial.projectSpaceId = demand.projectSpaceId || makeProjectSpaceId();
+        partial.projectSpaceCreatedAt = nowStr;
+      } else {
+        partial.status = "auditing";
+        partial.auditMode = "manual";
+        partial.auditedBy = null;
+        partial.auditedAt = null;
+      }
+      window.demoApp.updateDemand(demandId, partial);
+      window.demoToast("付款成功，预算已冻结：" + window.fmtMoney(amount), "ok");
+      activeStatus = "all";
+      render();
+    };
+
     $("filterScope").addEventListener("change", (e) => { activeScope = e.target.value; render(); });
     $("filterCat").addEventListener("change", (e) => { activeCat = e.target.value; render(); });
     $("searchInput").addEventListener("input", (e) => { searchKey = e.target.value.trim(); render(); });
@@ -455,19 +541,25 @@
     // 提示新提交（区分套餐自动通过 vs 自定义审核中）
     if (highlightId) {
       const paid = new URLSearchParams(location.search).get("paid") === "1";
+      const pendingPayment = new URLSearchParams(location.search).get("pendingPayment") === "1";
       const all = window.demoApp.getDemands();
       const d = all.find((x) => x.id === highlightId);
       if (d) {
+        if (pendingPayment && d.status === "pending-payment") {
+          setTimeout(() => window.demoToast("已保存为待付款需求，补足余额后再继续付款", "warn"), 300);
+        }
         if (paid && d.paymentStatus === "frozen") {
           setTimeout(() => window.demoToast("💰 预算已冻结：" + window.fmtMoney(d.budget) + "，冻结单 " + (d.freezeOrderId || "已生成"), "ok"), 300);
         }
         if (d.status === "auto-approved") {
-          setTimeout(() => window.demoToast("✅ 需求 " + highlightId + " · 平台套餐已自动审核通过", "ok"), paid ? 900 : 300);
+          setTimeout(() => window.demoToast("✅ 需求 " + highlightId + " · 平台套餐已自动审核通过", "ok"), paid ? 900 : pendingPayment ? 900 : 300);
           if (d.projectSpaceId) {
             setTimeout(() => window.demoToast("🤝 项目协同空间已创建：" + d.projectSpaceId + "，可立即进入跟进", "info"), paid ? 1600 : 1100);
           }
         } else if (d.status === "auditing") {
-          setTimeout(() => window.demoToast("✅ 需求 " + highlightId + " 已提交，平台核定中（≤24h）", "ok"), paid ? 900 : 300);
+          setTimeout(() => window.demoToast("✅ 需求 " + highlightId + " 已提交，平台核定中（≤24h）", "ok"), paid ? 900 : pendingPayment ? 900 : 300);
+        } else if (d.status === "pending-payment") {
+          setTimeout(() => window.demoToast("需求 " + highlightId + " 暂未付款，不会进入审核或撮合", "info"), pendingPayment ? 900 : 300);
         } else {
           setTimeout(() => window.demoToast("✅ 需求 " + highlightId + " 已更新", "ok"), paid ? 900 : 300);
         }

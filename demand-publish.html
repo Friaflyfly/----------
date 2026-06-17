@@ -673,6 +673,7 @@
       <div class="pay-modal-foot">
         <a class="btn" id="payRechargeLink" href="finance-center-prototype/recharge.html">去充值</a>
         <a class="btn" href="finance-center-prototype/accounts.html">查看资金中心</a>
+        <button class="btn" type="button" id="paymentSavePending">保存为待付款</button>
         <button class="btn ghost" type="button" id="paymentCancel">暂不付款</button>
         <button class="btn primary" type="button" id="paymentConfirm">确认付款并提交</button>
       </div>
@@ -1688,6 +1689,7 @@
         ? `当前付款账户可用余额不足，还差 <b>${fmtMoney(shortage)}</b>。建议先去资金中心充值，或切换到有预算的团队账户后再提交。`
         : "";
       $("paymentConfirm").disabled = !enough;
+      $("paymentSavePending").style.display = enough ? "none" : "";
       $("payRechargeLink").style.display = enough ? "none" : "";
       $("payRechargeLink").href = `finance-center-prototype/recharge.html?account=${encodeURIComponent(demand.walletKey)}&amount=${encodeURIComponent(shortage)}&from=demand-publish&demandId=${encodeURIComponent(demand.id)}`;
       modal.classList.add("open");
@@ -1754,12 +1756,39 @@
       setTimeout(() => { location.href = "demand-list.html?highlight=" + demand.id + "&paid=1"; }, 3200);
     }
 
+    function savePendingPaymentDemand() {
+      const demand = pendingPaymentDemand;
+      if (!demand) return;
+      const wallet = getWalletSnapshot(demand.walletKey);
+      const available = getAvailableBalance(wallet);
+      const amount = Number(demand.budget) || 0;
+      const shortage = Math.max(0, amount - available);
+      demand.status = "pending-payment";
+      demand.paymentStatus = "unpaid";
+      demand.paymentShortage = shortage;
+      demand.freezeOrderId = null;
+      demand.voucherNo = null;
+      demand.auditedBy = null;
+      demand.auditedAt = null;
+      demand.projectSpaceId = null;
+      demand.projectSpaceCreatedAt = null;
+      demand.quotesCount = 0;
+      window.demoApp.addDemand(demand);
+      window.demoApp.clearDraft();
+      closePaymentModal();
+      $("btnSubmit").textContent = "已保存待付款";
+      $("btnSubmit").disabled = true;
+      window.demoToast("已保存为待付款需求，补足余额后可继续付款", "warn");
+      setTimeout(() => { location.href = "demand-list.html?highlight=" + demand.id + "&pendingPayment=1"; }, 1200);
+    }
+
     $("paymentModalClose").addEventListener("click", closePaymentModal);
     $("paymentCancel").addEventListener("click", closePaymentModal);
     $("paymentModal").addEventListener("click", (e) => {
       if (e.target === $("paymentModal")) closePaymentModal();
     });
     $("paymentConfirm").addEventListener("click", confirmPaymentAndSubmit);
+    $("paymentSavePending").addEventListener("click", savePendingPaymentDemand);
 
     // ============================================================
     // 暂存草稿 / 重置 / 提交
