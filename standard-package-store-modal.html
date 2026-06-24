@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIGC 标准产品包（弹窗购买版）- 骋风天合 · 创作门户交易平台</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --ink: #172033;
+      --muted: #6c7890;
+      --line: #e6ebf3;
+      --paper: #ffffff;
+      --wash: #f3f7fb;
+      --blue: #245bff;
+      --cyan: #13b7c6;
+      --orange: #ff8a2a;
+      --green: #17a36b;
+      --red: #d74735;
+      --shadow: 0 18px 54px rgba(28, 48, 84, .12);
+      --radius: 22px;
+    }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 8% 6%, rgba(19,183,198,.18), transparent 30%),
+        radial-gradient(circle at 86% 12%, rgba(255,138,42,.13), transparent 32%),
+        linear-gradient(180deg, #eef5fb 0%, #f7f9fc 42%, #eef3f8 100%);
+      color: var(--ink);
+    }
+    .topbar { position: fixed; top: 0; left: 0; right: 0; height: 56px; background: rgba(255,255,255,.92); backdrop-filter: blur(18px); box-shadow: 0 1px 4px rgba(0,0,0,.06); z-index: 200; display: flex; align-items: center; padding: 0 20px; gap: 16px; }
+    .topbar .brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; color: #1890ff; text-decoration: none; min-width: 220px; }
+    .topbar .brand-sub { color: #8c8c8c; font-weight: 400; font-size: 12px; margin-left: 4px; }
+    .ws-switcher { position: relative; }
+    .ws-trigger { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid #e8e8e8; border-radius: 6px; background: #fafafa; cursor: pointer; font-size: 13px; min-width: 240px; }
+    .ws-trigger:hover { border-color: #1890ff; background: #e6f7ff; }
+    .ws-trigger .ws-name { font-weight: 500; flex: 1; text-align: left; }
+    .ws-dropdown { display: none; position: absolute; top: calc(100% + 6px); left: 0; min-width: 320px; background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,.12); padding: 8px; z-index: 300; }
+    .ws-dropdown.open { display: block; }
+    .ws-group-label { font-size: 12px; color: #8c8c8c; padding: 6px 10px; }
+    .ws-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+    .ws-item:hover, .ws-item.active { background: #f0f7ff; }
+    .ws-item-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .ws-item-icon.personal { background: #fff7e6; color: #fa8c16; }
+    .ws-item-icon.team { background: #e6f7ff; color: #1890ff; }
+    .ws-item-icon.admin { background: #f9f0ff; color: #722ed1; }
+    .ws-item-main { flex: 1; min-width: 0; }
+    .ws-item-name { font-weight: 600; }
+    .ws-item-desc { font-size: 12px; color: #8c8c8c; margin-top: 2px; }
+    .identity-switch { display: flex; gap: 4px; background: #f0f0f0; border-radius: 18px; padding: 3px; flex-wrap: wrap; }
+    .identity-switch button { border: none; background: transparent; padding: 5px 10px; border-radius: 16px; font-size: 13px; color: #595959; cursor: pointer; }
+    .identity-switch button.active { background: #fff; color: #1890ff; box-shadow: 0 1px 2px rgba(0,0,0,.06); font-weight: 600; }
+    .wallet-chip { display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: linear-gradient(135deg, #fff7e6, #fff1d6); border: 1px solid #ffd591; border-radius: 18px; cursor: pointer; font-size: 13px; color: #d46b08; text-decoration: none; }
+    .wallet-chip .wallet-amount { font-weight: 700; font-size: 14px; }
+    .wallet-chip .wallet-account { font-size: 11px; opacity: .85; }
+    .avatar-wrap { position: relative; margin-left: auto; }
+    .avatar-trigger { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px 8px; border-radius: 18px; }
+    .avatar-trigger:hover { background: #f5f5f5; }
+    .avatar-trigger img { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #f0f0f0; }
+    .avatar-trigger .avatar-name { font-size: 13px; color: #262626; }
+    .avatar-dropdown { display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 220px; background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,.12); padding: 8px; z-index: 300; }
+    .avatar-dropdown.open { display: block; }
+    .avatar-dropdown a { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 6px; color: #262626; text-decoration: none; font-size: 13px; }
+    .avatar-dropdown .divider { height: 1px; background: #f0f0f0; margin: 6px 4px; }
+    .app { display: flex; padding-top: 56px; min-height: 100vh; }
+    .sidebar { width: 200px; background: rgba(255,255,255,.9); backdrop-filter: blur(16px); box-shadow: 2px 0 8px rgba(0,0,0,.05); position: fixed; top: 56px; left: 0; bottom: 0; padding: 16px 0; overflow-y: auto; }
+    .menu a { display: flex; align-items: center; gap: 10px; padding: 11px 24px; color: #262626; text-decoration: none; border-left: 3px solid transparent; font-size: 14px; }
+    .menu a:hover { background: #f0f7ff; color: #1890ff; }
+    .menu a.active { background: #e6f7ff; color: #1890ff; border-left-color: #1890ff; font-weight: 700; }
+    .menu-icon { width: 18px; text-align: center; }
+    .menu-group { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+    .menu-group-title { padding: 8px 24px; font-size: 11px; color: #8c8c8c; text-transform: uppercase; letter-spacing: .5px; }
+    .main { margin-left: 200px; width: calc(100% - 200px); padding: 28px 30px 80px; }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 430px);
+      column-gap: 24px;
+      align-items: center;
+      min-height: 150px;
+      padding: 22px 26px;
+      border-radius: 24px;
+      background:
+        linear-gradient(135deg, rgba(16,31,62,.96), rgba(22,66,122,.94) 50%, rgba(4,116,124,.9)),
+        radial-gradient(circle at 78% 18%, rgba(255,255,255,.35), transparent 20%);
+      color: #fff;
+      box-shadow: var(--shadow);
+    }
+    .hero::after { content: ""; position: absolute; right: -72px; top: -120px; width: 300px; height: 300px; border-radius: 50%; background: conic-gradient(from 30deg, rgba(19,183,198,.7), rgba(255,138,42,.48), rgba(36,91,255,.5), rgba(19,183,198,.7)); filter: blur(3px); opacity: .42; }
+    .hero-kicker { position: relative; z-index: 1; grid-column: 1; display: inline-flex; width: fit-content; gap: 8px; align-items: center; padding: 5px 10px; border: 1px solid rgba(255,255,255,.22); border-radius: 999px; background: rgba(255,255,255,.08); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+    .hero h1 { position: relative; z-index: 1; grid-column: 1; margin: 10px 0 6px; font-size: clamp(28px, 3.2vw, 40px); line-height: 1.05; letter-spacing: -.05em; max-width: 640px; }
+    .hero p { position: relative; z-index: 1; grid-column: 1; margin: 0; max-width: 720px; color: rgba(255,255,255,.76); font-size: 13px; line-height: 1.65; }
+    .hero-actions { position: relative; z-index: 1; grid-column: 2; grid-row: 1; display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; align-self: start; margin-top: 0; }
+    .hero-actions .btn { height: 34px; padding: 0 14px; font-size: 12px; }
+    .hero-metrics { position: relative; z-index: 1; grid-column: 2; grid-row: 2 / span 2; display: flex; flex-wrap: wrap; justify-content: flex-end; align-self: end; gap: 8px; margin-top: 0; max-width: 430px; }
+    .hero-metric { display: inline-flex; align-items: baseline; gap: 8px; padding: 8px 11px; border: 1px solid rgba(255,255,255,.14); border-radius: 999px; background: rgba(255,255,255,.08); }
+    .hero-metric b { display: block; font-size: 15px; letter-spacing: -.02em; }
+    .hero-metric span { display: block; color: rgba(255,255,255,.66); font-size: 11px; margin-top: 0; }
+    .btn { border: 1px solid var(--line); background: #fff; color: var(--ink); height: 40px; padding: 0 18px; border-radius: 999px; cursor: pointer; font-weight: 800; box-shadow: 0 4px 14px rgba(23,32,51,.04); }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(23,32,51,.12); }
+    .btn.primary { border-color: var(--blue); background: var(--blue); color: #fff; }
+    .btn.dark { border-color: rgba(255,255,255,.24); background: rgba(255,255,255,.12); color: #fff; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-items: start; margin-top: 20px; }
+    .left-col { display: grid; gap: 18px; min-width: 0; }
+    .panel { background: rgba(255,255,255,.86); border: 1px solid rgba(230,235,243,.9); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+    .panel-head { padding: 22px 24px 8px; display: flex; align-items: end; justify-content: space-between; gap: 16px; }
+    .panel-title { margin: 0; font-size: 22px; letter-spacing: -.03em; }
+    .panel-sub { margin: 7px 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; padding: 16px 24px 8px; }
+    .tab { border: 1px solid var(--line); background: #fff; color: var(--muted); padding: 9px 14px; border-radius: 999px; cursor: pointer; font-weight: 800; font-size: 13px; }
+    .tab.active { border-color: rgba(36,91,255,.24); background: #eef3ff; color: var(--blue); }
+    .recommend-strip { margin: 12px 24px 0; padding: 14px 16px; border-radius: 18px; background: linear-gradient(90deg, rgba(255,138,42,.12), rgba(19,183,198,.12)); display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+    .recommend-strip strong { display: block; font-size: 14px; }
+    .recommend-strip span { color: var(--muted); font-size: 12px; }
+    .package-grid { padding: 18px 24px 24px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .pkg-card {
+      position: relative;
+      border: 1px solid rgba(23,32,51,.08);
+      border-radius: 24px;
+      padding: 24px 24px 20px;
+      background:
+        radial-gradient(circle at 86% 8%, rgba(255,255,255,.8), transparent 25%),
+        linear-gradient(145deg, var(--deal-a, #fff4ea), var(--deal-b, #e9f4ff));
+      cursor: pointer;
+      transition: .2s;
+      min-height: 308px;
+      overflow: hidden;
+      box-shadow: 0 10px 24px rgba(23,32,51,.08);
+    }
+    .pkg-card::before {
+      content: "";
+      position: absolute;
+      right: -48px;
+      top: -36px;
+      width: 170px;
+      height: 170px;
+      border-radius: 42px;
+      border: 1px solid rgba(23,32,51,.06);
+      transform: rotate(10deg);
+      background: rgba(255,255,255,.22);
+    }
+    .pkg-card:hover { transform: translateY(-5px); box-shadow: 0 22px 44px rgba(23,32,51,.15); }
+    .pkg-card.active { outline: 3px solid rgba(36,91,255,.2); border-color: rgba(36,91,255,.52); }
+    .pkg-ribbon {
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 2;
+      padding: 8px 18px 8px 20px;
+      border-bottom-left-radius: 18px;
+      background: linear-gradient(135deg, #ffc14b, #ffdf8a);
+      color: #111;
+      font-size: 13px;
+      font-weight: 950;
+      box-shadow: 0 8px 18px rgba(255,138,42,.22);
+    }
+    .pkg-top { position: relative; z-index: 1; display: flex; justify-content: flex-start; gap: 14px; align-items: flex-start; padding-right: 88px; }
+    .pkg-icon { width: 54px; height: 54px; border-radius: 18px; display: grid; place-items: center; font-size: 28px; background: rgba(255,255,255,.55); box-shadow: inset 0 0 0 1px rgba(255,255,255,.7); }
+    .pkg-kicker { position: relative; z-index: 1; width: fit-content; margin-top: 16px; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,.58); color: rgba(23,32,51,.58); font-size: 11px; font-weight: 950; letter-spacing: .08em; }
+    .pkg-name { position: relative; z-index: 1; margin: 8px 0 4px; font-size: 22px; font-weight: 950; letter-spacing: -.05em; }
+    .pkg-desc { position: relative; z-index: 1; color: rgba(23,32,51,.72); font-size: 12px; line-height: 1.65; min-height: 40px; max-width: 92%; }
+    .pkg-price { position: relative; z-index: 1; margin-top: 22px; display: grid; gap: 5px; letter-spacing: 0; }
+    .pkg-price-label { width: fit-content; padding: 3px 8px; border-radius: 999px; background: rgba(255,138,42,.14); color: #b87000; font-size: 11px; font-weight: 950; }
+    .pkg-price-main { display: flex; align-items: baseline; gap: 8px; letter-spacing: -.06em; }
+    .pkg-price .currency { font-size: 28px; font-weight: 950; }
+    .pkg-price .amount { font-size: 58px; line-height: .95; font-weight: 950; }
+    .pkg-price .suffix { color: rgba(23,32,51,.55); font-size: 13px; font-weight: 900; letter-spacing: 0; }
+    .pkg-list-price { color: rgba(23,32,51,.42); font-size: 13px; font-weight: 850; text-decoration: line-through; text-decoration-thickness: 1.5px; letter-spacing: 0; white-space: nowrap; }
+    .pkg-benefit { position: relative; z-index: 1; margin-top: 16px; color: #b87000; font-size: 13px; font-weight: 900; }
+    .pkg-footnote { position: relative; z-index: 1; text-align: center; color: rgba(23,32,51,.42); font-size: 12px; font-weight: 800; margin-top: 12px; }
+    .pkg-actions { position: relative; z-index: 3; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+    .pkg-actions button { height: 38px; border-radius: 999px; border: 1px solid rgba(23,32,51,.18); background: rgba(255,255,255,.64); cursor: pointer; font-weight: 950; color: rgba(23,32,51,.8); }
+    .pkg-actions button:hover { background: #fff; box-shadow: 0 8px 18px rgba(23,32,51,.12); }
+    .pkg-actions .buy-action { border-color: rgba(23,32,51,.64); color: var(--ink); background: linear-gradient(110deg, rgba(255,255,255,.72), rgba(255,223,184,.78)); }
+    .intro-card { border-radius: 22px; padding: 20px; background: linear-gradient(135deg, #0f1b2d, #1d3b64); color: #fff; min-height: 200px; }
+    .intro-card .label { color: rgba(255,255,255,.62); font-size: 12px; font-weight: 800; }
+    .intro-card h2 { margin: 10px 0 8px; font-size: 28px; letter-spacing: -.04em; }
+    .intro-card p { margin: 0; color: rgba(255,255,255,.74); line-height: 1.75; font-size: 13px; }
+    .scenario-card { border-radius: 22px; padding: 18px; background: #f8fbff; border: 1px solid var(--line); }
+    .scenario-card h3 { margin: 0 0 10px; font-size: 15px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { padding: 7px 10px; border-radius: 999px; background: #fff; border: 1px solid var(--line); color: var(--muted); font-size: 12px; font-weight: 700; }
+    .sample-section { border: 1px solid var(--line); border-radius: 24px; background: linear-gradient(180deg, #fff, #f8fbff); padding: 18px; }
+    .sample-head { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+    .sample-head h3 { margin: 0; font-size: 17px; letter-spacing: -.02em; }
+    .sample-head p { margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .sample-count { padding: 6px 10px; border-radius: 999px; background: #eef3ff; color: var(--blue); font-size: 12px; font-weight: 900; white-space: nowrap; }
+    .sample-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .sample-card { border: 1px solid var(--line); border-radius: 20px; background: #fff; overflow: hidden; box-shadow: 0 8px 24px rgba(23,32,51,.06); }
+    .sample-frame {
+      position: relative;
+      min-height: 138px;
+      aspect-ratio: 4 / 3;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 22% 20%, rgba(255,255,255,.65), transparent 20%),
+        linear-gradient(135deg, var(--sample-a, #dce8ff), var(--sample-b, #fff0df));
+    }
+    .sample-card.video .sample-frame { aspect-ratio: 16 / 9; }
+    .sample-frame::before { content: ""; position: absolute; inset: 14px; border: 1px dashed rgba(255,255,255,.68); border-radius: 16px; }
+    .sample-frame::after { content: ""; position: absolute; inset: -20%; background: repeating-linear-gradient(135deg, rgba(255,255,255,.18) 0 8px, transparent 8px 18px); opacity: .6; }
+    .sample-icon { position: relative; z-index: 1; width: 58px; height: 58px; border-radius: 22px; display: grid; place-items: center; background: rgba(255,255,255,.76); box-shadow: 0 12px 30px rgba(23,32,51,.12); font-size: 24px; }
+    .sample-card.video .sample-icon { border-radius: 50%; }
+    .sample-card.video .sample-icon::after { content: ""; width: 0; height: 0; margin-left: 4px; border-top: 9px solid transparent; border-bottom: 9px solid transparent; border-left: 14px solid var(--blue); }
+    .sample-card.video .sample-icon span { display: none; }
+    .sample-badge { position: absolute; z-index: 2; left: 12px; top: 12px; padding: 5px 9px; border-radius: 999px; background: rgba(15,27,45,.76); color: #fff; font-size: 11px; font-weight: 900; }
+    .sample-body { padding: 12px 13px 14px; }
+    .sample-title { font-size: 13px; font-weight: 900; line-height: 1.4; }
+    .sample-desc { margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.5; min-height: 36px; }
+    .sample-meta { display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; color: var(--muted); font-size: 11px; }
+    .sample-meta b { color: var(--ink); }
+    .compare { overflow-x: auto; border: 1px solid var(--line); border-radius: 20px; }
+    table { width: 100%; border-collapse: collapse; background: #fff; }
+    th, td { padding: 13px 14px; text-align: left; border-bottom: 1px solid var(--line); font-size: 13px; vertical-align: top; }
+    th { background: #f4f7fb; color: var(--muted); font-size: 12px; white-space: nowrap; }
+    tr:last-child td { border-bottom: 0; }
+    .two-col { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .info-box { padding: 18px; border: 1px solid var(--line); border-radius: 20px; background: #fff; }
+    .info-box h3 { margin: 0 0 10px; font-size: 15px; }
+    .info-box ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13px; line-height: 1.85; }
+    .config-card { background: rgba(255,255,255,.95); border: 1px solid var(--line); border-radius: 28px; box-shadow: var(--shadow); overflow: hidden; }
+    .config-head { padding: 22px 22px 16px; background: linear-gradient(135deg, #fff, #f2f7ff); border-bottom: 1px solid var(--line); }
+    .config-head h2 { margin: 0; font-size: 22px; letter-spacing: -.03em; }
+    .config-head p { margin: 6px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .config-body { padding: 18px 22px 22px; display: grid; gap: 16px; }
+    .field { display: grid; gap: 8px; }
+    .field label { font-size: 12px; color: var(--muted); font-weight: 900; }
+    .option-grid { display: grid; gap: 8px; }
+    .option { border: 1px solid var(--line); border-radius: 16px; padding: 12px; background: #fff; cursor: pointer; }
+    .option.active { border-color: var(--blue); background: #eef3ff; }
+    .option strong { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; }
+    .option span { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    select, input, textarea { width: 100%; border: 1px solid var(--line); border-radius: 14px; padding: 11px 12px; background: #fff; color: var(--ink); font: inherit; outline: none; }
+    textarea { min-height: 76px; resize: vertical; }
+    .inline { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .toggles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .toggle { border: 1px solid var(--line); border-radius: 14px; padding: 10px; background: #fff; cursor: pointer; text-align: center; font-size: 12px; font-weight: 900; color: var(--muted); }
+    .toggle.active { border-color: var(--green); background: #eefbf5; color: var(--green); }
+    .upload { border: 1px dashed #b9c6d8; border-radius: 18px; padding: 16px; background: #f8fbff; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .price-card { padding: 16px; border-radius: 20px; background: #0f1b2d; color: #fff; display: grid; gap: 9px; }
+    .price-row { display: flex; justify-content: space-between; gap: 12px; color: rgba(255,255,255,.72); font-size: 12px; }
+    .price-row.total { padding-top: 10px; border-top: 1px solid rgba(255,255,255,.14); color: #fff; align-items: baseline; }
+    .price-row.total b { font-size: 28px; letter-spacing: -.04em; }
+    .finance-note { padding: 13px 14px; border-radius: 16px; background: #fff7e6; color: #ad5d00; font-size: 12px; line-height: 1.7; }
+    .modal-mask { position: fixed; inset: 0; background: rgba(11,18,32,.45); display: none; align-items: center; justify-content: center; padding: 24px; z-index: 800; }
+    .modal-mask.open { display: flex; }
+    .modal { width: min(920px, 96vw); max-height: 88vh; overflow: auto; background: #fff; border-radius: 28px; box-shadow: 0 28px 90px rgba(0,0,0,.28); }
+    .modal.product-modal { width: min(1180px, 96vw); }
+    .modal.purchase-modal { width: min(760px, 96vw); }
+    .modal-head { padding: 24px 28px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 18px; align-items: start; }
+    .modal-head h2 { margin: 0; font-size: 24px; letter-spacing: -.03em; }
+    .modal-head p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+    .modal-body { padding: 22px 28px; display: grid; grid-template-columns: 1.1fr .9fr; gap: 18px; }
+    .purchase-modal-body { display: block; padding: 0; }
+    .purchase-modal .config-card { border: 0; border-radius: 0; box-shadow: none; background: #fff; }
+    .purchase-modal .config-head { display: none; }
+    .purchase-modal .config-body { padding: 22px 28px 28px; }
+    .detail-modal-body { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    .detail-modal-hero { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(300px, .85fr); gap: 16px; }
+    .detail-modal-section { border: 1px solid var(--line); border-radius: 22px; padding: 18px; background: #fff; }
+    .detail-modal-section h3 { margin: 0 0 12px; font-size: 16px; }
+    .price-tier-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .price-tier-card { position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: 20px; padding: 16px; background: linear-gradient(145deg, #fff, #f5f8ff); }
+    .price-tier-card.featured { border-color: rgba(36,91,255,.42); background: linear-gradient(145deg, #eef3ff, #fff); box-shadow: 0 16px 36px rgba(36,91,255,.12); }
+    .price-tier-card .tier-badge { display: inline-flex; height: 24px; align-items: center; padding: 0 9px; border-radius: 999px; background: rgba(36,91,255,.1); color: var(--blue); font-size: 11px; font-weight: 950; }
+    .price-tier-card h4 { margin: 12px 0 6px; font-size: 16px; letter-spacing: -.02em; }
+    .price-tier-card .tier-note { min-height: 36px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .tier-price { margin-top: 14px; display: flex; align-items: baseline; gap: 4px; color: var(--ink); }
+    .tier-price b { font-size: 28px; letter-spacing: -.05em; }
+    .tier-price span { color: var(--muted); font-size: 12px; font-weight: 800; }
+    .duration-price-list { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .duration-price-list span { padding: 5px 8px; border-radius: 999px; background: rgba(255,255,255,.75); border: 1px solid rgba(36,91,255,.14); color: rgba(23,32,51,.72); font-size: 11px; font-weight: 850; }
+    .tier-meta { margin-top: 12px; color: var(--muted); font-size: 12px; line-height: 1.65; }
+    .table-price-list { display: flex; flex-wrap: wrap; gap: 6px; min-width: 220px; }
+    .table-price-list span { padding: 4px 7px; border-radius: 999px; background: #eef3ff; color: var(--blue); font-size: 11px; font-weight: 850; white-space: nowrap; }
+    .confirm-box { border: 1px solid var(--line); border-radius: 20px; padding: 18px; background: #f8fbff; }
+    .confirm-box h3 { margin: 0 0 12px; font-size: 15px; }
+    .kv { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px dashed #dce4ef; font-size: 13px; }
+    .kv:last-child { border-bottom: 0; }
+    .kv span:first-child { color: var(--muted); }
+    .modal-foot { padding: 16px 28px 24px; display: flex; justify-content: flex-end; gap: 10px; }
+    .toasts { position: fixed; top: 72px; right: 20px; width: min(90vw, 360px); display: grid; gap: 8px; z-index: 1000; }
+    .toast { background: #fff; border: 1px solid #d9d9d9; border-radius: 12px; padding: 11px 14px; font-size: 13px; box-shadow: 0 8px 28px rgba(0,0,0,.14); animation: slideIn .25s ease-out; }
+    .toast.ok { border-color: #b7eb8f; background: #f6ffed; color: #389e0d; }
+    .toast.err { border-color: #ffccc7; background: #fff2f0; color: #cf1322; }
+    .toast.warn { border-color: #ffe58f; background: #fffbe6; color: #d48806; }
+    .toast.info { border-color: #91d5ff; background: #e6f7ff; color: #096dd9; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    @media (max-width: 1280px) { .package-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 1200px) { .layout { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) { .sample-grid, .price-tier-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 980px) { .hero { grid-template-columns: 1fr; } .hero-actions, .hero-metrics { grid-column: 1; grid-row: auto; justify-content: flex-start; margin-top: 12px; max-width: none; } }
+    @media (max-width: 800px) { .sidebar { display: none; } .main { margin-left: 0; width: 100%; padding: 18px; } .two-col, .modal-body, .package-grid { grid-template-columns: 1fr; } .toggles { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header class="topbar" id="topbar-shared"></header>
+  <div class="app">
+    <aside class="sidebar">
+      <nav class="menu">
+        <a href="platform-home-demander.html"><span class="menu-icon">🏠</span> 工作台</a>
+        <div class="menu-group">
+          <div class="menu-group-title">我有需求</div>
+          <a href="standard-package-store.html"><span class="menu-icon">🧩</span> 标准包 · 侧栏购买</a>
+          <a href="standard-package-store-modal.html" class="active"><span class="menu-icon">🪟</span> 标准包 · 弹窗购买</a>
+          <a href="demand-publish.html"><span class="menu-icon">📤</span> 发布需求</a>
+          <a href="demand-list.html"><span class="menu-icon">📋</span> 我的需求</a>
+          <a href="contractor-marketplace.html"><span class="menu-icon">🏪</span> 服务广场</a>
+        </div>
+        <div class="menu-group">
+          <div class="menu-group-title">我要接单</div>
+          <a href="contractor-demand-hall.html"><span class="menu-icon">📢</span> 接单广场</a>
+          <a href="contractor-orders.html"><span class="menu-icon">📬</span> 我的接单</a>
+          <a href="contractor-profile-edit.html"><span class="menu-icon">🛍</span> 我的服务主页</a>
+        </div>
+        <div class="menu-group">
+          <div class="menu-group-title">协同与账户</div>
+          <a href="project-space-list.html"><span class="menu-icon">🤝</span> 项目协同空间</a>
+          <a href="finance-center-prototype/accounts.html"><span class="menu-icon">💰</span> 资金中心</a>
+        </div>
+      </nav>
+    </aside>
+    <main class="main">
+      <section class="hero">
+        <div class="hero-kicker">AIGC STANDARD SERVICE SUPERMARKET</div>
+        <h1>AIGC标准化产品服务包</h1>
+        <p>图片、视频、电商套图、详情页、信息流短视频直接选购。明码标价、首购权益、交付周期清晰；支付后预算进入平台托管，验收和发票流程完成后再结算。</p>
+        <div class="hero-actions">
+          <button class="btn primary" onclick="document.getElementById('catalogPanel').scrollIntoView({behavior:'smooth'})">查看全部产品包</button>
+          <button class="btn dark" onclick="location.href='demand-publish.html'">发布定制需求</button>
+        </div>
+        <div class="hero-metrics">
+          <div class="hero-metric"><b>7 个</b><span>P0 首版标准包</span></div>
+          <div class="hero-metric"><b>3+4</b><span>图片包 + 视频包</span></div>
+          <div class="hero-metric"><b>¥9.9 起</b><span>低门槛试单</span></div>
+          <div class="hero-metric"><b>托管</b><span>付款冻结 / 验收结算</span></div>
+        </div>
+      </section>
+
+      <div class="layout">
+        <div class="left-col">
+          <section class="panel" id="catalogPanel">
+            <div class="panel-head">
+              <div>
+                <h2 class="panel-title">标准产品包目录</h2>
+                <p class="panel-sub">基于附件方案：覆盖图片需求 Top 场景、电商视觉、本地生活、信息流、剧情号和品牌宣传短片。</p>
+              </div>
+              <button class="btn" id="matchBtn">帮我选套餐</button>
+            </div>
+            <div class="tabs" id="categoryTabs"></div>
+            <div class="recommend-strip">
+              <div><strong>限时首购权益：标准包先下单锁价，交付资料可后补</strong><span>适合高频、可预期需求；不确定需求仍可走自定义发布。</span></div>
+              <button class="btn" id="recommendBtn">一键定位电商包</button>
+            </div>
+            <div class="package-grid" id="packageGrid"></div>
+          </section>
+
+        </div>
+
+        <div class="modal-mask" id="purchaseModal" aria-hidden="true">
+          <div class="modal purchase-modal">
+            <div class="modal-head">
+              <div>
+                <h2>购买配置</h2>
+                <p id="purchaseModalSub">选择档位、数量、规格和增项后，系统自动计算价格和预计交付。</p>
+              </div>
+              <button class="btn" id="closePurchaseModalBtn">关闭</button>
+            </div>
+            <div class="modal-body purchase-modal-body">
+              <section class="config-card">
+            <div class="config-head">
+              <h2>购买配置</h2>
+              <p id="configSub">选择档位、数量、规格和增项后，系统自动计算价格和预计交付。</p>
+            </div>
+            <div class="config-body">
+              <div class="field">
+                <label>档位</label>
+                <div class="option-grid" id="tierOptions"></div>
+              </div>
+              <div class="inline">
+                <div class="field">
+                  <label>数量</label>
+                  <input id="quantityInput" type="number" min="1" value="1">
+                </div>
+                <div class="field">
+                  <label id="specLabel">规格</label>
+                  <select id="specSelect"></select>
+                </div>
+              </div>
+              <div class="inline" id="videoOptions">
+                <div class="field">
+                  <label>视频时长</label>
+                  <select id="durationSelect"></select>
+                </div>
+                <div class="field">
+                  <label>画幅比例</label>
+                  <select id="ratioSelect"></select>
+                </div>
+              </div>
+              <div class="field">
+                <label>增项</label>
+                <div class="toggles">
+                  <button class="toggle" data-addon="copy">需要文案</button>
+                  <button class="toggle" data-addon="rush">加急交付</button>
+                  <button class="toggle" data-addon="source">源文件</button>
+                </div>
+              </div>
+              <div class="field">
+                <label>上传素材</label>
+                <div class="upload">支持图片、视频、参考链接和压缩包。原型中先做上传占位，实际研发时接文件服务。</div>
+              </div>
+              <div class="field">
+                <label>需求备注</label>
+                <textarea id="remarkInput" placeholder="例如：品牌调性、参考风格、投放平台、必须出现的卖点..."></textarea>
+              </div>
+              <div class="price-card">
+                <div class="price-row"><span>基础服务费</span><b id="basePrice">¥0</b></div>
+                <div class="price-row"><span>数量 / 时长调整</span><b id="qtyPrice">¥0</b></div>
+                <div class="price-row"><span>增项费用</span><b id="addonPrice">¥0</b></div>
+                <div class="price-row total"><span>合计</span><b id="totalPrice">¥0</b></div>
+                <div class="price-row"><span>预计交付</span><b id="etaText">1 天</b></div>
+              </div>
+              <div class="finance-note">资金说明：提交订单后从当前账户冻结套餐金额；服务完成并验收确认、承制方上传发票后，再完成分账结算。</div>
+              <button class="btn primary" id="buyBtn" style="width:100%;height:48px">立即购买</button>
+            </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-mask" id="orderModal" aria-hidden="true">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <h2>确认订单</h2>
+          <p>订单提交后将创建平台套餐需求，并从当前账户冻结预算。</p>
+        </div>
+        <button class="btn" id="closeModalBtn">关闭</button>
+      </div>
+      <div class="modal-body">
+        <div class="confirm-box">
+          <h3>服务信息</h3>
+          <div class="kv"><span>产品包</span><b id="confirmPkg">-</b></div>
+          <div class="kv"><span>档位</span><b id="confirmTier">-</b></div>
+          <div class="kv"><span>数量 / 规格</span><b id="confirmSpec">-</b></div>
+          <div class="kv"><span>增项</span><b id="confirmAddon">-</b></div>
+          <div class="kv"><span>预计交付</span><b id="confirmEta">-</b></div>
+        </div>
+        <div class="confirm-box">
+          <h3>资金与付款</h3>
+          <div class="kv"><span>付款账户</span><b id="confirmAccount">-</b></div>
+          <div class="kv"><span>当前可用余额</span><b id="confirmBalance">-</b></div>
+          <div class="kv"><span>订单金额</span><b id="confirmTotal">-</b></div>
+          <div class="kv"><span>资金动作</span><b id="confirmFinance">冻结预算</b></div>
+          <div class="finance-note" id="confirmNote" style="margin-top:12px">支付后资金进入平台托管，验收和发票流程完成后结算。</div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" id="cancelOrderBtn">取消</button>
+        <button class="btn primary" id="confirmOrderBtn">确认付款并提交</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="productDetailModal" aria-hidden="true">
+    <div class="modal product-modal">
+      <div class="modal-head">
+        <div>
+          <h2 id="modalDetailTitle">产品包详情</h2>
+          <p id="modalDetailSub">查看适用场景、样例、档位、交付内容和下单资料。</p>
+        </div>
+        <button class="btn" id="closeDetailBtn">关闭</button>
+      </div>
+      <div class="modal-body detail-modal-body">
+        <div class="detail-modal-hero">
+          <div class="intro-card">
+            <div class="label" id="modalDetailCategory">标准产品包</div>
+            <h2 id="modalDetailName">-</h2>
+            <p id="modalDetailDesc">-</p>
+          </div>
+          <div class="scenario-card">
+            <h3>适用场景</h3>
+            <div class="chips" id="modalDetailScenarios"></div>
+          </div>
+        </div>
+        <div class="detail-modal-section">
+          <h3>价格档位</h3>
+          <p class="panel-sub" style="margin: -4px 0 14px;">卡片展示该产品包的主要档位价；最终金额会根据数量、视频时长、规格和增项在购买弹窗中自动计算。</p>
+          <div class="price-tier-grid" id="modalDetailPriceCards"></div>
+        </div>
+        <div class="sample-section">
+          <div class="sample-head">
+            <div>
+              <h3>样例展示占位</h3>
+              <p>这里后续替换为真实图片、视频、成片预览或前后对比图。</p>
+            </div>
+            <span class="sample-count" id="modalDetailSampleCount">0 个样例位</span>
+          </div>
+          <div class="sample-grid" id="modalDetailSamples"></div>
+        </div>
+        <div class="detail-modal-section">
+          <h3>档位与交付对比</h3>
+          <div class="compare">
+            <table>
+              <thead><tr><th>档位</th><th>价格</th><th>制作方式</th><th>交付规格</th><th>修改</th><th>周期</th></tr></thead>
+              <tbody id="modalDetailTierTable"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="info-box">
+            <h3>你将获得</h3>
+            <ul id="modalDetailDeliverables"></ul>
+          </div>
+          <div class="info-box">
+            <h3>下单前请准备</h3>
+            <ul id="modalDetailMaterials"></ul>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" id="detailCloseFootBtn">继续浏览</button>
+        <button class="btn primary" id="detailChooseBtn">立即购买此套餐</button>
+      </div>
+    </div>
+  </div>
+  <div id="toastWrap" class="toasts"></div>
+
+  <script src="_shared.js?v=finance-nav-20260616"></script>
+  <script>
+  (function () {
+    const $ = (id) => document.getElementById(id);
+    const fmt = (n) => "¥" + (Math.round(Number(n || 0) * 100) / 100).toLocaleString("zh-CN", { maximumFractionDigits: 2 });
+    const nowStr = () => new Date().toLocaleString("zh-CN", { hour12: false });
+    const products = [
+      {
+        id: "ai-image", icon: "🖼️", category: "图片制作", catKey: "image", accent: "#eaf0ff",
+        name: "AI 图片制作包", desc: "AI 人物转绘、头像、风景、扩图、融合、LOGO、证件照等低门槛轻量需求。",
+        scenarios: ["头像转绘", "扩图融合", "证件照", "LOGO 概念", "人物+场景图"],
+        specs: ["2K", "4K", "人物图", "场景图", "真人风格"],
+        durations: [], ratios: [],
+        deliverables: ["1-10 张 PNG/JPG 成图", "2D/3D/真人风格可选", "支持人物或场景图类型", "基础 1 次修改"],
+        materials: ["参考图或人物照片", "目标风格说明", "图片用途", "禁用元素或版权要求"],
+        samples: [
+          { type: "image", title: "人物头像转绘样例", desc: "真人照片转 2D/3D/写实风格头像。", ratio: "1:1", status: "图片占位", tone: ["#cfe0ff", "#ffe2c7"] },
+          { type: "image", title: "产品融合场景图", desc: "产品与背景融合，用于社媒封面和轻量展示。", ratio: "4:3", status: "图片占位", tone: ["#dff8ef", "#e9edff"] },
+          { type: "image", title: "证件照与扩图效果", desc: "证件照修正、背景替换、画面扩展前后对比。", ratio: "3:2", status: "对比占位", tone: ["#fff1c8", "#dff4ff"] }
+        ],
+        tiers: [
+          { id: "base", name: "基础档", price: 9.9, unit: "张", method: "AI 生成", spec: "单张出图，2K/4K 可选", revision: "1 次", days: 1, note: "适合头像、证件照、轻量试风格" },
+          { id: "standard", name: "标准档", price: 39.9, unit: "组", method: "AI 生成 + 基础修正", spec: "5 张成图，统一风格", revision: "1 次", days: 1, note: "适合社媒封面、产品融合图" },
+          { id: "premium", name: "精修档", price: 69.9, unit: "组", method: "AI 生成 + 人工精修", spec: "10 张成图，含细节优化", revision: "2 次", days: 2, note: "适合成组物料和正式发布" }
+        ]
+      },
+      {
+        id: "ecommerce-set", icon: "🛍️", category: "电商设计", catKey: "ecommerce", accent: "#fff0df",
+        name: "电商套图制作包", desc: "商品主图、场景图、模特展示图，覆盖淘宝、京东、拼多多、抖音电商主图规范。",
+        scenarios: ["商品上新", "主图优化", "模特展示", "场景图", "高频换图"],
+        specs: ["800×800", "1000×1000", "白底+场景+细节图", "PSD+PNG"],
+        durations: [], ratios: [],
+        deliverables: ["1 套 5 张起，最多 5 套/25 张", "白底图、场景图、细节图", "PSD+PNG", "AI 生成 + 人工修改"],
+        materials: ["商品图片或样品图", "商品名称与卖点", "店铺平台规格", "品牌 Logo", "参考竞品图"],
+        samples: [
+          { type: "image", title: "商品主图套系", desc: "白底图、场景图、细节卖点图组合展示。", ratio: "1:1", status: "图片占位", tone: ["#fff0df", "#dfeaff"] },
+          { type: "image", title: "模特展示图", desc: "服饰、美妆、配饰类商品的上身展示位。", ratio: "4:5", status: "图片占位", tone: ["#f6e6ff", "#ffe7d2"] },
+          { type: "video", title: "主图短视频预览", desc: "电商主图视频或商品转场动效样例。", ratio: "16:9", status: "视频占位", tone: ["#dfeaff", "#dff8ef"] }
+        ],
+        tiers: [
+          { id: "base", name: "基础档", price: 99, unit: "套", method: "AI 生成 + 人工修改", spec: "1 套 / 5 张起", revision: "1 次", days: 2, note: "中小卖家、新手店主" },
+          { id: "standard", name: "进阶档", price: 199, unit: "套", method: "AI 生成 + 人工修饰", spec: "标准套图，含场景与细节图", revision: "2 次", days: 2, note: "适合有品质要求的上新商品" },
+          { id: "premium", name: "旗舰档", price: 299, unit: "套", method: "深度设计 + 人工精修", spec: "高质量套图，含品牌化视觉", revision: "3 次", days: 3, note: "适合品牌级精修和主推商品" }
+        ]
+      },
+      {
+        id: "detail-page", icon: "📄", category: "电商设计", catKey: "ecommerce", accent: "#e8fff5",
+        name: "商品详情页设计包", desc: "把产品卖点、参数、场景、功能、材质和购物须知做成转化型详情页视觉。",
+        scenarios: ["详情页长图", "新品首发", "卖点提炼", "参数说明", "品牌电商"],
+        specs: ["800×800 主图", "详情页长图", "PSD+PNG", "定制版式"],
+        durations: [], ratios: [],
+        deliverables: ["主图设计 4 张", "详情页长图 1 张", "产品参数、适用人群、功能解析、材质说明等模块", "AI 生成 + 人工精修"],
+        materials: ["产品参数", "产品卖点", "详情页参考", "目标人群", "品牌素材"],
+        samples: [
+          { type: "image", title: "详情页首屏视觉", desc: "商品利益点、品牌调性和核心卖点聚合展示。", ratio: "16:9", status: "图片占位", tone: ["#e8fff5", "#dce8ff"] },
+          { type: "image", title: "长图模块切片", desc: "参数、适用人群、材质说明、使用方法模块。", ratio: "3:4", status: "长图占位", tone: ["#fff6db", "#e6fff7"] },
+          { type: "image", title: "卖点对比模块", desc: "产品对比、细节放大、购物须知等信息位。", ratio: "4:3", status: "图片占位", tone: ["#e7f0ff", "#f1ffe8"] }
+        ],
+        tiers: [
+          { id: "base", name: "基础档", price: 249.9, unit: "套", method: "AI 生成 + 模板化排版", spec: "首屏 + 基础卖点模块", revision: "1 次", days: 2, note: "适合快速补齐详情页" },
+          { id: "standard", name: "进阶档", price: 499, unit: "套", method: "AI 生成 + 人工精修", spec: "主图 4 张 + 详情页长图", revision: "2 次", days: 3, note: "适合非标品和差异化商品" },
+          { id: "premium", name: "旗舰档", price: 899, unit: "套", method: "深度策划 + 视觉精修", spec: "完整详情页视觉 + 卖点模块", revision: "3 次", days: 5, note: "适合品牌商品和重点转化页" }
+        ]
+      },
+      {
+        id: "feed-video", icon: "🎞️", category: "短视频制作", catKey: "video", accent: "#e9f4ff",
+        name: "AI 信息流短视频", desc: "面向抖音、快手、小红书、视频号的信息流投放、产品种草、直播切片引流。",
+        scenarios: ["产品种草", "单品带货", "直播切片", "口播讲解", "数字人"],
+        specs: ["720P", "1080P", "2K 超分"],
+        durations: [15, 30, 45, 60], ratios: ["1:1", "9:16", "16:9"],
+        deliverables: ["MP4 成片", "15/30/45/60 秒可选", "720/1080P/2K 超分", "2 次修改"],
+        materials: ["产品介绍", "参考视频链接", "目标平台", "是否需要脚本", "品牌素材"],
+        samples: [
+          { type: "video", title: "单品种草信息流", desc: "3 秒钩子 + 卖点演示 + 行动引导。", ratio: "9:16", status: "视频占位", tone: ["#e9f4ff", "#ffe8c9"] },
+          { type: "video", title: "直播切片引流", desc: "直播高光片段剪辑包装，用于投放测试。", ratio: "16:9", status: "视频占位", tone: ["#dff8ef", "#e7ebff"] },
+          { type: "image", title: "封面帧样例", desc: "信息流首帧、标题贴片、利益点标签展示。", ratio: "4:3", status: "封面占位", tone: ["#fff0df", "#dbeafe"] }
+        ],
+        tiers: [
+          { id: "no-script", name: "基础包（无脚本）", price: 129, priceByDuration: {15:129,30:159,45:189,60:219}, unit: "条", method: "AI 生成 + 人工精修", spec: "1-10 条", revision: "2 次", days: 1, note: "已有脚本，快速出片" },
+          { id: "script", name: "进阶包（有脚本）", price: 169, priceByDuration: {15:169,30:199,45:229,60:259}, unit: "条", method: "AI 生成 + 人工精修", spec: "1-10 条", revision: "2 次", days: 1, note: "含口播或分镜脚本" }
+        ]
+      },
+      {
+        id: "local-video", icon: "📍", category: "本地生活", catKey: "local", accent: "#fff3e5",
+        name: "实景探店 / 门店引流视频", desc: "餐饮、美业、酒店、健身房、实体门店引流推广。",
+        scenarios: ["餐饮探店", "美业门店", "酒店民宿", "健身房", "同城投放"],
+        specs: ["720P", "1080P", "2K 超分"],
+        durations: [15, 30, 45, 60, 90, 120], ratios: ["1:1", "3:4", "4:3", "9:16", "16:9", "21:9"],
+        deliverables: ["MP4 成片", "15-120 秒可选", "AI 生成 + 人工精剪", "可选脚本与配音"],
+        materials: ["门店基础信息", "地址和营业时间", "服务卖点", "现场素材", "投放平台"],
+        samples: [
+          { type: "video", title: "餐饮探店引流片", desc: "门头、环境、招牌菜、到店路线完整节奏。", ratio: "9:16", status: "视频占位", tone: ["#fff3e5", "#dff8ef"] },
+          { type: "video", title: "美业门店转化片", desc: "服务流程、效果展示、套餐利益点。", ratio: "9:16", status: "视频占位", tone: ["#ffe7ef", "#e9f4ff"] },
+          { type: "image", title: "门店封面组图", desc: "同城投放封面、团购卡片、活动海报。", ratio: "1:1", status: "图片占位", tone: ["#fff1c8", "#dce8ff"] }
+        ],
+        tiers: [
+          { id: "no-script", name: "基础包（无脚本）", price: 99, priceByDuration: {15:99,30:129,45:159,60:189,90:219,120:249}, unit: "条", method: "AI 生成 + 人工精剪", spec: "1-10 条", revision: "2 次", days: 1, note: "适合试投放" },
+          { id: "script", name: "进阶包（有脚本）", price: 159, priceByDuration: {15:159,30:189,45:219,60:249,90:279,120:309}, unit: "条", method: "人工设计 + AI 辅助 + AI 配音", spec: "1-10 条", revision: "2 次", days: 1, note: "适合持续投放" }
+        ]
+      },
+      {
+        id: "story-video", icon: "🎭", category: "短视频制作", catKey: "video", accent: "#f2ecff",
+        name: "AI 创意剧情短视频", desc: "个人 IP、剧情号、情感号、段子号、矩阵起号内容打造。",
+        scenarios: ["个人 IP", "剧情号", "情感号", "段子号", "矩阵起号"],
+        specs: ["720P", "1080P", "2K 超分"],
+        durations: [15, 30, 45, 60, 90, 120], ratios: ["1:1", "3:4", "4:3", "9:16", "16:9", "21:9"],
+        deliverables: ["AI 剧情成片", "可选脚本", "2 次修改", "批量折扣 3 条起"],
+        materials: ["剧情方向", "人设说明", "参考账号", "禁用内容", "目标平台"],
+        samples: [
+          { type: "video", title: "情感反转剧情", desc: "人设、冲突、反转和评论引导结构。", ratio: "9:16", status: "视频占位", tone: ["#f2ecff", "#ffe6d6"] },
+          { type: "video", title: "矩阵号起号片段", desc: "可复用脚本模板，支持批量换人设换场景。", ratio: "9:16", status: "视频占位", tone: ["#e7ebff", "#dff8ef"] },
+          { type: "image", title: "角色设定板", desc: "剧情号人物形象、服装、场景基调占位。", ratio: "4:3", status: "图片占位", tone: ["#f7e7ff", "#e9f4ff"] }
+        ],
+        tiers: [
+          { id: "no-script", name: "基础包（无脚本）", price: 299, priceByDuration: {15:299,30:349,45:399,60:449,90:499,120:549}, unit: "条", method: "AI 生成 + 人工精剪", spec: "1-10 条", revision: "2 次", days: 1, note: "已有剧本或轻剧情" },
+          { id: "script", name: "进阶包（有脚本）", price: 399, priceByDuration: {15:399,30:499,45:599,60:699,90:799,120:899}, unit: "条", method: "人工设计 + AI 辅助 + AI 配音", spec: "1-10 条", revision: "2 次", days: 1, note: "含脚本策划" }
+        ]
+      },
+      {
+        id: "brand-film", icon: "🏢", category: "品牌宣传", catKey: "brand", accent: "#edf7ff",
+        name: "AI 品牌宣传短片", desc: "企业简介、品牌展示、门店宣传、招商宣传、产品功能展示、操作教程、详情页视频。",
+        scenarios: ["企业介绍", "品牌展示", "招商宣传", "产品介绍", "操作教程"],
+        specs: ["1080P", "横竖屏", "品牌视觉统一"],
+        durations: [15, 30, 45, 60, 90, 120], ratios: ["1:1", "3:4", "4:3", "9:16", "16:9", "21:9"],
+        deliverables: ["1080P 成片", "品牌统一风格", "不限修改", "7 个工作日交付"],
+        materials: ["企业简介", "品牌 VI", "产品资料", "参考视频", "应用场景"],
+        samples: [
+          { type: "video", title: "企业品牌宣传片", desc: "企业实力、品牌理念、场景资产组合展示。", ratio: "16:9", status: "视频占位", tone: ["#edf7ff", "#ffe8ce"] },
+          { type: "video", title: "招商介绍短片", desc: "招商卖点、合作优势、案例数据包装。", ratio: "16:9", status: "视频占位", tone: ["#dce8ff", "#e8fff5"] },
+          { type: "image", title: "品牌视觉分镜", desc: "主视觉、字幕条、片头片尾风格板。", ratio: "16:9", status: "分镜占位", tone: ["#eef3ff", "#fff0df"] }
+        ],
+        tiers: [
+          { id: "no-script", name: "基础包（无脚本）", price: 2999, priceByDuration: {15:2999,30:3299,45:3699,60:3999,90:4599,120:5299}, unit: "条", method: "AI 生成 + 精剪 + 配音", spec: "1-10 条", revision: "不限", days: 7, note: "适合已有文案素材" },
+          { id: "script", name: "基础包（有脚本）", price: 3499, priceByDuration: {15:3499,30:3799,45:3999,60:4599,90:5299,120:5999}, unit: "条", method: "AI 生成 + 精剪 + 配音", spec: "1-10 条", revision: "不限", days: 7, note: "含宣传片脚本" }
+        ]
+      }
+    ];
+    const categories = [
+      { id: "all", label: "全部" },
+      { id: "image", label: "图片制作" },
+      { id: "ecommerce", label: "电商设计" },
+      { id: "video", label: "短视频制作" },
+      { id: "local", label: "本地生活" },
+      { id: "brand", label: "品牌宣传" }
+    ];
+    const state = { category: "all", productId: "ecommerce-set", tierId: "", quantity: 1, spec: "", duration: 15, ratio: "9:16", addons: { copy: false, rush: false, source: false } };
+    function product() { return products.find(p => p.id === state.productId) || products[0]; }
+    function tier() { const p = product(); return p.tiers.find(t => t.id === state.tierId) || p.tiers[0]; }
+    function durationPrice(t) { return t.priceByDuration ? (t.priceByDuration[state.duration] || t.price) : t.price; }
+    function discount(q) { if (q >= 10) return .8; if (q >= 5) return .85; if (q >= 3) return .9; return 1; }
+    function calc() {
+      const p = product(), t = tier(), q = Math.max(1, Number(state.quantity) || 1);
+      const unit = durationPrice(t);
+      const subtotal = unit * q * discount(q);
+      const copy = state.addons.copy && !t.name.includes("有脚本") ? Math.max(60, unit * .25) * q : 0;
+      const source = state.addons.source ? Math.max(30, unit * .18) * q : 0;
+      const rush = state.addons.rush ? subtotal * .6 : 0;
+      const total = subtotal + copy + source + rush;
+      const eta = Math.max(1, Number(t.days) || 1) + Math.floor(Math.max(0, q - 1) / 2);
+      return { p, t, q, unit, subtotal, copy, source, rush, addon: copy + source + rush, total, eta: state.addons.rush ? Math.max(1, Math.ceil(eta / 2)) : eta };
+    }
+    function renderTabs() {
+      $("categoryTabs").innerHTML = categories.map(c => `<button class="tab ${state.category === c.id ? "active" : ""}" data-cat="${c.id}">${c.label}</button>`).join("");
+    }
+    function renderPackages() {
+      const list = products.filter(p => state.category === "all" || p.catKey === state.category);
+      $("packageGrid").innerHTML = list.map(p => {
+        const min = Math.min.apply(null, p.tiers.map(t => t.price));
+        const deal = dealMeta(p);
+        return `<article class="pkg-card ${p.id === state.productId ? "active" : ""}" data-product="${p.id}" style="--deal-a:${deal.a};--deal-b:${deal.b}">
+          <div class="pkg-ribbon">${deal.ribbon}</div>
+          <div class="pkg-top"><div class="pkg-icon">${p.icon}</div></div>
+          <div class="pkg-kicker">${p.category}</div>
+          <div class="pkg-name">${p.name}</div>
+          <div class="pkg-desc">${p.desc}</div>
+          <div class="pkg-price">
+            <span class="pkg-price-label">交易价</span>
+            <div class="pkg-price-main"><span class="currency">¥</span><span class="amount">${formatDealAmount(min)}</span><span class="suffix">起</span><span class="pkg-list-price">划线价 ¥${formatDealAmount(promoListPrice(min))}</span></div>
+          </div>
+          <div class="pkg-benefit">✦ ${deal.benefit}</div>
+          <div class="pkg-actions">
+            <button type="button" data-detail="${p.id}">查看详情</button>
+            <button type="button" class="buy-action" data-select="${p.id}">立即购买</button>
+          </div>
+          <div class="pkg-footnote">${deal.note}</div>
+        </article>`;
+      }).join("");
+    }
+    function formatDealAmount(n) {
+      const v = Number(n || 0);
+      return Number.isInteger(v) ? v.toLocaleString("zh-CN") : v.toLocaleString("zh-CN", { maximumFractionDigits: 1 });
+    }
+    function promoListPrice(n) {
+      const v = Number(n || 0);
+      if (v < 20) return 19.9;
+      if (v < 100) return Math.ceil(v * 1.45 / 10) * 10 - 1;
+      if (v < 1000) return Math.ceil(v * 1.35 / 10) * 10 - 1;
+      return Math.ceil(v * 1.25 / 100) * 100 - 1;
+    }
+    function dealMeta(p) {
+      const map = {
+        "ai-image": { ribbon: "低价试单", benefit: "最多生成 10 张图片", note: "轻量需求可快速验证风格", a: "#f3eadf", b: "#eef5ff" },
+        "ecommerce-set": { ribbon: "首购加赠 1 张", benefit: "一套覆盖主图/场景/细节图", note: "电商上新高频采购首选", a: "#fff0df", b: "#f7e9df" },
+        "detail-page": { ribbon: "转化提升包", benefit: "含详情页长图和卖点模块", note: "适合非标品和品牌商品", a: "#e6f9e0", b: "#f8f4e6" },
+        "feed-video": { ribbon: "投放测试", benefit: "最快 1 天出片，支持脚本", note: "信息流素材批量起量", a: "#e8f1ff", b: "#f3eadf" },
+        "local-video": { ribbon: "同城引流", benefit: "适配门店团购和本地投放", note: "餐饮美业酒店健身均可用", a: "#fff3e5", b: "#e8f7e9" },
+        "story-video": { ribbon: "矩阵起号", benefit: "剧情号/IP 内容批量生产", note: "3 条起享批量折扣", a: "#efe6ff", b: "#ffe9d8" },
+        "brand-film": { ribbon: "品牌大片", benefit: "1080P 成片，不限修改", note: "企业介绍/招商/产品宣传", a: "#e7f0ff", b: "#eef8ee" }
+      };
+      return map[p.id] || { ribbon: "限时优惠", benefit: "价格透明，交付可预期", note: "支付后进入平台托管", a: "#eef3ff", b: "#fff0df" };
+    }
+    function tierPriceRange(t) {
+      if (!t.priceByDuration) return fmt(t.price);
+      const values = Object.values(t.priceByDuration).map(Number);
+      const min = Math.min.apply(null, values);
+      const max = Math.max.apply(null, values);
+      return min === max ? fmt(min) : fmt(min) + " - " + fmt(max);
+    }
+    function durationPriceHtml(t) {
+      if (!t.priceByDuration) return "";
+      return `<div class="duration-price-list">${Object.entries(t.priceByDuration).map(([d, price]) => `<span>${d}s · ${fmt(price)}</span>`).join("")}</div>`;
+    }
+    function tablePriceHtml(t) {
+      if (!t.priceByDuration) return fmt(t.price);
+      return `<div class="table-price-list">${Object.entries(t.priceByDuration).map(([d, price]) => `<span>${d}s ${fmt(price)}</span>`).join("")}</div>`;
+    }
+    function priceCardsHtml(p) {
+      return p.tiers.map((t, index) => `<article class="price-tier-card ${index === 1 || (p.tiers.length === 1 && index === 0) ? "featured" : ""}">
+        <span class="tier-badge">${index === 0 ? "入门可选" : index === 1 ? "推荐档位" : "高配方案"}</span>
+        <h4>${t.name}</h4>
+        <p class="tier-note">${t.note}</p>
+        <div class="tier-price"><b>${tierPriceRange(t)}</b><span>/${t.unit || "项"}</span></div>
+        ${durationPriceHtml(t)}
+        <div class="tier-meta">${t.spec}<br>${t.revision}修改 · ${t.days} 天起交付</div>
+      </article>`).join("");
+    }
+    function tierRowsHtml(p) {
+      return p.tiers.map(t => `<tr><td><b>${t.name}</b><br><span style="color:var(--muted)">${t.note}</span></td><td>${tablePriceHtml(t)}</td><td>${t.method}</td><td>${t.spec}</td><td>${t.revision}</td><td>${t.days} 天起</td></tr>`).join("");
+    }
+    function sampleCardsHtml(samples) {
+      return (samples || []).map(s => {
+        const tone = s.tone || ["#dce8ff", "#fff0df"];
+        const icon = s.type === "video" ? "" : "▧";
+        const kind = s.type === "video" ? "视频" : "图片";
+        return `<article class="sample-card ${s.type}" style="--sample-a:${tone[0]};--sample-b:${tone[1]}">
+          <div class="sample-frame">
+            <span class="sample-badge">${s.status}</span>
+            <div class="sample-icon"><span>${icon}</span></div>
+          </div>
+          <div class="sample-body">
+            <div class="sample-title">${s.title}</div>
+            <div class="sample-desc">${s.desc}</div>
+            <div class="sample-meta"><span>${kind}样例</span><b>${s.ratio}</b></div>
+          </div>
+        </article>`;
+      }).join("");
+    }
+    function openProductDetail(productId) {
+      const p = products.find(x => x.id === productId) || product();
+      $("modalDetailTitle").textContent = p.name;
+      $("modalDetailSub").textContent = p.desc;
+      $("modalDetailCategory").textContent = p.category;
+      $("modalDetailName").textContent = p.name;
+      $("modalDetailDesc").textContent = p.desc;
+      $("modalDetailScenarios").innerHTML = p.scenarios.map(x => `<span class="chip">${x}</span>`).join("");
+      $("modalDetailPriceCards").innerHTML = priceCardsHtml(p);
+      $("modalDetailTierTable").innerHTML = tierRowsHtml(p);
+      $("modalDetailDeliverables").innerHTML = p.deliverables.map(x => `<li>${x}</li>`).join("");
+      $("modalDetailMaterials").innerHTML = p.materials.map(x => `<li>${x}</li>`).join("");
+      $("modalDetailSampleCount").textContent = (p.samples || []).length + " 个样例位";
+      $("modalDetailSamples").innerHTML = sampleCardsHtml(p.samples);
+      $("detailChooseBtn").dataset.product = p.id;
+      $("productDetailModal").classList.add("open");
+      $("productDetailModal").setAttribute("aria-hidden", "false");
+    }
+    function closeProductDetail() {
+      $("productDetailModal").classList.remove("open");
+      $("productDetailModal").setAttribute("aria-hidden", "true");
+    }
+    function openPurchaseModal(productId) {
+      if (productId) {
+        state.productId = productId;
+        state.tierId = "";
+      }
+      renderAll();
+      const c = calc();
+      $("purchaseModalSub").textContent = `${c.p.name} · ${c.t.name}，继续选择数量、规格和增项后确认价格。`;
+      $("purchaseModal").classList.add("open");
+      $("purchaseModal").setAttribute("aria-hidden", "false");
+    }
+    function closePurchaseModal() {
+      $("purchaseModal").classList.remove("open");
+      $("purchaseModal").setAttribute("aria-hidden", "true");
+    }
+    function renderConfig() {
+      const p = product();
+      if (!state.tierId || !p.tiers.some(t => t.id === state.tierId)) state.tierId = p.tiers[0].id;
+      if (!state.spec || !p.specs.includes(state.spec)) state.spec = p.specs[0];
+      if (p.durations.length && !p.durations.includes(Number(state.duration))) state.duration = p.durations[0];
+      if (p.ratios.length && !p.ratios.includes(state.ratio)) state.ratio = p.ratios[0];
+      $("tierOptions").innerHTML = p.tiers.map(t => `<div class="option ${t.id === state.tierId ? "active" : ""}" data-tier="${t.id}"><strong><span>${t.name}</span><span>${fmt(t.price)} 起</span></strong><span>${t.note} · ${t.revision}修改 · ${t.days}天起</span></div>`).join("");
+      $("quantityInput").value = state.quantity;
+      $("quantityInput").max = p.id.includes("image") ? 10 : 10;
+      $("specSelect").innerHTML = p.specs.map(s => `<option ${s === state.spec ? "selected" : ""}>${s}</option>`).join("");
+      $("videoOptions").style.display = p.durations.length ? "grid" : "none";
+      $("durationSelect").innerHTML = p.durations.map(d => `<option value="${d}" ${Number(state.duration) === d ? "selected" : ""}>${d} 秒</option>`).join("");
+      $("ratioSelect").innerHTML = p.ratios.map(r => `<option ${r === state.ratio ? "selected" : ""}>${r}</option>`).join("");
+      document.querySelectorAll(".toggle").forEach(btn => btn.classList.toggle("active", !!state.addons[btn.dataset.addon]));
+      const c = calc();
+      $("basePrice").textContent = fmt(c.unit);
+      $("qtyPrice").textContent = `${c.q} ${c.t.unit} ${discount(c.q) < 1 ? "· 已折扣" : ""} ${fmt(c.subtotal)}`;
+      $("addonPrice").textContent = fmt(c.addon);
+      $("totalPrice").textContent = fmt(c.total);
+      $("etaText").textContent = c.eta + (c.p.id === "brand-film" ? " 个工作日" : " 天");
+    }
+    function renderAll() { renderTabs(); renderPackages(); renderConfig(); }
+    function getWalletSnapshot(walletKey) {
+      const wallets = window.demoApp.getWallets ? window.demoApp.getWallets() : {};
+      return wallets[walletKey] || null;
+    }
+    function getAvailableBalance(wallet) {
+      if (!wallet) return 0;
+      return Number(wallet.available_balance != null ? wallet.available_balance : wallet.balance) || 0;
+    }
+    function openOrderModal() {
+      const c = calc();
+      const ws = window.demoApp.getCurrentWorkspace();
+      const wallet = getWalletSnapshot(ws.walletKey);
+      const available = getAvailableBalance(wallet);
+      $("confirmPkg").textContent = c.p.name;
+      $("confirmTier").textContent = c.t.name;
+      $("confirmSpec").textContent = `${c.q} ${c.t.unit} · ${state.spec}${c.p.durations.length ? " · " + state.duration + "秒 · " + state.ratio : ""}`;
+      $("confirmAddon").textContent = [
+        state.addons.copy ? "文案" : "",
+        state.addons.rush ? "加急" : "",
+        state.addons.source ? "源文件" : ""
+      ].filter(Boolean).join(" / ") || "无";
+      $("confirmEta").textContent = $("etaText").textContent;
+      $("confirmAccount").textContent = (ws.payer && ws.payer.name) || ws.payerLabel;
+      $("confirmBalance").textContent = fmt(available);
+      $("confirmTotal").textContent = fmt(c.total);
+      const shortage = Math.max(0, c.total - available);
+      $("confirmNote").innerHTML = shortage > 0
+        ? `当前账户余额不足，还差 <b>${fmt(shortage)}</b>。可先去资金中心充值，或切换团队账户。`
+        : `支付后冻结 <b>${fmt(c.total)}</b>，进入平台托管；服务完成、验收确认并完成发票流程后结算。`;
+      $("confirmOrderBtn").dataset.shortage = shortage > 0 ? "1" : "0";
+      $("confirmOrderBtn").textContent = shortage > 0 ? "余额不足，去充值" : "确认付款并提交";
+      $("orderModal").classList.add("open");
+      $("orderModal").setAttribute("aria-hidden", "false");
+    }
+    function closeOrderModal() {
+      $("orderModal").classList.remove("open");
+      $("orderModal").setAttribute("aria-hidden", "true");
+    }
+    function submitOrder() {
+      const c = calc();
+      const ws = window.demoApp.getCurrentWorkspace();
+      const id = "DM-" + new Date().toISOString().slice(0, 10).replace(/-/g, "") + Math.floor(Math.random() * 90 + 10);
+      const projectSpaceId = "PS-" + new Date().toISOString().slice(0, 10).replace(/-/g, "") + Math.floor(Math.random() * 9000 + 1000);
+      const title = c.p.name + " · " + c.t.name;
+      const result = window.demoApp.tccTry({
+        walletKey: ws.walletKey,
+        amount: c.total,
+        demandId: id,
+        orderTitle: title,
+        biz_type: "standard_package_lock",
+        operator: "昭岚",
+        expireDays: 7
+      });
+      if (!result || !result.ok) {
+        window.demoToast((result && result.error) || "付款冻结失败，请稍后重试", "err");
+        return;
+      }
+      window.demoApp.addDemand({
+        id,
+        requirementType: "PLATFORM_SKU",
+        spuId: c.p.id,
+        skuId: c.t.id,
+        skuSnapshot: JSON.parse(JSON.stringify({ product: c.p.name, tier: c.t, quantity: c.q, spec: state.spec, duration: state.duration, ratio: state.ratio, addons: state.addons, total: c.total })),
+        title,
+        category: c.p.category + " / " + c.p.name,
+        desc: $("remarkInput").value.trim() || c.p.desc,
+        budget: c.total,
+        budgetMin: c.total,
+        budgetMax: c.total,
+        deadline: $("etaText").textContent,
+        refs: [],
+        workspace: ws.id,
+        workspaceName: ws.name,
+        walletKey: ws.walletKey,
+        payerLabel: ws.payerLabel,
+        payerAccountName: (ws.payer && ws.payer.name) || ws.payerLabel,
+        paymentStatus: "frozen",
+        freezeOrderId: result.freezeId,
+        voucherNo: result.voucherNo,
+        status: "auto-approved",
+        auditMode: "auto",
+        auditedBy: "system-auto",
+        auditedAt: nowStr(),
+        projectSpaceId,
+        projectSpaceCreatedAt: nowStr(),
+        quotesCount: 0,
+        createTime: nowStr()
+      });
+      closeOrderModal();
+      closePurchaseModal();
+      window.demoToast("✅ 标准产品包已下单，预算已冻结", "ok");
+      setTimeout(() => window.demoToast("🤝 项目协同空间已创建，可在我的需求查看", "info"), 800);
+      setTimeout(() => { location.href = "demand-list.html?highlight=" + id + "&paid=1"; }, 1800);
+    }
+    document.addEventListener("click", (e) => {
+      const detailBtn = e.target.closest("[data-detail]");
+      if (detailBtn) { e.stopPropagation(); openProductDetail(detailBtn.dataset.detail); return; }
+      const selectBtn = e.target.closest("[data-select]");
+      if (selectBtn) {
+        e.stopPropagation();
+        openPurchaseModal(selectBtn.dataset.select);
+        return;
+      }
+      const cat = e.target.closest("[data-cat]");
+      if (cat) { state.category = cat.dataset.cat; renderAll(); return; }
+      const card = e.target.closest("[data-product]");
+      if (card) { state.productId = card.dataset.product; state.tierId = ""; renderAll(); return; }
+      const tierEl = e.target.closest("[data-tier]");
+      if (tierEl) { state.tierId = tierEl.dataset.tier; renderConfig(); return; }
+      const add = e.target.closest("[data-addon]");
+      if (add) { state.addons[add.dataset.addon] = !state.addons[add.dataset.addon]; renderConfig(); return; }
+    });
+    $("quantityInput").addEventListener("input", (e) => { state.quantity = Math.max(1, Math.min(10, Number(e.target.value) || 1)); renderConfig(); });
+    $("specSelect").addEventListener("change", (e) => { state.spec = e.target.value; renderConfig(); });
+    $("durationSelect").addEventListener("change", (e) => { state.duration = Number(e.target.value); renderConfig(); });
+    $("ratioSelect").addEventListener("change", (e) => { state.ratio = e.target.value; renderConfig(); });
+    $("recommendBtn").addEventListener("click", () => { state.category = "ecommerce"; state.productId = "ecommerce-set"; state.tierId = ""; renderAll(); });
+    $("matchBtn").addEventListener("click", () => window.demoToast("建议：电商上新选电商套图；详情转化选详情页；投放测试选信息流短视频。", "info"));
+    $("buyBtn").addEventListener("click", openOrderModal);
+    $("closePurchaseModalBtn").addEventListener("click", closePurchaseModal);
+    $("closeModalBtn").addEventListener("click", closeOrderModal);
+    $("cancelOrderBtn").addEventListener("click", closeOrderModal);
+    $("closeDetailBtn").addEventListener("click", closeProductDetail);
+    $("detailCloseFootBtn").addEventListener("click", closeProductDetail);
+    $("detailChooseBtn").addEventListener("click", () => {
+      const id = $("detailChooseBtn").dataset.product;
+      if (id) {
+        state.productId = id;
+        state.tierId = "";
+        renderAll();
+      }
+      closeProductDetail();
+      openPurchaseModal(id);
+    });
+    $("confirmOrderBtn").addEventListener("click", () => {
+      if ($("confirmOrderBtn").dataset.shortage === "1") {
+        const ws = window.demoApp.getCurrentWorkspace();
+        location.href = "finance-center-prototype/recharge.html?account=" + encodeURIComponent(ws.walletKey) + "&from=standard-package-store";
+        return;
+      }
+      submitOrder();
+    });
+    SharedHeader.mount({ activeNav: "publish" });
+    renderAll();
+  })();
+  </script>
+</body>
+</html>

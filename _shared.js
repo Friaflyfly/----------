@@ -98,6 +98,9 @@
 
   var defaultOrders = [
     { id: "OD-2026042307", demandId: "DM-2026042103", projectName: "新剧 IP 海报系列", contractor: "星辰创作工作室", contractorId: "starlight", workspace: "cf-drama", payerType: "team-budget", payerName: "短剧制作中心 - 团队预算账户", payerWalletKey: "team-budget-cf-drama", amount: 28000, status: "review-v3", createTime: "2026-04-23 10:00" },
+    { id: "OD-2026042801", demandId: "DM-2026042705", projectName: "商品详情页设计包 · 进阶档", contractor: "星辰创作工作室", contractorId: "starlight", workspace: "cf-marketing", payerType: "team-budget", payerName: "市场宣传组 - 团队预算账户", payerWalletKey: "team-budget-cf-marketing", amount: 499, status: "waiting-invoice", acceptanceStatus: "accepted", confirmedTime: "2026-05-06 15:20", createTime: "2026-04-28 10:12" },
+    { id: "OD-2026042902", demandId: "DM-2026042706", projectName: "营销短视频制作包 · 标准档", contractor: "星辰创作工作室", contractorId: "starlight", workspace: "cf-marketing", payerType: "team-budget", payerName: "市场宣传组 - 团队预算账户", payerWalletKey: "team-budget-cf-marketing", amount: 999, status: "invoice-reviewing", acceptanceStatus: "accepted", invoiceStatus: "uploaded", invoiceNo: "INV-2026061702", invoiceUploadedAt: "2026-06-17 11:06", createTime: "2026-04-29 14:35" },
+    { id: "OD-2026043003", demandId: "DM-2026042707", projectName: "AI 图片制作包 · 轻量试单", contractor: "星辰创作工作室", contractorId: "starlight", workspace: "cf-drama", payerType: "team-budget", payerName: "短剧制作中心 - 团队预算账户", payerWalletKey: "team-budget-cf-drama", amount: 129, status: "pending-settlement", acceptanceStatus: "accepted", invoiceStatus: "approved", invoiceNo: "INV-2026061803", invoiceUploadedAt: "2026-06-18 09:12", invoiceCheckedAt: "2026-06-18 15:40", settlementStatus: "pending", createTime: "2026-04-30 09:30" },
     { id: "OD-2026042009", demandId: "DM-2026041807", projectName: "广告片配音", contractor: "声海传媒", contractorId: "soundsea", workspace: "cf-marketing", payerType: "team-budget", payerName: "市场宣传组 - 团队预算账户", payerWalletKey: "team-budget-cf-marketing", amount: 8000, status: "completed", createTime: "2026-04-20 14:30" }
   ];
 
@@ -688,6 +691,24 @@
         if (!existingIds.has(seed.id)) { existing.push(seed); added++; }
       });
       if (added) writeJson(KEY.withdrawOrders, existing);
+      localStorage.setItem(migKey, "1");
+    })();
+    // 迁移：验收 → 上传发票 → 财务校验 → 分账链路演示种子。
+    // 只追加缺失订单，不覆盖用户在演示中推进过的订单状态。
+    (function migrateInvoiceSettlementSeedV1() {
+      var migKey = "demo_migrated_invoice_settlement_seed_v1";
+      if (localStorage.getItem(migKey)) return;
+      var existing = readJson(KEY.orders, []);
+      var existingIds = new Set(existing.map(function (o) { return o.id; }));
+      var seedIds = ["OD-2026042801", "OD-2026042902", "OD-2026043003"];
+      var added = 0;
+      defaultOrders.forEach(function (seed) {
+        if (seedIds.indexOf(seed.id) >= 0 && !existingIds.has(seed.id)) {
+          existing.push(seed);
+          added++;
+        }
+      });
+      if (added) writeJson(KEY.orders, existing);
       localStorage.setItem(migKey, "1");
     })();
   }

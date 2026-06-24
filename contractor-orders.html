@@ -48,13 +48,17 @@
     .badge.quoted { background: #f9f0ff; color: #531dab; }
     .badge.in-progress { background: #e6f7ff; color: #096dd9; }
     .badge.review { background: #fff1f0; color: #cf1322; }
+    .badge.waiting-invoice { background: #fff7e6; color: #d46b08; }
+    .badge.invoice-reviewing { background: #e6f4ff; color: #0958d9; }
+    .badge.invoice-rejected { background: #fff1f0; color: #cf1322; }
+    .badge.pending-settlement { background: #f9f0ff; color: #531dab; }
     .badge.completed { background: #f6ffed; color: #389e0d; }
     .badge.settle { background: #fffbe6; color: #d48806; }
     .tag { display: inline-block; padding: 2px 8px; background: #f5f5f5; border-radius: 10px; font-size: 11px; color: #595959; margin-right: 4px; }
     .meta-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 13px 0; margin-top: 12px; border-top: 1px dashed #f0f0f0; border-bottom: 1px dashed #f0f0f0; }
     .meta-label { font-size: 11px; color: #8c8c8c; margin-bottom: 3px; }
     .meta-value { font-size: 13px; font-weight: 500; }
-    .progress-line { margin-top: 12px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .progress-line { margin-top: 12px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
     .step { position: relative; padding-top: 16px; font-size: 11px; color: #8c8c8c; text-align: center; }
     .step::before { content: ""; position: absolute; left: 0; right: 0; top: 5px; height: 3px; background: #f0f0f0; }
     .step.done::before { background: #52c41a; }
@@ -70,8 +74,10 @@
     .modal-body { padding: 20px 22px; }
     .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
     .form-item label { display: block; font-size: 12px; color: #8c8c8c; margin-bottom: 5px; }
-    .form-item input, .form-item textarea { width: 100%; border: 1px solid #d9d9d9; border-radius: 6px; padding: 9px 10px; font-size: 13px; font-family: inherit; }
+    .form-item input, .form-item textarea, .form-item select { width: 100%; border: 1px solid #d9d9d9; border-radius: 6px; padding: 9px 10px; font-size: 13px; font-family: inherit; background: #fff; }
     .form-item.full { grid-column: 1 / -1; }
+    .upload-box { border: 1px dashed #91d5ff; background: #f0f7ff; border-radius: 10px; padding: 18px; text-align: center; color: #096dd9; font-size: 13px; }
+    .invoice-tip { margin-top: 12px; padding: 10px 12px; border-radius: 8px; background: #fffbe6; border: 1px solid #ffe58f; color: #ad6800; font-size: 12px; line-height: 1.6; }
     .modal-foot { padding: 14px 22px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 8px; }
     .toasts { position: fixed; top: 72px; right: 20px; width: min(90vw, 360px); display: grid; gap: 8px; z-index: 1100; }
     .toast { background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; padding: 10px 14px; font-size: 13px; box-shadow: 0 3px 12px rgba(0,0,0,.1); animation: slideIn .25s ease-out; }
@@ -130,7 +136,7 @@
         <div class="kpi"><div class="label">待处理邀约</div><div class="value" id="kpiInvite">0</div><div class="note">需在截止前提交报价</div></div>
         <div class="kpi"><div class="label">报价中</div><div class="value" id="kpiQuoted">0</div><div class="note">等待需求方选择</div></div>
         <div class="kpi"><div class="label">履约中</div><div class="value" id="kpiWork">0</div><div class="note">含待验收版本</div></div>
-        <div class="kpi"><div class="label">待结算金额</div><div class="value">¥26,600</div><div class="note">V3 验收后自动入账</div></div>
+        <div class="kpi"><div class="label">待结算金额</div><div class="value">¥26,600</div><div class="note">发票校验通过后入账</div></div>
       </section>
       <section class="toolbar">
         <div class="tabs" id="tabs">
@@ -139,6 +145,8 @@
           <button class="tab" data-status="quoted">已报价</button>
           <button class="tab" data-status="in-progress">履约中</button>
           <button class="tab" data-status="review">待验收</button>
+          <button class="tab" data-status="waiting-invoice">待上传发票</button>
+          <button class="tab" data-status="pending-settlement">待分账</button>
           <button class="tab" data-status="completed">已完成</button>
         </div>
         <input class="search" id="search" placeholder="搜索项目名 / 需求方 / 订单号">
@@ -174,22 +182,86 @@
       </div>
     </div>
   </div>
+  <div class="modal-mask" id="invoiceModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>上传结算发票</h3>
+        <button class="modal-close" onclick="closeInvoiceModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-item">
+            <label>订单号</label>
+            <input id="invoiceOrderNo" readonly>
+          </div>
+          <div class="form-item">
+            <label>结算金额</label>
+            <input id="invoiceAmount" readonly>
+          </div>
+          <div class="form-item">
+            <label>发票类型</label>
+            <select id="invoiceType">
+              <option>电子普通发票</option>
+              <option>电子专用发票</option>
+              <option>纸质普通发票</option>
+            </select>
+          </div>
+          <div class="form-item">
+            <label>发票内容</label>
+            <select id="invoiceContent">
+              <option>技术服务费</option>
+              <option>软件服务费</option>
+              <option>平台服务费</option>
+              <option>信息服务费</option>
+            </select>
+          </div>
+          <div class="form-item">
+            <label>发票号</label>
+            <input id="invoiceNo" value="INV-2026061601">
+          </div>
+          <div class="form-item">
+            <label>开票日期</label>
+            <input id="invoiceDate" value="2026-06-16">
+          </div>
+          <div class="form-item full">
+            <label>电子发票文件</label>
+            <div class="upload-box">点击或拖拽上传 PDF / OFD 文件（原型占位）</div>
+          </div>
+          <div class="form-item full">
+            <label>备注</label>
+            <textarea id="invoiceRemark" rows="3">订单已由需求方确认验收，上传结算发票后等待平台财务校验。</textarea>
+          </div>
+        </div>
+        <div class="invoice-tip">发票上传后，订单不会立即完成分账；平台财务会校验抬头、金额、订单号与服务内容，校验通过后系统再进行承制方收益入账。</div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeInvoiceModal()">取消</button>
+        <button class="btn primary" onclick="submitInvoice()">提交发票</button>
+      </div>
+    </div>
+  </div>
   <div id="toastWrap" class="toasts"></div>
   <script src="_shared.js?v=finance-nav-20260616"></script>
   <script>
     const state = { status: 'all', q: '' };
+    let activeInvoiceOrderId = '';
     const baseRows = [
       { id: 'INV-2026042701', title: '三集短剧解说视频（修仙题材）', demander: '骋风天合 · 短剧制作中心', budget: 18000, price: null, deadline: '2026-05-08', status: 'to-quote', tags: ['视频制作', '修仙', '平台邀请'], progress: 0 },
       { id: 'INV-2026042602', title: '品牌宣传短片脚本', demander: '骋风天合 · 市场宣传组', budget: 5000, price: 4800, deadline: '2026-05-02', status: 'quoted', tags: ['营销文案', '已报价'], progress: 1 },
       { id: 'OD-2026042307', title: '新剧 IP 海报系列', demander: '骋风天合 · 短剧制作中心', budget: 28000, price: 28000, deadline: '2026-04-30', status: 'review', tags: ['海报设计', 'V3 待验收'], progress: 3 },
       { id: 'OD-2026042609', title: '品牌宣传短片脚本', demander: '骋风天合 · 市场宣传组', budget: 5000, price: 5000, deadline: '2026-05-02', status: 'in-progress', tags: ['脚本初稿', '制作中'], progress: 2 },
-      { id: 'OD-2026042009', title: '广告片配音', demander: '骋风天合 · 市场宣传组', budget: 8000, price: 8000, deadline: '2026-04-25', status: 'completed', tags: ['配音', '待开票'], progress: 4 }
+      { id: 'OD-2026042801', title: '商品详情页设计包 · 进阶档', demander: '骋风天合 · 电商运营组', budget: 499, price: 499, deadline: '2026-05-06', status: 'waiting-invoice', tags: ['标准产品包', '待上传发票'], progress: 4 },
+      { id: 'OD-2026042009', title: '广告片配音', demander: '骋风天合 · 市场宣传组', budget: 8000, price: 8000, deadline: '2026-04-25', status: 'completed', tags: ['配音', '已结算'], progress: 6 }
     ];
     const statusMap = {
       'to-quote': ['待报价', 'to-quote'],
       quoted: ['已报价', 'quoted'],
       'in-progress': ['履约中', 'in-progress'],
       review: ['待验收', 'review'],
+      'waiting-invoice': ['待上传发票', 'waiting-invoice'],
+      'invoice-reviewing': ['发票校验中', 'invoice-reviewing'],
+      'invoice-rejected': ['发票被驳回', 'invoice-rejected'],
+      'pending-settlement': ['待分账', 'pending-settlement'],
       completed: ['已完成', 'completed']
     };
     function toast(msg, kind) {
@@ -203,13 +275,73 @@
     function readRows() {
       try {
         const extra = JSON.parse(localStorage.getItem('demoContractorInbox') || '[]');
-        return baseRows.map(row => {
-          const match = extra.find(x => x.id === row.id);
-          return match ? Object.assign({}, row, match) : row;
+        const sharedOrders = window.demoApp && window.demoApp.getOrders ? window.demoApp.getOrders() : [];
+        const rowsById = new Map(baseRows.map(row => [row.id, Object.assign({}, row)]));
+        sharedOrders.forEach(order => {
+          if (order.contractorId && order.contractorId !== 'starlight') return;
+          const current = rowsById.get(order.id) || sharedOrderToRow(order);
+          rowsById.set(order.id, Object.assign({}, current, sharedOrderPatch(order)));
         });
+        extra.forEach(item => {
+          const current = rowsById.get(item.id) || contractorInboxToRow(item);
+          rowsById.set(item.id, Object.assign({}, current, item));
+        });
+        return Array.from(rowsById.values());
       } catch (_) {
         return baseRows;
       }
+    }
+    function sharedOrderToRow(order) {
+      const ws = window.demoApp && window.demoApp.WORKSPACES ? window.demoApp.WORKSPACES[order.workspace] : null;
+      return {
+        id: order.id,
+        title: order.projectName || order.title || '未命名订单',
+        demander: ws ? ws.name : (order.payerName || '骋风天合'),
+        budget: order.amount || 0,
+        price: order.amount || 0,
+        deadline: order.deadline || '-',
+        status: order.status || 'in-progress',
+        tags: ['订单同步'],
+        progress: order.status === 'completed' ? 6 : 2
+      };
+    }
+    function contractorInboxToRow(item) {
+      return {
+        id: item.id,
+        title: item.projectName || item.title || '未命名邀约',
+        demander: item.demanderName || item.demander || '骋风天合',
+        budget: item.budget || item.amount || 0,
+        price: item.quotedAmount || item.price || null,
+        deadline: item.deadline || '-',
+        status: item.status || 'to-quote',
+        tags: ['邀约同步'],
+        progress: item.status === 'quoted' ? 1 : 0
+      };
+    }
+    function sharedOrderPatch(order) {
+      if (!order) return {};
+      const patch = {};
+      if (['waiting-invoice', 'invoice-reviewing', 'invoice-rejected', 'pending-settlement', 'completed'].includes(order.status)) {
+        patch.status = order.status;
+      }
+      if (order.invoiceStatus === 'uploaded' && order.status === 'invoice-reviewing') {
+        patch.tags = ['发票已提交', '待平台校验'];
+        patch.progress = 4;
+      }
+      if (order.invoiceStatus === 'approved' && order.status === 'pending-settlement') {
+        patch.tags = ['发票校验通过', '待分账'];
+        patch.progress = 5;
+      }
+      if (order.status === 'waiting-invoice') {
+        patch.tags = ['需求方已确认', '待上传发票'];
+        patch.progress = 4;
+      }
+      if (order.status === 'completed') {
+        patch.tags = ['已结算', order.invoiceNo || '发票已归档'];
+        patch.progress = 6;
+      }
+      if (order.invoiceNo) patch.invoiceNo = order.invoiceNo;
+      return patch;
     }
     function render() {
       const q = state.q.trim().toLowerCase();
@@ -220,7 +352,7 @@
       });
       document.getElementById('kpiInvite').textContent = readRows().filter(x => x.status === 'to-quote').length;
       document.getElementById('kpiQuoted').textContent = readRows().filter(x => x.status === 'quoted').length;
-      document.getElementById('kpiWork').textContent = readRows().filter(x => ['in-progress', 'review'].includes(x.status)).length;
+      document.getElementById('kpiWork').textContent = readRows().filter(x => ['in-progress', 'review', 'waiting-invoice', 'invoice-reviewing', 'pending-settlement'].includes(x.status)).length;
       const list = document.getElementById('list');
       if (!rows.length) {
         list.innerHTML = '<div class="empty">没有符合条件的订单</div>';
@@ -230,7 +362,7 @@
     }
     function cardHtml(row) {
       const status = statusMap[row.status] || ['未知', 'quoted'];
-      const steps = ['报价', '确认', '制作', '验收'].map((name, idx) => {
+      const steps = ['报价', '确认', '制作', '验收', '发票', '结算'].map((name, idx) => {
         const cls = idx < row.progress ? 'done' : (idx === row.progress ? 'current' : '');
         return `<div class="step ${cls}">${name}</div>`;
       }).join('');
@@ -263,6 +395,10 @@
       if (row.status === 'quoted') return `<button class="btn" onclick="toast('已提醒需求方查看报价', 'info')">提醒查看</button><button class="btn primary" onclick="location.href='demand-quote-comparison.html?demandId=${row.demandId || 'DM-2026042512'}'">看需求方视角</button>`;
       if (row.status === 'review') return `<button class="btn primary" onclick="location.href='project-space.html?orderId=${row.id}'">进入协同空间</button>`;
       if (row.status === 'in-progress') return `<button class="btn" onclick="toast('版本上传入口下版本补齐', 'info')">上传版本</button><button class="btn primary" onclick="location.href='project-space.html?orderId=${row.id}'">进入协同空间</button>`;
+      if (row.status === 'waiting-invoice') return `<button class="btn primary" onclick="openInvoiceModal('${row.id}')">上传发票</button><button class="btn" onclick="location.href='project-space.html?orderId=${row.id}'">进入协同空间</button>`;
+      if (row.status === 'invoice-rejected') return `<button class="btn primary" onclick="openInvoiceModal('${row.id}')">重新上传发票</button><button class="btn" onclick="toast('驳回原因：发票金额与订单金额不一致', 'info')">查看原因</button>`;
+      if (row.status === 'invoice-reviewing') return `<button class="btn" onclick="toast('发票已提交，等待平台财务校验', 'info')">查看发票</button><button class="btn" onclick="location.href='project-space.html?orderId=${row.id}'">进入协同空间</button>`;
+      if (row.status === 'pending-settlement') return `<button class="btn primary" onclick="toast('财务已校验通过，等待系统分账', 'ok')">查看结算进度</button><button class="btn" onclick="location.href='finance-center-prototype/fund-flows.html'">查看资金流水</button>`;
       return `<button class="btn" onclick="toast('归档详情下版本补齐', 'info')">查看归档</button><button class="btn" onclick="toast('开票申请已记录（mock）', 'ok')">申请开票</button>`;
     }
     function openQuoteModal() {
@@ -270,6 +406,45 @@
     }
     function closeQuoteModal() {
       document.getElementById('quoteModal').classList.remove('open');
+    }
+    function openInvoiceModal(id) {
+      activeInvoiceOrderId = id;
+      const row = readRows().find(x => x.id === id);
+      if (!row) return;
+      document.getElementById('invoiceOrderNo').value = row.id;
+      document.getElementById('invoiceAmount').value = '¥' + (row.price || row.budget || 0).toLocaleString('zh-CN');
+      document.getElementById('invoiceNo').value = row.invoiceNo || 'INV-2026061601';
+      document.getElementById('invoiceModal').classList.add('open');
+    }
+    function closeInvoiceModal() {
+      document.getElementById('invoiceModal').classList.remove('open');
+    }
+    function upsertLocalOrderPatch(id, patch) {
+      const list = JSON.parse(localStorage.getItem('demoContractorInbox') || '[]');
+      const idx = list.findIndex(x => x.id === id);
+      if (idx >= 0) list[idx] = Object.assign({}, list[idx], patch);
+      else list.push(Object.assign({ id }, patch));
+      localStorage.setItem('demoContractorInbox', JSON.stringify(list));
+    }
+    function submitInvoice() {
+      const id = activeInvoiceOrderId;
+      if (!id) return;
+      const invoiceNo = document.getElementById('invoiceNo').value.trim() || 'INV-2026061601';
+      const patch = {
+        status: 'invoice-reviewing',
+        invoiceStatus: 'uploaded',
+        invoiceNo,
+        invoiceUploadedAt: new Date().toLocaleString('zh-CN'),
+        tags: ['发票已提交', '待平台校验'],
+        progress: 4
+      };
+      upsertLocalOrderPatch(id, patch);
+      if (window.demoApp && window.demoApp.updateOrder) {
+        window.demoApp.updateOrder(id, patch);
+      }
+      closeInvoiceModal();
+      toast('发票已上传，等待平台财务校验', 'ok');
+      render();
     }
     function submitQuote() {
       if (!window.demoApp.requireProfile("quote")) return;

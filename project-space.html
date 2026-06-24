@@ -780,12 +780,12 @@
     <button class="btn success large" id="footerApproveBtn">✅ 确认订单</button>
   </div>
 
-  <!-- 验收 + 分账 modal -->
+  <!-- 验收 + 发票 + 分账 modal -->
   <div class="modal-mask" id="reviewModal">
     <div class="modal-large">
       <div class="ml-head">
-        <h3>✅ 确认订单 + 发票后分账</h3>
-        <p>需求方确认订单后，订单进入待承制方上传发票；发票上传并确认后，平台再完成承制方收益与平台服务费分账。</p>
+        <h3>✅ 确认订单 + 发票校验后分账</h3>
+        <p>需求方确认订单后，订单进入待承制方上传发票；平台财务校验通过后，再完成承制方收益与平台服务费分账。</p>
       </div>
       <div class="ml-body">
         <!-- 步骤 1：评分反馈 -->
@@ -841,7 +841,7 @@
               <div class="ss-row"><span class="ss-label">发票金额</span><span class="ss-val">¥28,000</span></div>
               <div class="ss-row"><span class="ss-label">发票号</span><span class="ss-val">INV-2026061601</span></div>
               <div class="ss-row"><span class="ss-label">上传方</span><span class="ss-val">星辰创作工作室</span></div>
-              <div class="ss-row"><span class="ss-label">接收邮箱</span><span class="ss-val">invoice@tianhe.example</span></div>
+              <div class="ss-row"><span class="ss-label">发票文件</span><span class="ss-val">电子发票 PDF 已上传</span></div>
             </div>
             <div style="margin-top:14px;padding:10px 14px;background:#eef6ff;border-radius:6px;font-size:12px;color:#096dd9;line-height:1.6">
               💡 <strong>结算规则</strong>：承制方上传发票后，平台校验发票抬头、金额与订单一致性；校验通过后进入订单分账。
@@ -849,9 +849,33 @@
           </div>
         </div>
 
-        <!-- 步骤 3：分账动画 -->
+        <!-- 步骤 3：平台财务校验 -->
         <div class="review-step" data-step="3">
-          <h4>3️⃣ 订单完成分账</h4>
+          <h4>3️⃣ 平台财务校验发票</h4>
+          <div style="background:#f6ffed;border:1px solid #b7eb8f;border-radius:10px;padding:16px 18px;line-height:1.7">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px">
+              <div>
+                <div style="font-size:14px;font-weight:800;color:#1f2d3d">当前状态：发票校验中</div>
+                <div style="font-size:12px;color:#6b7a90">平台财务核对发票抬头、税号、金额、订单号与服务内容。</div>
+              </div>
+              <span style="padding:5px 10px;border-radius:999px;background:#e6f4ff;color:#0958d9;font-size:12px;font-weight:800">财务处理中</span>
+            </div>
+            <div class="step3-summary" style="margin:0">
+              <div class="ss-row"><span class="ss-label">订单号</span><span class="ss-val">OD-2026042307</span></div>
+              <div class="ss-row"><span class="ss-label">发票号</span><span class="ss-val">INV-2026061601</span></div>
+              <div class="ss-row"><span class="ss-label">发票金额</span><span class="ss-val">¥28,000</span></div>
+              <div class="ss-row"><span class="ss-label">校验结论</span><span class="ss-val" style="color:#389e0d">抬头、金额、服务内容一致</span></div>
+              <div class="ss-row"><span class="ss-label">下一步</span><span class="ss-val">进入订单分账</span></div>
+            </div>
+            <div style="margin-top:14px;padding:10px 14px;background:#fff;border-radius:6px;font-size:12px;color:#389e0d;line-height:1.6">
+              ✅ <strong>演示动作</strong>：点击下一步后，模拟平台财务校验通过，订单进入待分账状态。
+            </div>
+          </div>
+        </div>
+
+        <!-- 步骤 4：分账动画 -->
+        <div class="review-step" data-step="4">
+          <h4>4️⃣ 订单完成分账</h4>
           <div class="settle-animation">
             <div class="settle-source" id="settleSource">
               <div class="ss-label">🔒 锁定金额</div>
@@ -887,8 +911,8 @@
           </div>
         </div>
 
-        <!-- 步骤 4：完成 -->
-        <div class="review-step" data-step="4">
+        <!-- 步骤 5：完成 -->
+        <div class="review-step" data-step="5">
           <div class="step3-success">
             <div class="step3-icon">🎉</div>
             <div class="step3-title">订单结算完成</div>
@@ -1045,7 +1069,7 @@
   })();
   </script>
 
-  <!-- 验收 + 分账 modal -->
+  <!-- 验收 + 发票 + 分账 modal -->
   <script>
   (function () {
     const $ = (id) => document.getElementById(id);
@@ -1095,10 +1119,16 @@
       } else if (n === 2) {
         cancelBtn.style.display = "none";
         nextBtn.style.display = "";
-        nextBtn.textContent = "模拟发票已上传 →";
+        nextBtn.textContent = "模拟承制方上传发票 →";
         nextBtn.className = "btn primary large";
         nextBtn.disabled = false;
       } else if (n === 3) {
+        cancelBtn.style.display = "none";
+        nextBtn.style.display = "";
+        nextBtn.textContent = "财务校验通过，进入分账 →";
+        nextBtn.className = "btn primary large";
+        nextBtn.disabled = false;
+      } else if (n === 4) {
         cancelBtn.style.display = "none";
         nextBtn.style.display = "";
         nextBtn.textContent = "完成分账 →";
@@ -1106,7 +1136,7 @@
         nextBtn.disabled = true;
         resetSettlementAnimation();
         playSettlementAnimation();
-      } else if (n === 4) {
+      } else if (n === 5) {
         cancelBtn.style.display = "none";
         nextBtn.style.display = "";
         nextBtn.textContent = "查看资金流水 →";
@@ -1191,26 +1221,32 @@
       if (currentStep === 1) {
         const orders = window.demoApp.getOrders();
         const o = orders.find(x => x.id === orderId);
-        if (o) window.demoApp.updateOrder(orderId, { status: "waiting-invoice", confirmedTime: new Date().toLocaleString("zh-CN") });
+        if (o) window.demoApp.updateOrder(orderId, { status: "waiting-invoice", acceptanceStatus: "accepted", confirmedTime: new Date().toLocaleString("zh-CN") });
         window.demoToast("需求方已确认订单，等待承制方上传发票", "ok");
         currentStep = 2;
         showStep(2);
       }
       else if (currentStep === 2) {
-        window.demoApp.updateOrder(orderId, { invoiceStatus: "uploaded", invoiceNo: "INV-2026061601", invoiceUploadedAt: new Date().toLocaleString("zh-CN") });
-        window.demoToast("承制方发票已上传并校验通过，开始分账", "ok");
+        window.demoApp.updateOrder(orderId, { status: "invoice-reviewing", invoiceStatus: "uploaded", invoiceNo: "INV-2026061601", invoiceUploadedAt: new Date().toLocaleString("zh-CN") });
+        window.demoToast("承制方发票已上传，等待平台财务校验", "ok");
         currentStep = 3;
         showStep(3);
       }
       else if (currentStep === 3) {
-        if (!settlementExecuted) {
-          executeSettlement();
-          settlementExecuted = true;
-        }
+        window.demoApp.updateOrder(orderId, { status: "pending-settlement", invoiceStatus: "approved", invoiceCheckedAt: new Date().toLocaleString("zh-CN"), settlementStatus: "pending" });
+        window.demoToast("发票校验通过，订单进入待分账", "ok");
         currentStep = 4;
         showStep(4);
       }
       else if (currentStep === 4) {
+        if (!settlementExecuted) {
+          executeSettlement();
+          settlementExecuted = true;
+        }
+        currentStep = 5;
+        showStep(5);
+      }
+      else if (currentStep === 5) {
         closeModal();
         window.demoToast("已完成分账 · 即将跳转资金流水", "ok");
         setTimeout(() => location.href = "finance-center-prototype/fund-flows.html", 800);
