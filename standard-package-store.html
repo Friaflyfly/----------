@@ -75,24 +75,29 @@
     .hero {
       position: relative;
       overflow: hidden;
-      min-height: 280px;
-      padding: 34px 38px;
-      border-radius: 30px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 430px);
+      column-gap: 24px;
+      align-items: center;
+      min-height: 150px;
+      padding: 22px 26px;
+      border-radius: 24px;
       background:
         linear-gradient(135deg, rgba(16,31,62,.96), rgba(22,66,122,.94) 50%, rgba(4,116,124,.9)),
         radial-gradient(circle at 78% 18%, rgba(255,255,255,.35), transparent 20%);
       color: #fff;
       box-shadow: var(--shadow);
     }
-    .hero::after { content: ""; position: absolute; right: -120px; top: -160px; width: 440px; height: 440px; border-radius: 50%; background: conic-gradient(from 30deg, rgba(19,183,198,.7), rgba(255,138,42,.55), rgba(36,91,255,.5), rgba(19,183,198,.7)); filter: blur(3px); opacity: .55; }
-    .hero-kicker { position: relative; z-index: 1; display: inline-flex; gap: 8px; align-items: center; padding: 7px 12px; border: 1px solid rgba(255,255,255,.22); border-radius: 999px; background: rgba(255,255,255,.08); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
-    .hero h1 { position: relative; z-index: 1; margin: 18px 0 10px; font-size: clamp(34px, 5vw, 62px); line-height: 1.05; letter-spacing: -.05em; max-width: 790px; }
-    .hero p { position: relative; z-index: 1; margin: 0; max-width: 760px; color: rgba(255,255,255,.78); font-size: 15px; line-height: 1.9; }
-    .hero-actions { position: relative; z-index: 1; display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
-    .hero-metrics { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 28px; max-width: 860px; }
-    .hero-metric { padding: 14px 16px; border: 1px solid rgba(255,255,255,.16); border-radius: 18px; background: rgba(255,255,255,.08); }
-    .hero-metric b { display: block; font-size: 22px; letter-spacing: -.02em; }
-    .hero-metric span { display: block; color: rgba(255,255,255,.66); font-size: 12px; margin-top: 4px; }
+    .hero::after { content: ""; position: absolute; right: -72px; top: -120px; width: 300px; height: 300px; border-radius: 50%; background: conic-gradient(from 30deg, rgba(19,183,198,.7), rgba(255,138,42,.48), rgba(36,91,255,.5), rgba(19,183,198,.7)); filter: blur(3px); opacity: .42; }
+    .hero-kicker { position: relative; z-index: 1; grid-column: 1; display: inline-flex; width: fit-content; gap: 8px; align-items: center; padding: 5px 10px; border: 1px solid rgba(255,255,255,.22); border-radius: 999px; background: rgba(255,255,255,.08); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+    .hero h1 { position: relative; z-index: 1; grid-column: 1; margin: 10px 0 6px; font-size: clamp(28px, 3.2vw, 40px); line-height: 1.05; letter-spacing: -.05em; max-width: 640px; }
+    .hero p { position: relative; z-index: 1; grid-column: 1; margin: 0; max-width: 720px; color: rgba(255,255,255,.76); font-size: 13px; line-height: 1.65; }
+    .hero-actions { position: relative; z-index: 1; grid-column: 2; grid-row: 1; display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; align-self: start; margin-top: 0; }
+    .hero-actions .btn { height: 34px; padding: 0 14px; font-size: 12px; }
+    .hero-metrics { position: relative; z-index: 1; grid-column: 2; grid-row: 2 / span 2; display: flex; flex-wrap: wrap; justify-content: flex-end; align-self: end; gap: 8px; margin-top: 0; max-width: 430px; }
+    .hero-metric { display: inline-flex; align-items: baseline; gap: 8px; padding: 8px 11px; border: 1px solid rgba(255,255,255,.14); border-radius: 999px; background: rgba(255,255,255,.08); }
+    .hero-metric b { display: block; font-size: 15px; letter-spacing: -.02em; }
+    .hero-metric span { display: block; color: rgba(255,255,255,.66); font-size: 11px; margin-top: 0; }
     .btn { border: 1px solid var(--line); background: #fff; color: var(--ink); height: 40px; padding: 0 18px; border-radius: 999px; cursor: pointer; font-weight: 800; box-shadow: 0 4px 14px rgba(23,32,51,.04); }
     .btn:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(23,32,51,.12); }
     .btn.primary { border-color: var(--blue); background: var(--blue); color: #fff; }
@@ -156,20 +161,19 @@
     .pkg-kicker { position: relative; z-index: 1; width: fit-content; margin-top: 16px; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,.58); color: rgba(23,32,51,.58); font-size: 11px; font-weight: 950; letter-spacing: .08em; }
     .pkg-name { position: relative; z-index: 1; margin: 8px 0 4px; font-size: 22px; font-weight: 950; letter-spacing: -.05em; }
     .pkg-desc { position: relative; z-index: 1; color: rgba(23,32,51,.72); font-size: 12px; line-height: 1.65; min-height: 40px; max-width: 92%; }
-    .pkg-price { position: relative; z-index: 1; margin-top: 26px; display: flex; align-items: baseline; gap: 8px; letter-spacing: -.06em; }
+    .pkg-price { position: relative; z-index: 1; margin-top: 22px; display: grid; gap: 5px; letter-spacing: 0; }
+    .pkg-price-label { width: fit-content; padding: 3px 8px; border-radius: 999px; background: rgba(255,138,42,.14); color: #b87000; font-size: 11px; font-weight: 950; }
+    .pkg-price-main { display: flex; align-items: baseline; gap: 8px; letter-spacing: -.06em; }
     .pkg-price .currency { font-size: 28px; font-weight: 950; }
     .pkg-price .amount { font-size: 58px; line-height: .95; font-weight: 950; }
     .pkg-price .suffix { color: rgba(23,32,51,.55); font-size: 13px; font-weight: 900; letter-spacing: 0; }
+    .pkg-list-price { color: rgba(23,32,51,.42); font-size: 13px; font-weight: 850; text-decoration: line-through; text-decoration-thickness: 1.5px; letter-spacing: 0; white-space: nowrap; }
     .pkg-benefit { position: relative; z-index: 1; margin-top: 16px; color: #b87000; font-size: 13px; font-weight: 900; }
-    .pkg-buy-row { position: relative; z-index: 3; display: grid; grid-template-columns: 1fr 1fr; width: 100%; border: 1px solid rgba(23,32,51,.64); border-radius: 18px; overflow: hidden; margin-top: 12px; background: rgba(255,255,255,.62); cursor: pointer; padding: 0; color: var(--ink); }
-    .pkg-buy-row span, .pkg-buy-row b { height: 42px; display: grid; place-items: center; font-size: 17px; }
-    .pkg-buy-row span { font-weight: 950; }
-    .pkg-buy-row b { background: linear-gradient(110deg, rgba(255,255,255,.18) 0 36%, rgba(255,255,255,.78) 36% 46%, rgba(255,223,184,.72) 46% 100%); border-left: 1px solid rgba(23,32,51,.16); }
-    .pkg-buy-row:hover { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(23,32,51,.14); }
     .pkg-footnote { position: relative; z-index: 1; text-align: center; color: rgba(23,32,51,.42); font-size: 12px; font-weight: 800; margin-top: 12px; }
-    .pkg-actions { position: relative; z-index: 3; display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 10px; }
+    .pkg-actions { position: relative; z-index: 3; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
     .pkg-actions button { height: 38px; border-radius: 999px; border: 1px solid rgba(23,32,51,.18); background: rgba(255,255,255,.64); cursor: pointer; font-weight: 950; color: rgba(23,32,51,.8); }
     .pkg-actions button:hover { background: #fff; box-shadow: 0 8px 18px rgba(23,32,51,.12); }
+    .pkg-actions .buy-action { border-color: rgba(23,32,51,.64); color: var(--ink); background: linear-gradient(110deg, rgba(255,255,255,.72), rgba(255,223,184,.78)); }
     .intro-card { border-radius: 22px; padding: 20px; background: linear-gradient(135deg, #0f1b2d, #1d3b64); color: #fff; min-height: 200px; }
     .intro-card .label { color: rgba(255,255,255,.62); font-size: 12px; font-weight: 800; }
     .intro-card h2 { margin: 10px 0 8px; font-size: 28px; letter-spacing: -.04em; }
@@ -284,7 +288,8 @@
     @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
     @media (max-width: 1200px) { .layout { grid-template-columns: 1fr; } .sticky-config { position: static; } .package-grid { grid-template-columns: 1fr; } }
     @media (max-width: 900px) { .sample-grid, .price-tier-grid { grid-template-columns: 1fr; } }
-    @media (max-width: 800px) { .sidebar { display: none; } .main { margin-left: 0; width: 100%; padding: 18px; } .hero-metrics, .two-col, .modal-body { grid-template-columns: 1fr; } .toggles { grid-template-columns: 1fr; } }
+    @media (max-width: 980px) { .hero { grid-template-columns: 1fr; } .hero-actions, .hero-metrics { grid-column: 1; grid-row: auto; justify-content: flex-start; margin-top: 12px; max-width: none; } }
+    @media (max-width: 800px) { .sidebar { display: none; } .main { margin-left: 0; width: 100%; padding: 18px; } .two-col, .modal-body { grid-template-columns: 1fr; } .toggles { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -295,7 +300,8 @@
         <a href="platform-home-demander.html"><span class="menu-icon">🏠</span> 工作台</a>
         <div class="menu-group">
           <div class="menu-group-title">我有需求</div>
-          <a href="standard-package-store.html" class="active"><span class="menu-icon">🧩</span> 标准产品包</a>
+          <a href="standard-package-store.html" class="active"><span class="menu-icon">🧩</span> 标准包 · 侧栏购买</a>
+          <a href="standard-package-store-modal.html"><span class="menu-icon">🪟</span> 标准包 · 弹窗购买</a>
           <a href="demand-publish.html"><span class="menu-icon">📤</span> 发布需求</a>
           <a href="demand-list.html"><span class="menu-icon">📋</span> 我的需求</a>
           <a href="contractor-marketplace.html"><span class="menu-icon">🏪</span> 服务广场</a>
@@ -316,7 +322,7 @@
     <main class="main">
       <section class="hero">
         <div class="hero-kicker">AIGC STANDARD SERVICE SUPERMARKET</div>
-        <h1>AIGC 标准创作服务超市</h1>
+        <h1>AIGC标准化产品服务包</h1>
         <p>图片、视频、电商套图、详情页、信息流短视频直接选购。明码标价、首购权益、交付周期清晰；支付后预算进入平台托管，验收和发票流程完成后再结算。</p>
         <div class="hero-actions">
           <button class="btn primary" onclick="document.getElementById('catalogPanel').scrollIntoView({behavior:'smooth'})">查看全部产品包</button>
@@ -686,11 +692,14 @@
           <div class="pkg-kicker">${p.category}</div>
           <div class="pkg-name">${p.name}</div>
           <div class="pkg-desc">${p.desc}</div>
-          <div class="pkg-price"><span class="currency">¥</span><span class="amount">${formatDealAmount(min)}</span><span class="suffix">起</span></div>
+          <div class="pkg-price">
+            <span class="pkg-price-label">交易价</span>
+            <div class="pkg-price-main"><span class="currency">¥</span><span class="amount">${formatDealAmount(min)}</span><span class="suffix">起</span><span class="pkg-list-price">划线价 ¥${formatDealAmount(promoListPrice(min))}</span></div>
+          </div>
           <div class="pkg-benefit">✦ ${deal.benefit}</div>
-          <button type="button" class="pkg-buy-row" data-select="${p.id}"><span>${deal.ctaPrice}</span><b>立即购买</b></button>
           <div class="pkg-actions">
             <button type="button" data-detail="${p.id}">查看详情</button>
+            <button type="button" class="buy-action" data-select="${p.id}">立即购买</button>
           </div>
           <div class="pkg-footnote">${deal.note}</div>
         </article>`;
@@ -700,17 +709,24 @@
       const v = Number(n || 0);
       return Number.isInteger(v) ? v.toLocaleString("zh-CN") : v.toLocaleString("zh-CN", { maximumFractionDigits: 1 });
     }
+    function promoListPrice(n) {
+      const v = Number(n || 0);
+      if (v < 20) return 19.9;
+      if (v < 100) return Math.ceil(v * 1.45 / 10) * 10 - 1;
+      if (v < 1000) return Math.ceil(v * 1.35 / 10) * 10 - 1;
+      return Math.ceil(v * 1.25 / 100) * 100 - 1;
+    }
     function dealMeta(p) {
       const map = {
-        "ai-image": { ribbon: "低价试单", benefit: "最多生成 10 张图片", ctaPrice: "¥9.9", note: "轻量需求可快速验证风格", a: "#f3eadf", b: "#eef5ff" },
-        "ecommerce-set": { ribbon: "首购加赠 1 张", benefit: "一套覆盖主图/场景/细节图", ctaPrice: "¥99", note: "电商上新高频采购首选", a: "#fff0df", b: "#f7e9df" },
-        "detail-page": { ribbon: "转化提升包", benefit: "含详情页长图和卖点模块", ctaPrice: "¥249.9", note: "适合非标品和品牌商品", a: "#e6f9e0", b: "#f8f4e6" },
-        "feed-video": { ribbon: "投放测试", benefit: "最快 1 天出片，支持脚本", ctaPrice: "¥129", note: "信息流素材批量起量", a: "#e8f1ff", b: "#f3eadf" },
-        "local-video": { ribbon: "同城引流", benefit: "适配门店团购和本地投放", ctaPrice: "¥99", note: "餐饮美业酒店健身均可用", a: "#fff3e5", b: "#e8f7e9" },
-        "story-video": { ribbon: "矩阵起号", benefit: "剧情号/IP 内容批量生产", ctaPrice: "¥299", note: "3 条起享批量折扣", a: "#efe6ff", b: "#ffe9d8" },
-        "brand-film": { ribbon: "品牌大片", benefit: "1080P 成片，不限修改", ctaPrice: "¥2999", note: "企业介绍/招商/产品宣传", a: "#e7f0ff", b: "#eef8ee" }
+        "ai-image": { ribbon: "低价试单", benefit: "最多生成 10 张图片", note: "轻量需求可快速验证风格", a: "#f3eadf", b: "#eef5ff" },
+        "ecommerce-set": { ribbon: "首购加赠 1 张", benefit: "一套覆盖主图/场景/细节图", note: "电商上新高频采购首选", a: "#fff0df", b: "#f7e9df" },
+        "detail-page": { ribbon: "转化提升包", benefit: "含详情页长图和卖点模块", note: "适合非标品和品牌商品", a: "#e6f9e0", b: "#f8f4e6" },
+        "feed-video": { ribbon: "投放测试", benefit: "最快 1 天出片，支持脚本", note: "信息流素材批量起量", a: "#e8f1ff", b: "#f3eadf" },
+        "local-video": { ribbon: "同城引流", benefit: "适配门店团购和本地投放", note: "餐饮美业酒店健身均可用", a: "#fff3e5", b: "#e8f7e9" },
+        "story-video": { ribbon: "矩阵起号", benefit: "剧情号/IP 内容批量生产", note: "3 条起享批量折扣", a: "#efe6ff", b: "#ffe9d8" },
+        "brand-film": { ribbon: "品牌大片", benefit: "1080P 成片，不限修改", note: "企业介绍/招商/产品宣传", a: "#e7f0ff", b: "#eef8ee" }
       };
-      return map[p.id] || { ribbon: "限时优惠", benefit: "价格透明，交付可预期", ctaPrice: "立即购买", note: "支付后进入平台托管", a: "#eef3ff", b: "#fff0df" };
+      return map[p.id] || { ribbon: "限时优惠", benefit: "价格透明，交付可预期", note: "支付后进入平台托管", a: "#eef3ff", b: "#fff0df" };
     }
     function tierPriceRange(t) {
       if (!t.priceByDuration) return fmt(t.price);
