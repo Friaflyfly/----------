@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AIGC 标准产品包（弹窗购买版）- 骋风天合 · 创作门户交易平台</title>
+  <title>标准包购买 - AIGC标准化产品服务包 - 骋风天合 · 创作门户交易平台</title>
   <style>
     * { box-sizing: border-box; }
     :root {
@@ -76,108 +76,121 @@
       position: relative;
       overflow: hidden;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(280px, 430px);
-      column-gap: 24px;
-      align-items: center;
-      min-height: 150px;
-      padding: 22px 26px;
+      grid-template-columns: minmax(360px, .82fr) minmax(520px, 1fr);
+      column-gap: 26px;
+      align-items: end;
+      min-height: 214px;
+      padding: 28px 34px;
       border-radius: 24px;
       background:
-        linear-gradient(135deg, rgba(16,31,62,.96), rgba(22,66,122,.94) 50%, rgba(4,116,124,.9)),
-        radial-gradient(circle at 78% 18%, rgba(255,255,255,.35), transparent 20%);
+        radial-gradient(circle at 94% 8%, rgba(255,255,255,.2), transparent 18%),
+        linear-gradient(118deg, #0a2caf 0%, #1260ff 58%, #6e9dff 100%);
       color: #fff;
       box-shadow: var(--shadow);
     }
-    .hero::after { content: ""; position: absolute; right: -72px; top: -120px; width: 300px; height: 300px; border-radius: 50%; background: conic-gradient(from 30deg, rgba(19,183,198,.7), rgba(255,138,42,.48), rgba(36,91,255,.5), rgba(19,183,198,.7)); filter: blur(3px); opacity: .42; }
-    .hero-kicker { position: relative; z-index: 1; grid-column: 1; display: inline-flex; width: fit-content; gap: 8px; align-items: center; padding: 5px 10px; border: 1px solid rgba(255,255,255,.22); border-radius: 999px; background: rgba(255,255,255,.08); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
-    .hero h1 { position: relative; z-index: 1; grid-column: 1; margin: 10px 0 6px; font-size: clamp(28px, 3.2vw, 40px); line-height: 1.05; letter-spacing: -.05em; max-width: 640px; }
-    .hero p { position: relative; z-index: 1; grid-column: 1; margin: 0; max-width: 720px; color: rgba(255,255,255,.76); font-size: 13px; line-height: 1.65; }
-    .hero-actions { position: relative; z-index: 1; grid-column: 2; grid-row: 1; display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; align-self: start; margin-top: 0; }
-    .hero-actions .btn { height: 34px; padding: 0 14px; font-size: 12px; }
-    .hero-metrics { position: relative; z-index: 1; grid-column: 2; grid-row: 2 / span 2; display: flex; flex-wrap: wrap; justify-content: flex-end; align-self: end; gap: 8px; margin-top: 0; max-width: 430px; }
-    .hero-metric { display: inline-flex; align-items: baseline; gap: 8px; padding: 8px 11px; border: 1px solid rgba(255,255,255,.14); border-radius: 999px; background: rgba(255,255,255,.08); }
-    .hero-metric b { display: block; font-size: 15px; letter-spacing: -.02em; }
-    .hero-metric span { display: block; color: rgba(255,255,255,.66); font-size: 11px; margin-top: 0; }
+    .hero::before { content: ""; position: absolute; inset: 0; background-image: linear-gradient(120deg, rgba(255,255,255,.12) 1px, transparent 1px), linear-gradient(60deg, rgba(255,255,255,.08) 1px, transparent 1px); background-size: 88px 88px, 118px 118px; mask-image: linear-gradient(90deg, transparent 0%, #000 34%, #000 100%); opacity: .48; }
+    .hero::after { content: ""; position: absolute; right: -54px; top: -92px; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle at 30% 28%, rgba(255,255,255,.54), rgba(31,38,118,.56) 58%, transparent 70%); filter: blur(1px); opacity: .72; }
+    .hero-kicker { position: relative; z-index: 1; grid-column: 1; display: inline-flex; width: fit-content; gap: 8px; align-items: center; padding: 5px 12px; border: 1px solid rgba(255,255,255,.32); border-radius: 999px; background: rgba(255,255,255,.1); font-size: 11px; letter-spacing: .07em; text-transform: uppercase; }
+    .hero h1 { position: relative; z-index: 1; grid-column: 1; margin: 14px 0 10px; font-size: clamp(30px, 3vw, 42px); line-height: 1.05; letter-spacing: -.04em; max-width: 620px; }
+    .hero p { position: relative; z-index: 1; grid-column: 1; margin: 0; max-width: 660px; color: rgba(255,255,255,.78); font-size: 13px; line-height: 1.75; }
+    .hero-actions { position: relative; z-index: 1; grid-column: 1; display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-start; align-self: start; margin-top: 24px; }
+    .hero-actions .btn { height: 36px; padding: 0 18px; font-size: 13px; }
+    .hero-notes { position: relative; z-index: 1; grid-column: 2; grid-row: 1 / span 4; display: grid; gap: 10px; justify-content: stretch; align-self: end; margin-top: 0; }
+    .hero-note { padding: 13px 15px; border: 1px solid rgba(255,255,255,.2); border-radius: 14px; background: rgba(255,255,255,.14); box-shadow: inset 0 1px 0 rgba(255,255,255,.16); color: rgba(255,255,255,.8); font-size: 12px; line-height: 1.65; }
+    .hero-note b { margin-right: 6px; color: #fff; font-size: 13px; }
     .btn { border: 1px solid var(--line); background: #fff; color: var(--ink); height: 40px; padding: 0 18px; border-radius: 999px; cursor: pointer; font-weight: 800; box-shadow: 0 4px 14px rgba(23,32,51,.04); }
     .btn:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(23,32,51,.12); }
     .btn.primary { border-color: var(--blue); background: var(--blue); color: #fff; }
     .btn.dark { border-color: rgba(255,255,255,.24); background: rgba(255,255,255,.12); color: #fff; }
-    .layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-items: start; margin-top: 20px; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-items: start; margin-top: 14px; }
     .left-col { display: grid; gap: 18px; min-width: 0; }
-    .panel { background: rgba(255,255,255,.86); border: 1px solid rgba(230,235,243,.9); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
-    .panel-head { padding: 22px 24px 8px; display: flex; align-items: end; justify-content: space-between; gap: 16px; }
+    .panel { background: rgba(255,255,255,.9); border: 1px solid rgba(230,235,243,.95); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+    .panel-head { padding: 24px 28px 8px; display: flex; align-items: end; justify-content: space-between; gap: 16px; }
     .panel-title { margin: 0; font-size: 22px; letter-spacing: -.03em; }
     .panel-sub { margin: 7px 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
-    .tabs { display: flex; gap: 8px; flex-wrap: wrap; padding: 16px 24px 8px; }
-    .tab { border: 1px solid var(--line); background: #fff; color: var(--muted); padding: 9px 14px; border-radius: 999px; cursor: pointer; font-weight: 800; font-size: 13px; }
-    .tab.active { border-color: rgba(36,91,255,.24); background: #eef3ff; color: var(--blue); }
-    .recommend-strip { margin: 12px 24px 0; padding: 14px 16px; border-radius: 18px; background: linear-gradient(90deg, rgba(255,138,42,.12), rgba(19,183,198,.12)); display: flex; align-items: center; justify-content: space-between; gap: 14px; }
-    .recommend-strip strong { display: block; font-size: 14px; }
-    .recommend-strip span { color: var(--muted); font-size: 12px; }
-    .package-grid { padding: 18px 24px 24px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .tabs { display: flex; gap: 10px; flex-wrap: wrap; padding: 18px 28px 10px; }
+    .tab { border: 1px solid var(--line); background: #f7f9fd; color: var(--muted); padding: 10px 18px; border-radius: 999px; cursor: pointer; font-weight: 900; font-size: 13px; }
+    .tab.active { border-color: #1890ff; background: #1890ff; color: #fff; box-shadow: 0 10px 22px rgba(24,144,255,.2); }
+    .recommend-strip { margin: 14px 28px 0; padding: 14px 18px; border-radius: 16px; background: linear-gradient(90deg, #fff4e8, #fff9f2); border: 1px solid rgba(255,181,92,.32); display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+    .recommend-main { display: flex; align-items: center; gap: 13px; min-width: 0; }
+    .recommend-icon { width: 42px; height: 42px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 14px; background: linear-gradient(135deg, #ffb23f, #ff6c2f); color: #fff; font-size: 22px; box-shadow: 0 12px 24px rgba(255,108,47,.18); }
+    .recommend-strip strong { display: block; font-size: 14px; color: #ec6d12; }
+    .recommend-strip em { margin-left: 8px; padding: 2px 7px; border-radius: 999px; background: #ffdf8a; color: #a95700; font-style: normal; font-size: 11px; }
+    .recommend-strip span { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; }
+    .recommend-tags { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; flex: 0 0 auto; }
+    .recommend-tag { display: inline-flex; align-items: center; height: 30px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(255,138,42,.22); background: rgba(255,255,255,.66); color: #d46b08; font-size: 12px; font-weight: 900; }
+    .package-grid { padding: 22px 28px 28px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
     .pkg-card {
       position: relative;
       border: 1px solid rgba(23,32,51,.08);
-      border-radius: 24px;
-      padding: 24px 24px 20px;
-      background:
-        radial-gradient(circle at 86% 8%, rgba(255,255,255,.8), transparent 25%),
-        linear-gradient(145deg, var(--deal-a, #fff4ea), var(--deal-b, #e9f4ff));
+      border-radius: 18px;
+      padding: 0;
+      background: #fff;
       cursor: pointer;
       transition: .2s;
-      min-height: 308px;
       overflow: hidden;
-      box-shadow: 0 10px 24px rgba(23,32,51,.08);
+      box-shadow: 0 10px 28px rgba(23,32,51,.08);
     }
     .pkg-card::before {
       content: "";
       position: absolute;
-      right: -48px;
-      top: -36px;
-      width: 170px;
-      height: 170px;
-      border-radius: 42px;
-      border: 1px solid rgba(23,32,51,.06);
-      transform: rotate(10deg);
-      background: rgba(255,255,255,.22);
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.64);
     }
     .pkg-card:hover { transform: translateY(-5px); box-shadow: 0 22px 44px rgba(23,32,51,.15); }
     .pkg-card.active { outline: 3px solid rgba(36,91,255,.2); border-color: rgba(36,91,255,.52); }
     .pkg-ribbon {
       position: absolute;
       top: 0;
-      right: 0;
+      left: 0;
       z-index: 2;
-      padding: 8px 18px 8px 20px;
-      border-bottom-left-radius: 18px;
-      background: linear-gradient(135deg, #ffc14b, #ffdf8a);
+      padding: 8px 16px;
+      border-bottom-right-radius: 12px;
+      background: linear-gradient(135deg, #ffe072, #ffc14b);
       color: #111;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 950;
       box-shadow: 0 8px 18px rgba(255,138,42,.22);
     }
-    .pkg-top { position: relative; z-index: 1; display: flex; justify-content: flex-start; gap: 14px; align-items: flex-start; padding-right: 88px; }
-    .pkg-icon { width: 54px; height: 54px; border-radius: 18px; display: grid; place-items: center; font-size: 28px; background: rgba(255,255,255,.55); box-shadow: inset 0 0 0 1px rgba(255,255,255,.7); }
-    .pkg-kicker { position: relative; z-index: 1; width: fit-content; margin-top: 16px; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,.58); color: rgba(23,32,51,.58); font-size: 11px; font-weight: 950; letter-spacing: .08em; }
-    .pkg-name { position: relative; z-index: 1; margin: 8px 0 4px; font-size: 22px; font-weight: 950; letter-spacing: -.05em; }
-    .pkg-desc { position: relative; z-index: 1; color: rgba(23,32,51,.72); font-size: 12px; line-height: 1.65; min-height: 40px; max-width: 92%; }
-    .pkg-price { position: relative; z-index: 1; margin-top: 22px; display: grid; gap: 5px; letter-spacing: 0; }
-    .pkg-price-label { width: fit-content; padding: 3px 8px; border-radius: 999px; background: rgba(255,138,42,.14); color: #b87000; font-size: 11px; font-weight: 950; }
-    .pkg-price-main { display: flex; align-items: baseline; gap: 8px; letter-spacing: -.06em; }
-    .pkg-price .currency { font-size: 28px; font-weight: 950; }
-    .pkg-price .amount { font-size: 58px; line-height: .95; font-weight: 950; }
-    .pkg-price .suffix { color: rgba(23,32,51,.55); font-size: 13px; font-weight: 900; letter-spacing: 0; }
-    .pkg-list-price { color: rgba(23,32,51,.42); font-size: 13px; font-weight: 850; text-decoration: line-through; text-decoration-thickness: 1.5px; letter-spacing: 0; white-space: nowrap; }
-    .pkg-benefit { position: relative; z-index: 1; margin-top: 16px; color: #b87000; font-size: 13px; font-weight: 900; }
-    .pkg-footnote { position: relative; z-index: 1; text-align: center; color: rgba(23,32,51,.42); font-size: 12px; font-weight: 800; margin-top: 12px; }
-    .pkg-actions { position: relative; z-index: 3; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
-    .pkg-actions button { height: 38px; border-radius: 999px; border: 1px solid rgba(23,32,51,.18); background: rgba(255,255,255,.64); cursor: pointer; font-weight: 950; color: rgba(23,32,51,.8); }
-    .pkg-actions button:hover { background: #fff; box-shadow: 0 8px 18px rgba(23,32,51,.12); }
-    .pkg-actions .buy-action { border-color: rgba(23,32,51,.64); color: var(--ink); background: linear-gradient(110deg, rgba(255,255,255,.72), rgba(255,223,184,.78)); }
-    .intro-card { border-radius: 22px; padding: 20px; background: linear-gradient(135deg, #0f1b2d, #1d3b64); color: #fff; min-height: 200px; }
+    .pkg-media {
+      position: relative;
+      min-height: 146px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 22% 18%, rgba(255,255,255,.8), transparent 22%),
+        linear-gradient(110deg, var(--deal-a, #e8f1ff), var(--deal-b, #fff4ea));
+    }
+    .pkg-media::before { content: ""; position: absolute; inset: -20%; background: repeating-linear-gradient(90deg, rgba(255,255,255,.3) 0 12px, transparent 12px 34px); transform: rotate(5deg); opacity: .52; }
+    .pkg-media::after { content: ""; position: absolute; right: 15%; top: 18%; width: 116px; height: 76px; border-radius: 32px; border: 1px solid rgba(255,255,255,.6); background: rgba(255,255,255,.12); transform: rotate(-8deg); }
+    .pkg-icon { position: relative; z-index: 1; width: 74px; height: 74px; border-radius: 24px; display: grid; place-items: center; font-size: 34px; background: rgba(255,255,255,.72); box-shadow: 0 18px 40px rgba(23,32,51,.14), inset 0 0 0 1px rgba(255,255,255,.8); }
+    .pkg-body { position: relative; z-index: 1; padding: 18px 20px 20px; }
+    .pkg-title-row { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+    .pkg-name { margin: 0; font-size: 20px; font-weight: 950; letter-spacing: -.04em; line-height: 1.25; }
+    .pkg-category-pill { flex: 0 0 auto; display: inline-flex; height: 27px; align-items: center; padding: 0 10px; border-radius: 999px; background: rgba(24,144,255,.1); color: #1683e8; font-size: 11px; font-weight: 950; }
+    .pkg-desc { color: rgba(23,32,51,.64); font-size: 12px; line-height: 1.7; min-height: 42px; margin: 10px 0 0; }
+    .pkg-price { margin-top: 14px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; letter-spacing: 0; }
+    .pkg-price-label { display: none; }
+    .pkg-price-main { display: flex; align-items: baseline; gap: 5px; letter-spacing: -.05em; color: #ff4438; }
+    .pkg-price .currency { font-size: 12px; font-weight: 950; }
+    .pkg-price .amount { font-size: 34px; line-height: 1; font-weight: 950; }
+    .pkg-price .suffix { color: #ff4438; font-size: 12px; font-weight: 950; letter-spacing: 0; }
+    .pkg-list-price { color: rgba(23,32,51,.38); font-size: 12px; font-weight: 850; text-decoration: line-through; text-decoration-thickness: 1.5px; letter-spacing: 0; white-space: nowrap; }
+    .pkg-benefit { margin-top: 12px; padding: 10px 12px; border: 1px solid rgba(36,91,255,.08); border-radius: 12px; background: #f7f9ff; color: var(--ink); font-size: 12px; font-weight: 850; }
+    .pkg-benefit b { color: var(--blue); }
+    .pkg-footnote { text-align: center; color: rgba(23,32,51,.38); font-size: 12px; font-weight: 800; margin-top: 12px; }
+    .pkg-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+    .pkg-actions button { height: 38px; border-radius: 999px; border: 1px solid var(--line); background: #fff; cursor: pointer; font-weight: 950; color: rgba(23,32,51,.82); }
+    .pkg-actions button:hover { box-shadow: 0 8px 18px rgba(23,32,51,.1); transform: translateY(-1px); }
+    .pkg-actions .buy-action { border-color: #1890ff; color: #fff; background: linear-gradient(135deg, #168fff, #4db3ff); box-shadow: 0 12px 22px rgba(24,144,255,.22); }
+    .intro-card { border-radius: 22px; padding: 18px 20px; background: linear-gradient(135deg, #0f1b2d, #1d3b64); color: #fff; }
+    .intro-card.compact { display: grid; grid-template-columns: minmax(0, .82fr) minmax(460px, 1fr); gap: 18px; align-items: center; }
     .intro-card .label { color: rgba(255,255,255,.62); font-size: 12px; font-weight: 800; }
-    .intro-card h2 { margin: 10px 0 8px; font-size: 28px; letter-spacing: -.04em; }
-    .intro-card p { margin: 0; color: rgba(255,255,255,.74); line-height: 1.75; font-size: 13px; }
+    .intro-card h2 { margin: 8px 0 7px; font-size: 26px; letter-spacing: -.04em; }
+    .intro-card p { margin: 0; color: rgba(255,255,255,.74); line-height: 1.65; font-size: 13px; }
     .scenario-card { border-radius: 22px; padding: 18px; background: #f8fbff; border: 1px solid var(--line); }
     .scenario-card h3 { margin: 0 0 10px; font-size: 15px; }
     .chips { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -229,6 +242,7 @@
     .config-body { padding: 18px 22px 22px; display: grid; gap: 16px; }
     .field { display: grid; gap: 8px; }
     .field label { font-size: 12px; color: var(--muted); font-weight: 900; }
+    .field-hint { margin-left: 8px; color: #9aa6b8; font-size: 11px; font-weight: 600; }
     .option-grid { display: grid; gap: 8px; }
     .option { border: 1px solid var(--line); border-radius: 16px; padding: 12px; background: #fff; cursor: pointer; }
     .option.active { border-color: var(--blue); background: #eef3ff; }
@@ -236,6 +250,8 @@
     .option span { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.45; }
     select, input, textarea { width: 100%; border: 1px solid var(--line); border-radius: 14px; padding: 11px 12px; background: #fff; color: var(--ink); font: inherit; outline: none; }
     textarea { min-height: 76px; resize: vertical; }
+    textarea.demand-template { min-height: 260px; line-height: 1.75; white-space: pre-wrap; }
+    textarea.template-filled { color: #7b879b; background: #f8fbff; }
     .inline { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .toggles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .toggle { border: 1px solid var(--line); border-radius: 14px; padding: 10px; background: #fff; cursor: pointer; text-align: center; font-size: 12px; font-weight: 900; color: var(--muted); }
@@ -259,10 +275,23 @@
     .purchase-modal .config-card { border: 0; border-radius: 0; box-shadow: none; background: #fff; }
     .purchase-modal .config-head { display: none; }
     .purchase-modal .config-body { padding: 22px 28px 28px; }
-    .detail-modal-body { display: grid; grid-template-columns: 1fr; gap: 16px; }
-    .detail-modal-hero { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(300px, .85fr); gap: 16px; }
+    .detail-modal-body { display: grid; grid-template-columns: 1fr; gap: 14px; }
+    .scene-summary { border: 1px solid var(--line); border-radius: 18px; padding: 14px 16px; background: linear-gradient(145deg, #fff, #f7faff); }
+    .scene-summary span { display: block; color: var(--muted); font-size: 12px; font-weight: 900; }
+    .scene-summary b { display: block; margin-top: 8px; color: var(--ink); font-size: 14px; line-height: 1.65; }
     .detail-modal-section { border: 1px solid var(--line); border-radius: 22px; padding: 18px; background: #fff; }
     .detail-modal-section h3 { margin: 0 0 12px; font-size: 16px; }
+    .detail-overview { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .brief-card { border: 1px solid var(--line); border-radius: 18px; padding: 14px; background: linear-gradient(145deg, #fff, #f7faff); }
+    .intro-card .brief-card { border-color: rgba(255,255,255,.16); background: rgba(255,255,255,.08); box-shadow: inset 0 1px 0 rgba(255,255,255,.08); }
+    .brief-card span { display: block; color: var(--muted); font-size: 12px; font-weight: 900; }
+    .intro-card .brief-card span { color: rgba(255,255,255,.58); }
+    .brief-card b { display: block; margin-top: 8px; color: var(--ink); font-size: 14px; line-height: 1.65; }
+    .intro-card .brief-card b { color: rgba(255,255,255,.9); font-size: 13px; line-height: 1.55; }
+    .reference-note { margin-bottom: 14px; padding: 12px 14px; border-radius: 14px; background: #fff8e8; color: #a96100; font-size: 12px; font-weight: 850; line-height: 1.65; }
+    .table-section-title { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .table-section-title h3 { margin: 0; }
+    .table-section-title span { color: var(--muted); font-size: 12px; }
     .price-tier-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
     .price-tier-card { position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: 20px; padding: 16px; background: linear-gradient(145deg, #fff, #f5f8ff); }
     .price-tier-card.featured { border-color: rgba(36,91,255,.42); background: linear-gradient(145deg, #eef3ff, #fff); box-shadow: 0 16px 36px rgba(36,91,255,.12); }
@@ -292,8 +321,8 @@
     @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
     @media (max-width: 1280px) { .package-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     @media (max-width: 1200px) { .layout { grid-template-columns: 1fr; } }
-    @media (max-width: 900px) { .sample-grid, .price-tier-grid { grid-template-columns: 1fr; } }
-    @media (max-width: 980px) { .hero { grid-template-columns: 1fr; } .hero-actions, .hero-metrics { grid-column: 1; grid-row: auto; justify-content: flex-start; margin-top: 12px; max-width: none; } }
+    @media (max-width: 900px) { .sample-grid, .price-tier-grid, .detail-overview, .intro-card.compact { grid-template-columns: 1fr; } }
+    @media (max-width: 1180px) { .hero { grid-template-columns: 1fr; } .hero-actions, .hero-notes { grid-column: 1; grid-row: auto; justify-content: flex-start; margin-top: 12px; max-width: none; } .recommend-strip { align-items: flex-start; flex-direction: column; } .recommend-tags { justify-content: flex-start; } }
     @media (max-width: 800px) { .sidebar { display: none; } .main { margin-left: 0; width: 100%; padding: 18px; } .two-col, .modal-body, .package-grid { grid-template-columns: 1fr; } .toggles { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -305,8 +334,7 @@
         <a href="platform-home-demander.html"><span class="menu-icon">🏠</span> 工作台</a>
         <div class="menu-group">
           <div class="menu-group-title">我有需求</div>
-          <a href="standard-package-store.html"><span class="menu-icon">🧩</span> 标准包 · 侧栏购买</a>
-          <a href="standard-package-store-modal.html" class="active"><span class="menu-icon">🪟</span> 标准包 · 弹窗购买</a>
+          <a href="standard-package-store-modal.html" class="active"><span class="menu-icon">📦</span> 标准包购买</a>
           <a href="demand-publish.html"><span class="menu-icon">📤</span> 发布需求</a>
           <a href="demand-list.html"><span class="menu-icon">📋</span> 我的需求</a>
           <a href="contractor-marketplace.html"><span class="menu-icon">🏪</span> 服务广场</a>
@@ -330,14 +358,12 @@
         <h1>AIGC标准化产品服务包</h1>
         <p>图片、视频、电商套图、详情页、信息流短视频直接选购。明码标价、首购权益、交付周期清晰；支付后预算进入平台托管，验收和发票流程完成后再结算。</p>
         <div class="hero-actions">
-          <button class="btn primary" onclick="document.getElementById('catalogPanel').scrollIntoView({behavior:'smooth'})">查看全部产品包</button>
-          <button class="btn dark" onclick="location.href='demand-publish.html'">发布定制需求</button>
+          <button class="btn primary" onclick="location.href='demand-publish.html'">发布定制需求</button>
         </div>
-        <div class="hero-metrics">
-          <div class="hero-metric"><b>7 个</b><span>P0 首版标准包</span></div>
-          <div class="hero-metric"><b>3+4</b><span>图片包 + 视频包</span></div>
-          <div class="hero-metric"><b>¥9.9 起</b><span>低门槛试单</span></div>
-          <div class="hero-metric"><b>托管</b><span>付款冻结 / 验收结算</span></div>
+        <div class="hero-notes">
+          <div class="hero-note"><b>使用说明：</b>请根据您所购买的产品包，需求规格填写对应内容。信息越完整，出品越精准，沟通越高效。</div>
+          <div class="hero-note"><b>修改规则：</b>各档次修改次数见各产品包说明。</div>
+          <div class="hero-note"><b>版权规则：</b>验收后商用版权归需求方。</div>
         </div>
       </section>
 
@@ -353,8 +379,15 @@
             </div>
             <div class="tabs" id="categoryTabs"></div>
             <div class="recommend-strip">
-              <div><strong>限时首购权益：标准包先下单锁价，交付资料可后补</strong><span>适合高频、可预期需求；不确定需求仍可走自定义发布。</span></div>
-              <button class="btn" id="recommendBtn">一键定位电商包</button>
+              <div class="recommend-main">
+                <div class="recommend-icon">%</div>
+                <div><strong>限时首购权益 <em>首单专享</em></strong><span>标准包先下单锁价，交付资料可后补；适合高频、可预期需求。</span></div>
+              </div>
+              <div class="recommend-tags">
+                <span class="recommend-tag">先锁价</span>
+                <span class="recommend-tag">资料后补</span>
+                <span class="recommend-tag">可转定制</span>
+              </div>
             </div>
             <div class="package-grid" id="packageGrid"></div>
           </section>
@@ -414,8 +447,8 @@
                 <div class="upload">支持图片、视频、参考链接和压缩包。原型中先做上传占位，实际研发时接文件服务。</div>
               </div>
               <div class="field">
-                <label>需求备注</label>
-                <textarea id="remarkInput" placeholder="例如：品牌调性、参考风格、投放平台、必须出现的卖点..."></textarea>
+                <label>需求描述 <span class="field-hint">以下灰字为填写提示，请根据提示描述您的具体需求（填写时请删除提示文字）</span></label>
+                <textarea class="demand-template" id="remarkInput" placeholder="请描述订单用途、服务类型、风格偏好、背景要求和参考图说明"></textarea>
               </div>
               <div class="price-card">
                 <div class="price-row"><span>基础服务费</span><b id="basePrice">¥0</b></div>
@@ -479,49 +512,52 @@
         <button class="btn" id="closeDetailBtn">关闭</button>
       </div>
       <div class="modal-body detail-modal-body">
-        <div class="detail-modal-hero">
-          <div class="intro-card">
-            <div class="label" id="modalDetailCategory">标准产品包</div>
-            <h2 id="modalDetailName">-</h2>
-            <p id="modalDetailDesc">-</p>
+        <div class="scene-summary"><span>主要场景</span><b id="modalDetailScenes">-</b></div>
+        <div class="detail-modal-section">
+          <div class="table-section-title">
+            <h3 id="modalDetailSpecTitle">规格参数</h3>
+            <span>规格和最终金额以购买配置为准</span>
           </div>
-          <div class="scenario-card">
-            <h3>适用场景</h3>
-            <div class="chips" id="modalDetailScenarios"></div>
+          <div class="compare">
+            <table>
+              <thead><tr><th>选项</th><th>规格</th></tr></thead>
+              <tbody id="modalDetailSpecTable"></tbody>
+            </table>
           </div>
         </div>
         <div class="detail-modal-section">
-          <h3>价格档位</h3>
-          <p class="panel-sub" style="margin: -4px 0 14px;">卡片展示该产品包的主要档位价；最终金额会根据数量、视频时长、规格和增项在购买弹窗中自动计算。</p>
-          <div class="price-tier-grid" id="modalDetailPriceCards"></div>
+          <div class="table-section-title">
+            <h3>素材上传要求</h3>
+            <span>用于减少沟通成本，提高一次成片率</span>
+          </div>
+          <div class="compare">
+            <table>
+              <thead><tr><th>服务类型</th><th>必须提供</th><th>质量要求</th></tr></thead>
+              <tbody id="modalDetailUploadTable"></tbody>
+            </table>
+          </div>
         </div>
         <div class="sample-section">
           <div class="sample-head">
             <div>
-              <h3>样例展示占位</h3>
-              <p>这里后续替换为真实图片、视频、成片预览或前后对比图。</p>
+              <h3>对标示例</h3>
+              <p>参考案例用于帮助用户理解出品效果，后续可替换为真实图片、视频、前后对比或链接。</p>
             </div>
             <span class="sample-count" id="modalDetailSampleCount">0 个样例位</span>
           </div>
+          <div class="reference-note" id="modalDetailReferenceNote">以下为本产品包的参考案例，可帮助您理解出品效果。</div>
           <div class="sample-grid" id="modalDetailSamples"></div>
         </div>
         <div class="detail-modal-section">
-          <h3>档位与交付对比</h3>
+          <div class="table-section-title">
+            <h3>交付要求</h3>
+            <span>提交订单后会作为验收依据之一</span>
+          </div>
           <div class="compare">
             <table>
-              <thead><tr><th>档位</th><th>价格</th><th>制作方式</th><th>交付规格</th><th>修改</th><th>周期</th></tr></thead>
-              <tbody id="modalDetailTierTable"></tbody>
+              <thead><tr><th>项目</th><th>选择</th></tr></thead>
+              <tbody id="modalDetailDeliveryTable"></tbody>
             </table>
-          </div>
-        </div>
-        <div class="two-col">
-          <div class="info-box">
-            <h3>你将获得</h3>
-            <ul id="modalDetailDeliverables"></ul>
-          </div>
-          <div class="info-box">
-            <h3>下单前请准备</h3>
-            <ul id="modalDetailMaterials"></ul>
           </div>
         </div>
       </div>
@@ -543,20 +579,49 @@
       {
         id: "ai-image", icon: "🖼️", category: "图片制作", catKey: "image", accent: "#eaf0ff",
         name: "AI 图片制作包", desc: "AI 人物转绘、头像、风景、扩图、融合、LOGO、证件照等低门槛轻量需求。",
-        scenarios: ["头像转绘", "扩图融合", "证件照", "LOGO 概念", "人物+场景图"],
-        specs: ["2K", "4K", "人物图", "场景图", "真人风格"],
+        scenarios: ["AI人物转绘", "头像制作", "证件照精修", "风景生成", "图片扩图", "图片融合", "LOGO设计"],
+        specs: ["2K", "4K", "2D风格", "3D风格", "真人风格"],
         durations: [], ratios: [],
         deliverables: ["1-10 张 PNG/JPG 成图", "2D/3D/真人风格可选", "支持人物或场景图类型", "基础 1 次修改"],
         materials: ["参考图或人物照片", "目标风格说明", "图片用途", "禁用元素或版权要求"],
+        detailProfile: {
+          audience: "低需求小白用户 · 个人客户简单需求",
+          scenes: "AI人物转绘 / 头像制作 / 证件照精修 / 风景生成 / 图片扩图 / 图片融合 / LOGO设计",
+          pricingFactor: "数量（1~10张，单价递减） × 分辨率（2K / 4K）",
+          specTitle: "规格参数"
+        },
+        specRows: [
+          ["价格", "5.9"],
+          ["风格", "2D/3D/真人（可选）"],
+          ["数量/套", "1~10张（可选）"],
+          ["单价", "¥5.9/张"],
+          ["制作方式", "AI生成"],
+          ["图片类型", "人物+场景图"],
+          ["分辨率", "2K/4K（可选）"],
+          ["修改次数", "1次"],
+          ["交付周期", "1天"],
+          ["源文件", "PNG/JPG"]
+        ],
+        uploadRows: [
+          ["人物转绘/头像", "人物正面清晰照", "五官完整可见，建议≥1080P"],
+          ["证件照精修", "原始证件照/生活照", "正面，光线均匀"],
+          ["图片扩图", "原图 + 扩展方向说明", "清晰原图"],
+          ["图片融合", "所有待融合素材图", "格式：JPG/PNG/HEIC"],
+          ["LOGO设计", "品牌资料（如有）", "品牌色值、理念说明"],
+          ["风景图生成", "无需上传，填写场景描述即可", "-"]
+        ],
+        deliveryRows: [
+          ["交付内容", "按照需求描述交付原图"],
+          ["交付格式", "PNG / JPG（默认两者都提供）"]
+        ],
+        referenceNote: "以下为本产品包的参考案例，可帮助您理解出品效果。",
         samples: [
-          { type: "image", title: "人物头像转绘样例", desc: "真人照片转 2D/3D/写实风格头像。", ratio: "1:1", status: "图片占位", tone: ["#cfe0ff", "#ffe2c7"] },
-          { type: "image", title: "产品融合场景图", desc: "产品与背景融合，用于社媒封面和轻量展示。", ratio: "4:3", status: "图片占位", tone: ["#dff8ef", "#e9edff"] },
-          { type: "image", title: "证件照与扩图效果", desc: "证件照修正、背景替换、画面扩展前后对比。", ratio: "3:2", status: "对比占位", tone: ["#fff1c8", "#dff4ff"] }
+          { type: "image", title: "示例1 · 人物转绘/头像", desc: "参考图/链接：人物原图，展示头像转绘效果。", ratio: "1:1", status: "人物原图", tone: ["#cfe0ff", "#ffe2c7"] },
+          { type: "image", title: "示例2 · 证件照精修", desc: "参考图/链接：人物原图，展示证件照修正效果。", ratio: "3:4", status: "人物原图", tone: ["#dff8ef", "#e9edff"] },
+          { type: "image", title: "示例3 · 人物转绘/图片融合", desc: "参考图/链接：人物原图，展示人物与场景融合效果。", ratio: "4:3", status: "人物原图", tone: ["#fff1c8", "#dff4ff"] }
         ],
         tiers: [
-          { id: "base", name: "基础档", price: 9.9, unit: "张", method: "AI 生成", spec: "单张出图，2K/4K 可选", revision: "1 次", days: 1, note: "适合头像、证件照、轻量试风格" },
-          { id: "standard", name: "标准档", price: 39.9, unit: "组", method: "AI 生成 + 基础修正", spec: "5 张成图，统一风格", revision: "1 次", days: 1, note: "适合社媒封面、产品融合图" },
-          { id: "premium", name: "精修档", price: 69.9, unit: "组", method: "AI 生成 + 人工精修", spec: "10 张成图，含细节优化", revision: "2 次", days: 2, note: "适合成组物料和正式发布" }
+          { id: "base", name: "标准图片包", price: 5.9, unit: "张", method: "AI 生成", spec: "1~10 张，2K/4K 可选", revision: "1 次", days: 1, note: "适合头像、证件照、轻量试风格" }
         ]
       },
       {
@@ -704,20 +769,25 @@
         const deal = dealMeta(p);
         return `<article class="pkg-card ${p.id === state.productId ? "active" : ""}" data-product="${p.id}" style="--deal-a:${deal.a};--deal-b:${deal.b}">
           <div class="pkg-ribbon">${deal.ribbon}</div>
-          <div class="pkg-top"><div class="pkg-icon">${p.icon}</div></div>
-          <div class="pkg-kicker">${p.category}</div>
-          <div class="pkg-name">${p.name}</div>
-          <div class="pkg-desc">${p.desc}</div>
-          <div class="pkg-price">
-            <span class="pkg-price-label">交易价</span>
-            <div class="pkg-price-main"><span class="currency">¥</span><span class="amount">${formatDealAmount(min)}</span><span class="suffix">起</span><span class="pkg-list-price">划线价 ¥${formatDealAmount(promoListPrice(min))}</span></div>
+          <div class="pkg-media"><div class="pkg-icon">${p.icon}</div></div>
+          <div class="pkg-body">
+            <div class="pkg-title-row">
+              <h3 class="pkg-name">${p.name}</h3>
+              <span class="pkg-category-pill">${p.category}</span>
+            </div>
+            <p class="pkg-desc">${p.desc}</p>
+            <div class="pkg-price">
+              <span class="pkg-price-label">交易价</span>
+              <div class="pkg-price-main"><span class="currency">¥</span><span class="amount">${formatDealAmount(min)}</span><span class="suffix">起</span></div>
+              <span class="pkg-list-price">¥${formatDealAmount(promoListPrice(min))}</span>
+            </div>
+            <div class="pkg-benefit">✦ <b>核心权益：</b>${deal.benefit}</div>
+            <div class="pkg-actions">
+              <button type="button" data-detail="${p.id}">查看详情</button>
+              <button type="button" class="buy-action" data-select="${p.id}">立即购买</button>
+            </div>
+            <div class="pkg-footnote">${deal.note}</div>
           </div>
-          <div class="pkg-benefit">✦ ${deal.benefit}</div>
-          <div class="pkg-actions">
-            <button type="button" data-detail="${p.id}">查看详情</button>
-            <button type="button" class="buy-action" data-select="${p.id}">立即购买</button>
-          </div>
-          <div class="pkg-footnote">${deal.note}</div>
         </article>`;
       }).join("");
     }
@@ -759,6 +829,76 @@
       if (!t.priceByDuration) return fmt(t.price);
       return `<div class="table-price-list">${Object.entries(t.priceByDuration).map(([d, price]) => `<span>${d}s ${fmt(price)}</span>`).join("")}</div>`;
     }
+    function tableRowsHtml(rows) {
+      return (rows || []).map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join("")}</tr>`).join("");
+    }
+    function detailProfile(p) {
+      if (p.detailProfile) return p.detailProfile;
+      const firstTier = p.tiers[0] || {};
+      return {
+        audience: firstTier.note || "有明确交付目标的需求方",
+        scenes: p.scenarios.join(" / "),
+        pricingFactor: p.durations.length ? "数量 × 视频时长 × 画幅比例 × 增项" : "数量 × 规格 × 增项",
+        specTitle: p.durations.length ? "视频规格" : "产品规格"
+      };
+    }
+    function specRows(p) {
+      if (p.specRows) return p.specRows;
+      const firstTier = p.tiers[0] || {};
+      return [
+        ["起步价格", tierPriceRange(firstTier || {})],
+        ["服务类型", p.category],
+        ["制作方式", firstTier.method || "-"],
+        ["规格选项", (p.specs || []).join(" / ") || "-"],
+        ["数量/套", firstTier.spec || "-"],
+        ["修改次数", firstTier.revision || "-"],
+        ["交付周期", firstTier.days ? firstTier.days + " 天起" : "-"],
+        ["交付文件", (p.deliverables || []).slice(0, 3).join(" / ") || "-"]
+      ];
+    }
+    function uploadRows(p) {
+      if (p.uploadRows) return p.uploadRows;
+      return (p.materials || []).map(item => [item, "按订单需求上传或填写", "资料清晰、可识别，建议提供参考效果"]);
+    }
+    function deliveryRows(p) {
+      if (p.deliveryRows) return p.deliveryRows;
+      return [
+        ["交付内容", (p.deliverables || []).join("；") || "按需求描述交付"],
+        ["交付格式", p.durations.length ? "MP4 / 封面图 / 相关素材" : "PNG / JPG / PSD（如套餐包含）"],
+        ["验收依据", "以需求描述、上传素材和购买配置为准"]
+      ];
+    }
+    const DEFAULT_DEMAND_DESCRIPTION = `订单用途：
+- 个人使用 / 社交媒体发布 / 商务用途 / 其他
+
+服务类型（选一项或多项）：
+- AI人物转绘 / 头像制作 / 证件照精修 / 风景图生成 / 图片扩图 / 图片融合 / LOGO设计 / 其他
+
+风格偏好：
+- 风格：2D插画风格 / 3D立体风格 / 真人写实风格
+- 细分标签（最多3项）：赛博朋克 / 复古胶片感 / 极简高级感 / 梦幻浪漫风 / 国潮水墨风 / 二次元日系 / 油画艺术风 / 蒸汽波 / 写实商业风 / 其他
+
+背景要求：
+- 纯色（请注明颜色）/ 场景背景 / 透明背景 / 其他
+- 色调偏好：暖色 / 冷色 / 黑白 / 鲜艳 / 柔和 / 不限
+
+参考图：
+- 强烈建议上传1~3张风格参考图或效果参考图`;
+    function ensureDemandDescriptionTemplate() {
+      const input = $("remarkInput");
+      if (!input) return;
+      if (!input.value.trim() || input.dataset.template === "1") {
+        input.value = DEFAULT_DEMAND_DESCRIPTION;
+        input.dataset.template = "1";
+        input.classList.add("template-filled");
+      }
+    }
+    function demandDescriptionValue(fallback) {
+      const input = $("remarkInput");
+      if (!input) return fallback;
+      if (input.dataset.template === "1" && input.value === DEFAULT_DEMAND_DESCRIPTION) return fallback;
+      return input.value.trim() || fallback;
+    }
     function priceCardsHtml(p) {
       return p.tiers.map((t, index) => `<article class="price-tier-card ${index === 1 || (p.tiers.length === 1 && index === 0) ? "featured" : ""}">
         <span class="tier-badge">${index === 0 ? "入门可选" : index === 1 ? "推荐档位" : "高配方案"}</span>
@@ -792,16 +932,15 @@
     }
     function openProductDetail(productId) {
       const p = products.find(x => x.id === productId) || product();
+      const profile = detailProfile(p);
       $("modalDetailTitle").textContent = p.name;
-      $("modalDetailSub").textContent = p.desc;
-      $("modalDetailCategory").textContent = p.category;
-      $("modalDetailName").textContent = p.name;
-      $("modalDetailDesc").textContent = p.desc;
-      $("modalDetailScenarios").innerHTML = p.scenarios.map(x => `<span class="chip">${x}</span>`).join("");
-      $("modalDetailPriceCards").innerHTML = priceCardsHtml(p);
-      $("modalDetailTierTable").innerHTML = tierRowsHtml(p);
-      $("modalDetailDeliverables").innerHTML = p.deliverables.map(x => `<li>${x}</li>`).join("");
-      $("modalDetailMaterials").innerHTML = p.materials.map(x => `<li>${x}</li>`).join("");
+      $("modalDetailSub").textContent = "查看规格参数、素材上传要求、对标示例和交付要求。";
+      $("modalDetailScenes").textContent = profile.scenes;
+      $("modalDetailSpecTitle").textContent = profile.specTitle || "产品规格";
+      $("modalDetailSpecTable").innerHTML = tableRowsHtml(specRows(p));
+      $("modalDetailUploadTable").innerHTML = tableRowsHtml(uploadRows(p));
+      $("modalDetailDeliveryTable").innerHTML = tableRowsHtml(deliveryRows(p));
+      $("modalDetailReferenceNote").textContent = p.referenceNote || "以下为本产品包的参考案例，可帮助您理解出品效果。";
       $("modalDetailSampleCount").textContent = (p.samples || []).length + " 个样例位";
       $("modalDetailSamples").innerHTML = sampleCardsHtml(p.samples);
       $("detailChooseBtn").dataset.product = p.id;
@@ -818,6 +957,7 @@
         state.tierId = "";
       }
       renderAll();
+      ensureDemandDescriptionTemplate();
       const c = calc();
       $("purchaseModalSub").textContent = `${c.p.name} · ${c.t.name}，继续选择数量、规格和增项后确认价格。`;
       $("purchaseModal").classList.add("open");
@@ -914,7 +1054,7 @@
         skuSnapshot: JSON.parse(JSON.stringify({ product: c.p.name, tier: c.t, quantity: c.q, spec: state.spec, duration: state.duration, ratio: state.ratio, addons: state.addons, total: c.total })),
         title,
         category: c.p.category + " / " + c.p.name,
-        desc: $("remarkInput").value.trim() || c.p.desc,
+        desc: demandDescriptionValue(c.p.desc),
         budget: c.total,
         budgetMin: c.total,
         budgetMax: c.total,
@@ -965,7 +1105,11 @@
     $("specSelect").addEventListener("change", (e) => { state.spec = e.target.value; renderConfig(); });
     $("durationSelect").addEventListener("change", (e) => { state.duration = Number(e.target.value); renderConfig(); });
     $("ratioSelect").addEventListener("change", (e) => { state.ratio = e.target.value; renderConfig(); });
-    $("recommendBtn").addEventListener("click", () => { state.category = "ecommerce"; state.productId = "ecommerce-set"; state.tierId = ""; renderAll(); });
+    $("remarkInput").addEventListener("input", (e) => {
+      const untouched = e.target.value === DEFAULT_DEMAND_DESCRIPTION;
+      e.target.dataset.template = untouched ? "1" : "0";
+      e.target.classList.toggle("template-filled", untouched);
+    });
     $("matchBtn").addEventListener("click", () => window.demoToast("建议：电商上新选电商套图；详情转化选详情页；投放测试选信息流短视频。", "info"));
     $("buyBtn").addEventListener("click", openOrderModal);
     $("closePurchaseModalBtn").addEventListener("click", closePurchaseModal);

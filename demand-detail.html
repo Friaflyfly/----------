@@ -189,6 +189,8 @@
       var status = STATUS_CONFIG[d.status] || { label: d.status, className: "", desc: "" };
       var mode = d.requirementType === "PLATFORM_SKU" ? "平台套餐" : "自定义需求";
       var audit = d.auditMode === "auto" ? "系统自动审核" : "运营人工核定";
+      var payeeName = "长沙骋风天合文化科技有限公司";
+      var contractorName = d.contractor || (order && order.contractor) || "李芳芳（平台签约AIGC工程师）";
       var description = d.description || [
         "需求说明：围绕「" + d.title + "」完成内容创作与交付。",
         "交付要求：按约定类目、预算和截止日期完成；如进入履约，版本、素材、沟通和验收会沉淀到项目空间。",
@@ -211,15 +213,16 @@
         + '<div class="info-item"><div class="info-label">创建时间</div><div class="info-value">' + d.createTime + '</div></div>'
         + '<div class="info-item"><div class="info-label">期望截止</div><div class="info-value">' + d.deadline + '</div></div>'
         + '<div class="info-item"><div class="info-label">扣款主体</div><div class="info-value">' + (d.payerLabel || "—") + '</div></div>'
+        + '<div class="info-item"><div class="info-label">收款主体</div><div class="info-value">' + payeeName + '</div></div>'
         + '<div class="info-item"><div class="info-label">报价数</div><div class="info-value">' + (d.quotesCount ? d.quotesCount + " 家" : "—") + '</div></div>'
-        + '<div class="info-item"><div class="info-label">承制方</div><div class="info-value">' + (d.contractor || (order && order.contractor) || "待选定") + '</div></div>'
+        + '<div class="info-item"><div class="info-label">承制方</div><div class="info-value">' + contractorName + '</div></div>'
         + '</div></section>'
         + '<section class="panel"><h3>需求详细描述</h3><div class="desc-box">' + description + '</div></section>'
         + '<section class="panel"><h3>处理记录</h3><div class="timeline">'
         + '<div class="timeline-item ok"><div class="timeline-title">需求已提交</div><div class="timeline-desc">' + d.createTime + ' · ' + ws.name + '</div></div>'
         + (d.auditedAt ? '<div class="timeline-item ok"><div class="timeline-title">平台核定通过</div><div class="timeline-desc">' + d.auditedAt + ' · ' + audit + (d.auditedBy ? ' · ' + d.auditedBy : '') + '</div></div>' : '<div class="timeline-item warn"><div class="timeline-title">等待平台核定</div><div class="timeline-desc">预计 24 小时内完成，期间可补充资料。</div></div>')
         + (d.projectSpaceId ? '<div class="timeline-item ok"><div class="timeline-title">项目空间已创建</div><div class="timeline-desc">' + d.projectSpaceId + ' · ' + (d.projectSpaceCreatedAt || d.auditedAt || d.createTime) + '</div></div>' : '')
-        + (order ? '<div class="timeline-item ok"><div class="timeline-title">订单已生成</div><div class="timeline-desc">' + order.id + ' · 承制方：' + order.contractor + ' · 金额 ' + window.fmtMoney(order.amount) + '</div></div>' : '')
+        + (order ? '<div class="timeline-item ok"><div class="timeline-title">订单已生成</div><div class="timeline-desc">' + order.id + ' · 承制方：' + contractorName + ' · 金额 ' + window.fmtMoney(order.amount) + '</div></div>' : '')
         + '</div></section>'
         + '</div>'
         + '<aside>'
