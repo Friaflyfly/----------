@@ -117,8 +117,6 @@
     .recommend-strip strong { display: block; font-size: 14px; color: #ec6d12; }
     .recommend-strip em { margin-left: 8px; padding: 2px 7px; border-radius: 999px; background: #ffdf8a; color: #a95700; font-style: normal; font-size: 11px; }
     .recommend-strip span { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; }
-    .recommend-tags { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; flex: 0 0 auto; }
-    .recommend-tag { display: inline-flex; align-items: center; height: 30px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(255,138,42,.22); background: rgba(255,255,255,.66); color: #d46b08; font-size: 12px; font-weight: 900; }
     .package-grid { padding: 22px 28px 28px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
     .pkg-card {
       position: relative;
@@ -200,12 +198,12 @@
     .sample-head h3 { margin: 0; font-size: 17px; letter-spacing: -.02em; }
     .sample-head p { margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
     .sample-count { padding: 6px 10px; border-radius: 999px; background: #eef3ff; color: var(--blue); font-size: 12px; font-weight: 900; white-space: nowrap; }
-    .sample-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .sample-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-items: start; }
     .sample-card { border: 1px solid var(--line); border-radius: 20px; background: #fff; overflow: hidden; box-shadow: 0 8px 24px rgba(23,32,51,.06); }
     .sample-frame {
       position: relative;
-      min-height: 138px;
-      aspect-ratio: 4 / 3;
+      min-height: 220px;
+      aspect-ratio: 3 / 4;
       display: grid;
       place-items: center;
       overflow: hidden;
@@ -213,7 +211,7 @@
         radial-gradient(circle at 22% 20%, rgba(255,255,255,.65), transparent 20%),
         linear-gradient(135deg, var(--sample-a, #dce8ff), var(--sample-b, #fff0df));
     }
-    .sample-card.video .sample-frame { aspect-ratio: 16 / 9; }
+    .sample-card.video .sample-frame { aspect-ratio: 9 / 16; }
     .sample-frame::before { content: ""; position: absolute; inset: 14px; border: 1px dashed rgba(255,255,255,.68); border-radius: 16px; }
     .sample-frame::after { content: ""; position: absolute; inset: -20%; background: repeating-linear-gradient(135deg, rgba(255,255,255,.18) 0 8px, transparent 8px 18px); opacity: .6; }
     .sample-icon { position: relative; z-index: 1; width: 58px; height: 58px; border-radius: 22px; display: grid; place-items: center; background: rgba(255,255,255,.76); box-shadow: 0 12px 30px rgba(23,32,51,.12); font-size: 24px; }
@@ -221,11 +219,17 @@
     .sample-card.video .sample-icon::after { content: ""; width: 0; height: 0; margin-left: 4px; border-top: 9px solid transparent; border-bottom: 9px solid transparent; border-left: 14px solid var(--blue); }
     .sample-card.video .sample-icon span { display: none; }
     .sample-badge { position: absolute; z-index: 2; left: 12px; top: 12px; padding: 5px 9px; border-radius: 999px; background: rgba(15,27,45,.76); color: #fff; font-size: 11px; font-weight: 900; }
-    .sample-body { padding: 12px 13px 14px; }
+    .sample-body { padding: 12px 13px 14px; display: grid; gap: 10px; }
+    .sample-title-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .sample-title { font-size: 13px; font-weight: 900; line-height: 1.4; }
-    .sample-desc { margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.5; min-height: 36px; }
-    .sample-meta { display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; color: var(--muted); font-size: 11px; }
+    .sample-meta { display: flex; justify-content: space-between; gap: 8px; color: var(--muted); font-size: 11px; }
     .sample-meta b { color: var(--ink); }
+    .case-desc-wrap { position: relative; flex: 0 0 auto; }
+    .case-desc-trigger { height: 26px; padding: 0 9px; border: 1px solid rgba(36,91,255,.16); border-radius: 999px; background: #eef3ff; color: var(--blue); font-size: 11px; font-weight: 950; cursor: default; white-space: nowrap; }
+    .case-desc-tooltip { position: absolute; right: 0; bottom: calc(100% + 9px); z-index: 8; min-width: 150px; max-width: 240px; padding: 10px 12px; border-radius: 14px; background: rgba(15,27,45,.94); color: #fff; font-size: 12px; line-height: 1.55; box-shadow: 0 16px 34px rgba(15,27,45,.22); opacity: 0; pointer-events: none; transform: translateY(6px); transition: .18s ease; }
+    .case-desc-tooltip::after { content: ""; position: absolute; right: 18px; top: 100%; border: 7px solid transparent; border-top-color: rgba(15,27,45,.94); }
+    .case-desc-wrap:hover .case-desc-tooltip,
+    .case-desc-trigger:focus + .case-desc-tooltip { opacity: 1; transform: translateY(0); }
     .compare { overflow-x: auto; border: 1px solid var(--line); border-radius: 20px; }
     table { width: 100%; border-collapse: collapse; background: #fff; }
     th, td { padding: 13px 14px; text-align: left; border-bottom: 1px solid var(--line); font-size: 13px; vertical-align: top; }
@@ -242,6 +246,7 @@
     .config-body { padding: 18px 22px 22px; display: grid; gap: 16px; }
     .field { display: grid; gap: 8px; }
     .field label { font-size: 12px; color: var(--muted); font-weight: 900; }
+    .field-label-main { display: flex; align-items: baseline; gap: 8px; color: var(--ink) !important; font-size: 16px !important; letter-spacing: -.02em; }
     .field-hint { margin-left: 8px; color: #9aa6b8; font-size: 11px; font-weight: 600; }
     .option-grid { display: grid; gap: 8px; }
     .option { border: 1px solid var(--line); border-radius: 16px; padding: 12px; background: #fff; cursor: pointer; }
@@ -256,7 +261,24 @@
     .toggles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .toggle { border: 1px solid var(--line); border-radius: 14px; padding: 10px; background: #fff; cursor: pointer; text-align: center; font-size: 12px; font-weight: 900; color: var(--muted); }
     .toggle.active { border-color: var(--green); background: #eefbf5; color: var(--green); }
-    .upload { border: 1px dashed #b9c6d8; border-radius: 18px; padding: 16px; background: #f8fbff; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .required-dot { color: #ff4d4f; margin-left: 4px; }
+    .material-section { border: 1px solid rgba(36,91,255,.16); border-radius: 20px; padding: 16px; background: linear-gradient(180deg, #f8fbff, #fff); display: grid; gap: 12px; }
+    .material-uploader { border: 1px dashed rgba(36,91,255,.45); border-radius: 18px; padding: 20px; background: linear-gradient(135deg, #eef3ff, #fff); display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.75); }
+    .material-uploader strong { display: block; color: var(--muted); font-size: 13px; letter-spacing: 0; }
+    .material-uploader span { display: block; margin-top: 6px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .material-uploader input { display: none; }
+    .material-uploader .btn { height: 42px; padding: 0 22px; background: var(--blue); border-color: var(--blue); color: #fff; box-shadow: 0 12px 24px rgba(36,91,255,.2); }
+    .material-files { display: grid; gap: 8px; }
+    .material-file { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 14px; background: #fff; font-size: 12px; }
+    .material-file b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); }
+    .material-file span { color: var(--muted); white-space: nowrap; }
+    .material-file button { border: 0; background: transparent; color: #ff4d4f; font-weight: 900; cursor: pointer; }
+    .material-empty { padding: 10px 12px; border-radius: 14px; background: #fff7e6; color: #ad5d00; font-size: 12px; line-height: 1.6; }
+    .material-requirements { border: 1px solid var(--line); border-radius: 16px; background: #fff; overflow: hidden; }
+    .material-requirements-title { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--line); color: var(--ink); font-size: 13px; font-weight: 900; }
+    .material-requirements-title span { color: var(--muted); font-size: 12px; font-weight: 700; }
+    .material-requirements .compare { border: 0; border-radius: 0; max-height: 210px; }
+    .material-requirements th, .material-requirements td { padding: 10px 12px; font-size: 12px; }
     .price-card { padding: 16px; border-radius: 20px; background: #0f1b2d; color: #fff; display: grid; gap: 9px; }
     .price-row { display: flex; justify-content: space-between; gap: 12px; color: rgba(255,255,255,.72); font-size: 12px; }
     .price-row.total { padding-top: 10px; border-top: 1px solid rgba(255,255,255,.14); color: #fff; align-items: baseline; }
@@ -292,6 +314,16 @@
     .table-section-title { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
     .table-section-title h3 { margin: 0; }
     .table-section-title span { color: var(--muted); font-size: 12px; }
+    .revision-scope-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .revision-card { border: 1px solid var(--line); border-radius: 18px; padding: 16px; background: linear-gradient(180deg, #fff, #f8fbff); }
+    .revision-card.good { border-color: rgba(25,135,84,.18); background: linear-gradient(180deg, #f4fff9, #fff); }
+    .revision-card.out { border-color: rgba(255,77,79,.18); background: linear-gradient(180deg, #fff8f7, #fff); }
+    .revision-card h4 { margin: 0 0 10px; display: flex; align-items: center; gap: 8px; font-size: 15px; letter-spacing: -.02em; }
+    .revision-card.good h4 { color: #16854b; }
+    .revision-card.out h4 { color: #cf3b35; }
+    .revision-card ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+    .revision-card li { color: var(--muted); font-size: 12px; line-height: 1.65; }
+    .revision-card li b { color: var(--ink); }
     .price-tier-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
     .price-tier-card { position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: 20px; padding: 16px; background: linear-gradient(145deg, #fff, #f5f8ff); }
     .price-tier-card.featured { border-color: rgba(36,91,255,.42); background: linear-gradient(145deg, #eef3ff, #fff); box-shadow: 0 16px 36px rgba(36,91,255,.12); }
@@ -321,8 +353,8 @@
     @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
     @media (max-width: 1280px) { .package-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     @media (max-width: 1200px) { .layout { grid-template-columns: 1fr; } }
-    @media (max-width: 900px) { .sample-grid, .price-tier-grid, .detail-overview, .intro-card.compact { grid-template-columns: 1fr; } }
-    @media (max-width: 1180px) { .hero { grid-template-columns: 1fr; } .hero-actions, .hero-notes { grid-column: 1; grid-row: auto; justify-content: flex-start; margin-top: 12px; max-width: none; } .recommend-strip { align-items: flex-start; flex-direction: column; } .recommend-tags { justify-content: flex-start; } }
+    @media (max-width: 900px) { .sample-grid, .price-tier-grid, .detail-overview, .intro-card.compact, .revision-scope-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 1180px) { .hero { grid-template-columns: 1fr; } .hero-actions, .hero-notes { grid-column: 1; grid-row: auto; justify-content: flex-start; margin-top: 12px; max-width: none; } .recommend-strip { align-items: flex-start; flex-direction: column; } }
     @media (max-width: 800px) { .sidebar { display: none; } .main { margin-left: 0; width: 100%; padding: 18px; } .two-col, .modal-body, .package-grid { grid-template-columns: 1fr; } .toggles { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -383,11 +415,6 @@
                 <div class="recommend-icon">%</div>
                 <div><strong>限时首购权益 <em>首单专享</em></strong><span>标准包先下单锁价，交付资料可后补；适合高频、可预期需求。</span></div>
               </div>
-              <div class="recommend-tags">
-                <span class="recommend-tag">先锁价</span>
-                <span class="recommend-tag">资料后补</span>
-                <span class="recommend-tag">可转定制</span>
-              </div>
             </div>
             <div class="package-grid" id="packageGrid"></div>
           </section>
@@ -408,10 +435,10 @@
             <div class="config-head">
               <h2>购买配置</h2>
               <p id="configSub">选择档位、数量、规格和增项后，系统自动计算价格和预计交付。</p>
-            </div>
+              </div>
             <div class="config-body">
               <div class="field">
-                <label>档位</label>
+                <label class="field-label-main">档位 <span class="required-dot">*</span></label>
                 <div class="option-grid" id="tierOptions"></div>
               </div>
               <div class="inline">
@@ -435,7 +462,7 @@
                 </div>
               </div>
               <div class="field">
-                <label>增项</label>
+                <label class="field-label-main">增项 <span class="required-dot">*</span><span class="field-hint">至少选择 1 项</span></label>
                 <div class="toggles">
                   <button class="toggle" data-addon="copy">需要文案</button>
                   <button class="toggle" data-addon="rush">加急交付</button>
@@ -443,12 +470,31 @@
                 </div>
               </div>
               <div class="field">
-                <label>上传素材</label>
-                <div class="upload">支持图片、视频、参考链接和压缩包。原型中先做上传占位，实际研发时接文件服务。</div>
+                <label class="field-label-main">需求描述 <span class="required-dot">*</span><span class="field-hint">必填，请根据提示描述具体需求（填写时请删除提示文字）</span></label>
+                <textarea class="demand-template" id="remarkInput" placeholder="请描述订单用途、服务类型、风格偏好、背景要求和参考图说明"></textarea>
               </div>
               <div class="field">
-                <label>需求描述 <span class="field-hint">以下灰字为填写提示，请根据提示描述您的具体需求（填写时请删除提示文字）</span></label>
-                <textarea class="demand-template" id="remarkInput" placeholder="请描述订单用途、服务类型、风格偏好、背景要求和参考图说明"></textarea>
+                <label class="field-label-main">上传素材 <span class="required-dot">*</span><span class="field-hint">必填，单个文件小于 2GB，最多上传 10 个</span></label>
+                <div class="material-section">
+                  <div class="material-requirements">
+                    <div class="material-requirements-title">素材上传要求 <span>请按所选服务类型准备素材</span></div>
+                    <div class="compare">
+                      <table>
+                        <thead><tr><th>服务类型</th><th>必须提供</th><th>质量要求</th></tr></thead>
+                        <tbody id="purchaseUploadTable"></tbody>
+                      </table>
+                    </div>
+                  </div>
+                  <div class="material-uploader">
+                    <div>
+                      <strong>上传本地附件</strong>
+                      <span id="materialUploadSummary">未上传附件。支持图片、视频、参考图、压缩包等本地文件。</span>
+                    </div>
+                    <input id="materialFilesInput" type="file" multiple>
+                    <button class="btn" type="button" id="materialUploadBtn">上传附件</button>
+                  </div>
+                  <div class="material-files" id="materialFilesList"></div>
+                </div>
               </div>
               <div class="price-card">
                 <div class="price-row"><span>基础服务费</span><b id="basePrice">¥0</b></div>
@@ -484,6 +530,7 @@
           <div class="kv"><span>档位</span><b id="confirmTier">-</b></div>
           <div class="kv"><span>数量 / 规格</span><b id="confirmSpec">-</b></div>
           <div class="kv"><span>增项</span><b id="confirmAddon">-</b></div>
+          <div class="kv"><span>上传素材</span><b id="confirmMaterials">-</b></div>
           <div class="kv"><span>预计交付</span><b id="confirmEta">-</b></div>
         </div>
         <div class="confirm-box">
@@ -507,7 +554,7 @@
       <div class="modal-head">
         <div>
           <h2 id="modalDetailTitle">产品包详情</h2>
-          <p id="modalDetailSub">查看适用场景、样例、档位、交付内容和下单资料。</p>
+          <p id="modalDetailSub">查看规格参数、对标示例、交付要求和修改要求。</p>
         </div>
         <button class="btn" id="closeDetailBtn">关闭</button>
       </div>
@@ -522,18 +569,6 @@
             <table>
               <thead><tr><th>选项</th><th>规格</th></tr></thead>
               <tbody id="modalDetailSpecTable"></tbody>
-            </table>
-          </div>
-        </div>
-        <div class="detail-modal-section">
-          <div class="table-section-title">
-            <h3>素材上传要求</h3>
-            <span>用于减少沟通成本，提高一次成片率</span>
-          </div>
-          <div class="compare">
-            <table>
-              <thead><tr><th>服务类型</th><th>必须提供</th><th>质量要求</th></tr></thead>
-              <tbody id="modalDetailUploadTable"></tbody>
             </table>
           </div>
         </div>
@@ -558,6 +593,39 @@
               <thead><tr><th>项目</th><th>选择</th></tr></thead>
               <tbody id="modalDetailDeliveryTable"></tbody>
             </table>
+          </div>
+        </div>
+        <div class="detail-modal-section">
+          <div class="table-section-title">
+            <h3>修改要求</h3>
+            <span>免费修改与超出范围的边界说明</span>
+          </div>
+          <div class="revision-scope-grid">
+            <div class="revision-card good">
+              <h4>✅ 合理修改（免费，含在订单内）</h4>
+              <ul>
+                <li><b>剪辑调整：</b>镜头顺序调整、片段删减/增加、转场效果修改、节奏微调</li>
+                <li><b>字幕修改：</b>字幕颜色、大小、位置、字体调整（文字内容不变）；新增/修改字幕内容（不改变核心信息）</li>
+                <li><b>音频调整：</b>BGM替换为同风格范围内的其他音乐、音量大小调整、配音语速微调</li>
+                <li><b>颜色调色：</b>整体色调、滤镜强度微调</li>
+                <li><b>文案微调：</b>口播文案的个别字词调整（不改变核心意思、卖点结构和行动号召）</li>
+                <li><b>片头片尾：</b>品牌信息、LOGO位置、时长微调</li>
+                <li><b>包装细节：</b>花字特效、贴纸位置、地图定位贴纸内容修正</li>
+              </ul>
+            </div>
+            <div class="revision-card out">
+              <h4>❌ 超出范围</h4>
+              <ul>
+                <li><b>更换主体/商品：</b>如将推广商品A改为商品B、将门店A改为门店B</li>
+                <li><b>改变视频主题方向：</b>如从产品种草改为品牌宣传、从探店引流改为活动预热</li>
+                <li><b>改变脚本结构与内容：</b>如口播文案重写、核心卖点变更、催单话术完全替换</li>
+                <li><b>改变整体视觉风格：</b>如从活泼欢快改为专业商务、从烟火气改为高颜值精致</li>
+                <li><b>改变视频用途：</b>如从带货改为品牌曝光、从引流到店改为粉丝增长</li>
+                <li><b>增加时长规格：</b>如从30秒要求改为60秒、从15秒改为45秒</li>
+                <li><b>改变画面比例：</b>如从9:16竖屏改为16:9横屏（需重新制作）</li>
+                <li><b>多轮修改后要求重做：</b>初稿确认后，以「不喜欢」为由要求重新拍摄/制作全片（非质量问题的重做）</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -616,9 +684,9 @@
         ],
         referenceNote: "以下为本产品包的参考案例，可帮助您理解出品效果。",
         samples: [
-          { type: "image", title: "示例1 · 人物转绘/头像", desc: "参考图/链接：人物原图，展示头像转绘效果。", ratio: "1:1", status: "人物原图", tone: ["#cfe0ff", "#ffe2c7"] },
-          { type: "image", title: "示例2 · 证件照精修", desc: "参考图/链接：人物原图，展示证件照修正效果。", ratio: "3:4", status: "人物原图", tone: ["#dff8ef", "#e9edff"] },
-          { type: "image", title: "示例3 · 人物转绘/图片融合", desc: "参考图/链接：人物原图，展示人物与场景融合效果。", ratio: "4:3", status: "人物原图", tone: ["#fff1c8", "#dff4ff"] }
+          { type: "image", title: "示例1 · 人物转绘", desc: "人物转绘/二维卡通", ratio: "竖屏", status: "人物原图", tone: ["#cfe0ff", "#ffe2c7"] },
+          { type: "image", title: "示例2 · 证件照精修", desc: "证件照精修", ratio: "竖屏", status: "证件照", tone: ["#dff8ef", "#e9edff"] },
+          { type: "image", title: "示例3 · 图片融合", desc: "人物转绘/图片融合", ratio: "竖屏", status: "效果对比", tone: ["#fff1c8", "#dff4ff"] }
         ],
         tiers: [
           { id: "base", name: "标准图片包", price: 5.9, unit: "张", method: "AI 生成", spec: "1~10 张，2K/4K 可选", revision: "1 次", days: 1, note: "适合头像、证件照、轻量试风格" }
@@ -743,7 +811,9 @@
       { id: "local", label: "本地生活" },
       { id: "brand", label: "品牌宣传" }
     ];
-    const state = { category: "all", productId: "ecommerce-set", tierId: "", quantity: 1, spec: "", duration: 15, ratio: "9:16", addons: { copy: false, rush: false, source: false } };
+    const MAX_MATERIAL_FILES = 10;
+    const MAX_MATERIAL_FILE_SIZE = 2 * 1024 * 1024 * 1024;
+    const state = { category: "all", productId: "ecommerce-set", tierId: "", quantity: 1, spec: "", duration: 15, ratio: "9:16", addons: { copy: false, rush: false, source: false }, materialFiles: [] };
     function product() { return products.find(p => p.id === state.productId) || products[0]; }
     function tier() { const p = product(); return p.tiers.find(t => t.id === state.tierId) || p.tiers[0]; }
     function durationPrice(t) { return t.priceByDuration ? (t.priceByDuration[state.duration] || t.price) : t.price; }
@@ -832,6 +902,13 @@
     function tableRowsHtml(rows) {
       return (rows || []).map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join("")}</tr>`).join("");
     }
+    function formatFileSize(bytes) {
+      const size = Number(bytes || 0);
+      if (size >= 1024 * 1024 * 1024) return (size / 1024 / 1024 / 1024).toFixed(2) + " GB";
+      if (size >= 1024 * 1024) return (size / 1024 / 1024).toFixed(1) + " MB";
+      if (size >= 1024) return (size / 1024).toFixed(1) + " KB";
+      return size + " B";
+    }
     function detailProfile(p) {
       if (p.detailProfile) return p.detailProfile;
       const firstTier = p.tiers[0] || {};
@@ -899,6 +976,85 @@
       if (input.dataset.template === "1" && input.value === DEFAULT_DEMAND_DESCRIPTION) return fallback;
       return input.value.trim() || fallback;
     }
+    function materialFilesSnapshot() {
+      return state.materialFiles.map(file => ({
+        name: file.name,
+        size: file.size,
+        sizeText: formatFileSize(file.size),
+        type: file.type || "unknown",
+        lastModified: file.lastModified || null
+      }));
+    }
+    function renderMaterialFiles() {
+      const summary = $("materialUploadSummary");
+      const list = $("materialFilesList");
+      if (!summary || !list) return;
+      summary.textContent = state.materialFiles.length
+        ? `已上传 ${state.materialFiles.length}/${MAX_MATERIAL_FILES} 个附件，单个文件需小于 2GB。`
+        : "未上传附件。支持图片、视频、参考图、压缩包等本地文件。";
+      list.innerHTML = state.materialFiles.length
+        ? state.materialFiles.map((file, index) => `<div class="material-file">
+            <b title="${file.name}">${file.name}</b>
+            <span>${formatFileSize(file.size)}</span>
+            <button type="button" data-remove-material="${index}">删除</button>
+          </div>`).join("")
+        : `<div class="material-empty">请先上传素材附件。素材为必填项，提交订单前至少需要上传 1 个附件。</div>`;
+    }
+    function addMaterialFiles(fileList) {
+      const files = Array.from(fileList || []);
+      if (!files.length) return;
+      const oversize = files.filter(file => file.size >= MAX_MATERIAL_FILE_SIZE);
+      const valid = files.filter(file => file.size < MAX_MATERIAL_FILE_SIZE);
+      if (oversize.length) window.demoToast(`已拦截 ${oversize.length} 个超过 2GB 的文件`, "warn");
+      const availableSlots = MAX_MATERIAL_FILES - state.materialFiles.length;
+      if (availableSlots <= 0) {
+        window.demoToast("最多只能上传 10 个附件", "warn");
+        return;
+      }
+      const accepted = valid.slice(0, availableSlots);
+      state.materialFiles.push(...accepted);
+      if (valid.length > accepted.length) window.demoToast("最多只能上传 10 个附件，超出部分未添加", "warn");
+      if (accepted.length) window.demoToast(`已添加 ${accepted.length} 个附件`, "ok");
+      renderMaterialFiles();
+    }
+    function validateMaterialFiles() {
+      if (state.materialFiles.length) return true;
+      renderMaterialFiles();
+      window.demoToast("请先上传素材附件后再购买", "warn");
+      $("materialUploadBtn").focus();
+      return false;
+    }
+    function validateTierSelection() {
+      const p = product();
+      if (state.tierId && p.tiers.some(t => t.id === state.tierId)) return true;
+      window.demoToast("请先选择购买档位", "warn");
+      const firstTier = document.querySelector("[data-tier]");
+      if (firstTier) firstTier.focus();
+      return false;
+    }
+    function validateAddons() {
+      const hasAddon = Object.keys(state.addons).some(key => state.addons[key]);
+      if (hasAddon) return true;
+      window.demoToast("请至少选择一个增项", "warn");
+      const firstAddon = document.querySelector("[data-addon]");
+      if (firstAddon) firstAddon.focus();
+      return false;
+    }
+    function validateDemandDescription() {
+      const input = $("remarkInput");
+      const value = input ? input.value.trim() : "";
+      const isTemplateOnly = value === DEFAULT_DEMAND_DESCRIPTION.trim();
+      if (value && !isTemplateOnly) return true;
+      window.demoToast("请先填写需求描述，并删除或修改提示文字", "warn");
+      if (input) input.focus();
+      return false;
+    }
+    function validatePurchaseRequiredFields() {
+      return validateTierSelection()
+        && validateAddons()
+        && validateDemandDescription()
+        && validateMaterialFiles();
+    }
     function priceCardsHtml(p) {
       return p.tiers.map((t, index) => `<article class="price-tier-card ${index === 1 || (p.tiers.length === 1 && index === 0) ? "featured" : ""}">
         <span class="tier-badge">${index === 0 ? "入门可选" : index === 1 ? "推荐档位" : "高配方案"}</span>
@@ -923,8 +1079,13 @@
             <div class="sample-icon"><span>${icon}</span></div>
           </div>
           <div class="sample-body">
-            <div class="sample-title">${s.title}</div>
-            <div class="sample-desc">${s.desc}</div>
+            <div class="sample-title-row">
+              <div class="sample-title">${s.title}</div>
+              <div class="case-desc-wrap">
+                <button class="case-desc-trigger" type="button">案例描述</button>
+                <div class="case-desc-tooltip">${s.desc || "暂无案例描述"}</div>
+              </div>
+            </div>
             <div class="sample-meta"><span>${kind}样例</span><b>${s.ratio}</b></div>
           </div>
         </article>`;
@@ -934,11 +1095,10 @@
       const p = products.find(x => x.id === productId) || product();
       const profile = detailProfile(p);
       $("modalDetailTitle").textContent = p.name;
-      $("modalDetailSub").textContent = "查看规格参数、素材上传要求、对标示例和交付要求。";
+      $("modalDetailSub").textContent = "查看规格参数、对标示例、交付要求和修改要求。";
       $("modalDetailScenes").textContent = profile.scenes;
       $("modalDetailSpecTitle").textContent = profile.specTitle || "产品规格";
       $("modalDetailSpecTable").innerHTML = tableRowsHtml(specRows(p));
-      $("modalDetailUploadTable").innerHTML = tableRowsHtml(uploadRows(p));
       $("modalDetailDeliveryTable").innerHTML = tableRowsHtml(deliveryRows(p));
       $("modalDetailReferenceNote").textContent = p.referenceNote || "以下为本产品包的参考案例，可帮助您理解出品效果。";
       $("modalDetailSampleCount").textContent = (p.samples || []).length + " 个样例位";
@@ -953,6 +1113,7 @@
     }
     function openPurchaseModal(productId) {
       if (productId) {
+        if (state.productId !== productId) state.materialFiles = [];
         state.productId = productId;
         state.tierId = "";
       }
@@ -974,6 +1135,7 @@
       if (p.durations.length && !p.durations.includes(Number(state.duration))) state.duration = p.durations[0];
       if (p.ratios.length && !p.ratios.includes(state.ratio)) state.ratio = p.ratios[0];
       $("tierOptions").innerHTML = p.tiers.map(t => `<div class="option ${t.id === state.tierId ? "active" : ""}" data-tier="${t.id}"><strong><span>${t.name}</span><span>${fmt(t.price)} 起</span></strong><span>${t.note} · ${t.revision}修改 · ${t.days}天起</span></div>`).join("");
+      $("purchaseUploadTable").innerHTML = tableRowsHtml(uploadRows(p));
       $("quantityInput").value = state.quantity;
       $("quantityInput").max = p.id.includes("image") ? 10 : 10;
       $("specSelect").innerHTML = p.specs.map(s => `<option ${s === state.spec ? "selected" : ""}>${s}</option>`).join("");
@@ -987,6 +1149,7 @@
       $("addonPrice").textContent = fmt(c.addon);
       $("totalPrice").textContent = fmt(c.total);
       $("etaText").textContent = c.eta + (c.p.id === "brand-film" ? " 个工作日" : " 天");
+      renderMaterialFiles();
     }
     function renderAll() { renderTabs(); renderPackages(); renderConfig(); }
     function getWalletSnapshot(walletKey) {
@@ -998,6 +1161,7 @@
       return Number(wallet.available_balance != null ? wallet.available_balance : wallet.balance) || 0;
     }
     function openOrderModal() {
+      if (!validatePurchaseRequiredFields()) return;
       const c = calc();
       const ws = window.demoApp.getCurrentWorkspace();
       const wallet = getWalletSnapshot(ws.walletKey);
@@ -1010,6 +1174,7 @@
         state.addons.rush ? "加急" : "",
         state.addons.source ? "源文件" : ""
       ].filter(Boolean).join(" / ") || "无";
+      $("confirmMaterials").textContent = `${state.materialFiles.length} 个附件`;
       $("confirmEta").textContent = $("etaText").textContent;
       $("confirmAccount").textContent = (ws.payer && ws.payer.name) || ws.payerLabel;
       $("confirmBalance").textContent = fmt(available);
@@ -1051,7 +1216,7 @@
         requirementType: "PLATFORM_SKU",
         spuId: c.p.id,
         skuId: c.t.id,
-        skuSnapshot: JSON.parse(JSON.stringify({ product: c.p.name, tier: c.t, quantity: c.q, spec: state.spec, duration: state.duration, ratio: state.ratio, addons: state.addons, total: c.total })),
+        skuSnapshot: JSON.parse(JSON.stringify({ product: c.p.name, tier: c.t, quantity: c.q, spec: state.spec, duration: state.duration, ratio: state.ratio, addons: state.addons, materials: materialFilesSnapshot(), total: c.total })),
         title,
         category: c.p.category + " / " + c.p.name,
         desc: demandDescriptionValue(c.p.desc),
@@ -1059,7 +1224,7 @@
         budgetMin: c.total,
         budgetMax: c.total,
         deadline: $("etaText").textContent,
-        refs: [],
+        refs: materialFilesSnapshot(),
         workspace: ws.id,
         workspaceName: ws.name,
         walletKey: ws.walletKey,
@@ -1095,11 +1260,23 @@
       const cat = e.target.closest("[data-cat]");
       if (cat) { state.category = cat.dataset.cat; renderAll(); return; }
       const card = e.target.closest("[data-product]");
-      if (card) { state.productId = card.dataset.product; state.tierId = ""; renderAll(); return; }
+      if (card) {
+        if (state.productId !== card.dataset.product) state.materialFiles = [];
+        state.productId = card.dataset.product;
+        state.tierId = "";
+        renderAll();
+        return;
+      }
       const tierEl = e.target.closest("[data-tier]");
       if (tierEl) { state.tierId = tierEl.dataset.tier; renderConfig(); return; }
       const add = e.target.closest("[data-addon]");
       if (add) { state.addons[add.dataset.addon] = !state.addons[add.dataset.addon]; renderConfig(); return; }
+      const removeMaterial = e.target.closest("[data-remove-material]");
+      if (removeMaterial) {
+        state.materialFiles.splice(Number(removeMaterial.dataset.removeMaterial), 1);
+        renderMaterialFiles();
+        return;
+      }
     });
     $("quantityInput").addEventListener("input", (e) => { state.quantity = Math.max(1, Math.min(10, Number(e.target.value) || 1)); renderConfig(); });
     $("specSelect").addEventListener("change", (e) => { state.spec = e.target.value; renderConfig(); });
@@ -1109,6 +1286,11 @@
       const untouched = e.target.value === DEFAULT_DEMAND_DESCRIPTION;
       e.target.dataset.template = untouched ? "1" : "0";
       e.target.classList.toggle("template-filled", untouched);
+    });
+    $("materialUploadBtn").addEventListener("click", () => $("materialFilesInput").click());
+    $("materialFilesInput").addEventListener("change", (e) => {
+      addMaterialFiles(e.target.files);
+      e.target.value = "";
     });
     $("matchBtn").addEventListener("click", () => window.demoToast("建议：电商上新选电商套图；详情转化选详情页；投放测试选信息流短视频。", "info"));
     $("buyBtn").addEventListener("click", openOrderModal);
@@ -1120,6 +1302,7 @@
     $("detailChooseBtn").addEventListener("click", () => {
       const id = $("detailChooseBtn").dataset.product;
       if (id) {
+        if (state.productId !== id) state.materialFiles = [];
         state.productId = id;
         state.tierId = "";
         renderAll();
