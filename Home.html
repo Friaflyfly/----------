@@ -3,357 +3,562 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>首页 - 天合短剧剪辑接单平台</title>
-  
-  <!-- Ant Design CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.css">
-  
+  <title>嘀嗒制作 - 标准化图片与视频制作服务</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            darkBg: '#0a0c11',
+            darkCard: '#10131b',
+            darkCardSoft: '#151a24',
+            primary: '#1b7cff',
+            secondary: '#7b5bff',
+            cyan: '#12d8ff',
+            pink: '#ff4f93'
+          },
+          boxShadow: {
+            glow: '0 16px 40px rgba(27, 124, 255, 0.24)',
+            soft: '0 16px 36px rgba(0, 0, 0, 0.28)'
+          }
+        }
+      }
+    }
+  </script>
   <style>
     body {
-      margin: 0;
-      padding: 0;
+      background:
+        radial-gradient(circle at 14% 12%, rgba(18, 216, 255, 0.12), transparent 24%),
+        radial-gradient(circle at 82% 10%, rgba(123, 91, 255, 0.18), transparent 22%),
+        linear-gradient(180deg, #0a0c11 0%, #090b10 100%);
     }
-
-    .home {
-      min-height: 100vh;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,0.8), transparent 92%);
+      z-index: 0;
     }
-
-    .header {
-      background: rgba(255, 255, 255, 0.95);
-      padding: 16px 24px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .hero-bg {
+      background-image:
+        radial-gradient(circle at 84% 18%, rgba(18, 216, 255, 0.14), transparent 18%),
+        radial-gradient(circle at 76% 12%, rgba(123, 91, 255, 0.18), transparent 28%),
+        linear-gradient(180deg, rgba(10, 12, 17, 0.75) 0%, rgba(10, 12, 17, 0) 100%);
     }
-
-    .logo {
-      font-size: 24px;
-      font-weight: 600;
-      color: #667eea;
+    .glass-card {
+      background: rgba(16, 19, 27, 0.86);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
-
-    .nav {
-      display: flex;
-      gap: 24px;
+    .panel-border {
+      position: relative;
+      overflow: hidden;
     }
-
-    .nav a {
-      color: #262626;
-      text-decoration: none;
-      font-size: 16px;
-      padding: 8px 16px;
-      border-radius: 4px;
-      transition: all 0.3s;
+    .panel-border::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent 38%);
+      pointer-events: none;
     }
-
-    .nav a:hover {
-      background-color: #f0f0f0;
+    .hero-ball {
+      animation: spin 36s linear infinite;
+      transform-origin: center center;
     }
-
-    .nav a.active {
-      color: #667eea;
-      background-color: #e6f7ff;
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
-
-    .hero {
-      text-align: center;
-      padding: 80px 24px;
-      color: white;
+    .section-anchor {
+      scroll-margin-top: 104px;
     }
-
-    .hero h1 {
-      font-size: 48px;
-      font-weight: 700;
-      margin: 0 0 16px 0;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    .package-shot {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.38;
+      filter: saturate(0.9) contrast(1.05);
+      transition: transform 700ms ease, opacity 300ms ease;
     }
-
-    .hero p {
-      font-size: 20px;
-      margin: 0 0 32px 0;
-      opacity: 0.9;
-    }
-
-    .heroButtons {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .heroButton {
-      padding: 12px 32px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s;
-      text-decoration: none;
-      display: inline-block;
-    }
-
-    .heroButton.primary {
-      background: white;
-      color: #667eea;
-      font-weight: 600;
-    }
-
-    .heroButton.primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-
-    .heroButton.secondary {
-      background: rgba(255, 255, 255, 0.2);
-      color: white;
-      border: 2px solid white;
-    }
-
-    .heroButton.secondary:hover {
-      background: rgba(255, 255, 255, 0.3);
-    }
-
-    .features {
-      background: white;
-      padding: 60px 24px;
-    }
-
-    .featuresContainer {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .featuresTitle {
-      text-align: center;
-      font-size: 32px;
-      font-weight: 600;
-      margin-bottom: 48px;
-      color: #262626;
-    }
-
-    .featuresGrid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 24px;
-    }
-
-    .featureCard {
-      padding: 32px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-      text-align: center;
-      transition: all 0.3s;
-    }
-
-    .featureCard:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    }
-
-    .featureIcon {
-      font-size: 48px;
-      margin-bottom: 16px;
-    }
-
-    .featureTitle {
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: #262626;
-    }
-
-    .featureDesc {
-      color: #8c8c8c;
-      line-height: 1.6;
-    }
-
-    .stats {
-      background: #f5f5f5;
-      padding: 60px 24px;
-    }
-
-    .statsContainer {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 32px;
-      text-align: center;
-    }
-
-    .statItem {
-      padding: 24px;
-    }
-
-    .statValue {
-      font-size: 36px;
-      font-weight: 700;
-      color: #667eea;
-      margin-bottom: 8px;
-    }
-
-    .statLabel {
-      font-size: 16px;
-      color: #8c8c8c;
-    }
-
-    .footer {
-      background: #262626;
-      color: white;
-      padding: 40px 24px;
-      text-align: center;
-    }
-
-    @media (max-width: 768px) {
-      .hero h1 {
-        font-size: 32px;
-      }
-
-      .hero p {
-        font-size: 16px;
-      }
-
-      .nav {
-        display: none;
-      }
-
-      .featuresGrid {
-        grid-template-columns: 1fr;
-      }
+    .group:hover .package-shot {
+      transform: scale(1.06);
+      opacity: 0.5;
     }
   </style>
 </head>
-<body>
-  <div id="root"></div>
+<body class="text-gray-300 antialiased overflow-x-hidden">
+  <nav class="fixed inset-x-0 top-0 z-50 h-20 border-b border-white/5 bg-darkBg/75 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-6">
+      <a href="#" class="flex items-center gap-3 min-w-0">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center font-bold text-lg shadow-glow">滴</div>
+        <div class="min-w-0">
+          <div class="text-white font-bold text-xl tracking-wide">嘀嗒制作</div>
+          <div class="text-[11px] uppercase tracking-[0.24em] text-gray-500">Standard Creative Service</div>
+        </div>
+      </a>
 
-  <!-- React & ReactDOM -->
-  <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
-  
-  <!-- Ant Design JS -->
-  <script src="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/antd.min.js"></script>
-  
-  <!-- Babel Standalone for JSX -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+      <div class="hidden md:flex items-center gap-8 text-[15px]">
+        <a href="#about" class="text-white hover:text-cyan transition">嘀嗒制作是什么</a>
+        <a href="#packages" class="hover:text-cyan transition">产品包</a>
+        <a href="#process" class="hover:text-cyan transition">制作流程</a>
+        <a href="#guarantee" class="hover:text-cyan transition">交付保障</a>
+        <a href="#faq" class="hover:text-cyan transition">常见问题</a>
+      </div>
 
-  <script type="text/babel">
-    const Home = () => {
-      const handleGoToHall = () => {
-        window.location.href = 'ProjectHall.html';
-      };
+      <div class="flex items-center gap-2">
+        <a href="Login.html" class="hidden sm:inline-flex items-center justify-center h-11 px-5 rounded-full border border-gray-700 text-sm text-gray-300 hover:bg-white/5 transition">登录</a>
+        <a href="Register.html" class="hidden sm:inline-flex items-center justify-center h-11 px-5 rounded-full border border-gray-700 text-sm text-gray-300 hover:bg-white/5 transition">注册入驻</a>
+        <a href="standard-package-store.html" class="inline-flex items-center justify-center h-11 px-5 rounded-full bg-gradient-to-r from-primary to-secondary text-white text-sm font-medium shadow-glow hover:scale-[1.02] transition">查看产品包</a>
+      </div>
+    </div>
+  </nav>
 
-      return (
-        <div className="home">
-          <div className="header">
-            <div className="logo">🎬 天合短剧剪辑接单平台</div>
-            <nav className="nav">
-              <a href="Home.html" className="active">首页</a>
-              <a href="ProjectHall.html">接单大厅</a>
-              <a href="Login.html">登录</a>
-              <a href="Register.html">注册入驻</a>
-            </nav>
+  <section class="relative pt-32 pb-20 lg:pt-44 lg:pb-28 hero-bg overflow-hidden">
+    <div class="absolute -right-28 top-6 w-[620px] h-[620px] rounded-full opacity-80 hero-ball hidden lg:block"
+      style="background:
+        radial-gradient(circle at 44% 44%, rgba(118,163,255,.34), transparent 30%),
+        radial-gradient(circle at 62% 40%, rgba(123,91,255,.2), transparent 54%),
+        conic-gradient(from 90deg, rgba(0,163,255,.16), rgba(123,91,255,.22), rgba(18,216,255,.16), rgba(0,163,255,.16));">
+    </div>
+    <div class="absolute -left-10 bottom-8 w-56 h-56 rounded-full opacity-60 blur-[1px] hidden lg:block"
+      style="background:
+        radial-gradient(circle at 35% 35%, rgba(18,216,255,.22), transparent 34%),
+        radial-gradient(circle at 65% 45%, rgba(123,91,255,.18), transparent 58%);">
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="max-w-3xl">
+        <div class="inline-flex items-center gap-3 text-cyan uppercase tracking-[0.24em] text-xs font-semibold">
+          <span class="w-6 h-px bg-cyan"></span>
+          Direct Purchase Creative Service
+        </div>
+        <h1 class="mt-5 text-4xl sm:text-5xl md:text-6xl font-semibold leading-[1.22] tracking-tight text-white">
+          嘀嗒制作
+          <span class="block bg-gradient-to-r from-white via-blue-200 to-cyan-200 bg-clip-text text-transparent">标准化图片与视频制作服务</span>
+        </h1>
+        <p class="mt-5 max-w-2xl text-base sm:text-lg text-gray-400 leading-8">
+          明码标价、流程清晰、按标准交付。面向电商商家、品牌方与内容团队，提供可直接下单的图片包与视频包服务。
+        </p>
+        <p class="mt-4 max-w-2xl text-sm sm:text-base text-gray-500 leading-8">
+          把原本零散、反复沟通的内容制作需求，变成可选包、可下单、可验收、可售后的标准服务，让你更快开始制作，也更容易拿到稳定结果。
+        </p>
+
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="standard-package-store.html" class="inline-flex items-center justify-center px-7 py-3 rounded-full text-white font-medium bg-gradient-to-r from-primary to-secondary shadow-glow hover:scale-[1.02] transition">查看产品包</a>
+          <a href="Register.html" class="inline-flex items-center justify-center px-7 py-3 rounded-full border border-white/20 text-white hover:bg-white/5 transition">立即下单</a>
+          <a href="Login.html" class="inline-flex items-center justify-center px-7 py-3 rounded-full border border-gray-700 text-gray-300 hover:bg-white/5 transition">进入平台</a>
+        </div>
+
+        <div class="mt-7 flex flex-wrap gap-3 text-sm">
+          <span class="px-4 py-2 rounded-full border border-white/10 bg-white/5 text-gray-300">价格透明</span>
+          <span class="px-4 py-2 rounded-full border border-white/10 bg-white/5 text-gray-300">周期明确</span>
+          <span class="px-4 py-2 rounded-full border border-white/10 bg-white/5 text-gray-300">支持验收</span>
+          <span class="px-4 py-2 rounded-full border border-white/10 bg-white/5 text-gray-300">售后可追溯</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="section-anchor py-24 bg-darkBg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white">嘀嗒制作是什么</h2>
+        <p class="mt-4 text-lg text-gray-400 max-w-4xl mx-auto">
+          嘀嗒制作把图片与视频制作服务做成了更清晰、更好下单的标准化产品包。
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="glass-card panel-border rounded-2xl p-8 hover:-translate-y-1 transition duration-300 shadow-soft">
+          <div class="w-14 h-14 rounded-2xl bg-blue-500/15 text-blue-300 flex items-center justify-center text-2xl mb-6">◎</div>
+          <h3 class="text-2xl font-bold text-white mb-3">产品定位</h3>
+          <p class="text-primary text-sm mb-4 font-medium">把制作服务做成可以直接理解和购买的产品包。</p>
+          <p class="text-gray-400 text-sm leading-7">
+            嘀嗒制作是一个标准化图片与视频制作服务入口。常见内容需求被整理成清晰产品包，服务内容、交付范围、周期和价格都能提前看到。
+          </p>
+        </div>
+
+        <div class="glass-card panel-border rounded-2xl p-8 hover:-translate-y-1 transition duration-300 shadow-soft">
+          <div class="w-14 h-14 rounded-2xl bg-secondary/15 text-violet-300 flex items-center justify-center text-2xl mb-6">⚙</div>
+          <h3 class="text-2xl font-bold text-white mb-3">解决什么问题</h3>
+          <p class="text-secondary text-sm mb-4 font-medium">减少沟通反复，降低交付不确定性。</p>
+          <p class="text-gray-400 text-sm leading-7">
+            通过标准产品包、需求模板、明确交付标准和修改规则，把“不会提需求、进度不好追、交付容易扯皮”的问题，提前收敛进一条更清晰的服务链路里。
+          </p>
+        </div>
+
+        <div class="glass-card panel-border rounded-2xl p-8 hover:-translate-y-1 transition duration-300 shadow-soft">
+          <div class="w-14 h-14 rounded-2xl bg-cyan/15 text-cyan-300 flex items-center justify-center text-2xl mb-6">◈</div>
+          <h3 class="text-2xl font-bold text-white mb-3">面向什么客户</h3>
+          <p class="text-cyan text-sm mb-4 font-medium">适合高频内容制作的商家与团队。</p>
+          <p class="text-gray-400 text-sm leading-7">
+            主要面向电商商家、品牌营销团队、本地生活商家和内容运营团队。尤其适合经常做图、做视频，但不想每次都从零沟通一次的人。
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 bg-darkCard border-y border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl font-extrabold text-white mb-4">不是零散找人做图做视频，而是一条完整服务链路</h2>
+      <p class="text-gray-400 mb-12">从选择产品包，到提交需求，再到制作、验收和售后，每个环节都有更明确的规则和预期。</p>
+
+      <div class="flex flex-col md:flex-row justify-center items-center space-y-8 md:space-y-0 md:space-x-4">
+        <div class="bg-darkBg p-6 rounded-xl w-full md:w-1/3 border border-white/5 z-10">
+          <h4 class="text-xl font-bold text-white mb-2">01 选择与下单</h4>
+          <p class="text-sm text-gray-400">查看产品包、规格、价格和周期，确认合适后再下单。</p>
+        </div>
+        <div class="hidden md:block w-12 border-t-2 border-dashed border-primary"></div>
+        <div class="bg-darkBg p-6 rounded-xl w-full md:w-1/3 border border-primary/40 shadow-[0_0_20px_rgba(27,124,255,0.18)] z-10 transform scale-105">
+          <h4 class="text-xl font-bold text-white mb-2 text-primary">02 制作与审核</h4>
+          <p class="text-sm text-gray-400">按模板提交需求与素材，按节点推进制作和反馈。</p>
+        </div>
+        <div class="hidden md:block w-12 border-t-2 border-dashed border-secondary"></div>
+        <div class="bg-darkBg p-6 rounded-xl w-full md:w-1/3 border border-white/5 z-10">
+          <h4 class="text-xl font-bold text-white mb-2">03 验收与售后</h4>
+          <p class="text-sm text-gray-400">按交付标准完成验收，并支持下载成品、提交修改和售后协助。</p>
+        </div>
+      </div>
+
+      <p class="mt-12 text-lg text-white font-medium bg-white/5 inline-block px-6 py-3 rounded-full border border-white/10">
+        服务内容先说明白，下单决策就会更轻松
+      </p>
+    </div>
+  </section>
+
+  <section id="packages" class="section-anchor py-24 bg-darkBg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl font-extrabold text-white sm:text-4xl">标准产品包</h2>
+        <p class="mt-4 text-xl text-gray-400 max-w-4xl mx-auto">
+          不同场景对应不同产品包，交付内容、制作周期和价格范围都能直接比较。
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-14">
+        <div class="bg-darkCard p-8 rounded-2xl border border-white/5 hover:border-primary/40 transition duration-300 group">
+          <div class="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center mb-6 group-hover:bg-blue-500/20 transition">
+            <span class="text-blue-300 text-xl">🖼</span>
           </div>
-
-          <div className="hero">
-            <h1>天合短剧剪辑接单平台</h1>
-            <p>专业的短剧剪辑接单平台，让您的剪辑技能创造价值</p>
-            <div className="heroButtons">
-              <a href="ProjectHall.html" className="heroButton primary">
-                立即接单
-              </a>
-              <a href="Register.html" className="heroButton secondary">
-                注册入驻
-              </a>
-            </div>
-          </div>
-
-          <div className="features">
-            <div className="featuresContainer">
-              <h2 className="featuresTitle">平台特色</h2>
-              <div className="featuresGrid">
-                <div className="featureCard">
-                  <div className="featureIcon">📋</div>
-                  <div className="featureTitle">丰富项目</div>
-                  <div className="featureDesc">
-                    涵盖短剧、AI漫剧、短视频、综艺等多种类型项目，满足不同剪辑需求
-                  </div>
-                </div>
-                <div className="featureCard">
-                  <div className="featureIcon">💰</div>
-                  <div className="featureTitle">收益透明</div>
-                  <div className="featureDesc">
-                    收益公开透明，验收后即时入账，支持多维度收益统计和榜单排行
-                  </div>
-                </div>
-                <div className="featureCard">
-                  <div className="featureIcon">⚡</div>
-                  <div className="featureTitle">高效协作</div>
-                  <div className="featureDesc">
-                    在线协同空间，素材交付、修改意见、沟通留痕全程可追溯
-                  </div>
-                </div>
-                <div className="featureCard">
-                  <div className="featureIcon">🏆</div>
-                  <div className="featureTitle">激励榜单</div>
-                  <div className="featureDesc">
-                    总接单量榜、总收益榜、近期活跃度榜，激励学员持续提升
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="stats">
-            <div className="statsContainer">
-              <div className="statItem">
-                <div className="statValue">500+</div>
-                <div className="statLabel">活跃学员</div>
-              </div>
-              <div className="statItem">
-                <div className="statValue">1000+</div>
-                <div className="statLabel">已完成项目</div>
-              </div>
-              <div className="statItem">
-                <div className="statValue">¥500万+</div>
-                <div className="statLabel">累计收益</div>
-              </div>
-              <div className="statItem">
-                <div className="statValue">98%</div>
-                <div className="statLabel">满意度</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="footer">
-            <p>© 2024 天合短剧剪辑接单平台 版权所有</p>
+          <h3 class="text-xl font-bold text-white mb-3">图片包</h3>
+          <p class="text-gray-400 text-sm leading-7">适合电商视觉、活动宣传、品牌物料等场景。</p>
+          <div class="mt-5 space-y-3 text-sm text-gray-400">
+            <div>常见交付：主图、海报、详情图、KV、套图等</div>
+            <div>周期参考：T+2 至 T+5 工作日</div>
+            <div>价格参考：￥XXX 起</div>
           </div>
         </div>
-      );
-    };
 
-    // 等待所有资源加载完成后再渲染
-    function renderApp() {
-      if (typeof React === 'undefined' || typeof ReactDOM === 'undefined') {
-        setTimeout(renderApp, 100);
-        return;
-      }
-      
-      try {
-        ReactDOM.render(<Home />, document.getElementById('root'));
-      } catch (error) {
-        console.error('渲染错误:', error);
-        document.getElementById('root').innerHTML = '<div style="padding: 20px; color: red;">页面加载失败: ' + error.message + '</div>';
-      }
-    }
+        <div class="bg-darkCard p-8 rounded-2xl border border-white/5 hover:border-secondary/40 transition duration-300 group">
+          <div class="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center mb-6 group-hover:bg-purple-500/20 transition">
+            <span class="text-violet-300 text-xl">🎬</span>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-3">视频包</h3>
+          <p class="text-gray-400 text-sm leading-7">适合投流广告、内容种草、门店宣传、品牌传播等场景。</p>
+          <div class="mt-5 space-y-3 text-sm text-gray-400">
+            <div>常见交付：成片、封面、字幕文件等</div>
+            <div>周期参考：T+3 至 T+7 工作日</div>
+            <div>价格参考：￥XXX 起</div>
+          </div>
+        </div>
+      </div>
 
-    if (document.readyState === 'loading') {
-      window.addEventListener('load', renderApp);
-    } else {
-      renderApp();
-    }
-  </script>
+      <div class="text-center mb-12">
+        <h3 class="text-3xl font-extrabold text-white">热门产品包</h3>
+        <p class="mt-4 text-gray-400">这些是更常被选择的产品包，适合用来快速判断需求方向。</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-[240px]">
+        <div class="relative group rounded-xl overflow-hidden sm:col-span-2 lg:col-span-2 row-span-2 border border-primary/20 bg-[radial-gradient(circle_at_18%_18%,rgba(18,216,255,.18),transparent_24%),radial-gradient(circle_at_84%_14%,rgba(123,91,255,.24),transparent_32%),linear-gradient(135deg,rgba(27,124,255,.22),rgba(123,91,255,.12),rgba(10,12,17,1))]">
+          <img class="package-shot" src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1400&q=80" alt="" aria-hidden="true">
+          <div class="absolute inset-0 bg-gradient-to-t from-darkBg via-darkBg/55 to-darkBg/10 opacity-95"></div>
+          <div class="absolute top-5 right-5 z-10 px-3 py-1 rounded-full bg-white/10 border border-white/10 text-white text-xs font-semibold">主推产品包</div>
+          <div class="absolute bottom-0 left-0 z-10 p-6">
+            <span class="px-2 py-1 bg-primary/80 text-darkBg text-xs font-bold rounded mb-3 inline-block">AI 图片制作包</span>
+            <h3 class="text-2xl font-bold text-white mb-2">适合电商上新、活动宣传、社媒配图的高频图像需求</h3>
+            <p class="text-gray-300 text-sm leading-7 max-w-xl">按约定张数输出成品图，适合希望快速成图、快速上线、减少沟通往返的商家和内容团队。</p>
+            <div class="mt-5 flex flex-wrap gap-3 text-xs text-gray-300">
+              <span class="px-3 py-1 rounded-full bg-white/10 border border-white/10">交付：成品图</span>
+              <span class="px-3 py-1 rounded-full bg-white/10 border border-white/10">周期：T+3 工作日</span>
+              <span class="px-3 py-1 rounded-full bg-white/10 border border-white/10">价格：￥XXX 起</span>
+            </div>
+            <div class="mt-6 flex gap-3">
+              <a href="standard-package-store.html" class="px-5 py-2 rounded-full border border-white/15 text-sm text-white hover:bg-white/5 transition">查看详情</a>
+              <a href="standard-package-store.html" class="px-5 py-2 rounded-full bg-primary/85 text-darkBg text-sm font-semibold hover:bg-cyan transition">立即购买</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative group rounded-xl overflow-hidden border border-secondary/20 bg-[linear-gradient(180deg,rgba(123,91,255,.18),rgba(16,19,27,1))]">
+          <img class="package-shot" src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=80" alt="" aria-hidden="true">
+          <div class="absolute inset-0 bg-gradient-to-t from-darkBg via-darkBg/65 to-darkBg/10 opacity-95"></div>
+          <div class="absolute bottom-0 left-0 z-10 p-4">
+            <span class="px-2 py-1 bg-secondary/80 text-white text-xs font-bold rounded mb-2 inline-block">电商套图包</span>
+            <h3 class="text-lg font-bold text-white">主图、卖点图、详情模块图一套交付</h3>
+            <p class="text-gray-400 text-sm mt-2">T+3 至 T+5 工作日 · ￥XXX 起</p>
+          </div>
+        </div>
+
+        <div class="relative group rounded-xl overflow-hidden border border-cyan/20 bg-[linear-gradient(180deg,rgba(18,216,255,.16),rgba(16,19,27,1))]">
+          <img class="package-shot" src="https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=900&q=80" alt="" aria-hidden="true">
+          <div class="absolute inset-0 bg-gradient-to-t from-darkBg via-darkBg/65 to-darkBg/10 opacity-95"></div>
+          <div class="absolute bottom-0 left-0 z-10 p-4">
+            <span class="px-2 py-1 bg-cyan/80 text-darkBg text-xs font-bold rounded mb-2 inline-block">信息流短视频包</span>
+            <h3 class="text-lg font-bold text-white">适合投流转化和短视频营销</h3>
+            <p class="text-gray-400 text-sm mt-2">短视频成片、字幕、封面 · T+4 工作日</p>
+          </div>
+        </div>
+
+        <div class="relative group rounded-xl overflow-hidden sm:col-span-2 border border-primary/20 bg-[linear-gradient(135deg,rgba(27,124,255,.16),rgba(16,19,27,1))]">
+          <img class="package-shot" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80" alt="" aria-hidden="true">
+          <div class="absolute inset-0 bg-gradient-to-t from-darkBg via-darkBg/55 to-darkBg/10 opacity-95"></div>
+          <div class="absolute bottom-0 left-0 z-10 p-5">
+            <span class="px-2 py-1 bg-primary/80 text-darkBg text-xs font-bold rounded mb-2 inline-block">本地生活短视频包</span>
+            <h3 class="text-xl font-bold text-white">探店、团购、门店宣传类内容，可以更快进入交付节奏</h3>
+            <p class="text-gray-400 text-sm leading-7 mt-2 max-w-2xl">竖版短视频成片交付，适合本地生活商家做高频内容更新和推广投放。</p>
+          </div>
+        </div>
+
+        <div class="relative group rounded-xl overflow-hidden border border-pink/20 bg-[linear-gradient(180deg,rgba(255,79,147,.14),rgba(16,19,27,1))]">
+          <img class="package-shot" src="https://images.unsplash.com/photo-1511300636408-a63a89df3482?auto=format&fit=crop&w=900&q=80" alt="" aria-hidden="true">
+          <div class="absolute inset-0 bg-gradient-to-t from-darkBg via-darkBg/65 to-darkBg/10 opacity-95"></div>
+          <div class="absolute bottom-0 left-0 z-10 p-4">
+            <span class="px-2 py-1 bg-pink/80 text-white text-xs font-bold rounded mb-2 inline-block">品牌海报设计包</span>
+            <h3 class="text-lg font-bold text-white">适合节日营销、活动海报、品牌传播</h3>
+            <p class="text-gray-400 text-sm mt-2">T+3 工作日 · ￥XXX 起</p>
+          </div>
+        </div>
+
+        <div class="relative group rounded-xl overflow-hidden border border-cyan/20 bg-[linear-gradient(180deg,rgba(18,216,255,.14),rgba(16,19,27,1))]">
+          <img class="package-shot" src="https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=900&q=80" alt="" aria-hidden="true">
+          <div class="absolute inset-0 bg-gradient-to-t from-darkBg via-darkBg/65 to-darkBg/10 opacity-95"></div>
+          <div class="absolute bottom-0 left-0 z-10 p-4">
+            <span class="px-2 py-1 bg-cyan/80 text-darkBg text-xs font-bold rounded mb-2 inline-block">宣传视频制作包</span>
+            <h3 class="text-lg font-bold text-white">品牌介绍、产品宣传、活动预热更适合这个包</h3>
+            <p class="text-gray-400 text-sm mt-2">T+5 至 T+7 工作日 · ￥XXX 起</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-10">
+        <a href="standard-package-store.html" class="inline-flex items-center text-gray-400 hover:text-white transition">
+          查看完整产品包列表
+          <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section id="process" class="section-anchor py-24 bg-[#05070b] border-t border-b border-white/5 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+        <div>
+          <h2 class="text-3xl font-extrabold text-white sm:text-4xl mb-4">下单与制作流程</h2>
+          <p class="text-xl text-gray-400 max-w-3xl">从提交需求到最终交付，流程节点、反馈方式和验收依据都更明确。</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <span class="px-4 py-1.5 rounded-full bg-primary/20 text-primary border border-primary/30 text-sm">选择产品包</span>
+          <span class="px-4 py-1.5 rounded-full bg-darkCard text-gray-300 border border-white/10 text-sm">提交需求与素材</span>
+          <span class="px-4 py-1.5 rounded-full bg-darkCard text-gray-300 border border-white/10 text-sm">制作与审核</span>
+          <span class="px-4 py-1.5 rounded-full bg-darkCard text-gray-300 border border-white/10 text-sm">验收与售后</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-[220px]">
+        <div class="relative group rounded-xl overflow-hidden sm:col-span-2 lg:col-span-2 row-span-2 cursor-default border border-primary/20 bg-[radial-gradient(circle_at_18%_20%,rgba(27,124,255,.18),transparent_24%),radial-gradient(circle_at_84%_14%,rgba(18,216,255,.12),transparent_26%),linear-gradient(135deg,rgba(27,124,255,.18),rgba(16,19,27,1))]">
+          <div class="absolute inset-0 bg-gradient-to-t from-darkBg via-darkBg/25 to-transparent opacity-90"></div>
+          <div class="absolute top-5 right-5 text-[11px] text-white/70 px-3 py-1 rounded-full bg-white/10 border border-white/10">下单起点</div>
+          <div class="absolute bottom-0 left-0 p-6">
+            <span class="px-2 py-1 bg-primary/80 text-darkBg text-xs font-bold rounded mb-2 inline-block">Step 01-02</span>
+            <h3 class="text-2xl font-bold text-white mb-2">选择产品包，并提交需求与素材</h3>
+            <p class="text-gray-300 text-sm leading-7 max-w-lg">根据场景选择图片包或视频包，确认规格、周期和价格，再按模板填写需求并上传参考资料。信息越完整，出品越精准，沟通越高效。</p>
+          </div>
+        </div>
+
+        <div class="relative rounded-xl overflow-hidden border border-secondary/20 bg-[linear-gradient(180deg,rgba(123,91,255,.16),rgba(16,19,27,1))]">
+          <div class="absolute inset-0 bg-gradient-to-t from-darkBg to-transparent opacity-90"></div>
+          <div class="absolute bottom-0 left-0 p-4">
+            <span class="px-2 py-1 bg-secondary/80 text-white text-xs font-bold rounded mb-2 inline-block">Step 03</span>
+            <h3 class="text-lg font-bold text-white">进入制作排期</h3>
+            <p class="text-gray-400 text-sm mt-2">确认下单后，制作团队根据产品包约定内容开始推进。</p>
+          </div>
+        </div>
+
+        <div class="relative rounded-xl overflow-hidden border border-pink/20 bg-[linear-gradient(180deg,rgba(255,79,147,.14),rgba(16,19,27,1))]">
+          <div class="absolute inset-0 bg-gradient-to-t from-darkBg to-transparent opacity-90"></div>
+          <div class="absolute bottom-0 left-0 p-4">
+            <span class="px-2 py-1 bg-pink/80 text-white text-xs font-bold rounded mb-2 inline-block">Step 04</span>
+            <h3 class="text-lg font-bold text-white">审核与反馈</h3>
+            <p class="text-gray-400 text-sm mt-2">按约定节点提交版本，收集修改意见并推进调整。</p>
+          </div>
+        </div>
+
+        <div class="relative rounded-xl overflow-hidden sm:col-span-2 cursor-default border border-cyan/20 bg-[linear-gradient(135deg,rgba(18,216,255,.14),rgba(16,19,27,1))]">
+          <div class="absolute inset-0 bg-gradient-to-t from-darkBg via-transparent to-transparent opacity-90"></div>
+          <div class="absolute bottom-0 left-0 p-5">
+            <span class="px-2 py-1 bg-cyan/80 text-darkBg text-xs font-bold rounded mb-2 inline-block">Step 05-06</span>
+            <h3 class="text-xl font-bold text-white">验收交付，并进入售后支持</h3>
+            <p class="text-gray-400 text-sm leading-7 mt-2 max-w-2xl">作品完成后按需求和交付标准进行验收，验收通过后交付最终文件；在约定范围内继续支持下载、修改和售后协助。</p>
+          </div>
+        </div>
+
+        <div class="relative rounded-xl overflow-hidden border border-white/10 bg-darkCard">
+          <div class="absolute inset-0 bg-gradient-to-t from-darkBg to-transparent opacity-90"></div>
+          <div class="absolute bottom-0 left-0 p-4">
+            <span class="px-2 py-1 bg-white/10 text-white text-xs font-bold rounded mb-2 inline-block">售后</span>
+            <h3 class="text-lg font-bold text-white">下载、修改、记录可追溯</h3>
+            <p class="text-gray-400 text-sm mt-2">交付完成后，仍可按约定继续查看记录、下载文件和处理售后。</p>
+          </div>
+        </div>
+
+        <div class="relative rounded-xl overflow-hidden border border-white/10 bg-darkCard">
+          <div class="absolute inset-0 bg-gradient-to-t from-darkBg to-transparent opacity-90"></div>
+          <div class="absolute bottom-0 left-0 p-4">
+            <span class="px-2 py-1 bg-white/10 text-white text-xs font-bold rounded mb-2 inline-block">验收</span>
+            <h3 class="text-lg font-bold text-white">按需求与规格确认结果</h3>
+            <p class="text-gray-400 text-sm mt-2">验收以产品包说明和下单口径为准，不再临时改标准。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="guarantee" class="section-anchor py-24 bg-darkBg relative">
+    <div class="absolute top-1/2 left-0 w-64 h-64 bg-primary/10 rounded-full blur-[100px] -translate-y-1/2"></div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl font-extrabold text-white sm:text-4xl">交付保障</h2>
+        <div class="w-16 h-1 bg-gradient-to-r from-primary to-secondary mx-auto mt-6 rounded-full"></div>
+        <p class="mt-6 max-w-3xl mx-auto text-gray-400">把修改机制、审核规则、交付标准和版权要求提前说明，合作过程会更顺畅，也更容易建立信任。</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="flex items-start p-6 bg-darkCard rounded-2xl border border-white/5 hover:border-primary/40 transition">
+          <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center border border-white/5">
+            <span class="text-2xl text-primary">↺</span>
+          </div>
+          <div class="ml-6">
+            <h3 class="text-xl font-bold text-white mb-2">修改机制</h3>
+            <p class="text-gray-400 text-sm leading-relaxed">每个产品包包含明确修改次数和适用范围。合理范围内按产品规则执行，超出原始需求范围的新增内容，可按增项或二次报价处理。</p>
+          </div>
+        </div>
+
+        <div class="flex items-start p-6 bg-darkCard rounded-2xl border border-white/5 hover:border-secondary/40 transition">
+          <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center border border-white/5">
+            <span class="text-2xl text-violet-300">◎</span>
+          </div>
+          <div class="ml-6">
+            <h3 class="text-xl font-bold text-white mb-2">审核规则</h3>
+            <p class="text-gray-400 text-sm leading-relaxed">审核以你下单时确认的需求、参考方向和产品包规格为基础进行，不以交付阶段临时新增要求作为默认标准。</p>
+          </div>
+        </div>
+
+        <div class="flex items-start p-6 bg-darkCard rounded-2xl border border-white/5 hover:border-primary/40 transition">
+          <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center border border-white/5">
+            <span class="text-2xl text-cyan">▣</span>
+          </div>
+          <div class="ml-6">
+            <h3 class="text-xl font-bold text-white mb-2">交付标准</h3>
+            <p class="text-gray-400 text-sm leading-relaxed">按照产品包约定交付对应格式、尺寸、时长、清晰度或文件类型。具体交付清单以产品详情页说明为准。</p>
+          </div>
+        </div>
+
+        <div class="flex items-start p-6 bg-darkCard rounded-2xl border border-white/5 hover:border-pink/40 transition">
+          <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-pink/20 to-rose-500/20 flex items-center justify-center border border-white/5">
+            <span class="text-2xl text-pink">©</span>
+          </div>
+          <div class="ml-6">
+            <h3 class="text-xl font-bold text-white mb-2">版权与素材要求</h3>
+            <p class="text-gray-400 text-sm leading-relaxed">请确保提交的素材、文案、图片、视频等资料具备合法使用权。平台基于客户提交资料和约定需求完成制作，成品版权或使用范围按订单约定执行。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" class="section-anchor py-24 bg-[#0d0f13] border-y border-white/5">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-14">
+        <span class="text-secondary font-semibold tracking-wider uppercase text-sm mb-4 block">FAQ</span>
+        <h2 class="text-3xl font-extrabold text-white sm:text-4xl mb-4">常见问题</h2>
+        <p class="text-gray-400 max-w-3xl mx-auto">关于周期、发票、退款、验收、下载和修改次数，常见问题都整理在这里。</p>
+      </div>
+
+      <div class="space-y-4">
+        <details open class="glass-card rounded-2xl border border-white/5 group">
+          <summary class="list-none cursor-pointer px-6 py-5 flex items-center justify-between text-white font-semibold text-lg">
+            制作周期多久？
+            <span class="text-primary text-2xl group-open:rotate-45 transition">+</span>
+          </summary>
+          <div class="px-6 pb-6 text-gray-400 text-sm leading-7">不同产品包的制作周期不同，通常会在产品详情页明确展示预计交付时间。下单时请以页面展示周期为准。</div>
+        </details>
+
+        <details class="glass-card rounded-2xl border border-white/5 group">
+          <summary class="list-none cursor-pointer px-6 py-5 flex items-center justify-between text-white font-semibold text-lg">
+            支持开发票吗？
+            <span class="text-primary text-2xl group-open:rotate-45 transition">+</span>
+          </summary>
+          <div class="px-6 pb-6 text-gray-400 text-sm leading-7">支持。具体开票信息和抬头要求，可在下单后按流程提交确认。</div>
+        </details>
+
+        <details class="glass-card rounded-2xl border border-white/5 group">
+          <summary class="list-none cursor-pointer px-6 py-5 flex items-center justify-between text-white font-semibold text-lg">
+            不满意可以退款吗？
+            <span class="text-primary text-2xl group-open:rotate-45 transition">+</span>
+          </summary>
+          <div class="px-6 pb-6 text-gray-400 text-sm leading-7">退款规则会根据是否已进入制作、当前制作进度以及产品包服务条款综合判断，具体以订单规则为准。</div>
+        </details>
+
+        <details class="glass-card rounded-2xl border border-white/5 group">
+          <summary class="list-none cursor-pointer px-6 py-5 flex items-center justify-between text-white font-semibold text-lg">
+            怎么验收交付结果？
+            <span class="text-primary text-2xl group-open:rotate-45 transition">+</span>
+          </summary>
+          <div class="px-6 pb-6 text-gray-400 text-sm leading-7">验收将以你下单时确认的需求、交付规格和产品包说明为依据进行，确认通过后交付最终版本。</div>
+        </details>
+
+        <details class="glass-card rounded-2xl border border-white/5 group">
+          <summary class="list-none cursor-pointer px-6 py-5 flex items-center justify-between text-white font-semibold text-lg">
+            交付后在哪里下载？
+            <span class="text-primary text-2xl group-open:rotate-45 transition">+</span>
+          </summary>
+          <div class="px-6 pb-6 text-gray-400 text-sm leading-7">验收完成后，可在对应订单页或交付页下载最终文件。</div>
+        </details>
+
+        <details class="glass-card rounded-2xl border border-white/5 group">
+          <summary class="list-none cursor-pointer px-6 py-5 flex items-center justify-between text-white font-semibold text-lg">
+            可以修改几次？
+            <span class="text-primary text-2xl group-open:rotate-45 transition">+</span>
+          </summary>
+          <div class="px-6 pb-6 text-gray-400 text-sm leading-7">不同产品包包含的修改次数不同，请以下单前的产品包说明为准。</div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="relative py-24 bg-darkBg text-center overflow-hidden">
+    <div class="absolute inset-0 hero-bg opacity-50"></div>
+    <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-4xl font-extrabold text-white mb-6">让内容制作更省心，让交付结果更可控</h2>
+      <p class="text-xl text-gray-400 mb-10">如果你已经有明确场景，可以直接进入产品包页；如果你的需求更复杂，也可以先提交信息，我们会帮你判断更适合哪种合作方式。</p>
+      <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <a href="standard-package-store.html" class="px-8 py-4 border border-transparent text-lg font-medium rounded-full text-white bg-gradient-to-r from-primary to-secondary hover:scale-105 transition transform">查看产品包</a>
+        <a href="Register.html" class="px-8 py-4 border border-gray-600 text-lg font-medium rounded-full text-white bg-darkCard hover:bg-gray-800 transition">提交定制需求</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-black py-8 text-center border-t border-gray-900">
+    <p class="text-gray-600 text-sm">© 2025-2026 长沙骋风天合文化科技有限公司及／或其关联公司及特许人。版权所有</p>
+  </footer>
 </body>
 </html>

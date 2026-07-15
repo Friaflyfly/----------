@@ -63,12 +63,12 @@
     .toolbar select, .toolbar input { height: 32px; border: 1px solid #d9d9d9; border-radius: 6px; padding: 0 10px; font-size: 13px; outline: none; }
     .toolbar input { min-width: 260px; }
     .toolbar .right { margin-left: auto; color: #8c8c8c; font-size: 12px; }
-    .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 14px; }
+    .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 14px; }
     .stat-card { background: #fff; border-radius: 10px; padding: 14px 16px; border: 1px solid #f0f0f0; }
     .stat-label { color: #8c8c8c; font-size: 12px; }
     .stat-value { margin-top: 4px; font-size: 22px; font-weight: 700; color: #262626; }
     .space-table { background: #fff; border-radius: 8px; overflow: hidden; border: 1px solid #f0f0f0; }
-    .space-row { display: grid; grid-template-columns: 1.6fr 1.05fr .95fr .9fr .85fr .9fr .7fr; gap: 12px; align-items: center; padding: 14px 18px; border-bottom: 1px solid #f0f0f0; transition: background .15s; }
+    .space-row { display: grid; grid-template-columns: 1.75fr 1.25fr 1.1fr 1fr 1.05fr .9fr .7fr; gap: 12px; align-items: center; padding: 14px 18px; border-bottom: 1px solid #f0f0f0; transition: background .15s; }
     .space-row:last-child { border-bottom: none; }
     .space-row.head { background: #fafafa; color: #8c8c8c; font-size: 12px; font-weight: 500; }
     .space-row:not(.head):hover { background: #f0f7ff; }
@@ -76,13 +76,22 @@
     .space-title:hover { color: #1890ff; }
     .space-id { font-size: 12px; color: #8c8c8c; font-family: monospace; margin-top: 3px; }
     .muted { color: #8c8c8c; font-size: 12px; margin-top: 2px; }
+    .meta-line { color: #595959; font-size: 12px; line-height: 1.65; }
+    .meta-line b { color: #262626; font-weight: 600; }
+    .type-badge { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px; border-radius: 999px; font-size: 11px; font-weight: 600; margin-bottom: 5px; }
+    .type-badge.sku { background: #e6f7ff; color: #096dd9; }
+    .type-badge.custom { background: #f9f0ff; color: #531dab; }
+    .sub-tag { display: inline-flex; align-items: center; margin-top: 5px; padding: 2px 7px; border-radius: 999px; background: #f5f5f5; color: #595959; font-size: 11px; }
     .cell-main { min-width: 0; }
     .status { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
     .status.pending { background: #fff7e6; color: #d46b08; }
     .status.quoting { background: #fff1f0; color: #cf1322; }
     .status.doing { background: #e6f7ff; color: #096dd9; }
+    .status.settlement { background: #f9f0ff; color: #531dab; }
     .status.done { background: #f6ffed; color: #389e0d; }
     .amount { color: #1890ff; font-weight: 600; }
+    .finance-cell { display: grid; gap: 3px; }
+    .finance-cell .amount { font-size: 14px; }
     .row-actions { display: flex; gap: 6px; justify-content: flex-end; }
     .btn-link { padding: 4px 10px; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff; color: #595959; font-size: 12px; cursor: pointer; text-decoration: none; white-space: nowrap; }
     .btn-link:hover { border-color: #1890ff; color: #1890ff; }
@@ -98,7 +107,6 @@
     @media (max-width: 1100px) {
       .stat-row { grid-template-columns: 1fr; }
       .space-row { grid-template-columns: 1.8fr 1fr 1fr .8fr; }
-      .space-row > :nth-child(4),
       .space-row > :nth-child(6),
       .space-row > :nth-child(7) { display: none; }
     }
@@ -113,6 +121,7 @@
         <a href="platform-home-demander.html"><span class="menu-icon">🏠</span> 工作台</a>
         <div class="menu-group">
           <div class="menu-group-title">我有需求</div>
+          <a href="standard-package-store-modal.html"><span class="menu-icon">📦</span> 标准包购买</a>
           <a href="demand-publish.html"><span class="menu-icon">📤</span> 发布需求</a>
           <a href="demand-list.html"><span class="menu-icon">📋</span> 我的需求</a>
           <a href="contractor-marketplace.html"><span class="menu-icon">🏪</span> 服务广场</a>
@@ -141,7 +150,7 @@
     <main class="main">
       <section class="page-head">
         <h1>🤝 我的协同项目空间</h1>
-        <div class="sub">一个需求通过审核后会创建一个项目空间；选定承制方并生成订单后，空间进入履约详情。</div>
+        <div class="sub">标准包购买后会自动创建项目空间；列表展示产品包配置、素材、预算冻结、验收、发票与分账状态。</div>
       </section>
       <section class="stat-row" id="statRow"></section>
       <section class="toolbar">
@@ -150,24 +159,31 @@
           <option value="all" selected>所有团队（我参与的）</option>
           <option value="current">仅当前团队</option>
         </select>
+        <span style="font-size:13px;color:#595959">项目类型：</span>
+        <select id="typeFilter">
+          <option value="">全部类型</option>
+          <option value="sku">标准产品包</option>
+          <option value="custom">自定义需求</option>
+        </select>
         <span style="font-size:13px;color:#595959">阶段：</span>
         <select id="stageFilter">
           <option value="">全部阶段</option>
-          <option value="pending">撮合 / 报价中</option>
+          <option value="pending">待派单 / 待选承制方</option>
           <option value="doing">履约中</option>
+          <option value="settlement">验收后 / 发票结算中</option>
           <option value="done">已完成</option>
         </select>
-        <input id="searchInput" placeholder="搜索项目空间 / 需求名 / 需求号 / 订单号">
+        <input id="searchInput" placeholder="搜索产品包 / 档位 / 项目空间 / 需求号 / 订单号">
         <span class="right" id="resultCount">共 0 个空间</span>
       </section>
       <section class="space-table" id="spaceTable">
         <div class="space-row head">
-          <div>项目空间 / 需求</div>
-          <div>所属团队</div>
-          <div>阶段</div>
-          <div>承制方</div>
-          <div>金额</div>
-          <div>创建 / 截止</div>
+          <div>项目空间 / 产品包</div>
+          <div>配置 / 素材</div>
+          <div>阶段 / 下一步</div>
+          <div>承制方 / 团队</div>
+          <div>资金 / 发票</div>
+          <div>创建 / 交付</div>
           <div style="text-align:right">操作</div>
         </div>
         <div id="spaceBody"></div>
@@ -181,6 +197,7 @@
   (function () {
     var $ = function (id) { return document.getElementById(id); };
     var stageFilter = "";
+    var typeFilter = "";
     var scopeFilter = "all";
     var searchKey = "";
 
@@ -192,12 +209,100 @@
       "completed": { text: "已完成", stage: "done", cls: "done" }
     };
 
+    function parseSnapshot(d) {
+      if (!d || !d.skuSnapshot) return {};
+      if (typeof d.skuSnapshot === "string") {
+        try { return JSON.parse(d.skuSnapshot); } catch (e) { return {}; }
+      }
+      return d.skuSnapshot || {};
+    }
+
+    function shortWorkspaceName(name) {
+      return String(name || "").replace("骋风天合 · ", "") || "-";
+    }
+
+    function isStandardPackage(d, order) {
+      return d.requirementType === "PLATFORM_SKU" || !!d.spuId || !!d.skuId || !!(order && order.projectName && order.projectName.indexOf("包") >= 0);
+    }
+
+    function packageInfo(d, order) {
+      var snap = parseSnapshot(d);
+      var sourceTitle = (snap.product || d.title || (order && order.projectName) || "").split(" · ");
+      var tierObj = snap.tier || {};
+      var productName = snap.product || sourceTitle[0] || d.title || "标准产品包";
+      var tierName = tierObj.name || sourceTitle[1] || (d.skuId ? d.skuId : "按需求配置");
+      var quantity = snap.quantity || snap.q || "";
+      var unit = (tierObj && tierObj.unit) || "";
+      var specParts = [];
+      if (quantity) specParts.push(quantity + (unit || "项"));
+      if (snap.spec) specParts.push(snap.spec);
+      if (snap.duration) specParts.push(snap.duration + "秒");
+      if (snap.ratio) specParts.push(snap.ratio);
+      var addons = snap.addons || {};
+      var addonNames = [
+        addons.copy ? "文案" : "",
+        addons.rush ? "加急" : "",
+        addons.source ? "源文件" : ""
+      ].filter(Boolean);
+      var materialCount = Array.isArray(snap.materials) ? snap.materials.length : (Array.isArray(d.refs) ? d.refs.length : null);
+      return {
+        productName: productName,
+        tierName: tierName,
+        configText: specParts.join(" · ") || (d.category || "-"),
+        addonText: addonNames.length ? addonNames.join(" / ") : "无增项",
+        materialText: materialCount != null ? materialCount + " 个附件" : (isStandardPackage(d, order) ? "3 个附件" : "按需求文档"),
+        snapshot: snap
+      };
+    }
+
+    function stageInfo(d, order) {
+      if (order) {
+        if (order.status === "waiting-invoice") return { text: "待上传发票", next: "承制方补充结算发票", stage: "settlement", cls: "settlement" };
+        if (order.status === "invoice-reviewing") return { text: "发票校验中", next: "平台财务校验发票", stage: "settlement", cls: "settlement" };
+        if (order.status === "pending-settlement") return { text: "待分账", next: "财务确认后分账", stage: "settlement", cls: "settlement" };
+        if (order.status === "completed") return { text: "已完成", next: "订单归档", stage: "done", cls: "done" };
+        if (order.status === "review-v3" || order.status === "reviewing" || order.acceptanceStatus === "pending") return { text: "待验收", next: "需求方确认验收", stage: "doing", cls: "doing" };
+        if (order.status === "in-progress") return { text: "履约中", next: "承制方交付版本", stage: "doing", cls: "doing" };
+      }
+      if (isStandardPackage(d, order) && d.status === "auto-approved") {
+        return { text: "待平台派单", next: "标准包已自动通过", stage: "pending", cls: "pending" };
+      }
+      if (d.status === "quoting") return { text: "待选承制方", next: "选择报价并生成订单", stage: "pending", cls: "quoting" };
+      if (d.status === "matching") return { text: "撮合中", next: "等待承制方响应", stage: "pending", cls: "pending" };
+      if (d.status === "in-progress") return { text: "履约中", next: "查看交付进度", stage: "doing", cls: "doing" };
+      if (d.status === "completed") return { text: "已完成", next: "订单归档", stage: "done", cls: "done" };
+      return STATUS[d.status] || { text: d.status || "进行中", next: "查看详情", stage: "pending", cls: "pending" };
+    }
+
+    function financeInfo(d, order, standardPackage) {
+      var amount = order ? order.amount : d.budget;
+      var freezeText = standardPackage ? "预算已冻结" : "按需求预算";
+      if (order && order.status === "completed") freezeText = "已结算";
+      if (order && order.status === "pending-settlement") freezeText = "待分账";
+      if (order && (order.status === "waiting-invoice" || order.status === "invoice-reviewing")) freezeText = "已验收待结算";
+      if (d.paymentStatus === "pending") freezeText = "待付款";
+
+      var invoiceText = "未到发票环节";
+      if (order) {
+        if (order.invoiceStatus === "approved") invoiceText = "发票已通过";
+        else if (order.invoiceStatus === "uploaded") invoiceText = "发票已上传";
+        else if (order.status === "waiting-invoice") invoiceText = "待上传发票";
+        else if (order.status === "invoice-reviewing") invoiceText = "发票校验中";
+        else if (order.status === "pending-settlement") invoiceText = "可分账";
+        else if (order.status === "completed") invoiceText = "已完成分账";
+      }
+      return { amount: amount, freezeText: freezeText, invoiceText: invoiceText };
+    }
+
     function getSpaces() {
       var demands = window.demoApp.getDemands().filter(function (d) { return !!d.projectSpaceId; });
       var orders = window.demoApp.getOrders();
       return demands.map(function (d) {
         var order = orders.find(function (o) { return o.demandId === d.id; });
-        var status = STATUS[d.status] || { text: d.status, stage: "pending", cls: "pending" };
+        var standardPackage = isStandardPackage(d, order);
+        var pkg = packageInfo(d, order);
+        var status = stageInfo(d, order);
+        var finance = financeInfo(d, order, standardPackage);
         var ws = window.demoApp.WORKSPACES[d.workspace] || { name: d.workspaceName || d.workspace };
         var href = order
           ? "project-space.html?orderId=" + order.id
@@ -207,11 +312,20 @@
           title: d.title,
           demandId: d.id,
           orderId: order ? order.id : "",
+          typeKey: standardPackage ? "sku" : "custom",
+          typeText: standardPackage ? "标准产品包" : "自定义需求",
           workspace: d.workspace,
           workspaceName: ws.name,
           category: d.category,
+          packageName: pkg.productName,
+          tierName: pkg.tierName,
+          configText: pkg.configText,
+          addonText: pkg.addonText,
+          materialText: pkg.materialText,
           contractor: order ? order.contractor : (d.contractor || "待选定"),
-          amount: order ? order.amount : d.budget,
+          amount: finance.amount,
+          financeText: finance.freezeText,
+          invoiceText: finance.invoiceText,
           deadline: d.deadline,
           createdAt: d.projectSpaceCreatedAt || d.createTime,
           status: status,
@@ -223,8 +337,9 @@
     function renderStats(list) {
       var cards = [
         { label: "全部空间", value: list.length },
-        { label: "撮合 / 报价中", value: list.filter(function (x) { return x.status.stage === "pending"; }).length },
+        { label: "标准产品包", value: list.filter(function (x) { return x.typeKey === "sku"; }).length },
         { label: "履约中", value: list.filter(function (x) { return x.status.stage === "doing"; }).length },
+        { label: "发票 / 结算中", value: list.filter(function (x) { return x.status.stage === "settlement"; }).length },
         { label: "已完成", value: list.filter(function (x) { return x.status.stage === "done"; }).length }
       ];
       $("statRow").innerHTML = cards.map(function (c) {
@@ -236,11 +351,12 @@
       var curWs = window.demoApp.getCurrentWorkspaceId();
       var list = getSpaces();
       if (scopeFilter === "current") list = list.filter(function (x) { return x.workspace === curWs; });
+      if (typeFilter) list = list.filter(function (x) { return x.typeKey === typeFilter; });
       if (stageFilter) list = list.filter(function (x) { return x.status.stage === stageFilter; });
       if (searchKey) {
         var k = searchKey.toLowerCase();
         list = list.filter(function (x) {
-          return [x.id, x.title, x.demandId, x.orderId, x.contractor].join(" ").toLowerCase().indexOf(k) >= 0;
+          return [x.id, x.title, x.demandId, x.orderId, x.contractor, x.packageName, x.tierName, x.configText].join(" ").toLowerCase().indexOf(k) >= 0;
         });
       }
       $("resultCount").textContent = "共 " + list.length + " 个空间";
@@ -251,18 +367,19 @@
       }
       $("spaceBody").innerHTML = list.map(function (s) {
         return '<div class="space-row">'
-          + '<div class="cell-main"><a class="space-title" href="' + s.href + '">🤝 ' + s.title + '</a><div class="space-id">' + s.id + ' · ' + s.demandId + (s.orderId ? ' · ' + s.orderId : '') + '</div><div class="muted">' + s.category + '</div></div>'
-          + '<div><div style="font-size:13px;color:#262626">' + s.workspaceName.replace("骋风天合 · ", "") + '</div></div>'
-          + '<div><span class="status ' + s.status.cls + '">' + s.status.text + '</span></div>'
-          + '<div><div style="font-size:13px;color:#262626">' + s.contractor + '</div></div>'
-          + '<div class="amount">' + window.fmtMoney(s.amount) + '</div>'
-          + '<div><div style="font-size:12px;color:#595959">创建 ' + s.createdAt + '</div><div class="muted">截止 ' + s.deadline + '</div></div>'
+          + '<div class="cell-main"><span class="type-badge ' + s.typeKey + '">' + (s.typeKey === "sku" ? "📦" : "🧩") + ' ' + s.typeText + '</span><a class="space-title" href="' + s.href + '">🤝 ' + (s.typeKey === "sku" ? s.packageName : s.title) + '</a><div class="space-id">' + s.id + ' · ' + s.demandId + (s.orderId ? ' · ' + s.orderId : '') + '</div><div class="muted">' + (s.typeKey === "sku" ? s.title : s.category) + '</div></div>'
+          + '<div><div class="meta-line"><b>' + s.tierName + '</b></div><div class="meta-line">' + s.configText + '</div><div class="muted">增项：' + s.addonText + '</div><span class="sub-tag">素材：' + s.materialText + '</span></div>'
+          + '<div><span class="status ' + s.status.cls + '">' + s.status.text + '</span><div class="muted">下一步：' + (s.status.next || "查看详情") + '</div></div>'
+          + '<div><div style="font-size:13px;color:#262626">' + s.contractor + '</div><div class="muted">' + shortWorkspaceName(s.workspaceName) + '</div></div>'
+          + '<div class="finance-cell"><div class="amount">' + window.fmtMoney(s.amount) + '</div><div class="muted">' + s.financeText + '</div><div class="muted">' + s.invoiceText + '</div></div>'
+          + '<div><div style="font-size:12px;color:#595959">创建 ' + s.createdAt + '</div><div class="muted">交付 ' + s.deadline + '</div></div>'
           + '<div class="row-actions"><a class="btn-link primary" href="' + s.href + '">进入</a><a class="btn-link" href="demand-detail.html?demandId=' + s.demandId + '">需求</a></div>'
           + '</div>';
       }).join("");
     }
 
     $("scopeFilter").addEventListener("change", function (e) { scopeFilter = e.target.value; render(); });
+    $("typeFilter").addEventListener("change", function (e) { typeFilter = e.target.value; render(); });
     $("stageFilter").addEventListener("change", function (e) { stageFilter = e.target.value; render(); });
     $("searchInput").addEventListener("input", function (e) { searchKey = e.target.value.trim(); render(); });
     window.onWorkspaceChanged = render;

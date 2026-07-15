@@ -137,6 +137,30 @@
         { label: "开票处理", href: "#", tone: "" }
       ],
       section: "admin"
+    },
+    adminReconciliation: {
+      title: "每日对账",
+      desc: "按日查看天合与汇付的对账结果，快速识别存在差异或执行失败的批次。",
+      actions: [
+        { label: "查看差异明细", href: "admin-reconciliation-differences.html", tone: "primary" },
+        { label: "导出当日汇总", href: "#", tone: "" }
+      ],
+      section: "admin"
+    },
+    adminReconciliationDiffs: {
+      title: "差异明细",
+      desc: "跨日期集中查看并处理支付、退款、分账、提现差异，适合财务日常跟进。",
+      actions: [
+        { label: "返回每日对账", href: "admin-reconciliation.html", tone: "primary" },
+        { label: "导出差异数据", href: "#", tone: "" }
+      ],
+      section: "admin"
+    },
+    adminReconciliationDetail: {
+      title: "对账批次详情",
+      desc: "查看批次汇总、各业务明细、差异处理进度和单笔交易双方数据。",
+      actions: [],
+      section: "admin"
     }
   };
 
@@ -167,10 +191,16 @@
       ["orderDetail", "订单资金详情", "≣"]
     ],
     admin: [
-      ["adminOverview", "财务总览", "◍"],
-      ["adminBudget", "预算管理", "▤"],
-      ["adminAudit", "审核中心", "▥"],
-      ["adminSettlement", "结算与发票", "▦"]
+      { title: "财务后台", items: [
+        ["adminOverview", "财务总览", "◍"],
+        ["adminBudget", "预算管理", "▤"],
+        ["adminAudit", "审核中心", "▥"],
+        ["adminSettlement", "结算与发票", "▦"]
+      ] },
+      { title: "对账管理", items: [
+        ["adminReconciliation", "每日对账", "◫"],
+        ["adminReconciliationDiffs", "差异明细", "≠"]
+      ] }
     ]
   };
 
@@ -668,8 +698,842 @@
     }
   };
 
+  const RECONCILIATION_DATA = {
+    overviewMetrics: [
+      ["对账批次数", "28", "当前筛选范围内已生成的对账批次"],
+      ["差异批次数", "6", "存在差异或执行失败的批次"],
+      ["差异笔数", "19", "支付、退款、分账、提现累计差异"],
+      ["未处理差异", "7", "待处理与处理中差异总和"]
+    ],
+    batches: [
+      {
+        id: "batch_001",
+        date: "2026-07-15",
+        batchNo: "DZ20260715001",
+        scope: "支付 / 退款 / 分账 / 提现",
+        businessTypes: ["all", "payment", "refund", "sharing", "withdraw"],
+        platformCount: 128,
+        huifuCount: 128,
+        platformAmount: 100000,
+        huifuAmount: 99800,
+        matchedCount: 125,
+        diffCount: 3,
+        diffAmount: 200,
+        unresolvedCount: 2,
+        reconStatus: "存在差异",
+        processingStatus: "处理中",
+        completedAt: "2026-07-16 02:06:21",
+        version: "v3",
+        exportSummary: "已导出 2 次",
+        rows: [
+          {
+            id: "detail_001",
+            businessType: "分账",
+            businessOrderNo: "PS202607150001",
+            platformTransactionNo: "TH202607150001",
+            huifuTransactionNo: "HF202607150001",
+            originalTransactionNo: "PAY202607140001",
+            counterpartyName: "承制方 A",
+            platformAmount: 900,
+            huifuAmount: 899,
+            diffAmount: -1,
+            platformStatus: "分账成功",
+            huifuStatus: "分账成功",
+            transactionTime: "2026-07-15 14:21:00",
+            huifuCompletedAt: "2026-07-15 14:21:15",
+            reconciliationResult: "差异",
+            differenceType: "金额不一致",
+            riskLevel: "中",
+            processingStatus: "待处理",
+            ownerName: "未分配"
+          },
+          {
+            id: "detail_002",
+            businessType: "支付",
+            businessOrderNo: "OD202607150013",
+            platformTransactionNo: "TH202607150002",
+            huifuTransactionNo: "HF202607150003",
+            originalTransactionNo: "-",
+            counterpartyName: "需求方企业账户",
+            platformAmount: 1280,
+            huifuAmount: 1280,
+            diffAmount: 0,
+            platformStatus: "支付失败",
+            huifuStatus: "支付成功",
+            transactionTime: "2026-07-15 09:52:11",
+            huifuCompletedAt: "2026-07-15 09:52:15",
+            reconciliationResult: "差异",
+            differenceType: "状态不一致",
+            riskLevel: "高",
+            processingStatus: "处理中",
+            ownerName: "王敏"
+          },
+          {
+            id: "detail_003",
+            businessType: "退款",
+            businessOrderNo: "RF202607150019",
+            platformTransactionNo: "TH202607150007",
+            huifuTransactionNo: "-",
+            originalTransactionNo: "PAY202607140208",
+            counterpartyName: "需求方企业账户",
+            platformAmount: 560,
+            huifuAmount: 0,
+            diffAmount: -560,
+            platformStatus: "退款成功",
+            huifuStatus: "未匹配到汇付流水",
+            transactionTime: "2026-07-15 18:06:03",
+            huifuCompletedAt: "-",
+            reconciliationResult: "差异",
+            differenceType: "汇付流水缺失",
+            riskLevel: "中",
+            processingStatus: "待处理",
+            ownerName: "未分配"
+          },
+          {
+            id: "detail_004",
+            businessType: "支付",
+            businessOrderNo: "OD202607150025",
+            platformTransactionNo: "TH202607150010",
+            huifuTransactionNo: "HF202607150018",
+            originalTransactionNo: "-",
+            counterpartyName: "需求方企业账户",
+            platformAmount: 3280,
+            huifuAmount: 3280,
+            diffAmount: 0,
+            platformStatus: "支付成功",
+            huifuStatus: "支付成功",
+            transactionTime: "2026-07-15 20:15:09",
+            huifuCompletedAt: "2026-07-15 20:15:10",
+            reconciliationResult: "一致",
+            differenceType: "无",
+            riskLevel: "低",
+            processingStatus: "无需处理",
+            ownerName: "-"
+          }
+        ],
+        diffStats: [
+          ["金额不一致", "1 笔", "分账手续费与汇付侧记录相差 1 元"],
+          ["状态不一致", "1 笔", "支付结果未同步回天合"],
+          ["汇付流水缺失", "1 笔", "退款流水仍未在汇付账单中出现"],
+          ["疑似重复交易", "0 笔", "当前批次未命中重复支付或重复退款"]
+        ],
+        progressStats: [
+          ["待处理", "2", "需财务或研发进一步排查"],
+          ["处理中", "1", "已由王敏跟进回调链路"],
+          ["已处理", "0", "当前批次暂无闭环项"],
+          ["人工确认关闭", "0", "暂无需要人工关闭的异常"]
+        ],
+        executionLogs: [
+          ["v3", "2026-07-16 02:06:21", "系统自动执行", "存在差异", "本次重新比对后仍保留 3 笔差异"],
+          ["v2", "2026-07-16 02:03:03", "系统自动重试", "执行中断", "汇付账单文件延迟 3 分钟到达"],
+          ["v1", "2026-07-16 02:00:00", "系统自动执行", "执行失败", "汇付账单拉取接口超时"]
+        ]
+      },
+      {
+        id: "batch_002",
+        date: "2026-07-14",
+        batchNo: "DZ20260714001",
+        scope: "支付 / 分账",
+        businessTypes: ["all", "payment", "sharing"],
+        platformCount: 92,
+        huifuCount: 92,
+        platformAmount: 84200,
+        huifuAmount: 84200,
+        matchedCount: 92,
+        diffCount: 0,
+        diffAmount: 0,
+        unresolvedCount: 0,
+        reconStatus: "对账一致",
+        processingStatus: "无需处理",
+        completedAt: "2026-07-15 02:01:08",
+        version: "v1",
+        exportSummary: "已导出 1 次",
+        rows: [],
+        diffStats: [],
+        progressStats: [],
+        executionLogs: []
+      },
+      {
+        id: "batch_003",
+        date: "2026-07-13",
+        batchNo: "DZ20260713002",
+        scope: "提现",
+        businessTypes: ["all", "withdraw"],
+        platformCount: 14,
+        huifuCount: 13,
+        platformAmount: 25600,
+        huifuAmount: 17600,
+        matchedCount: 12,
+        diffCount: 2,
+        diffAmount: 8000,
+        unresolvedCount: 1,
+        reconStatus: "执行失败",
+        processingStatus: "待处理",
+        completedAt: "2026-07-14 02:11:44",
+        version: "v2",
+        exportSummary: "未导出",
+        rows: [],
+        diffStats: [],
+        progressStats: [],
+        executionLogs: []
+      }
+    ],
+    differenceMetrics: [
+      ["待处理差异", "4", "尚未开始处理的差异单笔记录"],
+      ["处理中差异", "3", "已领取但尚未闭环的差异"],
+      ["高风险差异", "2", "状态错判、天合流水缺失等高风险异常"],
+      ["差异总金额", "¥ 8,760", "当前筛选范围内的金额差绝对值汇总"]
+    ],
+    differences: [
+      {
+        detailId: "detail_002",
+        date: "2026-07-15",
+        batchNo: "DZ20260715001",
+        businessType: "支付",
+        businessOrderNo: "OD202607150013",
+        platformTransactionNo: "TH202607150002",
+        huifuTransactionNo: "HF202607150003",
+        originalTransactionNo: "-",
+        counterpartyName: "需求方企业账户",
+        platformAmount: 1280,
+        huifuAmount: 1280,
+        diffAmount: 0,
+        platformStatus: "支付失败",
+        huifuStatus: "支付成功",
+        transactionTime: "2026-07-15 09:52:11",
+        huifuCompletedAt: "2026-07-15 09:52:15",
+        reconciliationResult: "差异",
+        differenceType: "状态不一致",
+        riskLevel: "高",
+        processingStatus: "处理中",
+        ownerName: "王敏",
+        lastProcessedAt: "2026-07-16 09:10:00"
+      },
+      {
+        detailId: "detail_005",
+        date: "2026-07-14",
+        batchNo: "DZ20260714003",
+        businessType: "支付",
+        businessOrderNo: "OD202607140208",
+        platformTransactionNo: "-",
+        huifuTransactionNo: "HF202607140119",
+        originalTransactionNo: "-",
+        counterpartyName: "需求方企业账户",
+        platformAmount: 0,
+        huifuAmount: 8000,
+        diffAmount: 8000,
+        platformStatus: "无记录",
+        huifuStatus: "支付成功",
+        transactionTime: "-",
+        huifuCompletedAt: "2026-07-14 18:19:23",
+        reconciliationResult: "差异",
+        differenceType: "天合流水缺失",
+        riskLevel: "高",
+        processingStatus: "待处理",
+        ownerName: "未分配",
+        lastProcessedAt: "-"
+      },
+      {
+        detailId: "detail_001",
+        date: "2026-07-15",
+        batchNo: "DZ20260715001",
+        businessType: "分账",
+        businessOrderNo: "PS202607150001",
+        platformTransactionNo: "TH202607150001",
+        huifuTransactionNo: "HF202607150001",
+        originalTransactionNo: "PAY202607140001",
+        counterpartyName: "承制方 A",
+        platformAmount: 900,
+        huifuAmount: 899,
+        diffAmount: -1,
+        platformStatus: "分账成功",
+        huifuStatus: "分账成功",
+        transactionTime: "2026-07-15 14:21:00",
+        huifuCompletedAt: "2026-07-15 14:21:15",
+        reconciliationResult: "差异",
+        differenceType: "金额不一致",
+        riskLevel: "中",
+        processingStatus: "待处理",
+        ownerName: "未分配",
+        lastProcessedAt: "-"
+      },
+      {
+        detailId: "detail_003",
+        date: "2026-07-15",
+        batchNo: "DZ20260715001",
+        businessType: "退款",
+        businessOrderNo: "RF202607150019",
+        platformTransactionNo: "TH202607150007",
+        huifuTransactionNo: "-",
+        originalTransactionNo: "PAY202607140208",
+        counterpartyName: "需求方企业账户",
+        platformAmount: 560,
+        huifuAmount: 0,
+        diffAmount: -560,
+        platformStatus: "退款成功",
+        huifuStatus: "未匹配到汇付流水",
+        transactionTime: "2026-07-15 18:06:03",
+        huifuCompletedAt: "-",
+        reconciliationResult: "差异",
+        differenceType: "汇付流水缺失",
+        riskLevel: "中",
+        processingStatus: "待处理",
+        ownerName: "未分配",
+        lastProcessedAt: "-"
+      }
+    ],
+    detailMap: {
+      detail_001: {
+        title: "分账金额不一致",
+        riskLevel: "中",
+        date: "2026-07-15",
+        businessType: "分账",
+        businessOrderNo: "PS202607150001",
+        platformTransactionNo: "TH202607150001",
+        huifuTransactionNo: "HF202607150001",
+        originalTransactionNo: "PAY202607140001",
+        reconciliationResult: "差异",
+        processingStatus: "待处理",
+        ownerName: "未分配",
+        overview: [
+          ["差异类型", "金额不一致"],
+          ["风险等级", "中风险"],
+          ["对账日期", "2026-07-15"],
+          ["业务类型", "分账"]
+        ],
+        platformFacts: [
+          ["业务单号", "PS202607150001"],
+          ["交易流水号", "TH202607150001"],
+          ["交易金额", "¥ 900"],
+          ["交易状态", "分账成功"],
+          ["交易时间", "2026-07-15 14:21:00"],
+          ["付款方", "平台主账户"],
+          ["分账接收方", "承制方 A"],
+          ["应分账金额", "¥ 900"],
+          ["平台服务费", "¥ 120"],
+          ["汇付手续费", "¥ 6"],
+          ["最近更新时间", "2026-07-15 14:21:20"],
+          ["规则版本", "share_rule_v202607"]
+        ],
+        huifuFacts: [
+          ["汇付交易流水号", "HF202607150001"],
+          ["商户订单号", "PS202607150001"],
+          ["原交易流水号", "PAY202607140001"],
+          ["交易金额", "¥ 899"],
+          ["交易状态", "分账成功"],
+          ["交易完成时间", "2026-07-15 14:21:15"],
+          ["付款方标识", "plat_01"],
+          ["分账接收方", "承制方 A"],
+          ["实际分账金额", "¥ 899"],
+          ["汇付手续费", "¥ 7"],
+          ["汇付返回码", "000000"],
+          ["最近查询时间", "2026-07-16 09:05:10"]
+        ],
+        snapshot: [
+          ["订单实付金额", "¥ 1,020"],
+          ["平台服务费费率", "11.76%"],
+          ["平台服务费金额", "¥ 120"],
+          ["汇付手续费", "¥ 6"],
+          ["承制方应分账金额", "¥ 900"],
+          ["分账比例", "88.24%"],
+          ["小数处理规则", "向下取整到分"],
+          ["规则版本", "share_rule_v202607"]
+        ],
+        processingForm: {
+          status: "待处理",
+          owner: "未分配",
+          reason: "金额计算规则不一致",
+          action: "待研发核查汇付手续费取整规则与平台结算快照。",
+          conclusion: "尚未闭环，先按待处理保留。",
+          ticket: "FIN-20260716-003",
+          remark: "需要同时检查分账接收方配置版本。"
+        },
+        logs: [
+          ["2026-07-16 09:05", "系统", "重新查询汇付状态", "汇付返回金额仍为 ¥899，未发生变化"],
+          ["2026-07-16 09:12", "王敏", "记录差异原因", "初步判断为手续费取整口径不一致"],
+          ["2026-07-16 09:18", "系统", "重新对账", "结果仍为金额不一致"]
+        ]
+      },
+      detail_002: {
+        title: "支付状态不一致",
+        riskLevel: "高",
+        date: "2026-07-15",
+        businessType: "支付",
+        businessOrderNo: "OD202607150013",
+        platformTransactionNo: "TH202607150002",
+        huifuTransactionNo: "HF202607150003",
+        originalTransactionNo: "-",
+        reconciliationResult: "差异",
+        processingStatus: "处理中",
+        ownerName: "王敏",
+        overview: [
+          ["差异类型", "状态不一致"],
+          ["风险等级", "高风险"],
+          ["对账日期", "2026-07-15"],
+          ["业务类型", "支付"]
+        ],
+        platformFacts: [
+          ["业务单号", "OD202607150013"],
+          ["交易流水号", "TH202607150002"],
+          ["交易金额", "¥ 1,280"],
+          ["交易状态", "支付失败"],
+          ["交易时间", "2026-07-15 09:52:11"],
+          ["付款方", "天合主账户"],
+          ["收款方", "汇付商户户头"],
+          ["最近更新时间", "2026-07-15 09:52:13"],
+          ["规则版本", "payment_callback_v2"]
+        ],
+        huifuFacts: [
+          ["汇付交易流水号", "HF202607150003"],
+          ["商户订单号", "OD202607150013"],
+          ["原交易流水号", "-"],
+          ["交易金额", "¥ 1,280"],
+          ["交易状态", "支付成功"],
+          ["交易完成时间", "2026-07-15 09:52:15"],
+          ["付款方标识", "payer_138****8888"],
+          ["收款方标识", "merchant_cfth"],
+          ["汇付失败原因", "-"],
+          ["汇付返回码", "000000"],
+          ["最近查询时间", "2026-07-16 09:08:22"]
+        ],
+        snapshot: [],
+        processingForm: {
+          status: "处理中",
+          owner: "王敏",
+          reason: "汇付回调处理失败",
+          action: "已补查回调日志并通知研发修复回调消费异常。",
+          conclusion: "等待修复后重新同步订单状态，再执行单笔对账。",
+          ticket: "FIN-20260716-001",
+          remark: "同批次另有 1 笔退款异常，建议一起复盘。"
+        },
+        logs: [
+          ["2026-07-16 08:55", "系统", "重新查询汇付状态", "汇付状态仍为支付成功"],
+          ["2026-07-16 09:02", "王敏", "开始处理", "处理状态由待处理改为处理中，负责人自动分配为当前用户"],
+          ["2026-07-16 09:10", "研发值班", "备注", "确认回调消费队列在 09:00 前有积压"]
+        ]
+      },
+      detail_003: {
+        title: "汇付流水缺失",
+        riskLevel: "中",
+        date: "2026-07-15",
+        businessType: "退款",
+        businessOrderNo: "RF202607150019",
+        platformTransactionNo: "TH202607150007",
+        huifuTransactionNo: "-",
+        originalTransactionNo: "PAY202607140208",
+        reconciliationResult: "差异",
+        processingStatus: "待处理",
+        ownerName: "未分配",
+        overview: [
+          ["差异类型", "汇付流水缺失"],
+          ["风险等级", "中风险"],
+          ["对账日期", "2026-07-15"],
+          ["业务类型", "退款"]
+        ],
+        platformFacts: [
+          ["业务单号", "RF202607150019"],
+          ["交易流水号", "TH202607150007"],
+          ["交易金额", "¥ 560"],
+          ["交易状态", "退款成功"],
+          ["交易时间", "2026-07-15 18:06:03"],
+          ["付款方", "平台主账户"],
+          ["收款方", "需求方企业账户"],
+          ["最近更新时间", "2026-07-15 18:06:09"],
+          ["规则版本", "refund_v1"]
+        ],
+        huifuFacts: [
+          ["汇付交易流水号", "-"],
+          ["商户订单号", "RF202607150019"],
+          ["原交易流水号", "PAY202607140208"],
+          ["交易金额", "¥ 0"],
+          ["交易状态", "未匹配到汇付账单"],
+          ["交易完成时间", "-"],
+          ["付款方标识", "merchant_cfth"],
+          ["收款方标识", "payer_139****2020"],
+          ["汇付失败原因", "账单延迟或流水未返回"],
+          ["汇付返回码", "-"],
+          ["最近查询时间", "2026-07-16 09:02:45"]
+        ],
+        snapshot: [],
+        processingForm: {
+          status: "待处理",
+          owner: "未分配",
+          reason: "汇付账单延迟",
+          action: "建议等待下一轮账单同步后再次查询。",
+          conclusion: "待确认账单是否跨日返回。",
+          ticket: "FIN-20260716-005",
+          remark: "退款原流水状态正常。"
+        },
+        logs: [
+          ["2026-07-16 09:02", "系统", "重新查询汇付状态", "仍未拉取到对应退款流水"],
+          ["2026-07-16 09:03", "系统", "重新对账", "仍判定为汇付流水缺失"]
+        ]
+      },
+      detail_005: {
+        title: "天合流水缺失",
+        riskLevel: "高",
+        date: "2026-07-14",
+        businessType: "支付",
+        businessOrderNo: "OD202607140208",
+        platformTransactionNo: "-",
+        huifuTransactionNo: "HF202607140119",
+        originalTransactionNo: "-",
+        reconciliationResult: "差异",
+        processingStatus: "待处理",
+        ownerName: "未分配",
+        overview: [
+          ["差异类型", "天合流水缺失"],
+          ["风险等级", "高风险"],
+          ["对账日期", "2026-07-14"],
+          ["业务类型", "支付"]
+        ],
+        platformFacts: [
+          ["业务单号", "未匹配到天合业务"],
+          ["交易流水号", "-"],
+          ["交易金额", "¥ 0"],
+          ["交易状态", "无记录"],
+          ["交易时间", "-"],
+          ["付款方", "-"],
+          ["收款方", "-"],
+          ["最近更新时间", "-"],
+          ["规则版本", "-"]
+        ],
+        huifuFacts: [
+          ["汇付交易流水号", "HF202607140119"],
+          ["商户订单号", "OD202607140208"],
+          ["原交易流水号", "-"],
+          ["交易金额", "¥ 8,000"],
+          ["交易状态", "支付成功"],
+          ["交易完成时间", "2026-07-14 18:19:23"],
+          ["付款方标识", "payer_138****7632"],
+          ["收款方标识", "merchant_cfth"],
+          ["汇付失败原因", "-"],
+          ["汇付返回码", "000000"],
+          ["最近查询时间", "2026-07-15 10:18:17"]
+        ],
+        snapshot: [],
+        processingForm: {
+          status: "待处理",
+          owner: "未分配",
+          reason: "汇付回调未收到",
+          action: "需要研发确认回调日志与订单创建链路。",
+          conclusion: "暂未确认真实业务归属，不可直接修改支付结果。",
+          ticket: "FIN-20260715-009",
+          remark: "属于高风险差异，优先级需提升。"
+        },
+        logs: [
+          ["2026-07-15 10:18", "系统管理员", "重新查询汇付状态", "确认汇付成功事实存在"],
+          ["2026-07-15 10:22", "财务", "备注", "禁止人工补单或直接改余额"]
+        ]
+      }
+    }
+  };
+
+  const ORDER_DETAIL_FIXTURES = {
+    drama: {
+      "OD-2026052607": {
+        ...TEAM_DATA.drama.orderDetail,
+        relatedBizNos: ["OD-2026052607"],
+        relatedTradeNos: ["FL-2026052601"],
+        relatedFundNos: ["FF-2026052601", "FF-2026052602"]
+      },
+      "OD-2026051809": {
+        orderNo: "OD-2026051809",
+        title: "IP 海报系列",
+        amount: "¥ 28,000",
+        payer: "短剧制作中心 - 团队预算账户",
+        contractor: "星辰创作工作室",
+        status: "已结算",
+        summary: [["订单金额", "¥ 28,000"], ["已锁资", "¥ 28,000"], ["已结算", "¥ 28,000"], ["可开票", "¥ 28,000"]],
+        timeline: [
+          { state: "done", title: "创建订单", time: "2026-05-18 10:18", meta: "订单创建成功，付款主体锁定为短剧制作中心。" },
+          { state: "done", title: "完成锁资", time: "2026-05-18 10:22", meta: "冻结团队预算 ¥28,000，等待视觉物料交付。" },
+          { state: "done", title: "验收通过", time: "2026-05-24 11:36", meta: "海报系列验收完成，触发结算流程。" },
+          { state: "done", title: "结算完成", time: "2026-05-24 11:41", meta: "承制方收益入账，可开票金额同步进入发票池。" },
+          { state: "warn", title: "退款争议处理中", time: "2026-05-21 16:00", meta: "因海报重制争议发起 RF-2026052103，当前退款回补仍在处理中。" }
+        ],
+        vouchers: [
+          ["voucher_7962", "锁资", "-¥ 28,000", "2026-05-18 10:22", "已生效"],
+          ["voucher_7984", "结算", "-¥ 28,000", "2026-05-24 11:41", "已结算"],
+          ["voucher_7985", "服务费", "¥ 1,680", "2026-05-24 11:41", "已结转"]
+        ],
+        relatedBizNos: ["OD-2026051809", "RF-2026052103"],
+        relatedTradeNos: ["FL-2026052403", "FL-2026052104"],
+        relatedFundNos: ["FF-2026052401", "FF-2026052101"]
+      },
+      "OD-2026051105": {
+        orderNo: "OD-2026051105",
+        title: "角色海报重绘",
+        amount: "¥ 16,300",
+        payer: "短剧制作中心 - 团队预算账户",
+        contractor: "云上视觉工作室",
+        status: "已结算，开票申请中",
+        summary: [["订单金额", "¥ 16,300"], ["已锁资", "¥ 16,300"], ["已结算", "¥ 16,300"], ["可开票", "¥ 16,300"]],
+        timeline: [
+          { state: "done", title: "创建订单", time: "2026-05-11 09:12", meta: "确认角色海报重绘范围与付款主体。" },
+          { state: "done", title: "完成锁资", time: "2026-05-11 09:16", meta: "冻结团队预算 ¥16,300。" },
+          { state: "done", title: "验收通过", time: "2026-05-19 15:20", meta: "重绘稿通过验收，进入结算。" },
+          { state: "done", title: "结算完成", time: "2026-05-19 15:26", meta: "承制方收益到账，系统生成可开票金额。" },
+          { state: "warn", title: "开票申请处理中", time: "2026-05-24 16:32", meta: "已并入 INV-2026052402 开票申请，等待财务处理。" }
+        ],
+        vouchers: [
+          ["voucher_7908", "锁资", "-¥ 16,300", "2026-05-11 09:16", "已生效"],
+          ["voucher_7948", "结算", "-¥ 16,300", "2026-05-19 15:26", "已结算"],
+          ["voucher_8019", "开票占用", "¥ 16,300", "2026-05-24 16:32", "处理中"]
+        ],
+        relatedBizNos: ["OD-2026051105"],
+        relatedTradeNos: ["FL-2026051906"],
+        relatedFundNos: ["FF-2026051902"]
+      },
+      "OD-2026050203": {
+        orderNo: "OD-2026050203",
+        title: "预告片后期包装",
+        amount: "¥ 34,895",
+        payer: "短剧制作中心 - 团队预算账户",
+        contractor: "逐帧后期工作室",
+        status: "已结算，开票申请中",
+        summary: [["订单金额", "¥ 34,895"], ["已锁资", "¥ 34,895"], ["已结算", "¥ 34,895"], ["可开票", "¥ 34,895"]],
+        timeline: [
+          { state: "done", title: "创建订单", time: "2026-05-02 14:05", meta: "预告片包装需求下单成功。" },
+          { state: "done", title: "完成锁资", time: "2026-05-02 14:08", meta: "冻结团队预算 ¥34,895。" },
+          { state: "done", title: "验收通过", time: "2026-05-12 18:30", meta: "后期包装版本通过验收。" },
+          { state: "done", title: "结算完成", time: "2026-05-12 18:42", meta: "结算完成并同步生成发票池额度。" },
+          { state: "warn", title: "开票申请处理中", time: "2026-05-24 16:32", meta: "当前与其他结算单合并申请专票。" }
+        ],
+        vouchers: [
+          ["voucher_7831", "锁资", "-¥ 34,895", "2026-05-02 14:08", "已生效"],
+          ["voucher_7866", "结算", "-¥ 34,895", "2026-05-12 18:42", "已结算"],
+          ["voucher_8018", "开票占用", "¥ 34,895", "2026-05-24 16:32", "处理中"]
+        ],
+        relatedBizNos: ["OD-2026050203"],
+        relatedTradeNos: ["FL-2026051204"],
+        relatedFundNos: ["FF-2026051203"]
+      },
+      "OD-2026051702": {
+        orderNo: "OD-2026051702",
+        title: "备选封面视频取消",
+        amount: "¥ 12,000",
+        payer: "短剧制作中心 - 团队预算账户",
+        contractor: "平台锁资池",
+        status: "已取消，预算已解冻",
+        summary: [["订单金额", "¥ 12,000"], ["已锁资", "¥ 12,000"], ["已解冻", "¥ 12,000"], ["可开票", "¥ 0"]],
+        timeline: [
+          { state: "done", title: "创建订单", time: "2026-05-17 14:20", meta: "备选封面视频需求创建成功。" },
+          { state: "done", title: "发起锁资", time: "2026-05-17 14:22", meta: "冻结团队预算 ¥12,000。" },
+          { state: "warn", title: "业务取消", time: "2026-05-20 09:30", meta: "需求方主动取消订单，触发解冻。" },
+          { state: "done", title: "预算解冻完成", time: "2026-05-20 09:33", meta: "原锁资金额全部退回可用余额。" }
+        ],
+        vouchers: [
+          ["voucher_7921", "锁资", "-¥ 12,000", "2026-05-17 14:22", "已生效"],
+          ["voucher_7927", "解冻", "+¥ 12,000", "2026-05-20 09:33", "已解冻"]
+        ],
+        relatedBizNos: ["OD-2026051702"],
+        relatedTradeNos: ["FL-2026052005"],
+        relatedFundNos: ["FF-2026052006"]
+      }
+    },
+    marketing: {
+      "OD-2026052603": {
+        ...TEAM_DATA.marketing.orderDetail,
+        relatedBizNos: ["OD-2026052603"],
+        relatedTradeNos: ["FL-2026052609"],
+        relatedFundNos: ["FF-2026052603"]
+      },
+      "OD-2026052202": {
+        orderNo: "OD-2026052202",
+        title: "海报素材包",
+        amount: "¥ 12,000",
+        payer: "市场宣传组 - 团队预算账户",
+        contractor: "内容承接方",
+        status: "锁资中",
+        summary: [["订单金额", "¥ 12,000"], ["已锁资", "¥ 12,000"], ["已结算", "¥ 0"], ["可开票", "¥ 0"]],
+        timeline: [
+          { state: "done", title: "创建订单", time: "2026-05-22 09:58", meta: "海报素材包需求创建成功。" },
+          { state: "done", title: "发起锁资", time: "2026-05-22 10:03", meta: "冻结团队预算 ¥12,000，生成 voucher_9021。" },
+          { state: "warn", title: "等待交付", time: "进行中", meta: "当前处于素材制作阶段，尚未进入验收。" },
+          { state: "", title: "验收后结算", time: "待发生", meta: "结算完成后会生成可开票金额。" }
+        ],
+        vouchers: [
+          ["voucher_9021", "锁资", "-¥ 12,000", "2026-05-22 10:03", "已生效"],
+          ["voucher_9022", "服务费预估", "¥ 720", "2026-05-22 10:03", "待结算"]
+        ],
+        relatedBizNos: ["OD-2026052202", "RF-2026052401"],
+        relatedTradeNos: ["FL-2026052211", "FL-2026052410"],
+        relatedFundNos: ["FF-2026052201", "FF-2026052402"]
+      },
+      "OD-2026051904": {
+        orderNo: "OD-2026051904",
+        title: "海报素材包补充",
+        amount: "¥ 9,880",
+        payer: "市场宣传组 - 团队预算账户",
+        contractor: "内容承接方",
+        status: "已结算",
+        summary: [["订单金额", "¥ 9,880"], ["已锁资", "¥ 9,880"], ["已结算", "¥ 9,880"], ["可开票", "¥ 9,880"]],
+        timeline: [
+          { state: "done", title: "创建订单", time: "2026-05-19 10:12", meta: "补充物料订单创建成功。" },
+          { state: "done", title: "完成锁资", time: "2026-05-19 10:15", meta: "冻结团队预算 ¥9,880。" },
+          { state: "done", title: "验收通过", time: "2026-05-19 18:36", meta: "物料补充版本验收通过。" },
+          { state: "done", title: "结算完成", time: "2026-05-19 18:40", meta: "结算成功并进入可开票池。" }
+        ],
+        vouchers: [
+          ["voucher_9004", "锁资", "-¥ 9,880", "2026-05-19 10:15", "已生效"],
+          ["voucher_9008", "结算", "-¥ 9,880", "2026-05-19 18:40", "已结算"]
+        ],
+        relatedBizNos: ["OD-2026051904"],
+        relatedTradeNos: ["FL-2026051916"],
+        relatedFundNos: ["FF-2026051911"]
+      }
+    }
+  };
+
+  function getPageLabel(page) {
+    return (PAGES[page] || {}).title || "当前页面";
+  }
+
+  function extractBizNos(value) {
+    return String(value || "").match(/[A-Z]{2}-\d{10}/g) || [];
+  }
+
+  function getRouteState() {
+    const params = {};
+    const search = new URLSearchParams(window.location.search || "");
+    const hashRaw = (window.location.hash || "").replace(/^#/, "");
+    const hash = new URLSearchParams(hashRaw && hashRaw.includes("=") ? hashRaw : "");
+
+    search.forEach((value, key) => {
+      if (value) params[key] = value;
+    });
+    if (hashRaw && !hashRaw.includes("=")) {
+      params.bizNo = params.bizNo || decodeURIComponent(hashRaw);
+    }
+    hash.forEach((value, key) => {
+      if (value && params[key] == null) params[key] = value;
+    });
+    return params;
+  }
+
+  function buildPageUrl(page, query = {}, hash = {}) {
+    const search = new URLSearchParams();
+    const hashParams = new URLSearchParams();
+    Object.entries(query).forEach(([key, value]) => {
+      if (value != null && value !== "") search.set(key, value);
+    });
+    Object.entries(hash).forEach(([key, value]) => {
+      if (value != null && value !== "") hashParams.set(key, value);
+    });
+    let href = pageToFile(page);
+    const searchText = search.toString();
+    const hashText = hashParams.toString();
+    if (searchText) href += `?${searchText}`;
+    if (hashText) href += `#${hashText}`;
+    return href;
+  }
+
+  function getTeamKeyByTeam(team) {
+    return Object.entries(TEAM_DATA).find(([, item]) => item.name === team.name)?.[0] || "drama";
+  }
+
+  function resolveOrderNo(teamKey, refNo) {
+    if (!refNo) return "";
+    const fixtures = ORDER_DETAIL_FIXTURES[teamKey] || {};
+    if (fixtures[refNo]) return refNo;
+    return Object.values(fixtures).find(detail => [detail.orderNo].concat(detail.relatedBizNos || []).includes(refNo))?.orderNo || "";
+  }
+
+  function resolveRouteTeamKey(routeState, fallbackTeamKey) {
+    if (routeState.team && TEAM_DATA[routeState.team]) return routeState.team;
+    const refs = [routeState.orderNo, routeState.bizNo].filter(Boolean);
+    for (const ref of refs) {
+      const matchedTeamKey = Object.keys(TEAM_DATA).find(teamKey => resolveOrderNo(teamKey, ref));
+      if (matchedTeamKey) return matchedTeamKey;
+    }
+    return fallbackTeamKey;
+  }
+
+  function resolveOrderContext(teamKey, routeState = {}) {
+    const effectiveTeamKey = resolveRouteTeamKey(routeState, teamKey);
+    const fixtures = ORDER_DETAIL_FIXTURES[effectiveTeamKey] || {};
+    const requestedOrderNo = routeState.orderNo || resolveOrderNo(effectiveTeamKey, routeState.bizNo);
+    const hasExplicitRef = Boolean(routeState.orderNo || routeState.bizNo);
+    const detail = requestedOrderNo && fixtures[requestedOrderNo]
+      ? fixtures[requestedOrderNo]
+      : TEAM_DATA[effectiveTeamKey].orderDetail;
+
+    return {
+      teamKey: effectiveTeamKey,
+      orderNo: detail.orderNo,
+      bizNo: routeState.bizNo || requestedOrderNo || detail.orderNo,
+      fromPage: routeState.from || "",
+      detail,
+      notFound: hasExplicitRef && !(requestedOrderNo && fixtures[requestedOrderNo])
+    };
+  }
+
+  function buildOrderDetailHref(teamKey, bizNo, fromPage, orderNo) {
+    const resolvedOrderNo = orderNo || resolveOrderNo(teamKey, bizNo);
+    if (!resolvedOrderNo) return "";
+    return buildPageUrl("orderDetail", { team: teamKey, bizNo: bizNo || resolvedOrderNo }, { from: fromPage, orderNo: resolvedOrderNo });
+  }
+
+  function buildOrderLinkedPageHref(page, teamKey, orderNo, bizNo, fromPage) {
+    return buildPageUrl(page, { team: teamKey, orderNo }, { from: fromPage, bizNo: bizNo || orderNo });
+  }
+
   function fmtMoney(value) {
     return "¥ " + Number(value).toLocaleString("zh-CN");
+  }
+
+  function fmtDeltaMoney(value) {
+    const number = Number(value) || 0;
+    const prefix = number > 0 ? "+" : "";
+    return `${prefix}${fmtMoney(number)}`;
+  }
+
+  function reconStatusTone(status) {
+    if (!status) return "blue";
+    if (status.includes("一致")) return "green";
+    if (status.includes("差异")) return "orange";
+    if (status.includes("失败")) return "red";
+    if (status.includes("关闭")) return "teal";
+    if (status.includes("执行中")) return "blue";
+    return "purple";
+  }
+
+  function processingStatusTone(status) {
+    if (!status) return "blue";
+    if (status.includes("无需")) return "teal";
+    if (status.includes("已处理") || status.includes("已关闭")) return "green";
+    if (status.includes("处理中")) return "blue";
+    if (status.includes("待处理")) return "red";
+    return "orange";
+  }
+
+  function riskTone(level) {
+    if (!level) return "teal";
+    if (level.includes("高")) return "red";
+    if (level.includes("中")) return "orange";
+    return "green";
+  }
+
+  function findReconBatch(batchNo) {
+    return RECONCILIATION_DATA.batches.find(item => item.batchNo === batchNo) || RECONCILIATION_DATA.batches[0];
+  }
+
+  function findReconDetail(detailId) {
+    return RECONCILIATION_DATA.detailMap[detailId] || RECONCILIATION_DATA.detailMap.detail_001;
+  }
+
+  function renderReconFactGrid(items, extraClass = "") {
+    return `
+      <div class="detail-grid detail-grid-2 ${extraClass}">
+        ${items.map(item => `
+          <div class="detail-item">
+            <span class="detail-label">${item[0]}</span>
+            <span class="detail-value">${item[1]}</span>
+          </div>
+        `).join("")}
+      </div>
+    `;
   }
 
   function parseMoney(value) {
@@ -742,6 +1606,7 @@
   }
 
   function buildTransactionRows(team) {
+    const teamKey = getTeamKeyByTeam(team);
     const operator = team.name.includes("短剧") ? "昭岚" : "陈思齐";
     const orderTitleMap = {
       "OD-2026052607": "三集短剧解说视频（修仙题材）",
@@ -798,6 +1663,7 @@
         status: row[4],
         amount: row[5],
         bizNo: row[6],
+        orderNo: resolveOrderNo(teamKey, row[6]),
         voucherNo: row[7],
         operator,
         bizName: orderTitleMap[row[6]] || row[6],
@@ -910,6 +1776,20 @@
     ];
   }
 
+  function buildLinkedBillDetailRows(team) {
+    const teamKey = getTeamKeyByTeam(team);
+    return buildBillDetailRows(team).map(row => {
+      const bizNo = extractBizNos(row.relatedBiz)[0] || "";
+      const orderNo = resolveOrderNo(teamKey, bizNo);
+      return {
+        ...row,
+        bizNo,
+        orderNo,
+        orderHref: orderNo ? buildOrderDetailHref(teamKey, bizNo, "bills", orderNo) : ""
+      };
+    });
+  }
+
   function lineChartSVG(labels, arrA, arrB, colorA, colorB) {
     const width = 560;
     const height = 220;
@@ -991,7 +1871,7 @@
       <div class="surface metric-card">
         <div class="metric-label">${item[0] || item.label}</div>
         <div class="metric-value">${item[1] || item.value}</div>
-        <div class="metric-foot">${item.foot || foot || ""}</div>
+        <div class="metric-foot">${item.foot || item[2] || foot || ""}</div>
       </div>
     `).join("");
   }
@@ -1081,7 +1961,10 @@
       adminOverview: "admin-overview.html",
       adminBudget: "admin-budget.html",
       adminAudit: "admin-audit.html",
-      adminSettlement: "admin-settlement.html"
+      adminSettlement: "admin-settlement.html",
+      adminReconciliation: "admin-reconciliation.html",
+      adminReconciliationDiffs: "admin-reconciliation-differences.html",
+      adminReconciliationDetail: "admin-reconciliation-detail.html"
     };
     return map[page] || "index.html";
   }
@@ -1101,6 +1984,9 @@
   Object.assign(PAGES.adminBudget, { icon: "▤" });
   Object.assign(PAGES.adminAudit, { icon: "▥" });
   Object.assign(PAGES.adminSettlement, { icon: "▦" });
+  Object.assign(PAGES.adminReconciliation, { icon: "◫" });
+  Object.assign(PAGES.adminReconciliationDiffs, { icon: "≠" });
+  Object.assign(PAGES.adminReconciliationDetail, { icon: "⊞" });
 
   function renderIndex() {
     return `
@@ -1109,13 +1995,13 @@
           <div>
             <div class="hero-kicker">Prototype Directory</div>
             <h3 class="hero-title">资金中心多页面原型</h3>
-            <div class="hero-balance">15</div>
+            <div class="hero-balance">18</div>
             <div class="hero-caption">已拆成独立页面，便于逐页打磨细节，而不是继续在单页大文件里堆内容。</div>
           </div>
           <div class="hero-side">
             <div class="hero-side-card"><div class="label">用户端页面</div><div class="value">10 页</div><div class="sub">资金首页、账户总览、账单流水、交易流水、资金流水、充值、积分、发票、提现、账户设置。</div></div>
             <div class="hero-side-card"><div class="label">三层流水</div><div class="value">交易 / 资金 / 账单</div><div class="sub">交易事件、余额变化、用户账单三层分离展示。</div></div>
-            <div class="hero-side-card"><div class="label">补充页面</div><div class="value">5 页</div><div class="sub">订单资金详情 + 4 个后台财务页面。</div></div>
+            <div class="hero-side-card"><div class="label">补充页面</div><div class="value">8 页</div><div class="sub">订单资金详情、财务后台和新增对账管理页面已拆分完成。</div></div>
           </div>
         </div>
       </div>
@@ -1145,7 +2031,10 @@
               ["admin-overview.html", "财务总览", "企业总池和审批总览"],
               ["admin-budget.html", "预算管理", "团队预算矩阵"],
               ["admin-audit.html", "审核中心", "对公充值与提现审核"],
-              ["admin-settlement.html", "结算与发票", "待结算与开票处理"]
+              ["admin-settlement.html", "结算与发票", "待结算与开票处理"],
+              ["admin-reconciliation.html", "每日对账", "按日查看批次结果"],
+              ["admin-reconciliation-differences.html", "差异明细", "集中查看和处理差异"],
+              ["admin-reconciliation-detail.html", "对账批次详情", "批次汇总、明细与差异抽屉"]
             ].map(item => `<a class="card-link" href="${item[0]}"><strong>${item[1]}</strong><span>${item[2]}</span></a>`).join("")}
           </div>
           <div class="footer-note">逐页深化计划在 <a href="PAGE-ENRICHMENT-PLAN.md">PAGE-ENRICHMENT-PLAN.md</a>。</div>
@@ -1154,11 +2043,49 @@
     `;
   }
 
-  function renderOverview(team) {
+  function renderOverview(team, routeState = {}) {
+    const teamKey = getTeamKeyByTeam(team);
     const monthlyRows = team.bills.monthly;
-    const pendingTone = kind => kind === "danger" ? "red" : kind === "warn" ? "orange" : "green";
     const recentTone = status => status.includes("到账") || status.includes("结算") ? "green" : status.includes("处理") || status.includes("锁资") ? "orange" : "blue";
+    const focusOrderNo = routeState.orderNo || resolveOrderNo(teamKey, routeState.bizNo);
+    const focusBizNo = routeState.bizNo || focusOrderNo;
+    const focusDetailHref = focusOrderNo ? buildOrderDetailHref(teamKey, focusBizNo, "overview", focusOrderNo) : "";
+    const recentRows = team.overview.recent.map(row => {
+      const orderNo = resolveOrderNo(teamKey, row[5]);
+      return {
+        time: row[0],
+        type: row[1],
+        title: row[2],
+        amount: row[3],
+        status: row[4],
+        bizNo: row[5],
+        orderNo,
+        orderHref: orderNo ? buildOrderDetailHref(teamKey, row[5], "overview", orderNo) : ""
+      };
+    });
+    const pendingRows = team.overview.pending.map(item => {
+      const bizNo = extractBizNos(item.meta)[0] || "";
+      const orderNo = resolveOrderNo(teamKey, bizNo);
+      return {
+        ...item,
+        bizNo,
+        orderNo,
+        orderHref: orderNo ? buildOrderDetailHref(teamKey, bizNo, "overview", orderNo) : ""
+      };
+    });
     return `
+      ${focusOrderNo ? `
+        <div class="notice-item ok" style="margin-bottom:16px;">
+          <div class="notice-main">
+            <strong>已定位到 ${focusOrderNo} 的总览入口</strong>
+            <span>${routeState.from === "orderDetail" ? "你正在从订单资金详情返回总览。" : "当前高亮与该订单相关的最近资金动态。"}${focusBizNo && focusBizNo !== focusOrderNo ? ` 本次入口业务单号为 ${focusBizNo}。` : ""}</span>
+          </div>
+          <div class="table-actions">
+            <a class="btn mini primary" href="${focusDetailHref}">回到订单详情</a>
+            <a class="btn mini" href="${buildPageUrl("transactions", { team: teamKey, orderNo: focusOrderNo }, { from: "overview", bizNo: focusBizNo })}">查看关联流水</a>
+          </div>
+        </div>
+      ` : ""}
       <div class="info-banner">
         <ul>
           <li>资金总览用于查看当前团队预算、当月支出节奏、待处理事项和最近资金动态。</li>
@@ -1220,15 +2147,15 @@
         <div class="surface">
           <div class="surface-head"><div><h3>待处理事项</h3><p>当前团队需要优先关注的资金动作</p></div></div>
           <div class="notice-list">
-            ${team.overview.pending.map(item => `<div class="notice-item ${item.kind}"><div class="notice-main"><strong>${item.title}</strong><span>${item.meta}</span></div><button class="btn mini" type="button">${item.action}</button></div>`).join("")}
+            ${pendingRows.map(item => `<div class="notice-item ${item.kind}"><div class="notice-main"><strong>${item.title}</strong><span>${item.meta}</span></div>${item.orderHref ? `<a class="btn mini ${item.orderNo === focusOrderNo ? "primary" : ""}" href="${item.orderHref}">${item.action}</a>` : `<button class="btn mini" type="button">${item.action}</button>`}</div>`).join("")}
           </div>
         </div>
         <div class="surface">
           <div class="surface-head"><div><h3>最近资金动态</h3><p>最近发生的预算、锁资、退款与结算动作</p></div></div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>发生时间</th><th>类型</th><th>业务名称</th><th>金额</th><th>状态</th><th>关联业务单号</th></tr></thead>
-              <tbody>${team.overview.recent.map(row => `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td><td><span class="tag ${recentTone(row[4])}">${row[4]}</span></td><td>${row[5]}</td></tr>`).join("")}</tbody>
+              <thead><tr><th>发生时间</th><th>类型</th><th>业务名称</th><th>金额</th><th>状态</th><th>关联业务单号</th><th>操作</th></tr></thead>
+              <tbody>${recentRows.map(row => `<tr class="${focusBizNo && (row.bizNo === focusBizNo || row.orderNo === focusOrderNo) ? "row-focus" : ""}"><td>${row.time}</td><td>${row.type}</td><td>${row.title}</td><td>${row.amount}</td><td><span class="tag ${recentTone(row.status)}">${row.status}</span></td><td>${row.orderHref ? `<a class="text-link" href="${row.orderHref}">${row.bizNo}</a>` : row.bizNo}</td><td>${row.orderHref ? `<a class="btn mini ${row.orderNo === focusOrderNo ? "primary" : ""}" href="${row.orderHref}">查看订单</a>` : `<span class="tiny">仅总览展示</span>`}</td></tr>`).join("")}</tbody>
             </table>
           </div>
         </div>
@@ -1415,19 +2342,37 @@
     `;
   }
 
-  function renderTransactions(team) {
+  function renderTransactions(team, routeState = {}) {
+    const teamKey = getTeamKeyByTeam(team);
     const rows = buildTransactionRows(team);
-    const inflow = rows
+    const focusOrderNo = routeState.orderNo || resolveOrderNo(teamKey, routeState.bizNo);
+    const focusBizNo = routeState.bizNo || focusOrderNo;
+    const displayRows = focusOrderNo
+      ? rows.filter(row => row.orderNo === focusOrderNo || row.bizNo === focusBizNo)
+      : rows;
+    const inflow = displayRows
       .filter(row => row.amount.startsWith("+"))
       .reduce((sum, row) => sum + parseMoney(row.amount), 0);
-    const outflow = rows
+    const outflow = displayRows
       .filter(row => row.amount.startsWith("-"))
       .reduce((sum, row) => sum + Math.abs(parseMoney(row.amount)), 0);
-    const locked = rows
+    const locked = displayRows
       .filter(row => row.type === "锁资" && row.status.includes("锁资"))
       .reduce((sum, row) => sum + Math.abs(parseMoney(row.amount)), 0);
-    const pendingCount = rows.filter(row => row.status.includes("处理") || row.status.includes("锁资")).length;
+    const pendingCount = displayRows.filter(row => row.status.includes("处理") || row.status.includes("锁资")).length;
     return `
+      ${focusOrderNo ? `
+        <div class="notice-item ok" style="margin-bottom:16px;">
+          <div class="notice-main">
+            <strong>当前只展示 ${focusOrderNo} 的关联交易流水</strong>
+            <span>${focusBizNo && focusBizNo !== focusOrderNo ? `入口业务单号为 ${focusBizNo}，已一并展示关联退款或回补记录。` : "当前筛选条件已定位到该订单相关的交易事件。"}${routeState.from === "orderDetail" ? " 你可以直接返回订单页继续追溯。" : ""}</span>
+          </div>
+          <div class="table-actions">
+            <a class="btn mini primary" href="${buildOrderDetailHref(teamKey, focusBizNo, "transactions", focusOrderNo)}">返回订单详情</a>
+            <a class="btn mini" href="${buildPageUrl("transactions", { team: teamKey })}">查看全部流水</a>
+          </div>
+        </div>
+      ` : ""}
       <div class="info-banner">
         <ul>
           <li>交易流水只记录交易事件本身，不直接等同于账户余额变化，也不直接等同于用户账单展示。</li>
@@ -1446,7 +2391,7 @@
           <div class="field"><label>交易流水号</label><input type="text" placeholder="请输入交易流水号"></div>
           <div class="field"><label>原交易流水号</label><input type="text" placeholder="请输入原交易流水号"></div>
           <div class="field"><label>关联业务类型</label><select><option>全部业务类型</option><option>订单</option><option>充值单</option><option>提现单</option><option>退款单</option><option>划拨单</option><option>积分兑换单</option></select></div>
-          <div class="field"><label>关联业务单号</label><input type="text" placeholder="请输入关联业务单号"></div>
+          <div class="field"><label>关联业务单号</label><input type="text" value="${focusBizNo || ""}" placeholder="请输入关联业务单号"></div>
           <div class="field"><label>流水类型</label><select><option>全部流水类型</option><option>充值</option><option>下单支付</option><option>预算冻结</option><option>预算解冻</option><option>验收结算</option><option>退款</option><option>提现</option><option>提现退回</option><option>平台调账</option><option>服务费扣除</option><option>积分兑换</option></select></div>
           <div class="field advanced-filter"><label>交易方向</label><select><option>全部方向</option><option>收入</option><option>支出</option><option>冻结</option><option>解冻</option><option>转账</option><option>退回</option></select></div>
           <div class="field advanced-filter"><label>支付方式</label><select><option>全部支付方式</option><option>余额支付</option><option>支付宝</option><option>微信</option><option>银行卡</option><option>积分</option><option>混合支付</option></select></div>
@@ -1465,20 +2410,20 @@
         <div class="soft-table-head">
           <strong>交易流水列表</strong>
           <div class="table-head-actions">
-            <span class="tiny">当前页展示 ${rows.length} 条记录</span>
+            <span class="tiny">当前页展示 ${displayRows.length} 条记录</span>
             <button class="table-config-btn" type="button" data-open-column-config="transactions">配置列</button>
           </div>
         </div>
         <div class="table-wrap" style="border:none;border-radius:0;">
           <table data-table="transactions">
-            <thead><tr><th data-col="flowNo">交易流水号</th><th data-col="type">流水类型</th><th data-col="direction">交易方向</th><th data-col="bizNo">关联业务单号</th><th data-col="bizName">业务名称</th><th data-col="time">发生时间</th><th data-col="from">付款方</th><th data-col="to">收款方</th><th data-col="payMethod">支付方式</th><th data-col="channel">支付渠道</th><th data-col="amount">交易金额</th><th data-col="tradeStatus">交易状态</th><th data-col="fundStatus">资金处理状态</th><th data-col="operator">操作人</th><th data-col="source">操作来源</th></tr></thead>
+            <thead><tr><th data-col="flowNo">交易流水号</th><th data-col="type">流水类型</th><th data-col="direction">交易方向</th><th data-col="bizNo">关联业务单号</th><th data-col="bizName">业务名称</th><th data-col="time">发生时间</th><th data-col="from">付款方</th><th data-col="to">收款方</th><th data-col="payMethod">支付方式</th><th data-col="channel">支付渠道</th><th data-col="amount">交易金额</th><th data-col="tradeStatus">交易状态</th><th data-col="fundStatus">资金处理状态</th><th data-col="operator">操作人</th><th data-col="source">操作来源</th><th>操作</th></tr></thead>
             <tbody>
-              ${rows.map(row => `
-                <tr>
+              ${displayRows.map(row => `
+                <tr class="${focusBizNo && (row.bizNo === focusBizNo || row.orderNo === focusOrderNo) ? "row-focus" : ""}">
                   <td data-col="flowNo">${row.flowNo}</td>
                   <td data-col="type">${row.type}</td>
                   <td data-col="direction">${row.direction || "支出"}</td>
-                  <td data-col="bizNo">${row.bizNo}</td>
+                  <td data-col="bizNo">${row.orderNo ? `<a class="text-link" href="${buildOrderDetailHref(teamKey, row.bizNo, "transactions", row.orderNo)}">${row.bizNo}</a>` : row.bizNo}</td>
                   <td data-col="bizName">${row.bizName}</td>
                   <td data-col="time">${row.time}</td>
                   <td data-col="from">${row.from}</td>
@@ -1490,13 +2435,14 @@
                   <td data-col="fundStatus"><span class="tag ${row.status.includes("处理") ? "orange" : row.status.includes("锁资") ? "blue" : "green"}">${row.fundStatus || row.status}</span></td>
                   <td data-col="operator">${row.operator}</td>
                   <td data-col="source">${row.source || "B端"}</td>
+                  <td>${row.orderNo ? `<a class="btn mini ${row.orderNo === focusOrderNo ? "primary" : ""}" href="${buildOrderDetailHref(teamKey, row.bizNo, "transactions", row.orderNo)}">查看订单</a>` : `<span class="tiny">仅流水记录</span>`}</td>
                 </tr>
               `).join("")}
             </tbody>
           </table>
         </div>
         <div class="table-footbar">
-          <div class="pager-meta">共 ${rows.length} 条</div>
+          <div class="pager-meta">共 ${displayRows.length} 条</div>
           <div class="pager">
             <span class="pager-btn disabled">上一页</span>
             <span class="pager-btn active">1</span>
@@ -1589,11 +2535,28 @@
     `;
   }
 
-  function renderBills(team) {
-    const billRows = buildBillRows(team);
-    const detailRows = buildBillDetailRows(team);
-    const firstBill = detailRows[0];
+  function renderBills(team, routeState = {}) {
+    const teamKey = getTeamKeyByTeam(team);
+    const detailRows = buildLinkedBillDetailRows(team);
+    const focusOrderNo = routeState.orderNo || resolveOrderNo(teamKey, routeState.bizNo);
+    const focusBizNo = routeState.bizNo || focusOrderNo;
+    const displayRows = focusOrderNo
+      ? detailRows.filter(row => row.orderNo === focusOrderNo || row.bizNo === focusBizNo)
+      : detailRows;
+    const firstBill = displayRows[0] || detailRows[0];
     return `
+      ${focusOrderNo ? `
+        <div class="notice-item ok" style="margin-bottom:16px;">
+          <div class="notice-main">
+            <strong>当前只展示 ${focusOrderNo} 的关联账单</strong>
+            <span>${focusBizNo && focusBizNo !== focusOrderNo ? `入口业务单号为 ${focusBizNo}，已自动串联关联订单账单。` : "当前账单视图已定位到该订单的冻结、结算或退款记录。"}${routeState.from === "orderDetail" ? " 关闭筛选后可回到完整账单列表。" : ""}</span>
+          </div>
+          <div class="table-actions">
+            <a class="btn mini primary" href="${buildOrderDetailHref(teamKey, focusBizNo, "bills", focusOrderNo)}">返回订单详情</a>
+            <a class="btn mini" href="${buildPageUrl("bills", { team: teamKey })}">查看全部账单</a>
+          </div>
+        </div>
+      ` : ""}
       <div class="info-banner">
         <ul>
           <li>账单明细用于查看当前账户的充值、消费、冻结、退款、提现等资金记录。</li>
@@ -1609,7 +2572,7 @@
           <div class="field"><label>账单类型</label><select><option>全部账单类型</option><option>充值</option><option>消费</option><option>冻结</option><option>解冻</option><option>收入</option><option>退款</option><option>提现</option><option>服务费</option><option>调账</option></select></div>
           <div class="field"><label>收支方向</label><select><option>全部方向</option><option>收入</option><option>支出</option><option>冻结</option><option>解冻</option><option>不计收支</option></select></div>
           <div class="field"><label>账单状态</label><select><option>全部账单状态</option><option>处理中</option><option>成功</option><option>失败</option><option>已关闭</option><option>已退款</option><option>冻结中</option><option>已解冻</option></select></div>
-          <div class="field"><label>关联业务单号</label><input type="text" value="" placeholder="请输入关联业务单号"></div>
+          <div class="field"><label>关联业务单号</label><input type="text" value="${focusBizNo || ""}" placeholder="请输入关联业务单号"></div>
           <div class="field advanced-filter"><label>账户主体名称</label><select><option>${team.name}</option></select></div>
           <div class="field advanced-filter"><label>关联业务类型</label><select><option>全部业务类型</option><option>订单</option><option>充值单</option><option>提现单</option><option>退款单</option><option>结算单</option></select></div>
         </div>
@@ -1623,7 +2586,7 @@
         <div class="soft-table-head">
           <strong>账单明细列表</strong>
           <div class="table-head-actions">
-            <span class="tiny">当前页展示 ${billRows.length} 条记录</span>
+            <span class="tiny">当前页展示 ${displayRows.length} 条记录</span>
             <button class="table-config-btn" type="button" data-open-column-config="bills">配置列</button>
           </div>
         </div>
@@ -1642,23 +2605,23 @@
               </tr>
             </thead>
             <tbody>
-              ${detailRows.map((row, index) => `
-                <tr>
+              ${displayRows.map((row, index) => `
+                <tr class="${focusBizNo && (row.bizNo === focusBizNo || row.orderNo === focusOrderNo) ? "row-focus" : ""}">
                   <td data-col="time">${row.time}</td>
                   <td data-col="title">${row.title}</td>
                   <td data-col="type">${row.type}</td>
-                  <td data-col="relatedBiz">${row.relatedBiz}</td>
+                  <td data-col="relatedBiz">${row.orderHref ? `<a class="text-link" href="${row.orderHref}">${row.relatedBiz}</a>` : row.relatedBiz}</td>
                   <td data-col="direction">${row.direction}</td>
                   <td data-col="amount" class="${row.amount.startsWith("+") ? "amt-in" : row.amount.includes("冻结") ? "amt-warn" : "amt-out"}">${row.amount}</td>
                   <td data-col="status"><span class="tag ${row.statusTone}">${row.status}</span></td>
-                  <td data-col="actions"><button class="text-link-btn" type="button" data-open-bill-modal="detail" data-bill-record="${index}">查看详情</button></td>
+                  <td data-col="actions"><div class="table-actions"><button class="text-link-btn" type="button" data-open-bill-modal="detail" data-bill-record="${detailRows.indexOf(row)}">查看详情</button>${row.orderHref ? `<a class="btn mini ${row.orderNo === focusOrderNo ? "primary" : ""}" href="${row.orderHref}">查看订单</a>` : ""}</div></td>
                 </tr>
               `).join("")}
             </tbody>
           </table>
         </div>
         <div class="table-footbar">
-          <div class="pager-meta">共 ${detailRows.length} 条</div>
+          <div class="pager-meta">共 ${displayRows.length} 条</div>
           <div class="pager">
             <span class="pager-btn disabled">上一页</span>
             <span class="pager-btn active">1</span>
@@ -1690,6 +2653,7 @@
             <div class="detail-item"><span class="detail-label">退款处理</span><strong class="detail-value" data-bill-detail-field="refundHint">${firstBill.refundHint}</strong></div>
           </div>
           <div class="summary-actions" style="margin-top:16px;">
+            <a class="btn mini primary" href="${firstBill.orderHref || "#"}" data-bill-detail-field="orderHref" ${firstBill.orderHref ? "" : "hidden"}>查看订单资金轨迹</a>
             <button class="btn mini primary" type="button" data-bill-detail-field="refundAction">${firstBill.refundAction}</button>
             <button class="btn mini" type="button">联系客服</button>
             <button class="btn mini" type="button">下载凭证</button>
@@ -2398,13 +3362,25 @@
     return `<div class="security-grid">${team.security.map(item => `<div class="security-card"><h4>${item[0]}</h4><p>${item[1]}</p><div class="security-state">${item[2]}</div></div>`).join("")}</div>`;
   }
 
-  function renderOrderDetail(team) {
-    const detail = team.orderDetail;
+  function renderOrderDetail(team, teamKey, routeState = {}) {
+    const context = resolveOrderContext(teamKey, routeState);
+    const detail = context.detail;
+    const backPage = ["overview", "transactions", "bills"].includes(context.fromPage) ? context.fromPage : "overview";
+    const backHref = buildPageUrl(backPage, { team: context.teamKey, bizNo: context.bizNo || detail.orderNo }, { from: "orderDetail", orderNo: detail.orderNo });
+    const transactionHref = buildOrderLinkedPageHref("transactions", context.teamKey, detail.orderNo, context.bizNo, "orderDetail");
+    const billHref = buildOrderLinkedPageHref("bills", context.teamKey, detail.orderNo, context.bizNo, "orderDetail");
+    const sourceLabel = context.fromPage ? getPageLabel(context.fromPage) : "订单主链路";
     return `
-      <div class="helper-links" style="justify-content:flex-end;margin-bottom:14px;">
-        <a href="transactions.html">关联交易流水</a>
-        <a href="bills.html">查看账单</a>
-        <a href="invoices.html">查看发票</a>
+      <div class="notice-item ok" style="margin-bottom:16px;">
+        <div class="notice-main">
+          <strong>${context.notFound ? `未找到 ${context.bizNo || routeState.orderNo}，已回退到最近订单` : `当前查看 ${detail.orderNo} 的资金轨迹`}</strong>
+          <span>${context.bizNo && context.bizNo !== detail.orderNo ? `已根据业务单 ${context.bizNo} 定位到关联订单。` : "订单的锁资、结算、退款与开票会在这里按时间串联展示。"} ${context.fromPage ? `来源页面：${sourceLabel}。` : ""}</span>
+        </div>
+        <div class="table-actions">
+          <a class="btn mini" href="${backHref}">返回${getPageLabel(backPage)}</a>
+          <a class="btn mini primary" href="${transactionHref}">关联交易流水</a>
+          <a class="btn mini" href="${billHref}">关联账单</a>
+        </div>
       </div>
       <div class="summary-strip" style="grid-template-columns:repeat(4,minmax(0,1fr));">
         ${detail.summary.map(item => `<div class="summary-box"><div class="kicker">${item[0]}</div><div class="big">${item[1]}</div></div>`).join("")}
@@ -2440,6 +3416,8 @@
             <div class="list-item"><strong>结算逻辑</strong><span>验收通过后结算给承接方收益账户，并同步结转平台服务费。</span></div>
             <div class="list-item"><strong>开票逻辑</strong><span>仅已结算金额进入可开票池，未结算订单不产生开票额度。</span></div>
             <div class="list-item"><strong>退款处理</strong><span>未结算订单可申请取消并退回冻结预算；已结算订单如有争议请联系客服处理。</span></div>
+            ${detail.relatedTradeNos ? `<div class="list-item"><strong>关联交易流水</strong><span>${detail.relatedTradeNos.join(" / ")}</span></div>` : ""}
+            ${detail.relatedFundNos ? `<div class="list-item"><strong>关联资金流水</strong><span>${detail.relatedFundNos.join(" / ")}</span></div>` : ""}
           </div>
           <div class="summary-actions" style="margin-top:16px;">
             <button class="btn primary" type="button">申请退款</button>
@@ -2500,48 +3478,452 @@
     `;
   }
 
+  function renderReconciliationDrawer(detailId = "detail_001") {
+    const detail = findReconDetail(detailId);
+    return `
+      <div class="recharge-modal-mask reconciliation-drawer-mask" data-reconciliation-drawer="detail" hidden>
+        <div class="recharge-modal reconciliation-drawer">
+          <div class="config-modal-head">
+            <div>
+              <h3 data-recon-field="title">${detail.title}</h3>
+              <p data-recon-field="subtitle">${detail.date} · ${detail.businessType} · ${detail.businessOrderNo}</p>
+            </div>
+            <button class="config-close" type="button" data-close-reconciliation-drawer="detail">×</button>
+          </div>
+          <div class="recharge-modal-body">
+            <div class="surface reconciliation-overview">
+              <div class="surface-head">
+                <div>
+                  <h3>差异概览</h3>
+                  <p>用于快速判断风险等级、当前处理人和关闭路径。</p>
+                </div>
+                <div class="table-actions">
+                  <span class="tag ${riskTone(detail.riskLevel)}" data-recon-field="riskTag">${detail.riskLevel}风险</span>
+                  <span class="tag ${processingStatusTone(detail.processingStatus)}" data-recon-field="processingTag">${detail.processingStatus}</span>
+                </div>
+              </div>
+              <div data-recon-section="overview">${renderReconFactGrid(detail.overview)}</div>
+            </div>
+
+            <div class="grid-2" style="margin-top:16px;">
+              <div class="surface">
+                <div class="surface-head"><div><h3>天合侧数据</h3><p>平台记录事实，适合核对业务单号、金额、状态和规则版本。</p></div></div>
+                <div data-recon-section="platformFacts">${renderReconFactGrid(detail.platformFacts)}</div>
+              </div>
+              <div class="surface">
+                <div class="surface-head"><div><h3>汇付侧数据</h3><p>汇付查询或账单结果，敏感字段按原型要求脱敏展示。</p></div></div>
+                <div data-recon-section="huifuFacts">${renderReconFactGrid(detail.huifuFacts)}</div>
+              </div>
+            </div>
+
+            <div class="surface" style="margin-top:16px;" data-recon-section-wrap="snapshot" ${detail.snapshot.length ? "" : "hidden"}>
+              <div class="surface-head"><div><h3>分账计算快照</h3><p>分账差异需要展示平台规则快照，定位费率、小数处理和手续费口径。</p></div></div>
+              <div data-recon-section="snapshot">${renderReconFactGrid(detail.snapshot)}</div>
+            </div>
+
+            <div class="grid-2" style="margin-top:16px;">
+              <div class="surface">
+                <div class="surface-head"><div><h3>处理信息</h3><p>一期只记录过程，不允许通过后台直接修改真实资金结果。</p></div></div>
+                <div class="detail-grid">
+                  <div class="detail-item"><span class="detail-label">处理状态</span><span class="detail-value" data-recon-form="status">${detail.processingForm.status}</span></div>
+                  <div class="detail-item"><span class="detail-label">负责人</span><span class="detail-value" data-recon-form="owner">${detail.processingForm.owner}</span></div>
+                  <div class="detail-item"><span class="detail-label">差异原因</span><span class="detail-value" data-recon-form="reason">${detail.processingForm.reason}</span></div>
+                  <div class="detail-item"><span class="detail-label">处理动作</span><span class="detail-value" data-recon-form="action">${detail.processingForm.action}</span></div>
+                  <div class="detail-item"><span class="detail-label">处理结论</span><span class="detail-value" data-recon-form="conclusion">${detail.processingForm.conclusion}</span></div>
+                  <div class="detail-item"><span class="detail-label">关联工单</span><span class="detail-value" data-recon-form="ticket">${detail.processingForm.ticket}</span></div>
+                  <div class="detail-item"><span class="detail-label">备注</span><span class="detail-value" data-recon-form="remark">${detail.processingForm.remark}</span></div>
+                </div>
+              </div>
+              <div class="surface">
+                <div class="surface-head"><div><h3>操作记录</h3><p>保留重新查询、重新对账、人工处理的全链路日志。</p></div></div>
+                <div class="timeline" data-recon-section="logs">
+                  ${detail.logs.map(log => `<div class="timeline-item ${log[1].includes("系统") ? "" : "done"}"><div class="timeline-head"><strong>${log[2]}</strong><span class="timeline-meta">${log[0]} · ${log[1]}</span></div><div class="tiny">${log[3]}</div></div>`).join("")}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="config-modal-foot">
+            <button class="btn secondary" type="button">重新查询汇付状态</button>
+            <button class="btn" type="button">重新对账</button>
+            <button class="btn" type="button">开始处理</button>
+            <button class="btn primary" type="button">标记已处理</button>
+            <button class="btn" type="button">人工确认关闭</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderAdminReconciliation() {
+    return `
+      <div class="info-banner">
+        <ul>
+          <li>系统每日自动核对天合与汇付前一自然日的支付、退款、分账及提现数据。</li>
+          <li>重新执行和重新查询仅会重新拉取数据并重新比对，不会触发真实支付、退款、分账或提现。</li>
+        </ul>
+      </div>
+      <div class="surface">
+        <div class="surface-head"><div><h3>筛选条件</h3><p>默认展示最近 7 天批次，可按状态、业务类型和批次号快速定位。</p></div></div>
+        <div class="form-grid">
+          <div class="field"><label>对账日期</label><input value="2026-07-09 ~ 2026-07-15"></div>
+          <div class="field"><label>对账状态</label><select><option>全部</option><option>存在差异</option><option>对账一致</option><option>执行失败</option></select></div>
+          <div class="field"><label>业务类型</label><select><option>全部</option><option>支付</option><option>退款</option><option>分账</option><option>提现</option></select></div>
+          <div class="field"><label>处理状态</label><select><option>全部</option><option>待处理</option><option>处理中</option><option>已处理</option></select></div>
+          <div class="field"><label>批次号</label><input value="" placeholder="支持模糊搜索，例如 DZ20260715001"></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn primary" type="button">查询</button>
+          <button class="btn" type="button">重置</button>
+        </div>
+      </div>
+      <div class="grid-4" style="margin-top:16px;">${metricCards(RECONCILIATION_DATA.overviewMetrics)}</div>
+      <div class="surface" style="margin-top:16px;">
+        <div class="surface-head">
+          <div><h3>对账批次列表</h3><p>同时展示对账状态和差异处理状态，便于区分“存在差异”与“是否已处理”。</p></div>
+          <div class="table-actions">
+            <a class="btn mini primary" href="${buildPageUrl("adminReconciliationDiffs")}">查看差异明细</a>
+            <button class="btn mini" type="button">导出汇总</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table style="min-width: 1800px;">
+            <thead>
+              <tr>
+                <th>对账日期</th><th>批次号</th><th>对账范围</th><th>天合交易笔数</th><th>汇付交易笔数</th><th>天合交易金额</th><th>汇付交易金额</th><th>一致笔数</th><th>差异笔数</th><th>差异金额</th><th>未处理差异</th><th>对账状态</th><th>处理状态</th><th>完成时间</th><th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${RECONCILIATION_DATA.batches.map(row => `
+                <tr class="${row.diffCount > 0 || row.reconStatus.includes("失败") ? "row-focus" : ""}">
+                  <td>${row.date}</td>
+                  <td><strong>${row.batchNo}</strong><div class="tiny">${row.version}</div></td>
+                  <td>${row.scope}</td>
+                  <td>${row.platformCount}</td>
+                  <td>${row.huifuCount}</td>
+                  <td>${fmtMoney(row.platformAmount)}</td>
+                  <td>${fmtMoney(row.huifuAmount)}</td>
+                  <td>${row.matchedCount}</td>
+                  <td>${row.diffCount}</td>
+                  <td class="${row.diffAmount ? "amt-warn" : ""}">${fmtMoney(row.diffAmount)}</td>
+                  <td>${row.unresolvedCount}</td>
+                  <td><span class="tag ${reconStatusTone(row.reconStatus)}">${row.reconStatus}</span></td>
+                  <td><span class="tag ${processingStatusTone(row.processingStatus)}">${row.processingStatus}</span></td>
+                  <td>${row.completedAt}</td>
+                  <td>
+                    <div class="table-actions">
+                      <a class="btn mini primary" href="${buildPageUrl("adminReconciliationDetail", { batch: row.batchNo })}">查看详情</a>
+                      <button class="btn mini" type="button">重新执行</button>
+                      <button class="btn mini" type="button">导出</button>
+                    </div>
+                  </td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderAdminReconciliationDetail(routeState = {}) {
+    const batch = findReconBatch(routeState.batch);
+    const bizType = routeState.bizType || "all";
+    const tabDefs = [
+      ["all", "全部"],
+      ["payment", "支付"],
+      ["refund", "退款"],
+      ["sharing", "分账"],
+      ["withdraw", "提现"]
+    ].map(item => {
+      const count = item[0] === "all" ? batch.rows.length : batch.rows.filter(row => (
+        (item[0] === "payment" && row.businessType === "支付")
+        || (item[0] === "refund" && row.businessType === "退款")
+        || (item[0] === "sharing" && row.businessType === "分账")
+        || (item[0] === "withdraw" && row.businessType === "提现")
+      )).length;
+      return { key: item[0], label: item[1], count };
+    });
+    const filteredRows = batch.rows.filter(row => {
+      if (bizType === "all") return true;
+      if (bizType === "payment") return row.businessType === "支付";
+      if (bizType === "refund") return row.businessType === "退款";
+      if (bizType === "sharing") return row.businessType === "分账";
+      if (bizType === "withdraw") return row.businessType === "提现";
+      return true;
+    });
+
+    return `
+      <div class="summary-strip">
+        <div class="summary-box">
+          <div class="kicker">批次信息</div>
+          <div class="big">${batch.date} 对账详情</div>
+          <div class="chip-row">
+            <span class="chip">${batch.batchNo}</span>
+            <span class="tag ${reconStatusTone(batch.reconStatus)}">${batch.reconStatus}</span>
+            <span class="tag ${processingStatusTone(batch.processingStatus)}">${batch.processingStatus}</span>
+          </div>
+          <div class="tiny" style="margin-top:10px;">完成时间：${batch.completedAt} · 当前展示版本：${batch.version}</div>
+        </div>
+        <div class="summary-box">
+          <div class="kicker">重新执行说明</div>
+          <div class="big" style="font-size:18px;">仅重新拉取数据并重新对账</div>
+          <div class="tiny">不会发起真实支付、退款、分账或提现操作。</div>
+        </div>
+        <div class="summary-box">
+          <div class="kicker">操作</div>
+          <div class="summary-actions">
+            <a class="btn mini primary" href="${buildPageUrl("adminReconciliation")}">返回批次列表</a>
+            <button class="btn mini" type="button">重新执行</button>
+            <button class="btn mini" type="button">导出</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="surface">
+          <div class="surface-head"><div><h3>交易笔数</h3><p>天合和汇付交易量对比，便于快速判断批次整体一致性。</p></div></div>
+          <div class="split-metric">
+            <div class="cell"><div class="label">天合交易笔数</div><div class="value">${batch.platformCount}</div></div>
+            <div class="cell"><div class="label">汇付交易笔数</div><div class="value">${batch.huifuCount}</div></div>
+            <div class="cell"><div class="label">一致笔数</div><div class="value">${batch.matchedCount}</div></div>
+            <div class="cell"><div class="label">差异笔数</div><div class="value">${batch.diffCount}</div></div>
+          </div>
+        </div>
+        <div class="surface">
+          <div class="surface-head"><div><h3>交易金额</h3><p>金额均以元展示，后端实际应以分为最小单位做比较。</p></div></div>
+          <div class="split-metric">
+            <div class="cell"><div class="label">天合交易金额</div><div class="value">${fmtMoney(batch.platformAmount)}</div></div>
+            <div class="cell"><div class="label">汇付交易金额</div><div class="value">${fmtMoney(batch.huifuAmount)}</div></div>
+            <div class="cell"><div class="label">差异金额</div><div class="value ${batch.diffAmount ? "amt-warn" : ""}">${fmtMoney(batch.diffAmount)}</div></div>
+            <div class="cell"><div class="label">未处理差异</div><div class="value">${batch.unresolvedCount}</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top:16px;">
+        <div class="surface">
+          <div class="surface-head"><div><h3>差异分类</h3><p>金额、状态、流水缺失和重复交易等分类，帮助快速分派处理路径。</p></div></div>
+          <div class="list">${batch.diffStats.map(item => `<div class="list-item"><strong>${item[0]}</strong><span>${item[1]} · ${item[2]}</span></div>`).join("")}</div>
+        </div>
+        <div class="surface">
+          <div class="surface-head"><div><h3>处理进度</h3><p>对账状态和差异处理状态分离展示，避免把“人工关闭”误认为“已一致”。</p></div></div>
+          <div class="list">${batch.progressStats.map(item => `<div class="list-item"><strong>${item[0]}</strong><span>${item[1]} 笔 · ${item[2]}</span></div>`).join("")}</div>
+        </div>
+      </div>
+
+      <div class="surface" style="margin-top:16px;">
+        <div class="surface-head">
+          <div><h3>业务类型</h3><p>可按支付、退款、分账、提现切换查看明细。</p></div>
+          <div class="inline-tabs">
+            ${tabDefs.map(tab => `<a class="tab ${bizType === tab.key ? "active" : ""}" href="${buildPageUrl("adminReconciliationDetail", { batch: batch.batchNo, bizType: tab.key })}">${tab.label} ${tab.count}</a>`).join("")}
+          </div>
+        </div>
+        <div class="compact-filters expanded" data-filter-panel="reconciliationDetail">
+          <div class="form-grid">
+            <div class="field"><label>业务单号</label><input placeholder="订单号 / 退款单号 / 分账单号 / 提现单号"></div>
+            <div class="field"><label>天合流水号</label><input placeholder="TH202607150001"></div>
+            <div class="field"><label>汇付流水号</label><input placeholder="HF202607150001"></div>
+            <div class="field"><label>对账结果</label><select><option>全部</option><option>一致</option><option>差异</option></select></div>
+            <div class="field advanced-filter"><label>差异类型</label><select><option>全部</option><option>金额不一致</option><option>状态不一致</option><option>汇付流水缺失</option><option>天合流水缺失</option></select></div>
+            <div class="field advanced-filter"><label>处理状态</label><select><option>全部</option><option>待处理</option><option>处理中</option><option>已处理</option></select></div>
+            <div class="field advanced-filter"><label>负责人</label><select><option>全部</option><option>王敏</option><option>刘畅</option><option>未分配</option></select></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn primary" type="button">查询</button>
+            <button class="btn" type="button">重置</button>
+          </div>
+        </div>
+        <div class="table-wrap" style="margin-top:16px;">
+          <table style="min-width: 2400px;">
+            <thead>
+              <tr>
+                <th>业务类型</th><th>天合业务单号</th><th>天合交易流水号</th><th>汇付交易流水号</th><th>原交易流水号</th><th>交易主体</th><th>天合金额</th><th>汇付金额</th><th>金额差异</th><th>天合状态</th><th>汇付状态</th><th>交易时间</th><th>汇付完成时间</th><th>对账结果</th><th>差异类型</th><th>处理状态</th><th>负责人</th><th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filteredRows.map(row => `
+                <tr class="${row.reconciliationResult === "差异" ? "row-focus" : ""}">
+                  <td>${row.businessType}</td>
+                  <td>${row.businessOrderNo}</td>
+                  <td>${row.platformTransactionNo}</td>
+                  <td>${row.huifuTransactionNo}</td>
+                  <td>${row.originalTransactionNo}</td>
+                  <td>${row.counterpartyName}</td>
+                  <td>${fmtMoney(row.platformAmount)}</td>
+                  <td>${fmtMoney(row.huifuAmount)}</td>
+                  <td class="${row.diffAmount !== 0 ? "amt-warn" : ""}">${fmtDeltaMoney(row.diffAmount)}</td>
+                  <td>${row.platformStatus}</td>
+                  <td>${row.huifuStatus}</td>
+                  <td>${row.transactionTime}</td>
+                  <td>${row.huifuCompletedAt}</td>
+                  <td><span class="tag ${row.reconciliationResult === "一致" ? "green" : "orange"}">${row.reconciliationResult === "一致" ? "对账一致" : "存在差异"}</span></td>
+                  <td>${row.differenceType}</td>
+                  <td><span class="tag ${processingStatusTone(row.processingStatus)}">${row.processingStatus}</span></td>
+                  <td>${row.ownerName}</td>
+                  <td>
+                    <div class="table-actions">
+                      <button class="btn mini primary" type="button" data-open-reconciliation-drawer="detail" data-reconciliation-detail-id="${row.id}">查看详情</button>
+                      <button class="btn mini" type="button">重新查询</button>
+                      <button class="btn mini" type="button">${row.processingStatus === "待处理" ? "开始处理" : "继续处理"}</button>
+                    </div>
+                  </td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="surface" style="margin-top:16px;">
+        <div class="surface-head"><div><h3>执行版本与操作日志</h3><p>保留历史执行版本、失败原因和重试记录，用于排查账单延迟或任务异常。</p></div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>版本</th><th>完成时间</th><th>触发方式</th><th>结果</th><th>说明</th></tr></thead>
+            <tbody>${batch.executionLogs.map(log => `<tr><td>${log[0]}</td><td>${log[1]}</td><td>${log[2]}</td><td><span class="tag ${reconStatusTone(log[3])}">${log[3]}</span></td><td>${log[4]}</td></tr>`).join("")}</tbody>
+          </table>
+        </div>
+      </div>
+
+      ${renderReconciliationDrawer()}
+    `;
+  }
+
+  function renderAdminReconciliationDiffs() {
+    return `
+      <div class="info-banner">
+        <ul>
+          <li>集中查看并处理天合与汇付之间的资金差异，适合财务按责任人和风险等级持续跟进。</li>
+          <li>高风险差异优先关注：天合流水缺失、支付状态错判、重复支付或重复退款。</li>
+        </ul>
+      </div>
+      <div class="surface">
+        <div class="surface-head"><div><h3>筛选条件</h3><p>支持跨日期、差异类型、风险等级和负责人维度筛选。</p></div></div>
+        <div class="form-grid">
+          <div class="field"><label>对账日期</label><input value="2026-07-09 ~ 2026-07-15"></div>
+          <div class="field"><label>业务类型</label><select><option>全部</option><option>支付</option><option>退款</option><option>分账</option><option>提现</option></select></div>
+          <div class="field"><label>差异类型</label><select><option>全部</option><option>汇付流水缺失</option><option>天合流水缺失</option><option>金额不一致</option><option>状态不一致</option></select></div>
+          <div class="field"><label>风险等级</label><select><option>全部</option><option>高</option><option>中</option><option>低</option></select></div>
+          <div class="field"><label>处理状态</label><select><option>全部</option><option>待处理</option><option>处理中</option><option>已处理</option></select></div>
+          <div class="field"><label>负责人</label><select><option>全部</option><option>王敏</option><option>刘畅</option><option>未分配</option></select></div>
+          <div class="field"><label>业务单号</label><input placeholder="例如 OD202607150013"></div>
+          <div class="field"><label>汇付流水号</label><input placeholder="例如 HF202607140119"></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn primary" type="button">查询</button>
+          <button class="btn" type="button">重置</button>
+        </div>
+      </div>
+      <div class="grid-4" style="margin-top:16px;">${metricCards(RECONCILIATION_DATA.differenceMetrics)}</div>
+      <div class="surface" style="margin-top:16px;">
+        <div class="surface-head">
+          <div><h3>差异明细列表</h3><p>字段与批次详情保持一致，并额外展示对账日期、批次号、风险等级和最后处理时间。</p></div>
+          <div class="table-actions">
+            <button class="btn mini primary" type="button">导出差异明细</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table style="min-width: 2200px;">
+            <thead>
+              <tr>
+                <th>对账日期</th><th>批次号</th><th>业务类型</th><th>天合业务单号</th><th>天合流水号</th><th>汇付流水号</th><th>交易主体</th><th>天合金额</th><th>汇付金额</th><th>金额差异</th><th>天合状态</th><th>汇付状态</th><th>差异类型</th><th>风险等级</th><th>处理状态</th><th>负责人</th><th>最后处理时间</th><th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${RECONCILIATION_DATA.differences.map(row => `
+                <tr class="row-focus">
+                  <td>${row.date}</td>
+                  <td><a class="text-link" href="${buildPageUrl("adminReconciliationDetail", { batch: row.batchNo })}">${row.batchNo}</a></td>
+                  <td>${row.businessType}</td>
+                  <td>${row.businessOrderNo}</td>
+                  <td>${row.platformTransactionNo}</td>
+                  <td>${row.huifuTransactionNo}</td>
+                  <td>${row.counterpartyName}</td>
+                  <td>${fmtMoney(row.platformAmount)}</td>
+                  <td>${fmtMoney(row.huifuAmount)}</td>
+                  <td class="${row.diffAmount !== 0 ? "amt-warn" : ""}">${fmtDeltaMoney(row.diffAmount)}</td>
+                  <td>${row.platformStatus}</td>
+                  <td>${row.huifuStatus}</td>
+                  <td>${row.differenceType}</td>
+                  <td><span class="tag ${riskTone(row.riskLevel)}">${row.riskLevel}风险</span></td>
+                  <td><span class="tag ${processingStatusTone(row.processingStatus)}">${row.processingStatus}</span></td>
+                  <td>${row.ownerName}</td>
+                  <td>${row.lastProcessedAt}</td>
+                  <td>
+                    <div class="table-actions">
+                      <button class="btn mini primary" type="button" data-open-reconciliation-drawer="detail" data-reconciliation-detail-id="${row.detailId}">查看详情</button>
+                      <button class="btn mini" type="button">重新查询</button>
+                      <a class="btn mini" href="${buildPageUrl("adminReconciliationDetail", { batch: row.batchNo })}">查看批次</a>
+                    </div>
+                  </td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      ${renderReconciliationDrawer("detail_002")}
+    `;
+  }
+
   function currentPage() {
     return document.body.dataset.page || "index";
   }
 
   function buildNav(page, accountScope = "team") {
-    const groups = NAV.finance
+    const isAdminSection = (PAGES[page] || {}).section === "admin";
+    const activePage = page === "adminReconciliationDetail" ? "adminReconciliation" : page;
+    const groups = (isAdminSection ? NAV.admin : NAV.finance)
       .map(group => ({
         ...group,
-        items: accountScope === "personal"
-          ? group.items.filter(item => item[0] !== "overview")
-          : group.items
+        items: isAdminSection
+          ? group.items
+          : accountScope === "personal"
+            ? group.items.filter(item => item[0] !== "overview")
+            : group.items
       }))
       .filter(group => group.items.length > 0);
     const finance = groups.map(group => {
-      const links = group.items.map(item => `<a class="nav-link ${page === item[0] ? "active" : ""}" href="${pageToFile(item[0])}"><span class="nav-icon">${item[2]}</span><span>${item[1]}</span></a>`).join("");
+      const links = group.items.map(item => `<a class="nav-link ${activePage === item[0] ? "active" : ""}" href="${pageToFile(item[0])}"><span class="nav-icon">${item[2]}</span><span>${item[1]}</span></a>`).join("");
       return `<div class="nav-group"><div class="nav-title">${group.title}</div>${links}</div>`;
     }).join("");
     return `
       ${finance}
-      <div class="sidebar-block"><strong>菜单口径</strong><span>用户端资金中心只保留账户、余额、账单、流水、积分、发票和设置。</span></div>
+      <div class="sidebar-block"><strong>${isAdminSection ? "后台口径" : "菜单口径"}</strong><span>${isAdminSection ? "对账后台只做查询、重试、记录和导出，不允许人工修改真实资金结果。" : "用户端资金中心只保留账户、余额、账单、流水、积分、发票和设置。"}</span></div>
     `;
   }
 
-  function renderPage(page, teamKey, accountScope = "team") {
+  function getPageActions(page, teamKey, routeState = {}) {
+    if (page !== "orderDetail") return PAGES[page]?.actions || [];
+    const context = resolveOrderContext(teamKey, routeState);
+    const backPage = ["overview", "transactions", "bills"].includes(context.fromPage) ? context.fromPage : "overview";
+    return [
+      { label: "查看关联流水", href: buildOrderLinkedPageHref("transactions", context.teamKey, context.orderNo, context.bizNo, "orderDetail"), tone: "primary" },
+      { label: `返回${getPageLabel(backPage)}`, href: buildPageUrl(backPage, { team: context.teamKey, bizNo: context.bizNo }, { from: "orderDetail", orderNo: context.orderNo }), tone: "" }
+    ];
+  }
+
+  function renderPage(page, teamKey, accountScope = "team", routeState = {}) {
     if (page === "index") return renderIndex();
     const team = TEAM_DATA[teamKey] || TEAM_DATA.drama;
     switch (page) {
-      case "overview": return renderOverview(team);
+      case "overview": return renderOverview(team, routeState);
       case "accounts": return renderAccounts(team, accountScope);
-      case "transactions": return renderTransactions(team);
+      case "transactions": return renderTransactions(team, routeState);
       case "fundFlows": return renderFundFlows(team);
-      case "bills": return renderBills(team);
+      case "bills": return renderBills(team, routeState);
       case "points": return renderPoints(team, accountScope);
       case "invoices": return renderInvoices(team);
       case "recharge": return renderRecharge(team, accountScope);
       case "withdraw": return renderWithdraw(team);
       case "security": return renderSecurity(team);
-      case "orderDetail": return renderOrderDetail(team);
+      case "orderDetail": return renderOrderDetail(team, teamKey, routeState);
       case "adminOverview": return renderAdminOverview();
       case "adminBudget": return renderAdminBudget();
       case "adminAudit": return renderAdminAudit();
       case "adminSettlement": return renderAdminSettlement();
+      case "adminReconciliation": return renderAdminReconciliation();
+      case "adminReconciliationDiffs": return renderAdminReconciliationDiffs();
+      case "adminReconciliationDetail": return renderAdminReconciliationDetail(routeState);
       default: return renderIndex();
     }
   }
@@ -2666,7 +4048,7 @@
   }
 
   function syncBillDetailModal(team, recordIndex) {
-    const row = buildBillDetailRows(team)[recordIndex] || buildBillDetailRows(team)[0];
+    const row = buildLinkedBillDetailRows(team)[recordIndex] || buildLinkedBillDetailRows(team)[0];
     const tag = document.querySelector('[data-bill-detail-field="statusTag"]');
     if (tag) {
       tag.textContent = row.status;
@@ -2681,6 +4063,11 @@
       refundButton.textContent = row.refundAction || "联系客服";
       refundButton.disabled = row.refundAction === "不可退款";
       refundButton.className = `btn mini ${row.refundAction === "申请退款" ? "primary" : ""}`;
+    }
+    const orderLink = document.querySelector('[data-bill-detail-field="orderHref"]');
+    if (orderLink && "href" in orderLink) {
+      orderLink.href = row.orderHref || "#";
+      orderLink.hidden = !row.orderHref;
     }
   }
 
@@ -2765,6 +4152,64 @@
     if (!modal) return;
     modal.hidden = false;
     document.body.classList.add("modal-open");
+  }
+
+  function syncReconciliationDrawer(detailId) {
+    const detail = findReconDetail(detailId);
+    const title = document.querySelector('[data-recon-field="title"]');
+    const subtitle = document.querySelector('[data-recon-field="subtitle"]');
+    const riskTag = document.querySelector('[data-recon-field="riskTag"]');
+    const processingTag = document.querySelector('[data-recon-field="processingTag"]');
+    if (title) title.textContent = detail.title;
+    if (subtitle) subtitle.textContent = `${detail.date} · ${detail.businessType} · ${detail.businessOrderNo}`;
+    if (riskTag) {
+      riskTag.textContent = `${detail.riskLevel}风险`;
+      riskTag.className = `tag ${riskTone(detail.riskLevel)}`;
+    }
+    if (processingTag) {
+      processingTag.textContent = detail.processingStatus;
+      processingTag.className = `tag ${processingStatusTone(detail.processingStatus)}`;
+    }
+
+    const overview = document.querySelector('[data-recon-section="overview"]');
+    const platformFacts = document.querySelector('[data-recon-section="platformFacts"]');
+    const huifuFacts = document.querySelector('[data-recon-section="huifuFacts"]');
+    const snapshot = document.querySelector('[data-recon-section="snapshot"]');
+    const logs = document.querySelector('[data-recon-section="logs"]');
+    const snapshotWrap = document.querySelector('[data-recon-section-wrap="snapshot"]');
+    if (overview) overview.innerHTML = renderReconFactGrid(detail.overview);
+    if (platformFacts) platformFacts.innerHTML = renderReconFactGrid(detail.platformFacts);
+    if (huifuFacts) huifuFacts.innerHTML = renderReconFactGrid(detail.huifuFacts);
+    if (snapshot) snapshot.innerHTML = renderReconFactGrid(detail.snapshot);
+    if (snapshotWrap) snapshotWrap.hidden = detail.snapshot.length === 0;
+    if (logs) {
+      logs.innerHTML = detail.logs.map(log => `<div class="timeline-item ${log[1].includes("系统") ? "" : "done"}"><div class="timeline-head"><strong>${log[2]}</strong><span class="timeline-meta">${log[0]} · ${log[1]}</span></div><div class="tiny">${log[3]}</div></div>`).join("");
+    }
+
+    Object.entries(detail.processingForm).forEach(([key, value]) => {
+      const node = document.querySelector(`[data-recon-form="${key}"]`);
+      if (node) node.textContent = value;
+    });
+  }
+
+  function openReconciliationDrawer(type, options = {}) {
+    document.querySelectorAll("[data-reconciliation-drawer]").forEach(modal => {
+      modal.hidden = true;
+    });
+    if (type === "detail") syncReconciliationDrawer(options.detailId || "detail_001");
+    const modal = document.querySelector(`[data-reconciliation-drawer="${type}"]`);
+    if (!modal) return;
+    modal.hidden = false;
+    document.body.classList.add("modal-open");
+  }
+
+  function closeReconciliationDrawer(type) {
+    const modal = document.querySelector(`[data-reconciliation-drawer="${type}"]`);
+    if (!modal) return;
+    modal.hidden = true;
+    if (!document.querySelector(".config-modal-mask:not([hidden]), .recharge-modal-mask:not([hidden])")) {
+      document.body.classList.remove("modal-open");
+    }
   }
 
   function closeRechargeModal(type) {
@@ -2920,6 +4365,22 @@
       return;
     }
 
+    const openReconBtn = event.target.closest("[data-open-reconciliation-drawer]");
+    if (openReconBtn) {
+      event.preventDefault();
+      openReconciliationDrawer(openReconBtn.getAttribute("data-open-reconciliation-drawer"), {
+        detailId: openReconBtn.getAttribute("data-reconciliation-detail-id")
+      });
+      return;
+    }
+
+    const closeReconBtn = event.target.closest("[data-close-reconciliation-drawer]");
+    if (closeReconBtn) {
+      event.preventDefault();
+      closeReconciliationDrawer(closeReconBtn.getAttribute("data-close-reconciliation-drawer"));
+      return;
+    }
+
     const openBtn = event.target.closest("[data-open-column-config]");
     if (openBtn) {
       event.preventDefault();
@@ -2990,6 +4451,11 @@
       const invoiceType = rechargeModalMask.getAttribute("data-invoice-modal");
       if (invoiceType) {
         closeInvoiceModal(invoiceType);
+        return;
+      }
+      const reconType = rechargeModalMask.getAttribute("data-reconciliation-drawer");
+      if (reconType) {
+        closeReconciliationDrawer(reconType);
       }
     }
   }
@@ -3009,8 +4475,19 @@
     try {
       const page = currentPage();
       const cfg = PAGES[page] || PAGES.index;
+      const isAdminPage = cfg.section === "admin";
+      const routeState = getRouteState();
       const storedTeam = getStoredTeam();
-      const storedAccountScope = getStoredAccountScope();
+      let storedAccountScope = getStoredAccountScope();
+      const forceTeamScope = isAdminPage || page === "orderDetail" || (page === "overview" && (routeState.orderNo || routeState.bizNo || routeState.from === "orderDetail"));
+      if (forceTeamScope && storedAccountScope !== "team") {
+        storedAccountScope = "team";
+        setStoredAccountScope("team");
+      }
+      const initialTeamKey = resolveRouteTeamKey(routeState, storedTeam);
+      if (initialTeamKey !== storedTeam) {
+        setStoredTeam(initialTeamKey);
+      }
 
       app.innerHTML = `
         <div class="shell">
@@ -3038,7 +4515,7 @@
               <section class="page-card">
                 <div class="page-head">
                   <div><h2>${cfg.title}</h2><p>${cfg.desc}</p></div>
-                  <div class="page-actions">${buildButtons(cfg.actions)}</div>
+                  <div class="page-actions"></div>
                 </div>
                 <div id="pageMount"></div>
               </section>
@@ -3049,27 +4526,36 @@
 
       const teamSelect = document.getElementById("teamSelect");
       const accountScopeSelect = document.getElementById("accountScopeSelect");
+      if (isAdminPage) accountScopeSelect.hidden = true;
       Object.entries(TEAM_DATA).forEach(([key, item]) => {
         const option = document.createElement("option");
         option.value = key;
         option.textContent = item.name;
-        if (storedTeam === key) option.selected = true;
+        if (initialTeamKey === key) option.selected = true;
         teamSelect.appendChild(option);
       });
 
       function refresh(teamKey, accountScope = getStoredAccountScope()) {
-        const team = TEAM_DATA[teamKey] || TEAM_DATA.drama;
-        const isPersonalScope = accountScope === "personal";
+        const currentRouteState = getRouteState();
+        const effectiveTeamKey = resolveRouteTeamKey(currentRouteState, teamKey);
+        const effectiveAccountScope = page === "orderDetail" ? "team" : accountScope;
+        const team = TEAM_DATA[effectiveTeamKey] || TEAM_DATA.drama;
+        const isPersonalScope = effectiveAccountScope === "personal";
         const personalAccount = getPersonalAccountView(team);
         const teamSelectorWrap = document.getElementById("teamSelectorWrap");
         const topAccountScopeLabel = document.getElementById("topAccountScopeLabel");
         const topbarSubtitle = document.getElementById("topbarSubtitle");
+        if (effectiveTeamKey !== getStoredTeam()) setStoredTeam(effectiveTeamKey);
+        if (effectiveAccountScope !== getStoredAccountScope()) setStoredAccountScope(effectiveAccountScope);
+        if (teamSelect.value !== effectiveTeamKey) teamSelect.value = effectiveTeamKey;
+        if (accountScopeSelect.value !== effectiveAccountScope) accountScopeSelect.value = effectiveAccountScope;
         if (teamSelectorWrap) teamSelectorWrap.hidden = isPersonalScope;
         if (topbarSubtitle) topbarSubtitle.textContent = isPersonalScope ? "个人收益、提现、积分与账单统一管理" : "团队预算、订单资金、后台财务一体化原型";
-        document.getElementById("sidebarNav").innerHTML = buildNav(page, accountScope);
+        document.getElementById("sidebarNav").innerHTML = buildNav(page, effectiveAccountScope);
         document.getElementById("topAccountLabel").textContent = isPersonalScope ? personalAccount.name : team.accountLabel;
         topAccountScopeLabel.textContent = isPersonalScope ? "账户口径" : "预算口径";
-        document.getElementById("pageMount").innerHTML = renderPage(page, teamKey, accountScope);
+        document.querySelector(".page-actions").innerHTML = buildButtons(getPageActions(page, effectiveTeamKey, currentRouteState));
+        document.getElementById("pageMount").innerHTML = renderPage(page, effectiveTeamKey, effectiveAccountScope, currentRouteState);
         ["transactions", "fundFlows", "bills", "points"].forEach(applyColumnVisibility);
         bindPrototypeInteractions();
       }
@@ -3081,6 +4567,12 @@
 
       accountScopeSelect.addEventListener("change", function () {
         setStoredAccountScope(accountScopeSelect.value);
+        if (page === "orderDetail" && accountScopeSelect.value === "personal") {
+          accountScopeSelect.value = "team";
+          setStoredAccountScope("team");
+          refresh(teamSelect.value, "team");
+          return;
+        }
         if (accountScopeSelect.value === "personal" && page === "overview") {
           window.location.href = "accounts.html";
           return;
@@ -3088,12 +4580,12 @@
         refresh(teamSelect.value, accountScopeSelect.value);
       });
 
-      if (storedAccountScope === "personal" && page === "overview") {
+      if (storedAccountScope === "personal" && page === "overview" && !forceTeamScope) {
         window.location.href = "accounts.html";
         return;
       }
 
-      refresh(storedTeam, storedAccountScope);
+      refresh(initialTeamKey, storedAccountScope);
     } catch (error) {
       console.error(error);
       app.innerHTML = renderMountError(error);

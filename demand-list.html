@@ -66,7 +66,7 @@
     .page-head { background: #fff; border-radius: 8px; padding: 18px 24px; margin-bottom: 14px; }
     .page-head h1 { margin: 0 0 4px; font-size: 22px; }
     .page-head .sub { color: #8c8c8c; font-size: 13px; }
-    .page-head .new-btn { float: right; }
+    .page-head .head-actions { float: right; display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; margin-left: 16px; }
 
     /* 状态卡片栏 */
     .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px; }
@@ -167,6 +167,7 @@
       .stat-row { grid-template-columns: repeat(2, 1fr); }
       .ws-trigger { min-width: auto; }
       .topbar .brand-sub { display: none; }
+      .page-head .head-actions { float: none; justify-content: flex-start; margin: 0 0 12px; }
     }
   </style>
 </head>
@@ -212,6 +213,7 @@
         <a href="platform-home-demander.html"><span class="menu-icon">🏠</span> 工作台</a>
         <div class="menu-group">
           <div class="menu-group-title">我有需求</div>
+          <a href="standard-package-store-modal.html"><span class="menu-icon">📦</span> 标准包购买</a>
           <a href="demand-publish.html"><span class="menu-icon">📤</span> 发布需求</a>
           <a href="demand-list.html" class="active"><span class="menu-icon">📋</span> 我的需求</a>
           <a href="contractor-marketplace.html"><span class="menu-icon">🏪</span> 服务广场</a>
@@ -240,7 +242,10 @@
 
     <main class="main">
       <section class="page-head">
-        <a href="demand-publish.html" class="btn primary new-btn">📤 发布新需求</a>
+        <div class="head-actions">
+          <a href="standard-package-store-modal.html" class="btn primary">📦 标准包购买</a>
+          <a href="demand-publish.html" class="btn">📤 发布自定义需求</a>
+        </div>
         <h1>📋 我的需求</h1>
         <div class="sub">查看所有团队下的需求与订单状态。可按团队范围筛选只看当前团队相关的内容。</div>
       </section>

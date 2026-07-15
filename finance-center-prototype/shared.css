@@ -645,6 +645,14 @@ th {
 
 tr:last-child td { border-bottom: none; }
 
+tr.row-focus td {
+  background: linear-gradient(180deg, rgba(31,87,255,.08), rgba(0,166,166,.04));
+}
+
+tr.row-focus td:first-child {
+  box-shadow: inset 3px 0 0 var(--brand);
+}
+
 .amt-in { color: var(--ok); font-weight: 900; }
 .amt-out { color: var(--danger); font-weight: 900; }
 .amt-warn { color: var(--warn); font-weight: 900; }
@@ -1503,6 +1511,24 @@ body.modal-open {
   box-shadow: 0 24px 60px rgba(18, 28, 52, .18);
 }
 
+.reconciliation-drawer-mask {
+  justify-content: flex-end;
+  padding: 12px 0 12px 12px;
+}
+
+.reconciliation-drawer {
+  width: min(820px, calc(100vw - 12px));
+  max-height: calc(100dvh - 24px);
+  height: calc(100dvh - 24px);
+  border-radius: 28px 0 0 28px;
+  padding-bottom: 24px;
+}
+
+.reconciliation-overview {
+  border: 1px solid rgba(31,87,255,.10);
+  background: linear-gradient(180deg, rgba(242,246,255,.98), rgba(236,243,255,.94));
+}
+
 .recharge-modal-body {
   min-height: auto;
   overflow: visible;
@@ -1645,7 +1671,7 @@ body.modal-open {
   flex-shrink: 0;
 }
 
-@media (max-width: 1280px) {
+@media (max-width: 1180px) {
   .layout { grid-template-columns: 1fr; }
   .sidebar { position: static; }
   .hero-grid, .grid-2, .grid-3, .grid-4, .security-grid, .card-link-grid, .summary-strip, .form-grid, .month-process, .ledger-grid, .detail-grid-2, .detail-grid-4, .points-hero, .point-rule-grid { grid-template-columns: 1fr; }

@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>嘀嗒制作｜标准化图片与视频制作服务</title>
+  <style>
+    :root {
+      --bg: #f5efe6;
+      --paper: #fffaf2;
+      --paper-strong: #fffdf8;
+      --ink: #1b1714;
+      --ink-soft: #62584f;
+      --line: rgba(27, 23, 20, 0.12);
+      --line-strong: rgba(27, 23, 20, 0.2);
+      --accent: #b4492d;
+      --accent-deep: #8d3019;
+      --accent-soft: #f0d8ca;
+      --gold: #c4963b;
+      --olive: #617160;
+      --shadow: 0 24px 70px rgba(75, 45, 25, 0.12);
+      --radius-xl: 32px;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --max: 1240px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(196, 150, 59, 0.14), transparent 28%),
+        radial-gradient(circle at 92% 10%, rgba(180, 73, 45, 0.12), transparent 20%),
+        linear-gradient(180deg, #f7f0e7 0%, #f3ecdf 45%, #f0e8db 100%);
+      font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "Source Han Serif SC", "Songti SC", "STSong", serif;
+      line-height: 1.55;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(27, 23, 20, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(27, 23, 20, 0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9), transparent 92%);
+      opacity: 0.45;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    .page-shell {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page-shell::after {
+      content: "";
+      position: absolute;
+      top: 140px;
+      right: -120px;
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(180, 73, 45, 0.14), transparent 68%);
+      filter: blur(6px);
+      pointer-events: none;
+    }
+
+    .container {
+      width: min(calc(100% - 32px), var(--max));
+      margin: 0 auto;
+    }
+
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(16px);
+      background: rgba(245, 239, 230, 0.82);
+      border-bottom: 1px solid rgba(27, 23, 20, 0.08);
+    }
+
+    .site-nav-inner {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background:
+        linear-gradient(135deg, rgba(180, 73, 45, 0.16), rgba(196, 150, 59, 0.18)),
+        var(--paper);
+      border: 1px solid rgba(27, 23, 20, 0.1);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+      font-size: 24px;
+    }
+
+    .brand-text {
+      display: grid;
+      gap: 3px;
+    }
+
+    .brand-name {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-sub {
+      color: var(--ink-soft);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .nav-links a {
+      padding: 9px 14px;
+      border-radius: 999px;
+      font-size: 14px;
+      color: var(--ink-soft);
+      transition: 180ms ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--ink);
+      background: rgba(255, 250, 242, 0.9);
+    }
+
+    .nav-cta {
+      padding: 14px 20px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+      color: #fff9f5;
+      font-size: 14px;
+      font-weight: 700;
+      box-shadow: 0 18px 36px rgba(141, 48, 25, 0.24);
+      transition: transform 180ms ease, box-shadow 180ms ease;
+      white-space: nowrap;
+    }
+
+    .nav-cta:hover,
+    .btn:hover,
+    .btn-secondary:hover,
+    .package-actions a:hover,
+    .cta-actions a:hover {
+      transform: translateY(-2px);
+    }
+
+    .hero {
+      padding: 44px 0 56px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(330px, 0.92fr);
+      gap: 26px;
+      align-items: stretch;
+    }
+
+    .hero-main,
+    .hero-aside {
+      position: relative;
+      background: rgba(255, 250, 242, 0.72);
+      border: 1px solid rgba(27, 23, 20, 0.1);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero-main {
+      padding: 36px;
+      border-radius: var(--radius-xl);
+      background:
+        linear-gradient(135deg, rgba(255, 253, 248, 0.94), rgba(245, 232, 221, 0.9)),
+        var(--paper);
+    }
+
+    .hero-main::before {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border: 1px solid rgba(27, 23, 20, 0.08);
+      border-radius: 24px;
+      pointer-events: none;
+    }
+
+    .hero-kicker {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 247, 239, 0.9);
+      border: 1px solid rgba(180, 73, 45, 0.16);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .hero-kicker::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--gold));
+      box-shadow: 0 0 0 5px rgba(180, 73, 45, 0.08);
+    }
+
+    h1 {
+      margin: 22px 0 18px;
+      max-width: 10ch;
+      font-size: clamp(48px, 7vw, 86px);
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+      font-weight: 700;
+    }
+
+    .hero-main p {
+      position: relative;
+      max-width: 54ch;
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 18px;
+      line-height: 1.72;
+    }
+
+    .hero-main p + p {
+      margin-top: 18px;
+      font-size: 15px;
+    }
+
+    .hero-actions {
+      position: relative;
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 26px;
+    }
+
+    .btn,
+    .btn-secondary {
+      padding: 16px 24px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 700;
+      transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+      color: #fff7f2;
+      box-shadow: 0 18px 34px rgba(141, 48, 25, 0.2);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 250, 242, 0.84);
+      color: var(--ink);
+      border: 1px solid rgba(27, 23, 20, 0.12);
+      box-shadow: 0 12px 24px rgba(79, 51, 33, 0.08);
+    }
+
+    .hero-metrics {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    .metric {
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(27, 23, 20, 0.08);
+      background: rgba(255, 255, 255, 0.54);
+      min-height: 108px;
+    }
+
+    .metric b {
+      display: block;
+      font-size: 26px;
+      margin-bottom: 10px;
+      line-height: 1;
+    }
+
+    .metric span {
+      display: block;
+      font-size: 13px;
+      color: var(--ink-soft);
+      line-height: 1.55;
+    }
+
+    .hero-aside {
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      background:
+        linear-gradient(180deg, rgba(36, 30, 25, 0.98), rgba(43, 34, 28, 0.98)),
+        #2d251f;
+      color: #f7efe5;
+    }
+
+    .hero-aside::before {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      pointer-events: none;
+    }
+
+    .aside-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(247, 239, 229, 0.74);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .aside-label::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f3b188, #c4963b);
+    }
+
+    .aside-grid {
+      display: grid;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .aside-card {
+      position: relative;
+      padding: 20px 20px 18px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .aside-card::after {
+      content: "";
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      right: -34px;
+      top: -50px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.12), transparent 70%);
+    }
+
+    .aside-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 24px;
+      line-height: 1.1;
+    }
+
+    .aside-card p {
+      margin: 0;
+      color: rgba(247, 239, 229, 0.72);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .signal-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .signal {
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .signal small {
+      display: block;
+      color: rgba(247, 239, 229, 0.58);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .signal b {
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    section {
+      padding: 42px 0;
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: end;
+      margin-bottom: 26px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 28px;
+      height: 1px;
+      background: currentColor;
+    }
+
+    h2 {
+      margin: 10px 0 12px;
+      font-size: clamp(34px, 5vw, 54px);
+      line-height: 0.98;
+      letter-spacing: -0.05em;
+      font-weight: 700;
+    }
+
+    .section-head p,
+    .section-copy {
+      margin: 0;
+      max-width: 66ch;
+      color: var(--ink-soft);
+      font-size: 16px;
+      line-height: 1.82;
+    }
+
+    .section-stamp {
+      align-self: start;
+      padding: 12px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: rgba(255, 250, 242, 0.84);
+      color: var(--ink-soft);
+      font-size: 12px;
+      max-width: 180px;
+      line-height: 1.5;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .feature-card,
+    .client-card,
+    .guarantee-card,
+    .category-card,
+    .package-card,
+    .cta-shell,
+    .story-panel {
+      position: relative;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(27, 23, 20, 0.1);
+      background: rgba(255, 252, 247, 0.84);
+      box-shadow: 0 18px 40px rgba(82, 56, 36, 0.08);
+      overflow: hidden;
+    }
+
+    .feature-card,
+    .client-card,
+    .guarantee-card,
+    .category-card {
+      padding: 22px;
+    }
+
+    .feature-card::before,
+    .client-card::before,
+    .guarantee-card::before,
+    .category-card::before,
+    .package-card::before,
+    .story-panel::before,
+    .cta-shell::before {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border-radius: calc(var(--radius-lg) - 10px);
+      border: 1px solid rgba(27, 23, 20, 0.06);
+      pointer-events: none;
+    }
+
+    .card-index {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      height: 44px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .feature-card h3,
+    .client-card h3,
+    .guarantee-card h3,
+    .category-card h3,
+    .story-panel h3 {
+      margin: 18px 0 10px;
+      font-size: 30px;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      font-weight: 700;
+    }
+
+    .feature-card p,
+    .client-card p,
+    .guarantee-card p,
+    .category-card p,
+    .package-card p,
+    .story-panel p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 15px;
+      line-height: 1.78;
+    }
+
+    .story-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .story-panel {
+      padding: 26px;
+      background:
+        linear-gradient(135deg, rgba(255, 252, 247, 0.96), rgba(248, 239, 229, 0.9));
+    }
+
+    .story-panel .quote {
+      margin-top: 20px;
+      padding: 20px;
+      border-left: 4px solid var(--accent);
+      background: rgba(180, 73, 45, 0.05);
+      color: var(--ink);
+      font-size: 20px;
+      line-height: 1.65;
+    }
+
+    .story-note {
+      display: grid;
+      gap: 12px;
+    }
+
+    .story-chip {
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(255, 252, 247, 0.8);
+      border: 1px solid rgba(27, 23, 20, 0.1);
+      box-shadow: 0 18px 36px rgba(82, 56, 36, 0.08);
+    }
+
+    .story-chip b {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 16px;
+      color: var(--accent-deep);
+    }
+
+    .story-chip span {
+      color: var(--ink-soft);
+      font-size: 14px;
+      line-height: 1.72;
+    }
+
+    .client-card {
+      min-height: 248px;
+    }
+
+    .client-card .client-role {
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .category-grid,
+    .packages-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .category-card {
+      min-height: 290px;
+      background:
+        linear-gradient(145deg, rgba(255, 253, 248, 0.94), rgba(244, 234, 222, 0.88));
+    }
+
+    .category-card.video {
+      background:
+        linear-gradient(145deg, rgba(255, 251, 245, 0.94), rgba(236, 229, 218, 0.9));
+    }
+
+    .category-card ul {
+      list-style: none;
+      padding: 0;
+      margin: 18px 0 0;
+      display: grid;
+      gap: 12px;
+    }
+
+    .category-card li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      color: var(--ink-soft);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .category-card li::before {
+      content: "·";
+      color: var(--accent);
+      font-size: 22px;
+      line-height: 1;
+      margin-top: -2px;
+    }
+
+    .package-card {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 360px;
+      padding: 0;
+      background: rgba(255, 252, 247, 0.9);
+    }
+
+    .package-top {
+      padding: 24px 24px 18px;
+      border-bottom: 1px solid rgba(27, 23, 20, 0.08);
+      background:
+        linear-gradient(135deg, rgba(180, 73, 45, 0.08), rgba(196, 150, 59, 0.08)),
+        rgba(255, 252, 247, 0.82);
+    }
+
+    .package-kicker {
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .package-card h3 {
+      margin: 16px 0 10px;
+      font-size: 30px;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      font-weight: 700;
+    }
+
+    .package-price {
+      margin-top: 16px;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .package-price strong {
+      font-size: 40px;
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .package-price span {
+      color: var(--ink-soft);
+      font-size: 13px;
+    }
+
+    .package-body {
+      padding: 20px 24px 18px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .package-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .package-item {
+      display: grid;
+      grid-template-columns: 98px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+    }
+
+    .package-item b {
+      color: var(--ink);
+      font-size: 13px;
+    }
+
+    .package-item span {
+      color: var(--ink-soft);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .package-actions {
+      display: flex;
+      gap: 10px;
+      padding: 0 24px 24px;
+      flex-wrap: wrap;
+    }
+
+    .package-actions a {
+      flex: 1 1 160px;
+      text-align: center;
+      padding: 14px 18px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .package-actions a.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+      color: #fff8f2;
+      box-shadow: 0 16px 30px rgba(141, 48, 25, 0.18);
+    }
+
+    .package-actions a.secondary {
+      border: 1px solid rgba(27, 23, 20, 0.12);
+      background: rgba(255, 255, 255, 0.58);
+      color: var(--ink);
+    }
+
+    .process-wrap {
+      position: relative;
+      padding: 28px;
+      border-radius: 28px;
+      border: 1px solid rgba(27, 23, 20, 0.1);
+      background: rgba(255, 251, 246, 0.88);
+      box-shadow: 0 20px 44px rgba(82, 56, 36, 0.08);
+      overflow: hidden;
+    }
+
+    .process-wrap::before {
+      content: "";
+      position: absolute;
+      inset: 14px;
+      border-radius: 22px;
+      border: 1px solid rgba(27, 23, 20, 0.06);
+      pointer-events: none;
+    }
+
+    .timeline {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      top: 31px;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(180, 73, 45, 0.2), rgba(196, 150, 59, 0.75), rgba(97, 113, 96, 0.3));
+      z-index: 0;
+    }
+
+    .step {
+      position: relative;
+      z-index: 1;
+      padding: 0 8px;
+    }
+
+    .step-dot {
+      width: 64px;
+      height: 64px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 14px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--paper-strong), rgba(240, 216, 202, 0.95));
+      border: 1px solid rgba(27, 23, 20, 0.12);
+      box-shadow: 0 10px 22px rgba(82, 56, 36, 0.1);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .step h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      line-height: 1.3;
+    }
+
+    .step p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .faq-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.94fr) minmax(0, 1.06fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .faq-side {
+      position: sticky;
+      top: 94px;
+      padding: 24px;
+      border-radius: 26px;
+      background: linear-gradient(180deg, rgba(37, 31, 26, 0.98), rgba(48, 38, 32, 0.98));
+      border: 1px solid rgba(27, 23, 20, 0.08);
+      color: #f7efe5;
+      box-shadow: var(--shadow);
+    }
+
+    .faq-side h3 {
+      margin: 10px 0 12px;
+      font-size: 34px;
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .faq-side p {
+      margin: 0 0 18px;
+      color: rgba(247, 239, 229, 0.74);
+      font-size: 15px;
+      line-height: 1.76;
+    }
+
+    .faq-side .mini-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .faq-side .mini-list span {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 13px;
+      color: rgba(247, 239, 229, 0.84);
+    }
+
+    .faq-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    details {
+      border-radius: 22px;
+      border: 1px solid rgba(27, 23, 20, 0.1);
+      background: rgba(255, 252, 247, 0.86);
+      box-shadow: 0 16px 36px rgba(82, 56, 36, 0.08);
+      overflow: hidden;
+    }
+
+    summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 22px 24px;
+      font-size: 19px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary::after {
+      content: "+";
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(180, 73, 45, 0.08);
+      color: var(--accent);
+      font-size: 22px;
+      font-weight: 400;
+      flex: 0 0 auto;
+    }
+
+    details[open] summary::after {
+      content: "−";
+    }
+
+    .faq-answer {
+      padding: 0 24px 24px;
+      color: var(--ink-soft);
+      font-size: 15px;
+      line-height: 1.82;
+      max-width: 66ch;
+    }
+
+    .cta-shell {
+      padding: 34px;
+      background:
+        linear-gradient(135deg, rgba(180, 73, 45, 0.96), rgba(141, 48, 25, 0.96)),
+        var(--accent);
+      color: #fff7f2;
+    }
+
+    .cta-shell::before {
+      border-color: rgba(255, 255, 255, 0.16);
+    }
+
+    .cta-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .cta-shell h2 {
+      margin: 8px 0 14px;
+      color: #fffaf5;
+    }
+
+    .cta-shell p {
+      margin: 0;
+      max-width: 58ch;
+      color: rgba(255, 247, 242, 0.82);
+      font-size: 16px;
+      line-height: 1.85;
+    }
+
+    .cta-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .cta-actions a {
+      padding: 16px 20px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .cta-actions a.primary {
+      background: #fff6ef;
+      color: var(--accent-deep);
+      box-shadow: 0 14px 26px rgba(56, 20, 10, 0.16);
+    }
+
+    .cta-actions a.secondary {
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: #fff9f5;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    footer {
+      padding: 26px 0 44px;
+    }
+
+    .footer-box {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      padding: 22px 24px;
+      border-top: 1px solid rgba(27, 23, 20, 0.1);
+      color: var(--ink-soft);
+      font-size: 13px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      animation: revealUp 720ms ease forwards;
+    }
+
+    .delay-1 { animation-delay: 90ms; }
+    .delay-2 { animation-delay: 180ms; }
+    .delay-3 { animation-delay: 270ms; }
+    .delay-4 { animation-delay: 360ms; }
+    .delay-5 { animation-delay: 450ms; }
+    .delay-6 { animation-delay: 540ms; }
+
+    @keyframes revealUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 1120px) {
+      .hero-grid,
+      .story-layout,
+      .faq-grid,
+      .cta-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .timeline {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .timeline::before {
+        display: none;
+      }
+
+      .faq-side {
+        position: static;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .site-nav-inner {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 16px 0;
+      }
+
+      .brand,
+      .nav-links,
+      .nav-cta {
+        justify-content: center;
+      }
+
+      .hero-main,
+      .hero-aside,
+      .process-wrap,
+      .cta-shell {
+        padding-left: 22px;
+        padding-right: 22px;
+      }
+
+      .hero-metrics,
+      .grid-3,
+      .grid-4,
+      .category-grid,
+      .packages-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .timeline {
+        grid-template-columns: 1fr;
+      }
+
+      .step {
+        padding-left: 0;
+      }
+
+      h1 {
+        max-width: none;
+        font-size: clamp(40px, 13vw, 68px);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        width: min(calc(100% - 20px), var(--max));
+      }
+
+      .hero {
+        padding-top: 26px;
+      }
+
+      .hero-main,
+      .hero-aside {
+        border-radius: 24px;
+      }
+
+      .hero-main {
+        padding: 24px;
+      }
+
+      .hero-aside {
+        padding: 18px;
+      }
+
+      .hero-main p,
+      .section-head p,
+      .section-copy,
+      .cta-shell p {
+        font-size: 15px;
+      }
+
+      .section-head {
+        grid-template-columns: 1fr;
+      }
+
+      .metric,
+      .feature-card,
+      .client-card,
+      .guarantee-card,
+      .category-card,
+      .story-panel,
+      .story-chip,
+      .cta-shell {
+        border-radius: 20px;
+      }
+
+      .package-item {
+        grid-template-columns: 1fr;
+      }
+
+      .cta-actions,
+      .hero-actions,
+      .package-actions,
+      .footer-links {
+        justify-content: stretch;
+      }
+
+      .cta-actions a,
+      .hero-actions a,
+      .package-actions a,
+      .nav-cta {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-nav">
+      <div class="container site-nav-inner">
+        <a class="brand" href="#top">
+          <span class="brand-mark">滴</span>
+          <span class="brand-text">
+            <span class="brand-name">嘀嗒制作</span>
+            <span class="brand-sub">Standard Creative Service</span>
+          </span>
+        </a>
+        <nav class="nav-links" aria-label="主导航">
+          <a href="#about">嘀嗒制作是什么</a>
+          <a href="#packages">产品包</a>
+          <a href="#process">制作流程</a>
+          <a href="#guarantee">交付保障</a>
+          <a href="#faq">常见问题</a>
+        </nav>
+        <a class="nav-cta" href="#cta">立即下单</a>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="container hero-grid">
+          <div class="hero-main reveal">
+            <span class="hero-kicker">Standardized Production Service</span>
+            <h1>嘀嗒制作，标准化图片与视频制作服务</h1>
+            <p>明码标价、流程清晰、按标准交付。面向电商商家、品牌方与内容团队，提供可直接下单的图片包与视频包服务。</p>
+            <p>把原本零散、反复沟通的内容制作需求，变成可选包、可下单、可验收、可售后的标准服务，让你更快开始制作，也更容易拿到稳定结果。</p>
+            <div class="hero-actions">
+              <a class="btn" href="#packages">查看产品包</a>
+              <a class="btn-secondary" href="#cta">立即下单</a>
+            </div>
+            <div class="hero-metrics">
+              <div class="metric reveal delay-1">
+                <b>价格透明</b>
+                <span>先看产品包，再下单，不用反复等报价。</span>
+              </div>
+              <div class="metric reveal delay-2">
+                <b>周期明确</b>
+                <span>交付时间提前说明，便于团队安排节奏。</span>
+              </div>
+              <div class="metric reveal delay-3">
+                <b>支持验收</b>
+                <span>交付不是“发文件结束”，而是按口径完成验收。</span>
+              </div>
+              <div class="metric reveal delay-4">
+                <b>售后可追溯</b>
+                <span>修改规则、交付记录、下载路径都更清楚。</span>
+              </div>
+            </div>
+          </div>
+
+          <aside class="hero-aside reveal delay-2" aria-label="服务总览">
+            <span class="aside-label">What You Get</span>
+            <div class="aside-grid">
+              <div class="aside-card">
+                <strong>不是“先聊聊看”</strong>
+                <p>而是先看产品包、先看交付内容、先看周期，再决定是否下单。更像购买一个服务方案，而不是进入一场没有边界的沟通。</p>
+              </div>
+              <div class="aside-card">
+                <strong>标准包优先</strong>
+                <p>图片包与视频包覆盖高频场景；需求超出标准范围时，再进入定制沟通，减少前期时间浪费。</p>
+                <div class="signal-row">
+                  <div class="signal">
+                    <small>产品形式</small>
+                    <b>图片包 / 视频包</b>
+                  </div>
+                  <div class="signal">
+                    <small>交付节奏</small>
+                    <b>T+N 工作日</b>
+                  </div>
+                  <div class="signal">
+                    <small>协作方式</small>
+                    <b>下单 · 制作 · 验收</b>
+                  </div>
+                </div>
+              </div>
+              <div class="aside-card">
+                <strong>适合高频内容团队</strong>
+                <p>电商运营、品牌营销、本地生活和内容团队，可以用更低的沟通成本，换来更稳定的制作效率。</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="about">
+        <div class="container">
+          <div class="section-head reveal">
+            <div>
+              <span class="eyebrow">About</span>
+              <h2>不是“先聊聊看”，而是可以直接下单的制作服务</h2>
+              <p>嘀嗒制作是一个标准化图片与视频制作服务入口。我们把常见的内容制作需求整理成清晰的产品包，让客户不必从零整理需求、不必反复确认报价，也能更快进入制作流程。</p>
+            </div>
+            <div class="section-stamp">更像一本可购买的服务目录，而不是一页泛泛的公司介绍。</div>
+          </div>
+
+          <div class="story-layout">
+            <div class="story-panel reveal delay-1">
+              <h3>把制作这件事，从“模糊沟通”改成“标准协作”</h3>
+              <p>无论你是想做电商主图、活动海报、详情页素材，还是想做信息流短视频、口播剪辑、门店宣传视频，都可以先按标准产品包快速下单；如果需求超出标准范围，也可以转入定制沟通。</p>
+              <div class="quote">“先把服务范围、交付内容、周期与修改规则说清，再开始制作。”</div>
+            </div>
+            <div class="story-note">
+              <div class="story-chip reveal delay-2">
+                <b>需求更好提</b>
+                <span>通过标准产品包和填写模板，减少“不会提需求、需求说不清”的沟通成本。</span>
+              </div>
+              <div class="story-chip reveal delay-3">
+                <b>制作更省心</b>
+                <span>从购买、提交资料到制作、审核、验收，流程清晰可跟进，不用反复追进度。</span>
+              </div>
+              <div class="story-chip reveal delay-4">
+                <b>交付更可控</b>
+                <span>交付内容、修改次数、验收口径提前说明，减少交付阶段的反复扯皮。</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="clients">
+        <div class="container">
+          <div class="section-head reveal">
+            <div>
+              <span class="eyebrow">Clients</span>
+              <h2>适合这些需要高频内容制作的团队</h2>
+              <p>如果你经常遇到“要做内容，但沟通时间比制作时间还长”的情况，嘀嗒制作会更适合你。</p>
+            </div>
+          </div>
+
+          <div class="grid-4">
+            <article class="client-card reveal delay-1">
+              <span class="client-role">01 / 电商商家</span>
+              <h3>稳定出图，也要稳定预算</h3>
+              <p>需要持续产出主图、详情图、活动图、短视频素材，希望在提高效率的同时，预算和周期也更可预期。</p>
+            </article>
+            <article class="client-card reveal delay-2">
+              <span class="client-role">02 / 品牌营销团队</span>
+              <h3>流程标准，内部更好协同</h3>
+              <p>需要海报、KV、宣传素材、广告短视频，希望交付稳定、过程清晰，便于内部多人协作与审核。</p>
+            </article>
+            <article class="client-card reveal delay-3">
+              <span class="client-role">03 / 本地生活商家</span>
+              <h3>内容要快，交付也要快</h3>
+              <p>需要探店、团购推广、门店宣传等视频内容，希望快速起量、快速交付，减少试错时间。</p>
+            </article>
+            <article class="client-card reveal delay-4">
+              <span class="client-role">04 / 内容运营团队</span>
+              <h3>高频产出，低沟通损耗</h3>
+              <p>需要持续生产图文和视频内容，希望降低沟通成本，提高制作周转效率，让团队更像在跑一个稳定系统。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="packages">
+        <div class="container">
+          <div class="section-head reveal">
+            <div>
+              <span class="eyebrow">Packages</span>
+              <h2>你可以直接下单的产品包</h2>
+              <p>我们先把高频、相对标准化的制作需求做成了两类产品包：图片包和视频包。你可以先按场景选择，再进入具体产品详情页查看交付内容、周期和价格。</p>
+            </div>
+          </div>
+
+          <div class="category-grid">
+            <article class="category-card reveal delay-1">
+              <span class="card-index">Image</span>
+              <h3>图片包</h3>
+              <p>适合电商视觉、活动宣传、品牌物料等场景。</p>
+              <ul>
+                <li>常见交付：主图、海报、详情图、KV、套图等</li>
+                <li>周期参考：T+2 至 T+5 工作日</li>
+                <li>价格参考：￥XXX 起</li>
+              </ul>
+            </article>
+            <article class="category-card video reveal delay-2">
+              <span class="card-index">Video</span>
+              <h3>视频包</h3>
+              <p>适合投流广告、内容种草、门店宣传、品牌传播等场景。</p>
+              <ul>
+                <li>常见交付：成片、封面、字幕文件等</li>
+                <li>周期参考：T+3 至 T+7 工作日</li>
+                <li>价格参考：￥XXX 起</li>
+              </ul>
+            </article>
+          </div>
+
+          <div class="section-head reveal" style="margin-top:32px;">
+            <div>
+              <span class="eyebrow">Popular</span>
+              <h2>先从这些热门产品包开始</h2>
+              <p>如果你已经有明确场景，可以直接从下面的热门产品包进入。每个产品包都会提前说明服务内容、交付周期和价格范围，方便快速比较。</p>
+            </div>
+          </div>
+
+          <div class="packages-grid">
+            <article class="package-card reveal delay-1">
+              <div class="package-top">
+                <span class="package-kicker">Image Package</span>
+                <h3>AI 图片制作包</h3>
+                <p>适合电商上新、活动宣传、社媒配图。</p>
+                <div class="package-price">
+                  <strong>￥XXX</strong>
+                  <span>起 / T+3 工作日</span>
+                </div>
+              </div>
+              <div class="package-body">
+                <div class="package-list">
+                  <div class="package-item"><b>适用场景</b><span>电商上新、活动宣传、社媒配图</span></div>
+                  <div class="package-item"><b>交付内容</b><span>按约定张数输出成品图</span></div>
+                  <div class="package-item"><b>交付节奏</b><span>需求确认后进入制作并按周期交付</span></div>
+                </div>
+              </div>
+              <div class="package-actions">
+                <a class="secondary" href="#faq">查看详情</a>
+                <a class="primary" href="#cta">立即购买</a>
+              </div>
+            </article>
+
+            <article class="package-card reveal delay-2">
+              <div class="package-top">
+                <span class="package-kicker">Image Package</span>
+                <h3>电商套图包</h3>
+                <p>适合商品主图、卖点图、详情页素材。</p>
+                <div class="package-price">
+                  <strong>￥XXX</strong>
+                  <span>起 / T+3 至 T+5</span>
+                </div>
+              </div>
+              <div class="package-body">
+                <div class="package-list">
+                  <div class="package-item"><b>适用场景</b><span>商品主图、卖点图、详情页素材</span></div>
+                  <div class="package-item"><b>交付内容</b><span>主图、卖点图、详情模块图</span></div>
+                  <div class="package-item"><b>适合谁</b><span>追求高频出图和清晰预算的电商团队</span></div>
+                </div>
+              </div>
+              <div class="package-actions">
+                <a class="secondary" href="#faq">查看详情</a>
+                <a class="primary" href="#cta">立即购买</a>
+              </div>
+            </article>
+
+            <article class="package-card reveal delay-3">
+              <div class="package-top">
+                <span class="package-kicker">Video Package</span>
+                <h3>信息流短视频包</h3>
+                <p>适合广告投流、转化素材、短视频营销。</p>
+                <div class="package-price">
+                  <strong>￥XXX</strong>
+                  <span>起 / T+4 工作日</span>
+                </div>
+              </div>
+              <div class="package-body">
+                <div class="package-list">
+                  <div class="package-item"><b>适用场景</b><span>广告投流、转化素材、短视频营销</span></div>
+                  <div class="package-item"><b>交付内容</b><span>短视频成片、字幕、封面</span></div>
+                  <div class="package-item"><b>核心价值</b><span>让素材生产更快进入投放节奏</span></div>
+                </div>
+              </div>
+              <div class="package-actions">
+                <a class="secondary" href="#faq">查看详情</a>
+                <a class="primary" href="#cta">立即购买</a>
+              </div>
+            </article>
+
+            <article class="package-card reveal delay-4">
+              <div class="package-top">
+                <span class="package-kicker">Video Package</span>
+                <h3>本地生活短视频包</h3>
+                <p>适合探店、团购、门店宣传。</p>
+                <div class="package-price">
+                  <strong>￥XXX</strong>
+                  <span>起 / T+5 工作日</span>
+                </div>
+              </div>
+              <div class="package-body">
+                <div class="package-list">
+                  <div class="package-item"><b>适用场景</b><span>探店、团购、门店宣传</span></div>
+                  <div class="package-item"><b>交付内容</b><span>竖版短视频成片</span></div>
+                  <div class="package-item"><b>适合谁</b><span>需要更快起量的门店或本地运营团队</span></div>
+                </div>
+              </div>
+              <div class="package-actions">
+                <a class="secondary" href="#faq">查看详情</a>
+                <a class="primary" href="#cta">立即购买</a>
+              </div>
+            </article>
+
+            <article class="package-card reveal delay-5">
+              <div class="package-top">
+                <span class="package-kicker">Image Package</span>
+                <h3>品牌海报设计包</h3>
+                <p>适合活动海报、品牌传播、节日营销。</p>
+                <div class="package-price">
+                  <strong>￥XXX</strong>
+                  <span>起 / T+3 工作日</span>
+                </div>
+              </div>
+              <div class="package-body">
+                <div class="package-list">
+                  <div class="package-item"><b>适用场景</b><span>活动海报、品牌传播、节日营销</span></div>
+                  <div class="package-item"><b>交付内容</b><span>海报成品图，按产品说明提供对应格式</span></div>
+                  <div class="package-item"><b>适合谁</b><span>需要在固定节奏内稳定产出品牌物料的团队</span></div>
+                </div>
+              </div>
+              <div class="package-actions">
+                <a class="secondary" href="#faq">查看详情</a>
+                <a class="primary" href="#cta">立即购买</a>
+              </div>
+            </article>
+
+            <article class="package-card reveal delay-6">
+              <div class="package-top">
+                <span class="package-kicker">Video Package</span>
+                <h3>宣传视频制作包</h3>
+                <p>适合品牌介绍、产品宣传、活动预热。</p>
+                <div class="package-price">
+                  <strong>￥XXX</strong>
+                  <span>起 / T+5 至 T+7</span>
+                </div>
+              </div>
+              <div class="package-body">
+                <div class="package-list">
+                  <div class="package-item"><b>适用场景</b><span>品牌介绍、产品宣传、活动预热</span></div>
+                  <div class="package-item"><b>交付内容</b><span>宣传视频成片</span></div>
+                  <div class="package-item"><b>协作重点</b><span>需求清楚后更适合快速推进成片制作</span></div>
+                </div>
+              </div>
+              <div class="package-actions">
+                <a class="secondary" href="#faq">查看详情</a>
+                <a class="primary" href="#cta">立即购买</a>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="process">
+        <div class="container">
+          <div class="section-head reveal">
+            <div>
+              <span class="eyebrow">Process</span>
+              <h2>从下单到交付，流程一目了然</h2>
+              <p>你不需要先猜流程，也不需要担心买完之后没人推进。下单后，我们会按明确的制作链路推进，并在关键节点完成审核与交付。</p>
+            </div>
+          </div>
+
+          <div class="process-wrap reveal delay-1">
+            <div class="timeline">
+              <article class="step">
+                <div class="step-dot">01</div>
+                <h3>选择产品包</h3>
+                <p>根据使用场景，选择合适的图片包或视频包，先看清服务内容、交付周期和价格。</p>
+              </article>
+              <article class="step">
+                <div class="step-dot">02</div>
+                <h3>提交需求与素材</h3>
+                <p>按照模板填写需求信息，并上传参考资料、原始素材或必要说明。</p>
+              </article>
+              <article class="step">
+                <div class="step-dot">03</div>
+                <h3>进入制作</h3>
+                <p>确认下单后，制作团队根据产品包约定内容进入排期与制作流程。</p>
+              </article>
+              <article class="step">
+                <div class="step-dot">04</div>
+                <h3>审核与反馈</h3>
+                <p>在约定节点提交版本，按产品包规则收集反馈并推进修改。</p>
+              </article>
+              <article class="step">
+                <div class="step-dot">05</div>
+                <h3>验收与交付</h3>
+                <p>作品完成后进入验收，验收通过后交付最终文件。</p>
+              </article>
+              <article class="step">
+                <div class="step-dot">06</div>
+                <h3>售后支持</h3>
+                <p>在约定范围内提供修改、下载和售后协助，让交付不止停留在发完文件。</p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="guarantee">
+        <div class="container">
+          <div class="section-head reveal">
+            <div>
+              <span class="eyebrow">Guarantee</span>
+              <h2>交付边界提前说清，合作更省心</h2>
+              <p>制作服务最怕的不是提意见，而是边界不清。我们会把修改机制、审核口径、交付标准和素材要求提前说明，帮助双方更高效协作。</p>
+            </div>
+          </div>
+
+          <div class="grid-4">
+            <article class="guarantee-card reveal delay-1">
+              <span class="card-index">01</span>
+              <h3>修改机制</h3>
+              <p>每个产品包都包含明确的修改次数和适用范围。合理范围内的修改按产品规则执行，超出原始需求范围的新增内容，可按增项或二次报价处理。</p>
+            </article>
+            <article class="guarantee-card reveal delay-2">
+              <span class="card-index">02</span>
+              <h3>审核规则</h3>
+              <p>审核将以你下单时确认的需求、参考方向和产品包规格为基础进行，不以交付阶段临时新增要求作为默认标准。</p>
+            </article>
+            <article class="guarantee-card reveal delay-3">
+              <span class="card-index">03</span>
+              <h3>交付标准</h3>
+              <p>我们会按照产品包约定交付对应格式、尺寸、时长、清晰度或文件类型。具体交付清单以产品详情页说明为准。</p>
+            </article>
+            <article class="guarantee-card reveal delay-4">
+              <span class="card-index">04</span>
+              <h3>版权与素材要求</h3>
+              <p>请确保你提交的素材、文案、图片、视频等资料具备合法使用权。平台将基于客户提交资料和约定需求完成制作，成品的版权或使用范围按订单约定执行。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq">
+        <div class="container faq-grid">
+          <aside class="faq-side reveal">
+            <span class="eyebrow" style="color:#f3d9c9;">FAQ</span>
+            <h3>下单前，最常被问到的问题</h3>
+            <p>首页先回答高频问题，让用户不用离开页面也能判断是否适合继续下单。</p>
+            <div class="mini-list">
+              <span>制作周期会在产品详情页提前说明</span>
+              <span>发票、退款、修改次数都有独立口径</span>
+              <span>标准包之外的需求可转入定制协助</span>
+            </div>
+          </aside>
+
+          <div class="faq-list">
+            <details class="reveal delay-1" open>
+              <summary>制作周期多久？</summary>
+              <div class="faq-answer">不同产品包的制作周期不同，通常会在产品详情页明确展示预计交付时间。下单时请以页面展示周期为准。</div>
+            </details>
+            <details class="reveal delay-2">
+              <summary>支持开发票吗？</summary>
+              <div class="faq-answer">支持。具体开票信息和抬头要求，可在下单后按流程提交确认。</div>
+            </details>
+            <details class="reveal delay-3">
+              <summary>不满意可以退款吗？</summary>
+              <div class="faq-answer">退款规则会根据是否已进入制作、当前制作进度以及产品包服务条款综合判断，具体以订单规则为准。</div>
+            </details>
+            <details class="reveal delay-4">
+              <summary>怎么验收交付结果？</summary>
+              <div class="faq-answer">验收将以你下单时确认的需求、交付规格和产品包说明为依据进行，确认通过后交付最终版本。</div>
+            </details>
+            <details class="reveal delay-5">
+              <summary>交付后在哪里下载？</summary>
+              <div class="faq-answer">验收完成后，可在对应订单页或交付页下载最终文件。</div>
+            </details>
+            <details class="reveal delay-6">
+              <summary>可以修改几次？</summary>
+              <div class="faq-answer">不同产品包包含的修改次数不同，请以下单前的产品包说明为准。</div>
+            </details>
+            <details class="reveal delay-6">
+              <summary>素材没有准备齐，可以先下单吗？</summary>
+              <div class="faq-answer">部分产品包可以先下单后补充资料，但也有部分产品包需要素材齐全后才能进入制作，建议先查看产品详情页中的素材要求。</div>
+            </details>
+            <details class="reveal delay-6">
+              <summary>如果我的需求不在标准产品包里怎么办？</summary>
+              <div class="faq-answer">如果你的需求属于非标准场景，可以通过定制需求入口联系我们，由人工协助评估制作方案。</div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section id="cta">
+        <div class="container">
+          <div class="cta-shell reveal">
+            <div class="cta-grid">
+              <div>
+                <span class="eyebrow" style="color:#ffe7d8;">Ready</span>
+                <h2>已经准备好开始制作了吗？</h2>
+                <p>标准化需求可以直接选择产品包下单，非标准需求也可以先提交信息，我们会帮你判断更适合哪种合作方式。</p>
+              </div>
+              <div class="cta-actions">
+                <a class="primary" href="#packages">查看产品包</a>
+                <a class="secondary" href="#about">提交定制需求</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container footer-box">
+        <div>嘀嗒制作 · 标准化图片与视频制作服务<br>可在此补充公司名称、联系方式、服务时间与发票说明入口。</div>
+        <div class="footer-links">
+          <a href="#guarantee">交付保障</a>
+          <a href="#faq">常见问题</a>
+          <a href="#packages">产品包</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
