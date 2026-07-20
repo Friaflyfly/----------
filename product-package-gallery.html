@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="data:,">
+  <title>作品案例 - 嘀嗒制作 · 产品包作品展示</title>
+  <link rel="stylesheet" href="_shared.css">
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #68758c;
+      --line: #e4eaf2;
+      --paper: #ffffff;
+      --wash: #f4f7fb;
+      --blue: #245bff;
+      --cyan: #13b7c6;
+      --orange: #ff8a2a;
+      --green: #12a36a;
+      --shadow: 0 18px 48px rgba(23, 32, 51, .11);
+    }
+    body {
+      background:
+        linear-gradient(180deg, #eef4fb 0, #f8fafc 38%, #eef3f8 100%);
+      color: var(--ink);
+    }
+    .topbar { background: rgba(255,255,255,.94); backdrop-filter: blur(18px); }
+    .sidebar { background: rgba(255,255,255,.92); backdrop-filter: blur(18px); }
+    .main {
+      width: calc(100% - 200px);
+      padding: 24px 28px 72px;
+    }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      min-height: 260px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 24px;
+      align-items: end;
+      padding: 34px;
+      border-radius: 26px;
+      background:
+        linear-gradient(125deg, rgba(10,18,34,.96), rgba(24,61,112,.94) 54%, rgba(9,121,134,.86)),
+        radial-gradient(circle at 84% 14%, rgba(255,255,255,.36), transparent 25%);
+      color: #fff;
+      box-shadow: var(--shadow);
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(120deg, rgba(255,255,255,.11) 1px, transparent 1px),
+        linear-gradient(60deg, rgba(255,255,255,.08) 1px, transparent 1px);
+      background-size: 84px 84px, 122px 122px;
+      opacity: .44;
+      mask-image: linear-gradient(90deg, transparent 0, #000 28%, #000 100%);
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -70px;
+      top: -120px;
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      background: conic-gradient(from 20deg, rgba(19,183,198,.8), rgba(255,138,42,.54), rgba(36,91,255,.72), rgba(19,183,198,.8));
+      filter: blur(4px);
+      opacity: .38;
+    }
+    .hero-main, .hero-side { position: relative; z-index: 1; }
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      height: 28px;
+      padding: 0 12px;
+      border: 1px solid rgba(255,255,255,.24);
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+    h1 {
+      margin: 16px 0 10px;
+      max-width: 720px;
+      font-size: clamp(34px, 4vw, 58px);
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+    .hero p {
+      margin: 0;
+      max-width: 760px;
+      color: rgba(255,255,255,.76);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .search-panel {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 18px;
+      background: rgba(255,255,255,.12);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.13);
+    }
+    .search-box {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      color: var(--ink);
+    }
+    .search-box span { color: var(--muted); }
+    .search-box input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--ink);
+      font: inherit;
+      font-size: 13px;
+    }
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .hero-stat {
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+    .hero-stat b {
+      display: block;
+      font-size: 22px;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+    .hero-stat span {
+      display: block;
+      margin-top: 7px;
+      color: rgba(255,255,255,.62);
+      font-size: 11px;
+    }
+    .filters {
+      position: sticky;
+      top: 56px;
+      z-index: 60;
+      margin: 18px 0;
+      padding: 12px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      overflow-x: auto;
+      border: 1px solid rgba(228,234,242,.9);
+      border-radius: 18px;
+      background: rgba(255,255,255,.88);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 28px rgba(23,32,51,.07);
+    }
+    .filter-btn {
+      flex: 0 0 auto;
+      height: 36px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .filter-btn.active {
+      border-color: var(--blue);
+      background: var(--blue);
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(36,91,255,.2);
+    }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+      margin: 18px 2px 14px;
+    }
+    .section-head h2 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 0;
+    }
+    .section-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .sort-hint {
+      flex: 0 0 auto;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .gallery {
+      column-count: 4;
+      column-gap: 16px;
+    }
+    .work-card {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+      margin: 0 0 16px;
+      break-inside: avoid;
+      border: 1px solid rgba(23,32,51,.08);
+      border-radius: 18px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 12px 30px rgba(23,32,51,.08);
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .work-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 22px 46px rgba(23,32,51,.16);
+    }
+    .work-media {
+      position: relative;
+      display: block;
+      overflow: hidden;
+      background: #dfe7f2;
+    }
+    .work-media img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .work-media::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      height: 42%;
+      background: linear-gradient(180deg, transparent, rgba(6,14,26,.62));
+      opacity: .76;
+      pointer-events: none;
+    }
+    .work-badge {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      z-index: 2;
+      max-width: calc(100% - 24px);
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(15,27,45,.78);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 900;
+      backdrop-filter: blur(12px);
+    }
+    .work-play {
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      z-index: 2;
+      width: 34px;
+      height: 34px;
+      display: none;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(255,255,255,.88);
+      color: var(--blue);
+      font-weight: 950;
+    }
+    .work-card[data-type="video"] .work-play { display: grid; }
+    .work-body {
+      padding: 13px 14px 14px;
+    }
+    .work-title {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    .work-desc {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .work-meta {
+      margin-top: 11px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .work-meta b { color: var(--ink); }
+    .work-actions {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+    .buy-link, .detail-link {
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 12px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 950;
+      border: 1px solid var(--line);
+    }
+    .buy-link {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+    .detail-link {
+      background: #fff;
+      color: var(--ink);
+    }
+    .empty-state {
+      display: none;
+      padding: 32px;
+      border: 1px dashed #b8c4d6;
+      border-radius: 20px;
+      background: #fff;
+      color: var(--muted);
+      text-align: center;
+    }
+    .package-rail {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .package-card {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 8px 24px rgba(23,32,51,.06);
+    }
+    .package-card strong {
+      display: block;
+      font-size: 14px;
+    }
+    .package-card span {
+      display: block;
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .package-card a {
+      margin-top: 12px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 11px;
+      border-radius: 999px;
+      background: #eef3ff;
+      color: var(--blue);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 950;
+    }
+    @media (max-width: 1280px) {
+      .gallery { column-count: 3; }
+      .hero { grid-template-columns: 1fr; }
+      .package-rail { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 900px) {
+      .main { width: 100%; }
+      .hero { padding: 24px; }
+      .gallery { column-count: 2; }
+    }
+    @media (max-width: 620px) {
+      .gallery { column-count: 1; }
+      .package-rail { grid-template-columns: 1fr; }
+      .hero-stats { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar" id="topbar-shared"></header>
+  <div class="app">
+    <aside class="sidebar">
+      <nav class="menu">
+        <a href="platform-home-demander.html"><span class="menu-icon">🏠</span> 工作台</a>
+        <div class="menu-group">
+          <div class="menu-group-title">我有需求</div>
+          <a href="product-package-gallery.html" class="active"><span class="menu-icon">🖼</span> 作品案例</a>
+          <a href="standard-package-store-modal.html"><span class="menu-icon">📦</span> 标准包购买</a>
+          <a href="online-course-package-store.html"><span class="menu-icon">🎓</span> 在线课程包</a>
+          <a href="demand-publish.html"><span class="menu-icon">📤</span> 发布需求</a>
+          <a href="demand-list.html"><span class="menu-icon">📋</span> 我的需求</a>
+          <a href="contractor-marketplace.html"><span class="menu-icon">🏪</span> 服务广场</a>
+        </div>
+        <div class="menu-group">
+          <div class="menu-group-title">我要接单</div>
+          <a href="contractor-demand-hall.html"><span class="menu-icon">📢</span> 接单广场</a>
+          <a href="contractor-orders.html"><span class="menu-icon">📬</span> 我的接单</a>
+          <a href="contractor-profile-edit.html"><span class="menu-icon">🛍</span> 我的服务主页</a>
+        </div>
+        <div class="menu-group">
+          <div class="menu-group-title">协同与账户</div>
+          <a href="project-space-list.html"><span class="menu-icon">🤝</span> 项目协同空间</a>
+          <a href="finance-center-prototype/accounts.html"><span class="menu-icon">💰</span> 资金中心</a>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <section class="hero">
+        <div class="hero-main">
+          <div class="kicker">PRODUCT PACKAGE GALLERY</div>
+          <h1>先看作品，再买同款产品包</h1>
+          <p>把标准产品包的交付效果做成作品发现流。用户可以按图片、电商、短视频、本地生活和品牌宣传浏览案例，看到喜欢的风格后直接购买同款产品包。</p>
+        </div>
+        <div class="hero-side">
+          <div class="search-panel">
+            <label class="search-box">
+              <span>搜索</span>
+              <input id="searchInput" placeholder="作品、场景、产品包">
+            </label>
+            <div class="hero-stats">
+              <div class="hero-stat"><b id="statWorks">16</b><span>作品案例</span></div>
+              <div class="hero-stat"><b>7</b><span>产品包</span></div>
+              <div class="hero-stat"><b>1步</b><span>买同款</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <nav class="filters" id="filters"></nav>
+
+      <section>
+        <div class="section-head">
+          <div>
+            <h2>精选作品</h2>
+            <p>每张卡片都绑定一个标准产品包，点击“买同款产品包”会带入对应购买配置。</p>
+          </div>
+          <div class="sort-hint" id="resultHint">全部作品</div>
+        </div>
+        <div class="gallery" id="gallery"></div>
+        <div class="empty-state" id="emptyState">没有匹配的作品，换个关键词或分类试试。</div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <div>
+            <h2>热门同款产品包</h2>
+            <p>适合作为运营位：展示当前主推的产品包与作品流之间的转化入口。</p>
+          </div>
+        </div>
+        <div class="package-rail" id="packageRail"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toastWrap" class="toasts"></div>
+  <script src="_shared.js?v=finance-nav-20260616"></script>
+  <script>
+    (function () {
+      const works = [
+        { id: "w01", title: "国风角色头像转绘", desc: "人物照片转绘为清爽国风插画，可用于头像和社媒封面。", category: "image", type: "image", packageId: "ai-image", packageName: "AI 图片制作包", price: "¥5.9起", metric: "2K / 4K", src: "assets/product-gallery/ai-portrait-01.png", tags: ["头像", "人物转绘", "国风"] },
+        { id: "w02", title: "轻品牌 Logo 方案", desc: "适合个人 IP、店铺小品牌和活动标识的轻量 Logo 视觉。", category: "image", type: "image", packageId: "ai-image", packageName: "AI 图片制作包", price: "¥5.9起", metric: "PNG/JPG", src: "assets/product-gallery/ai-logo-01.png", tags: ["LOGO", "品牌", "轻设计"] },
+        { id: "w03", title: "夏季新品主图套系", desc: "主图、场景图、细节图组合，突出商品卖点和活动氛围。", category: "ecommerce", type: "image", packageId: "ecommerce-set", packageName: "电商套图制作包", price: "¥99起", metric: "5张/套", src: "assets/product-gallery/ecom-main-01.png", tags: ["电商", "主图", "上新"] },
+        { id: "w04", title: "服饰模特展示图", desc: "用模特场景强化商品穿搭感，适合服饰、美妆、配饰类商品。", category: "ecommerce", type: "image", packageId: "ecommerce-set", packageName: "电商套图制作包", price: "¥99起", metric: "4:5", src: "assets/product-gallery/ecom-model-01.png", tags: ["模特", "场景图", "服饰"] },
+        { id: "w05", title: "详情页首屏视觉", desc: "用首屏利益点承接流量，适合新品首发和重点转化页。", category: "ecommerce", type: "image", packageId: "detail-page", packageName: "商品详情页设计包", price: "¥249.9起", metric: "长图", src: "assets/product-gallery/detail-page-01.png", tags: ["详情页", "转化", "首屏"] },
+        { id: "w06", title: "卖点拆解长图", desc: "把参数、功能、材质和对比信息整合成可读性更强的详情模块。", category: "ecommerce", type: "image", packageId: "detail-page", packageName: "商品详情页设计包", price: "¥249.9起", metric: "模块化", src: "assets/product-gallery/detail-page-02.png", tags: ["卖点", "长图", "参数"] },
+        { id: "w07", title: "单品种草信息流", desc: "3 秒钩子、卖点演示和行动引导，适合投放测试。", category: "video", type: "video", packageId: "feed-video", packageName: "AI 信息流短视频", price: "¥129起", metric: "9:16", src: "assets/product-gallery/feed-video-01.png", tags: ["信息流", "种草", "投放"] },
+        { id: "w08", title: "直播切片引流", desc: "从直播高光切片中包装卖点，用于短视频平台二次分发。", category: "video", type: "video", packageId: "feed-video", packageName: "AI 信息流短视频", price: "¥129起", metric: "15-60s", src: "assets/product-gallery/feed-video-02.png", tags: ["直播切片", "短视频", "引流"] },
+        { id: "w09", title: "餐饮门店探店片", desc: "门头、环境、招牌菜和到店路线，适合同城团购引流。", category: "local", type: "video", packageId: "local-video", packageName: "实景探店 / 门店引流视频", price: "¥99起", metric: "9:16", src: "assets/product-gallery/local-food-01.png", tags: ["探店", "餐饮", "同城"] },
+        { id: "w10", title: "美业到店转化片", desc: "服务流程、效果展示和套餐利益点，更适合门店投放。", category: "local", type: "video", packageId: "local-video", packageName: "实景探店 / 门店引流视频", price: "¥99起", metric: "30s", src: "assets/product-gallery/local-beauty-01.png", tags: ["美业", "门店", "团购"] },
+        { id: "w11", title: "情感反转剧情号", desc: "人设、冲突和反转结构，适合账号矩阵批量测试。", category: "video", type: "video", packageId: "story-video", packageName: "AI 创意剧情短视频", price: "¥299起", metric: "剧情", src: "assets/product-gallery/story-drama-01.png", tags: ["剧情", "情感", "矩阵"] },
+        { id: "w12", title: "短剧角色设定板", desc: "角色形象、服装和场景基调，便于剧情号保持系列一致性。", category: "video", type: "image", packageId: "story-video", packageName: "AI 创意剧情短视频", price: "¥299起", metric: "角色板", src: "assets/product-gallery/story-role-01.png", tags: ["角色", "短剧", "设定"] },
+        { id: "w13", title: "企业品牌宣传片", desc: "品牌理念、企业实力和核心场景组合，适合官网和招商物料。", category: "brand", type: "video", packageId: "brand-film", packageName: "AI 品牌宣传短片", price: "¥2999起", metric: "16:9", src: "assets/product-gallery/brand-film-01.png", tags: ["品牌", "宣传片", "招商"] },
+        { id: "w14", title: "产品功能故事片", desc: "把产品亮点转化成故事化分镜，适合新品发布和销售演示。", category: "brand", type: "video", packageId: "brand-film", packageName: "AI 品牌宣传短片", price: "¥2999起", metric: "1080P", src: "assets/product-gallery/brand-product-01.png", tags: ["产品", "功能", "品牌"] },
+        { id: "w15", title: "证件照精修示例", desc: "适合低门槛个人需求，快速完成证件照、头像和基础图片修复。", category: "image", type: "image", packageId: "ai-image", packageName: "AI 图片制作包", price: "¥5.9起", metric: "1天", src: "assets/product-gallery/ai-certificate-01.png", tags: ["证件照", "修复", "个人"] },
+        { id: "w16", title: "电商主图短视频", desc: "把主图素材延展为短视频首帧和动效片段，提高内容丰富度。", category: "ecommerce", type: "video", packageId: "feed-video", packageName: "AI 信息流短视频", price: "¥129起", metric: "商品视频", src: "assets/product-gallery/ecom-short-01.png", tags: ["电商", "短视频", "主图"] }
+      ];
+      const filters = [
+        { id: "all", label: "全部" },
+        { id: "image", label: "图片制作" },
+        { id: "ecommerce", label: "电商设计" },
+        { id: "video", label: "短视频" },
+        { id: "local", label: "本地生活" },
+        { id: "brand", label: "品牌宣传" }
+      ];
+      const packages = [
+        { id: "ai-image", name: "AI 图片制作包", desc: "头像、证件照、转绘、扩图、融合、LOGO 等轻量需求。", price: "¥5.9起" },
+        { id: "ecommerce-set", name: "电商套图制作包", desc: "商品主图、模特展示图、场景图和细节图。", price: "¥99起" },
+        { id: "detail-page", name: "商品详情页设计包", desc: "首屏视觉、长图模块、卖点拆解和参数说明。", price: "¥249.9起" },
+        { id: "feed-video", name: "AI 信息流短视频", desc: "种草、投放、直播切片和商品短视频。", price: "¥129起" }
+      ];
+      const state = { filter: "all", keyword: "" };
+      const buyUrl = (id) => `standard-package-store-modal.html?product=${encodeURIComponent(id)}&action=buy`;
+      const detailUrl = (id) => `standard-package-store-modal.html?product=${encodeURIComponent(id)}&action=detail`;
+      function renderFilters() {
+        document.getElementById("filters").innerHTML = filters.map(item => `<button class="filter-btn ${state.filter === item.id ? "active" : ""}" data-filter="${item.id}">${item.label}</button>`).join("");
+      }
+      function matches(work) {
+        const byFilter = state.filter === "all" || work.category === state.filter;
+        const key = state.keyword.trim().toLowerCase();
+        if (!key) return byFilter;
+        const haystack = [work.title, work.desc, work.packageName, work.metric].concat(work.tags).join(" ").toLowerCase();
+        return byFilter && haystack.includes(key);
+      }
+      function renderGallery() {
+        const list = works.filter(matches);
+        document.getElementById("gallery").innerHTML = list.map(work => `<article class="work-card" data-type="${work.type}">
+          <a class="work-media" href="${detailUrl(work.packageId)}" aria-label="查看${work.title}">
+            <span class="work-badge">${work.packageName}</span>
+            <span class="work-play">▶</span>
+            <img src="${work.src}" alt="${work.title}" loading="lazy">
+          </a>
+          <div class="work-body">
+            <h3 class="work-title">${work.title}</h3>
+            <p class="work-desc">${work.desc}</p>
+            <div class="work-meta"><span>${work.tags.join(" / ")}</span><b>${work.price}</b></div>
+            <div class="work-actions">
+              <a class="buy-link" href="${buyUrl(work.packageId)}">买同款产品包</a>
+              <a class="detail-link" href="${detailUrl(work.packageId)}">详情</a>
+            </div>
+          </div>
+        </article>`).join("");
+        document.getElementById("emptyState").style.display = list.length ? "none" : "block";
+        document.getElementById("resultHint").textContent = `${list.length} 个作品`;
+        document.getElementById("statWorks").textContent = String(works.length);
+      }
+      function renderPackages() {
+        document.getElementById("packageRail").innerHTML = packages.map(pkg => `<article class="package-card">
+          <strong>${pkg.name}</strong>
+          <span>${pkg.desc}</span>
+          <a href="${buyUrl(pkg.id)}">${pkg.price} · 买同款</a>
+        </article>`).join("");
+      }
+      document.addEventListener("click", (event) => {
+        const btn = event.target.closest("[data-filter]");
+        if (!btn) return;
+        state.filter = btn.dataset.filter;
+        renderFilters();
+        renderGallery();
+      });
+      document.getElementById("searchInput").addEventListener("input", (event) => {
+        state.keyword = event.target.value;
+        renderGallery();
+      });
+      SharedHeader.mount({ activeNav: "publish" });
+      renderFilters();
+      renderGallery();
+      renderPackages();
+    })();
+  </script>
+</body>
+</html>

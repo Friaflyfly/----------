@@ -1995,13 +1995,13 @@
           <div>
             <div class="hero-kicker">Prototype Directory</div>
             <h3 class="hero-title">资金中心多页面原型</h3>
-            <div class="hero-balance">18</div>
+            <div class="hero-balance">17</div>
             <div class="hero-caption">已拆成独立页面，便于逐页打磨细节，而不是继续在单页大文件里堆内容。</div>
           </div>
           <div class="hero-side">
             <div class="hero-side-card"><div class="label">用户端页面</div><div class="value">10 页</div><div class="sub">资金首页、账户总览、账单流水、交易流水、资金流水、充值、积分、发票、提现、账户设置。</div></div>
             <div class="hero-side-card"><div class="label">三层流水</div><div class="value">交易 / 资金 / 账单</div><div class="sub">交易事件、余额变化、用户账单三层分离展示。</div></div>
-            <div class="hero-side-card"><div class="label">补充页面</div><div class="value">8 页</div><div class="sub">订单资金详情、财务后台和新增对账管理页面已拆分完成。</div></div>
+            <div class="hero-side-card"><div class="label">补充页面</div><div class="value">7 页 + 1 弹窗</div><div class="sub">订单资金详情、财务后台和新增对账管理页面已拆分完成，批次详情改为弹窗查看。</div></div>
           </div>
         </div>
       </div>
@@ -2033,8 +2033,7 @@
               ["admin-audit.html", "审核中心", "对公充值与提现审核"],
               ["admin-settlement.html", "结算与发票", "待结算与开票处理"],
               ["admin-reconciliation.html", "每日对账", "按日查看批次结果"],
-              ["admin-reconciliation-differences.html", "差异明细", "集中查看和处理差异"],
-              ["admin-reconciliation-detail.html", "对账批次详情", "批次汇总、明细与差异抽屉"]
+              ["admin-reconciliation-differences.html", "差异明细", "集中查看和处理差异"]
             ].map(item => `<a class="card-link" href="${item[0]}"><strong>${item[1]}</strong><span>${item[2]}</span></a>`).join("")}
           </div>
           <div class="footer-note">逐页深化计划在 <a href="PAGE-ENRICHMENT-PLAN.md">PAGE-ENRICHMENT-PLAN.md</a>。</div>
@@ -3611,7 +3610,7 @@
                   <td>${row.completedAt}</td>
                   <td>
                     <div class="table-actions">
-                      <a class="btn mini primary" href="${buildPageUrl("adminReconciliationDetail", { batch: row.batchNo })}">查看详情</a>
+                      <button class="btn mini primary" type="button" data-open-batch-detail-modal="detail" data-batch-no="${row.batchNo}">查看详情</button>
                       <button class="btn mini" type="button">重新执行</button>
                       <button class="btn mini" type="button">导出</button>
                     </div>
@@ -3622,10 +3621,56 @@
           </table>
         </div>
       </div>
+      ${renderBatchDetailModal()}
+      ${renderReconciliationDrawer()}
     `;
   }
 
-  function renderAdminReconciliationDetail(routeState = {}) {
+  function renderReconciliationTabControl(tab, batchNo, bizType, embedded = false) {
+    if (embedded) {
+      return `<button class="tab ${bizType === tab.key ? "active" : ""}" type="button" data-open-batch-detail-modal="detail" data-batch-no="${batchNo}" data-batch-biz-type="${tab.key}">${tab.label} ${tab.count}</button>`;
+    }
+    return `<a class="tab ${bizType === tab.key ? "active" : ""}" href="${buildPageUrl("adminReconciliationDetail", { batch: batchNo, bizType: tab.key })}">${tab.label} ${tab.count}</a>`;
+  }
+
+  function reconDiffCardTone(title = "") {
+    if (title.includes("金额")) return "warn";
+    if (title.includes("状态")) return "blue";
+    if (title.includes("缺失")) return "danger";
+    if (title.includes("重复")) return "neutral";
+    return "blue";
+  }
+
+  function reconProgressCardTone(title = "") {
+    if (title.includes("待处理")) return "warn";
+    if (title.includes("处理中")) return "blue";
+    if (title.includes("已处理")) return "success";
+    if (title.includes("关闭")) return "neutral";
+    return "blue";
+  }
+
+  function renderReconOverviewCards(items, kind = "diff") {
+    const toneGetter = kind === "progress" ? reconProgressCardTone : reconDiffCardTone;
+    const countFormatter = kind === "progress"
+      ? item => `${item[1]} 笔`
+      : item => item[1];
+    return `
+      <div class="reconciliation-panel-list">
+        ${items.map(item => `
+          <div class="reconciliation-list-card ${toneGetter(item[0])}">
+            <div class="reconciliation-list-card-head">
+              <strong>${item[0]}</strong>
+              <span class="chip">${countFormatter(item)}</span>
+            </div>
+            <p>${item[2]}</p>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function renderAdminReconciliationDetailContent(routeState = {}, options = {}) {
+    const embedded = Boolean(options.embedded);
     const batch = findReconBatch(routeState.batch);
     const bizType = routeState.bizType || "all";
     const tabDefs = [
@@ -3651,75 +3696,188 @@
       if (bizType === "withdraw") return row.businessType === "提现";
       return true;
     });
+    const headlineMetrics = [
+      ["天合交易笔数", String(batch.platformCount), "platform_transaction_count"],
+      ["汇付交易笔数", String(batch.huifuCount), "huifu_transaction_count"],
+      ["差异笔数", String(batch.diffCount), "difference_transaction_count"],
+      ["未处理差异", String(batch.unresolvedCount), `对账状态 ${batch.reconStatus}`]
+    ];
+    const amountMetrics = [
+      ["天合交易金额", fmtMoney(batch.platformAmount), "platform_transaction_amount"],
+      ["汇付交易金额", fmtMoney(batch.huifuAmount), "huifu_transaction_amount"],
+      ["差异金额", fmtMoney(batch.diffAmount), "difference_amount"],
+      ["当前展示版本", batch.version, `完成时间 ${batch.completedAt}`]
+    ];
+    const detailFilterExpanded = embedded ? "" : " expanded";
+    const detailFilterToggleLabel = embedded ? "更多筛选" : "收起筛选";
+    const actionButtons = embedded ? `
+      <button class="btn mini" type="button">重新执行</button>
+      <button class="btn mini" type="button">导出</button>
+      <button class="btn mini" type="button" data-close-batch-detail-modal="detail">关闭</button>
+    ` : `
+      <a class="btn mini primary" href="${buildPageUrl("adminReconciliation")}">返回批次列表</a>
+      <button class="btn mini" type="button">重新执行</button>
+      <button class="btn mini" type="button">导出</button>
+    `;
+    const embeddedSummary = `
+      <div class="result-hero reconciliation-batch-hero">
+        <div class="reconciliation-batch-hero-head">
+          <div>
+            <span class="detail-label">批次结论</span>
+            <strong class="result-amount ${batch.diffAmount ? "amt-warn" : ""}">${batch.reconStatus}</strong>
+            <p class="reconciliation-batch-subtitle">${batch.batchNo} · ${batch.scope}</p>
+          </div>
+          <div class="reconciliation-batch-hero-side">
+            <div class="chip-row">
+              <span class="chip">${batch.version}</span>
+              <span class="tag ${reconStatusTone(batch.reconStatus)}">${batch.reconStatus}</span>
+              <span class="tag ${processingStatusTone(batch.processingStatus)}">${batch.processingStatus}</span>
+            </div>
+            <div class="summary-actions reconciliation-batch-actions">
+              ${actionButtons}
+            </div>
+          </div>
+        </div>
 
-    return `
-      <div class="summary-strip">
-        <div class="summary-box">
-          <div class="kicker">批次信息</div>
-          <div class="big">${batch.date} 对账详情</div>
-          <div class="chip-row">
-            <span class="chip">${batch.batchNo}</span>
-            <span class="tag ${reconStatusTone(batch.reconStatus)}">${batch.reconStatus}</span>
-            <span class="tag ${processingStatusTone(batch.processingStatus)}">${batch.processingStatus}</span>
+        <div class="detail-grid detail-grid-4 compact-detail-grid reconciliation-batch-facts">
+          <div class="detail-item">
+            <span class="detail-label">对账日期</span>
+            <strong class="detail-value">${batch.date}</strong>
           </div>
-          <div class="tiny" style="margin-top:10px;">完成时间：${batch.completedAt} · 当前展示版本：${batch.version}</div>
-        </div>
-        <div class="summary-box">
-          <div class="kicker">重新执行说明</div>
-          <div class="big" style="font-size:18px;">仅重新拉取数据并重新对账</div>
-          <div class="tiny">不会发起真实支付、退款、分账或提现操作。</div>
-        </div>
-        <div class="summary-box">
-          <div class="kicker">操作</div>
-          <div class="summary-actions">
-            <a class="btn mini primary" href="${buildPageUrl("adminReconciliation")}">返回批次列表</a>
-            <button class="btn mini" type="button">重新执行</button>
-            <button class="btn mini" type="button">导出</button>
+          <div class="detail-item">
+            <span class="detail-label">完成时间</span>
+            <strong class="detail-value">${batch.completedAt}</strong>
           </div>
+          <div class="detail-item">
+            <span class="detail-label">差异概况</span>
+            <strong class="detail-value">${batch.diffCount} 笔 · ${fmtMoney(batch.diffAmount)}</strong>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">处理进度</span>
+            <strong class="detail-value">待处理 ${batch.unresolvedCount} 笔</strong>
+          </div>
+        </div>
+
+        <div class="grid-3 reconciliation-batch-summary-grid">
+          <div class="list-item"><strong>天合 / 汇付笔数</strong><span>${batch.platformCount} / ${batch.huifuCount}</span></div>
+          <div class="list-item"><strong>天合 / 汇付金额</strong><span>${fmtMoney(batch.platformAmount)} / ${fmtMoney(batch.huifuAmount)}</span></div>
+          <div class="list-item"><strong>当前状态</strong><span>${batch.reconStatus} · ${batch.processingStatus}</span></div>
         </div>
       </div>
 
-      <div class="grid-2">
-        <div class="surface">
-          <div class="surface-head"><div><h3>交易笔数</h3><p>天合和汇付交易量对比，便于快速判断批次整体一致性。</p></div></div>
-          <div class="split-metric">
-            <div class="cell"><div class="label">天合交易笔数</div><div class="value">${batch.platformCount}</div></div>
-            <div class="cell"><div class="label">汇付交易笔数</div><div class="value">${batch.huifuCount}</div></div>
-            <div class="cell"><div class="label">一致笔数</div><div class="value">${batch.matchedCount}</div></div>
-            <div class="cell"><div class="label">差异笔数</div><div class="value">${batch.diffCount}</div></div>
+      <div class="grid-4 reconciliation-batch-metrics">
+        <div class="summary-box reconciliation-mini-metric">
+          <div class="kicker">天合交易金额</div>
+          <div class="big">${fmtMoney(batch.platformAmount)}</div>
+          <div class="tiny">${batch.platformCount} 笔</div>
+        </div>
+        <div class="summary-box reconciliation-mini-metric">
+          <div class="kicker">汇付交易金额</div>
+          <div class="big">${fmtMoney(batch.huifuAmount)}</div>
+          <div class="tiny">${batch.huifuCount} 笔</div>
+        </div>
+        <div class="summary-box reconciliation-mini-metric">
+          <div class="kicker">差异金额</div>
+          <div class="big ${batch.diffAmount ? "amt-warn" : ""}">${fmtMoney(batch.diffAmount)}</div>
+          <div class="tiny">${batch.diffCount} 笔存在差异</div>
+        </div>
+        <div class="summary-box reconciliation-mini-metric">
+          <div class="kicker">待处理差异</div>
+          <div class="big">${batch.unresolvedCount}</div>
+          <div class="tiny">已处理 ${Math.max(batch.diffCount - batch.unresolvedCount, 0)} 笔</div>
+        </div>
+      </div>
+    `;
+
+    return `
+      ${embedded ? "" : `
+        <div class="info-banner">
+          <ul>
+            <li>本页用于查看单个对账批次的汇总结果、业务明细、差异处理进度和操作记录。</li>
+            <li>重新执行和重新对账只会重新拉取数据或重新比较，不会触发真实支付、退款、分账或提现。</li>
+          </ul>
+        </div>
+      `}
+
+      ${embedded ? embeddedSummary : `
+        <div class="surface" style="margin-bottom:16px;">
+          <div class="surface-head">
+            <div>
+              <h3>批次概览</h3>
+              <p>先看批次结论和基本信息，再继续查看差异分类、明细和处理动作。</p>
+            </div>
+            <div class="table-actions">
+              ${actionButtons}
+            </div>
+          </div>
+          <div class="detail-grid detail-grid-4">
+            <div class="detail-item">
+              <span class="detail-label">对账日期</span>
+              <span class="detail-value">${batch.date}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">批次号</span>
+              <span class="detail-value">${batch.batchNo}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">对账范围</span>
+              <span class="detail-value">${batch.scope}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">完成时间</span>
+              <span class="detail-value">${batch.completedAt}</span>
+            </div>
+          </div>
+          <div class="chip-row" style="margin-top:14px;">
+            <span class="chip">${batch.version}</span>
+            <span class="tag ${reconStatusTone(batch.reconStatus)}">${batch.reconStatus}</span>
+            <span class="tag ${processingStatusTone(batch.processingStatus)}">${batch.processingStatus}</span>
           </div>
         </div>
-        <div class="surface">
-          <div class="surface-head"><div><h3>交易金额</h3><p>金额均以元展示，后端实际应以分为最小单位做比较。</p></div></div>
-          <div class="split-metric">
-            <div class="cell"><div class="label">天合交易金额</div><div class="value">${fmtMoney(batch.platformAmount)}</div></div>
-            <div class="cell"><div class="label">汇付交易金额</div><div class="value">${fmtMoney(batch.huifuAmount)}</div></div>
-            <div class="cell"><div class="label">差异金额</div><div class="value ${batch.diffAmount ? "amt-warn" : ""}">${fmtMoney(batch.diffAmount)}</div></div>
-            <div class="cell"><div class="label">未处理差异</div><div class="value">${batch.unresolvedCount}</div></div>
+      `}
+
+      <div class="grid-4" style="margin-bottom:16px;${embedded ? "display:none;" : ""}">
+        ${headlineMetrics.map(item => `
+          <div class="surface metric-card">
+            <div class="metric-label">${item[0]}</div>
+            <div class="metric-value">${item[1]}</div>
+            <div class="metric-foot">${item[2]}</div>
           </div>
-        </div>
+        `).join("")}
+      </div>
+
+      <div class="grid-4" style="margin-bottom:16px;${embedded ? "display:none;" : ""}">
+        ${amountMetrics.map(item => `
+          <div class="surface metric-card">
+            <div class="metric-label">${item[0]}</div>
+            <div class="metric-value ${item[0] === "当前展示版本" ? "metric-value-text" : ""} ${item[0] === "差异金额" && batch.diffAmount ? "amt-warn" : ""}">${item[1]}</div>
+            <div class="metric-foot">${item[2]}</div>
+          </div>
+        `).join("")}
       </div>
 
       <div class="grid-2" style="margin-top:16px;">
         <div class="surface">
-          <div class="surface-head"><div><h3>差异分类</h3><p>金额、状态、流水缺失和重复交易等分类，帮助快速分派处理路径。</p></div></div>
-          <div class="list">${batch.diffStats.map(item => `<div class="list-item"><strong>${item[0]}</strong><span>${item[1]} · ${item[2]}</span></div>`).join("")}</div>
+          <div class="surface-head"><div><h3>差异分类</h3><p>按差异类型归类展示，像开票记录卡一样先看类别，再决定把问题分派给谁。</p></div></div>
+          ${renderReconOverviewCards(batch.diffStats, "diff")}
         </div>
         <div class="surface">
-          <div class="surface-head"><div><h3>处理进度</h3><p>对账状态和差异处理状态分离展示，避免把“人工关闭”误认为“已一致”。</p></div></div>
-          <div class="list">${batch.progressStats.map(item => `<div class="list-item"><strong>${item[0]}</strong><span>${item[1]} 笔 · ${item[2]}</span></div>`).join("")}</div>
+          <div class="surface-head"><div><h3>处理进度</h3><p>按状态分组查看差异去向，先判断还剩多少待办，再决定是否下钻单笔处理。</p></div></div>
+          ${renderReconOverviewCards(batch.progressStats, "progress")}
         </div>
       </div>
 
       <div class="surface" style="margin-top:16px;">
-        <div class="surface-head">
-          <div><h3>业务类型</h3><p>可按支付、退款、分账、提现切换查看明细。</p></div>
-          <div class="inline-tabs">
-            ${tabDefs.map(tab => `<a class="tab ${bizType === tab.key ? "active" : ""}" href="${buildPageUrl("adminReconciliationDetail", { batch: batch.batchNo, bizType: tab.key })}">${tab.label} ${tab.count}</a>`).join("")}
+        <div class="surface-head reconciliation-detail-head">
+          <div><h3>对账明细</h3><p>按业务类型切换查看批次明细，适合继续定位单笔差异和进入处理抽屉。</p></div>
+          <div class="reconciliation-detail-toolbar">
+            <div class="inline-tabs">
+            ${tabDefs.map(tab => renderReconciliationTabControl(tab, batch.batchNo, bizType, embedded)).join("")}
+            </div>
           </div>
         </div>
-        <div class="compact-filters expanded" data-filter-panel="reconciliationDetail">
-          <div class="form-grid">
+        <div class="compact-filters reconciliation-detail-filters${detailFilterExpanded}" data-filter-panel="reconciliationDetail">
+          <div class="form-grid reconciliation-detail-filter-grid">
             <div class="field"><label>业务单号</label><input placeholder="订单号 / 退款单号 / 分账单号 / 提现单号"></div>
             <div class="field"><label>天合流水号</label><input placeholder="TH202607150001"></div>
             <div class="field"><label>汇付流水号</label><input placeholder="HF202607150001"></div>
@@ -3728,13 +3886,14 @@
             <div class="field advanced-filter"><label>处理状态</label><select><option>全部</option><option>待处理</option><option>处理中</option><option>已处理</option></select></div>
             <div class="field advanced-filter"><label>负责人</label><select><option>全部</option><option>王敏</option><option>刘畅</option><option>未分配</option></select></div>
           </div>
-          <div class="form-actions">
+          <div class="form-actions reconciliation-detail-filter-actions">
             <button class="btn primary" type="button">查询</button>
             <button class="btn" type="button">重置</button>
+            <button class="text-link-btn" type="button" data-toggle-filter-panel="reconciliationDetail">${detailFilterToggleLabel}</button>
           </div>
         </div>
         <div class="table-wrap" style="margin-top:16px;">
-          <table style="min-width: 2400px;">
+          <table class="reconciliation-detail-table" style="min-width: 2200px;">
             <thead>
               <tr>
                 <th>业务类型</th><th>天合业务单号</th><th>天合交易流水号</th><th>汇付交易流水号</th><th>原交易流水号</th><th>交易主体</th><th>天合金额</th><th>汇付金额</th><th>金额差异</th><th>天合状态</th><th>汇付状态</th><th>交易时间</th><th>汇付完成时间</th><th>对账结果</th><th>差异类型</th><th>处理状态</th><th>负责人</th><th>操作</th>
@@ -3783,7 +3942,32 @@
           </table>
         </div>
       </div>
+    `;
+  }
 
+  function renderBatchDetailModal(batchNo = "DZ20260715001", bizType = "all") {
+    const batch = findReconBatch(batchNo);
+    return `
+      <div class="recharge-modal-mask" data-batch-detail-modal="detail" hidden>
+        <div class="recharge-modal reconciliation-batch-modal">
+          <div class="config-modal-head">
+            <div>
+              <h3 data-batch-detail-field="title">${batch.date} 对账详情</h3>
+              <p data-batch-detail-field="subtitle">${batch.batchNo} · ${batch.scope} · ${batch.completedAt}</p>
+            </div>
+            <button class="config-close" type="button" data-close-batch-detail-modal="detail">×</button>
+          </div>
+          <div class="recharge-modal-body" data-batch-detail-body>
+            ${renderAdminReconciliationDetailContent({ batch: batch.batchNo, bizType }, { embedded: true })}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderAdminReconciliationDetail(routeState = {}) {
+    return `
+      ${renderAdminReconciliationDetailContent(routeState)}
       ${renderReconciliationDrawer()}
     `;
   }
@@ -3832,7 +4016,7 @@
               ${RECONCILIATION_DATA.differences.map(row => `
                 <tr class="row-focus">
                   <td>${row.date}</td>
-                  <td><a class="text-link" href="${buildPageUrl("adminReconciliationDetail", { batch: row.batchNo })}">${row.batchNo}</a></td>
+                  <td><button class="text-link-btn" type="button" data-open-batch-detail-modal="detail" data-batch-no="${row.batchNo}">${row.batchNo}</button></td>
                   <td>${row.businessType}</td>
                   <td>${row.businessOrderNo}</td>
                   <td>${row.platformTransactionNo}</td>
@@ -3852,7 +4036,7 @@
                     <div class="table-actions">
                       <button class="btn mini primary" type="button" data-open-reconciliation-drawer="detail" data-reconciliation-detail-id="${row.detailId}">查看详情</button>
                       <button class="btn mini" type="button">重新查询</button>
-                      <a class="btn mini" href="${buildPageUrl("adminReconciliationDetail", { batch: row.batchNo })}">查看批次</a>
+                      <button class="btn mini" type="button" data-open-batch-detail-modal="detail" data-batch-no="${row.batchNo}">查看批次</button>
                     </div>
                   </td>
                 </tr>
@@ -3861,6 +4045,7 @@
           </table>
         </div>
       </div>
+      ${renderBatchDetailModal("DZ20260715002")}
       ${renderReconciliationDrawer("detail_002")}
     `;
   }
@@ -4154,6 +4339,18 @@
     document.body.classList.add("modal-open");
   }
 
+  function syncBatchDetailModal(batchNo, bizType = "all") {
+    const batch = findReconBatch(batchNo);
+    const title = document.querySelector('[data-batch-detail-field="title"]');
+    const subtitle = document.querySelector('[data-batch-detail-field="subtitle"]');
+    const body = document.querySelector("[data-batch-detail-body]");
+    if (title) title.textContent = `${batch.date} 对账详情`;
+    if (subtitle) subtitle.textContent = `${batch.batchNo} · ${batch.scope} · ${batch.completedAt}`;
+    if (body) {
+      body.innerHTML = renderAdminReconciliationDetailContent({ batch: batch.batchNo, bizType }, { embedded: true });
+    }
+  }
+
   function syncReconciliationDrawer(detailId) {
     const detail = findReconDetail(detailId);
     const title = document.querySelector('[data-recon-field="title"]');
@@ -4190,6 +4387,28 @@
       const node = document.querySelector(`[data-recon-form="${key}"]`);
       if (node) node.textContent = value;
     });
+  }
+
+  function openBatchDetailModal(type, options = {}) {
+    document.querySelectorAll("[data-batch-detail-modal]").forEach(modal => {
+      modal.hidden = true;
+    });
+    if (type === "detail") {
+      syncBatchDetailModal(options.batchNo || "DZ20260715001", options.bizType || "all");
+    }
+    const modal = document.querySelector(`[data-batch-detail-modal="${type}"]`);
+    if (!modal) return;
+    modal.hidden = false;
+    document.body.classList.add("modal-open");
+  }
+
+  function closeBatchDetailModal(type) {
+    const modal = document.querySelector(`[data-batch-detail-modal="${type}"]`);
+    if (!modal) return;
+    modal.hidden = true;
+    if (!document.querySelector(".config-modal-mask:not([hidden]), .recharge-modal-mask:not([hidden])")) {
+      document.body.classList.remove("modal-open");
+    }
   }
 
   function openReconciliationDrawer(type, options = {}) {
@@ -4302,6 +4521,23 @@
   }
 
   function handlePrototypeClick(event) {
+    const openBatchDetailBtn = event.target.closest("[data-open-batch-detail-modal]");
+    if (openBatchDetailBtn) {
+      event.preventDefault();
+      openBatchDetailModal(openBatchDetailBtn.getAttribute("data-open-batch-detail-modal"), {
+        batchNo: openBatchDetailBtn.getAttribute("data-batch-no"),
+        bizType: openBatchDetailBtn.getAttribute("data-batch-biz-type")
+      });
+      return;
+    }
+
+    const closeBatchDetailBtn = event.target.closest("[data-close-batch-detail-modal]");
+    if (closeBatchDetailBtn) {
+      event.preventDefault();
+      closeBatchDetailModal(closeBatchDetailBtn.getAttribute("data-close-batch-detail-modal"));
+      return;
+    }
+
     const openInvoiceBtn = event.target.closest("[data-open-invoice-modal]");
     if (openInvoiceBtn) {
       event.preventDefault();
@@ -4451,6 +4687,11 @@
       const invoiceType = rechargeModalMask.getAttribute("data-invoice-modal");
       if (invoiceType) {
         closeInvoiceModal(invoiceType);
+        return;
+      }
+      const batchDetailType = rechargeModalMask.getAttribute("data-batch-detail-modal");
+      if (batchDetailType) {
+        closeBatchDetailModal(batchDetailType);
         return;
       }
       const reconType = rechargeModalMask.getAttribute("data-reconciliation-drawer");

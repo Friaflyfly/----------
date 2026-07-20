@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="data:,">
-  <title>标准包购买 - AIGC标准化产品服务包 - 骋风天合 · 创作门户交易平台</title>
+  <title>在线课程包购买 - 嘀嗒制作 · 创作门户交易平台</title>
   <style>
     * { box-sizing: border-box; }
     :root {
@@ -368,8 +368,8 @@
         <div class="menu-group">
           <div class="menu-group-title">我有需求</div>
           <a href="product-package-gallery.html"><span class="menu-icon">🖼</span> 作品案例</a>
-          <a href="standard-package-store-modal.html" class="active"><span class="menu-icon">📦</span> 标准包购买</a>
-          <a href="online-course-package-store.html"><span class="menu-icon">🎓</span> 在线课程包</a>
+          <a href="standard-package-store-modal.html"><span class="menu-icon">📦</span> 标准包购买</a>
+          <a href="online-course-package-store.html" class="active"><span class="menu-icon">🎓</span> 在线课程包</a>
           <a href="demand-publish.html"><span class="menu-icon">📤</span> 发布需求</a>
           <a href="demand-list.html"><span class="menu-icon">📋</span> 我的需求</a>
           <a href="contractor-marketplace.html"><span class="menu-icon">🏪</span> 服务广场</a>
@@ -389,16 +389,16 @@
     </aside>
     <main class="main">
       <section class="hero">
-        <div class="hero-kicker">AIGC STANDARD SERVICE SUPERMARKET</div>
-        <h1>AIGC标准化产品服务包</h1>
-        <p>图片、视频、电商套图、详情页、信息流短视频直接选购。明码标价、首购权益、交付周期清晰；支付后预算进入平台托管，验收和发票流程完成后再结算。</p>
+        <div class="hero-kicker">ONLINE COURSE PACKAGE STORE</div>
+        <h1>嘀嗒制作在线课程包</h1>
+        <p>AI 绘画、AI 通识与影视创作课程独立售卖。购买后平台自动发放课程兑换码，用户凭码激活站内课程；课程长期有效，可反复观看学习。</p>
         <div class="hero-actions">
-          <button class="btn primary" onclick="location.href='demand-publish.html'">发布定制需求</button>
+          <button class="btn primary" onclick="document.getElementById('catalogPanel').scrollIntoView({behavior:'smooth'})">查看课程包</button>
         </div>
         <div class="hero-notes">
-          <div class="hero-note"><b>使用说明：</b>请根据您所购买的产品包，需求规格填写对应内容。信息越完整，出品越精准，沟通越高效。</div>
-          <div class="hero-note"><b>修改规则：</b>各档次修改次数见各产品包说明。</div>
-          <div class="hero-note"><b>版权规则：</b>验收后商用版权归需求方。</div>
+          <div class="hero-note"><b>发货规则：</b>购买成功后由平台自动发码，兑换码发送至购买账户，用户凭码激活课程。</div>
+          <div class="hero-note"><b>虚拟商品：</b>在线课程一经购买开通即视为交付完成，不支持 7 天无理由退换货。</div>
+          <div class="hero-note"><b>学习权益：</b>课程长期有效，可在站内线上学习并反复观看；内容更新后已购学员免费获取。</div>
         </div>
       </section>
 
@@ -407,16 +407,16 @@
           <section class="panel" id="catalogPanel">
             <div class="panel-head">
               <div>
-                <h2 class="panel-title">标准产品包目录</h2>
-                <p class="panel-sub">基于附件方案：覆盖图片需求 Top 场景、电商视觉、本地生活、信息流、剧情号和品牌宣传短片。</p>
+                <h2 class="panel-title">在线课程包目录</h2>
+                <p class="panel-sub">基于《嘀嗒制作 - 在线课程产品包方案》：三款课程均为虚拟商品、独立售卖、平台自动发码、站内线上学习。</p>
               </div>
-              <button class="btn" id="matchBtn">帮我选套餐</button>
+              <button class="btn" id="matchBtn">帮我选课程</button>
             </div>
             <div class="tabs" id="categoryTabs"></div>
             <div class="recommend-strip">
               <div class="recommend-main">
-                <div class="recommend-icon">%</div>
-                <div><strong>限时首购权益 <em>首单专享</em></strong><span>标准包先下单锁价，交付资料可后补；适合高频、可预期需求。</span></div>
+                <div class="recommend-icon">↗</div>
+                <div><strong>购买前请确认课程适配度 <em>虚拟商品</em></strong><span>课程购买开通后不支持退款；如遇学习平台故障，由平台提供技术保障直至恢复。</span></div>
               </div>
             </div>
             <div class="package-grid" id="packageGrid"></div>
@@ -429,7 +429,7 @@
             <div class="modal-head">
               <div>
                 <h2>购买配置</h2>
-                <p id="purchaseModalSub">选择档位、数量、规格和增项后，系统自动计算价格和预计交付。</p>
+                <p id="purchaseModalSub">选择课程包、购买席位和激活方式后，系统自动计算价格并生成兑换码订单。</p>
               </div>
               <button class="btn" id="closePurchaseModalBtn">关闭</button>
             </div>
@@ -437,7 +437,7 @@
               <section class="config-card">
             <div class="config-head">
               <h2>购买配置</h2>
-              <p id="configSub">选择档位、数量、规格和增项后，系统自动计算价格和预计交付。</p>
+              <p id="configSub">选择课程包、购买席位和激活方式后，系统自动计算价格并生成兑换码订单。</p>
               </div>
             <div class="config-body">
               <div class="field">
@@ -465,34 +465,31 @@
                 </div>
               </div>
               <div class="field">
-                <label class="field-label-main">增项 <span class="required-dot">*</span><span class="field-hint">至少选择 1 项</span></label>
+                <label class="field-label-main">学习权益确认 <span class="required-dot">*</span><span class="field-hint">请确认虚拟商品规则</span></label>
                 <div class="toggles">
-                  <button class="toggle" data-addon="copy">需要文案</button>
-                  <button class="toggle" data-addon="rush">加急交付</button>
-                  <button class="toggle" data-addon="source">源文件</button>
+                  <button class="toggle" data-addon="copy">长期有效</button>
+                  <button class="toggle" data-addon="rush">自动发码</button>
+                  <button class="toggle" data-addon="source">同意虚拟商品规则</button>
                 </div>
               </div>
               <div class="field">
-                <label class="field-label-main">需求描述 <span class="required-dot">*</span><span class="field-hint">必填，请根据提示描述具体需求（填写时请删除提示文字）</span></label>
-                <textarea class="demand-template" id="remarkInput" placeholder="请描述订单用途、服务类型、风格偏好、背景要求和参考图说明"></textarea>
+                <label class="field-label-main">学习账户信息 <span class="required-dot">*</span><span class="field-hint">必填，请确认学员信息或团队分配方式</span></label>
+                <textarea class="demand-template" id="remarkInput" placeholder="请填写购买用途、学习对象、接收兑换码账户和备注"></textarea>
               </div>
               <div class="field">
-                <label class="field-label-main">上传素材 <span class="required-dot">*</span><span class="field-hint">必填，单个文件小于 2GB，最多上传 10 个</span></label>
+                <label class="field-label-main">课程开通说明 <span class="field-hint">无需上传素材，购买后系统自动发码</span></label>
                 <div class="material-section">
                   <div class="material-requirements">
-                    <div class="material-requirements-title">素材上传要求 <span>请按所选服务类型准备素材</span></div>
+                    <div class="material-requirements-title">发码与学习规则 <span>与标准产品包同一购买链路，但交付动作为课程兑换码发放</span></div>
                     <div class="compare">
                       <table>
-                        <thead><tr><th>服务类型</th><th>必须提供</th><th>质量要求</th></tr></thead>
+                        <thead><tr><th>环节</th><th>系统动作</th><th>用户说明</th></tr></thead>
                         <tbody id="purchaseUploadTable"></tbody>
                       </table>
                     </div>
                   </div>
-                  <div class="material-uploader">
-                    <div>
-                      <strong>上传本地附件</strong>
-                      <span id="materialUploadSummary">未上传附件。支持图片、视频、参考图、压缩包等本地文件。</span>
-                    </div>
+                  <div class="material-uploader" style="display:none">
+                    <div><strong>上传本地附件</strong><span id="materialUploadSummary">课程包无需上传附件。</span></div>
                     <input id="materialFilesInput" type="file" multiple>
                     <button class="btn" type="button" id="materialUploadBtn">上传附件</button>
                   </div>
@@ -500,13 +497,13 @@
                 </div>
               </div>
               <div class="price-card">
-                <div class="price-row"><span>基础服务费</span><b id="basePrice">¥0</b></div>
-                <div class="price-row"><span>数量 / 时长调整</span><b id="qtyPrice">¥0</b></div>
-                <div class="price-row"><span>增项费用</span><b id="addonPrice">¥0</b></div>
+                <div class="price-row"><span>课程单价</span><b id="basePrice">¥0</b></div>
+                <div class="price-row"><span>购买席位</span><b id="qtyPrice">¥0</b></div>
+                <div class="price-row"><span>额外费用</span><b id="addonPrice">¥0</b></div>
                 <div class="price-row total"><span>合计</span><b id="totalPrice">¥0</b></div>
-                <div class="price-row"><span>预计交付</span><b id="etaText">1 天</b></div>
+                <div class="price-row"><span>发货方式</span><b id="etaText">自动发码</b></div>
               </div>
-              <div class="finance-note">资金说明：提交订单后从当前账户冻结套餐金额；服务完成并验收确认、承制方上传发票后，再完成分账结算。</div>
+              <div class="finance-note">资金说明：课程包复用标准产品包购买链路；提交订单后从当前账户冻结/扣减套餐金额，并创建平台套餐需求快照，交付动作为自动发放课程兑换码。</div>
               <button class="btn primary" id="buyBtn" style="width:100%;height:48px">立即购买</button>
             </div>
               </section>
@@ -522,19 +519,19 @@
       <div class="modal-head">
         <div>
           <h2>确认订单</h2>
-          <p>订单提交后将创建平台套餐需求，并从当前账户冻结预算。</p>
+          <p>订单提交后将创建课程套餐需求，并从当前账户冻结预算，同时生成课程兑换码发放记录。</p>
         </div>
         <button class="btn" id="closeModalBtn">关闭</button>
       </div>
       <div class="modal-body">
         <div class="confirm-box">
           <h3>服务信息</h3>
-          <div class="kv"><span>产品包</span><b id="confirmPkg">-</b></div>
+          <div class="kv"><span>课程包</span><b id="confirmPkg">-</b></div>
           <div class="kv"><span>档位</span><b id="confirmTier">-</b></div>
-          <div class="kv"><span>数量 / 规格</span><b id="confirmSpec">-</b></div>
-          <div class="kv"><span>增项</span><b id="confirmAddon">-</b></div>
-          <div class="kv"><span>上传素材</span><b id="confirmMaterials">-</b></div>
-          <div class="kv"><span>预计交付</span><b id="confirmEta">-</b></div>
+          <div class="kv"><span>席位 / 规格</span><b id="confirmSpec">-</b></div>
+          <div class="kv"><span>权益确认</span><b id="confirmAddon">-</b></div>
+          <div class="kv"><span>兑换码</span><b id="confirmMaterials">-</b></div>
+          <div class="kv"><span>发货方式</span><b id="confirmEta">-</b></div>
         </div>
         <div class="confirm-box">
           <h3>资金与付款</h3>
@@ -542,7 +539,7 @@
           <div class="kv"><span>当前可用余额</span><b id="confirmBalance">-</b></div>
           <div class="kv"><span>订单金额</span><b id="confirmTotal">-</b></div>
           <div class="kv"><span>资金动作</span><b id="confirmFinance">冻结预算</b></div>
-          <div class="finance-note" id="confirmNote" style="margin-top:12px">支付后资金进入平台托管，验收和发票流程完成后结算。</div>
+          <div class="finance-note" id="confirmNote" style="margin-top:12px">支付后系统自动发放课程兑换码；虚拟商品购买开通后不支持 7 天无理由退换货。</div>
         </div>
       </div>
       <div class="modal-foot">
@@ -556,22 +553,22 @@
     <div class="modal product-modal">
       <div class="modal-head">
         <div>
-          <h2 id="modalDetailTitle">产品包详情</h2>
-          <p id="modalDetailSub">查看规格参数、对标示例、交付要求和修改要求。</p>
+          <h2 id="modalDetailTitle">课程包详情</h2>
+          <p id="modalDetailSub">查看课程权益、适用人群、发码规则和保障条款。</p>
         </div>
         <button class="btn" id="closeDetailBtn">关闭</button>
       </div>
       <div class="modal-body detail-modal-body">
-        <div class="scene-summary"><span>主要场景</span><b id="modalDetailScenes">-</b></div>
+        <div class="scene-summary"><span>适用场景</span><b id="modalDetailScenes">-</b></div>
         <div class="sample-section">
           <div class="sample-head">
             <div>
-              <h3>对标示例</h3>
-              <p>参考案例用于帮助用户理解出品效果，后续可替换为真实图片、视频、前后对比或链接。</p>
+              <h3>课程预览</h3>
+              <p>预览卡用于帮助用户理解课程定位、课时规模、学习方式和发码规则。</p>
             </div>
-            <span class="sample-count" id="modalDetailSampleCount">0 个样例位</span>
+            <span class="sample-count" id="modalDetailSampleCount">0 个预览位</span>
           </div>
-          <div class="reference-note" id="modalDetailReferenceNote">以下为本产品包的参考案例，可帮助您理解出品效果。</div>
+          <div class="reference-note" id="modalDetailReferenceNote">以下为本课程包的预览信息，可帮助您理解课程权益。</div>
           <div class="sample-grid" id="modalDetailSamples"></div>
         </div>
         <div class="detail-modal-section">
@@ -588,8 +585,8 @@
         </div>
         <div class="detail-modal-section">
           <div class="table-section-title">
-            <h3>交付要求</h3>
-            <span>提交订单后会作为验收依据之一</span>
+            <h3>开通与保障</h3>
+            <span>提交订单后写入课程订单快照</span>
           </div>
           <div class="compare">
             <table>
@@ -600,33 +597,28 @@
         </div>
         <div class="detail-modal-section">
           <div class="table-section-title">
-            <h3>修改要求</h3>
-            <span>免费修改与超出范围的边界说明</span>
+            <h3>购买须知</h3>
+            <span>在线课程为知识内容类虚拟商品</span>
           </div>
           <div class="revision-scope-grid">
             <div class="revision-card good">
-              <h4>✅ 合理修改（免费，含在订单内）</h4>
+              <h4>✅ 学习权益</h4>
               <ul>
-                <li><b>剪辑调整：</b>镜头顺序调整、片段删减/增加、转场效果修改、节奏微调</li>
-                <li><b>字幕修改：</b>字幕颜色、大小、位置、字体调整（文字内容不变）；新增/修改字幕内容（不改变核心信息）</li>
-                <li><b>音频调整：</b>BGM替换为同风格范围内的其他音乐、音量大小调整、配音语速微调</li>
-                <li><b>颜色调色：</b>整体色调、滤镜强度微调</li>
-                <li><b>文案微调：</b>口播文案的个别字词调整（不改变核心意思、卖点结构和行动号召）</li>
-                <li><b>片头片尾：</b>品牌信息、LOGO位置、时长微调</li>
-                <li><b>包装细节：</b>花字特效、贴纸位置、地图定位贴纸内容修正</li>
+                <li><b>自动发码：</b>购买成功后由平台自动生成课程兑换码，并发送至购买账户。</li>
+                <li><b>随到随学：</b>课程激活后即可在站内学习，不受固定开课时间限制。</li>
+                <li><b>长期有效：</b>课程激活后可永久反复观看学习，无时间限制。</li>
+                <li><b>免费更新：</b>课程内容根据 AI 工具迭代和市场变化不定期更新，已购学员可免费获取更新内容。</li>
+                <li><b>技术保障：</b>如遇课程平台故障导致无法学习，由平台提供技术保障服务直至恢复正常。</li>
               </ul>
             </div>
             <div class="revision-card out">
-              <h4>❌ 超出范围</h4>
+              <h4>❌ 虚拟商品限制</h4>
               <ul>
-                <li><b>更换主体/商品：</b>如将推广商品A改为商品B、将门店A改为门店B</li>
-                <li><b>改变视频主题方向：</b>如从产品种草改为品牌宣传、从探店引流改为活动预热</li>
-                <li><b>改变脚本结构与内容：</b>如口播文案重写、核心卖点变更、催单话术完全替换</li>
-                <li><b>改变整体视觉风格：</b>如从活泼欢快改为专业商务、从烟火气改为高颜值精致</li>
-                <li><b>改变视频用途：</b>如从带货改为品牌曝光、从引流到店改为粉丝增长</li>
-                <li><b>增加时长规格：</b>如从30秒要求改为60秒、从15秒改为45秒</li>
-                <li><b>改变画面比例：</b>如从9:16竖屏改为16:9横屏（需重新制作）</li>
-                <li><b>多轮修改后要求重做：</b>初稿确认后，以「不喜欢」为由要求重新拍摄/制作全片（非质量问题的重做）</li>
+                <li><b>不支持 7 天无理由退换货：</b>购买前请仔细阅读课程详情，确认符合自身需求后再下单。</li>
+                <li><b>开通即视为交付：</b>课程兑换码激活后即视为在线课程服务交付完成。</li>
+                <li><b>不支持下载：</b>课程学习平台为站内线上学习，课程视频不可下载。</li>
+                <li><b>禁止传播：</b>课程内容版权归出品方所有，禁止录屏、传播、二次售卖等侵权行为。</li>
+                <li><b>学习资料：</b>当前三款课程包均不包含额外学习资料。</li>
               </ul>
             </div>
           </div>
@@ -816,7 +808,157 @@
     ];
     const MAX_MATERIAL_FILES = 10;
     const MAX_MATERIAL_FILE_SIZE = 2 * 1024 * 1024 * 1024;
-    const state = { category: "all", productId: "ecommerce-set", tierId: "", quantity: 1, spec: "", duration: 15, ratio: "9:16", addons: { copy: false, rush: false, source: false }, materialFiles: [] };
+    const state = { category: "all", productId: "course-ai-painting", tierId: "", quantity: 1, spec: "", duration: 0, ratio: "站内学习", addons: { copy: false, rush: false, source: false }, materialFiles: [] };
+    const courseProducts = [
+      {
+        id: "course-ai-painting", packageType: "ONLINE_COURSE", icon: "🎨", category: "AI 绘画", catKey: "painting", accent: "#f3eadf",
+        name: "如何快速用AI绘画", desc: "AI 绘画实战速成课程，适合零基础用户快速理解工具、提示词和图片生成流程。",
+        scenarios: ["AI绘画入门", "提示词实践", "图片生成", "办公提效", "求职技能"],
+        specs: ["个人激活", "团队批量激活", "站内线上学习"],
+        durations: [], ratios: ["站内学习"],
+        deliverables: ["平台自动发送课程兑换码", "站内线上学习，不可下载", "13 课时，单节 15~30 分钟", "长期有效，可永久反复观看"],
+        materials: ["购买账户手机号/邮箱", "学员姓名或团队席位备注", "是否需要统一分配兑换码"],
+        detailProfile: {
+          audience: "办公人员、教育行业从业者、互联网从业者、企业管理人员、学生及求职者、AI 零基础爱好者",
+          scenes: "AI 绘画实战速成 / 零基础入门 / 提示词训练 / 图片生成工具认知",
+          pricingFactor: "课程单价 × 购买席位",
+          specTitle: "课程规格"
+        },
+        specRows: [
+          ["价格", "¥99"],
+          ["核心权益", "AI 绘画实战速成"],
+          ["适用人群", "办公人员、教育行业从业者、互联网从业者、企业管理人员、学生及求职者、AI 零基础爱好者"],
+          ["发货形式", "平台发码，购买后自动发送课程兑换码至购买账户"],
+          ["学习平台", "站内线上学习（不可下载）"],
+          ["开课形式", "随到随学，激活后即可开始学习"],
+          ["课程有效期", "长期有效，购买激活后可永久反复观看"],
+          ["总课时", "13 课时（单节 15~30 分钟）"],
+          ["学习资料", "无"],
+          ["教学形式", "在线视频课（录播形式）"]
+        ],
+        uploadRows: [
+          ["支付成功", "生成课程兑换码", "发送至当前购买账户"],
+          ["课程激活", "用户凭兑换码激活课程", "站内线上学习，不支持下载"],
+          ["售后保障", "平台故障导致无法学习", "平台提供技术保障直至恢复正常"]
+        ],
+        deliveryRows: [
+          ["交付内容", "课程兑换码 + 站内课程访问权益"],
+          ["交付节点", "购买成功后自动发码；激活即视为课程开通"],
+          ["退款规则", "虚拟商品，不支持 7 天无理由退换货；开通后不支持退款"],
+          ["版权规则", "课程内容版权归出品方所有，禁止录屏、传播、二次售卖"]
+        ],
+        referenceNote: "课程包为虚拟商品，以下卡片用于辅助理解课程定位、课时和学习方式。",
+        samples: [
+          { type: "image", title: "课程定位", desc: "AI 绘画实战速成，面向零基础用户。", ratio: "13课时", status: "课程权益", tone: ["#f3eadf", "#eef5ff"] },
+          { type: "image", title: "学习方式", desc: "站内录播视频课，随到随学，可反复观看。", ratio: "长期有效", status: "站内学习", tone: ["#e8f7e9", "#fff0df"] },
+          { type: "image", title: "发码激活", desc: "购买后自动发码，用户凭兑换码激活课程。", ratio: "自动发码", status: "虚拟商品", tone: ["#e7f0ff", "#fff6db"] }
+        ],
+        tiers: [
+          { id: "standard", name: "标准课程包", price: 99, unit: "席位", method: "平台自动发码", spec: "13 课时 · 站内录播 · 长期有效", revision: "不适用", days: 0, note: "AI 绘画实战速成" }
+        ]
+      },
+      {
+        id: "course-ai-general", packageType: "ONLINE_COURSE", icon: "🤖", category: "AI 通识", catKey: "general", accent: "#e7f0ff",
+        name: "人人都能学AI课", desc: "AI 通识入门课程，帮助设计、运营、创意和 AIGC 创作者建立 AI 工具认知与应用路径。",
+        scenarios: ["AI通识入门", "工具认知", "设计提效", "新媒体运营", "AIGC创作"],
+        specs: ["个人激活", "团队批量激活", "站内线上学习"],
+        durations: [], ratios: ["站内学习"],
+        deliverables: ["平台自动发送课程兑换码", "站内线上学习，不可下载", "38 课时，单节 15~30 分钟", "长期有效，可永久反复观看"],
+        materials: ["购买账户手机号/邮箱", "学员姓名或团队席位备注", "是否需要统一分配兑换码"],
+        detailProfile: {
+          audience: "设计师、插画师、电商美工、广告创意人员、UI/UX 设计师、新媒体运营、AIGC 创作者",
+          scenes: "AI 通识入门 / 工具认知 / 创意工作流 / 内容提效",
+          pricingFactor: "课程单价 × 购买席位",
+          specTitle: "课程规格"
+        },
+        specRows: [
+          ["价格", "¥188"],
+          ["核心权益", "AI 通识入门"],
+          ["适用人群", "设计师、插画师、电商美工、广告创意人员、UI/UX 设计师、新媒体运营、AIGC 创作者"],
+          ["发货形式", "平台发码，购买后自动发送课程兑换码至购买账户"],
+          ["学习平台", "站内线上学习（不可下载）"],
+          ["开课形式", "随到随学，激活后即可开始学习"],
+          ["课程有效期", "长期有效，购买激活后可永久反复观看"],
+          ["总课时", "38 课时（单节 15~30 分钟）"],
+          ["学习资料", "无"],
+          ["教学形式", "在线视频课（录播形式）"]
+        ],
+        uploadRows: [
+          ["支付成功", "生成课程兑换码", "发送至当前购买账户"],
+          ["课程激活", "用户凭兑换码激活课程", "站内线上学习，不支持下载"],
+          ["售后保障", "平台故障导致无法学习", "平台提供技术保障直至恢复正常"]
+        ],
+        deliveryRows: [
+          ["交付内容", "课程兑换码 + 站内课程访问权益"],
+          ["交付节点", "购买成功后自动发码；激活即视为课程开通"],
+          ["退款规则", "虚拟商品，不支持 7 天无理由退换货；开通后不支持退款"],
+          ["版权规则", "课程内容版权归出品方所有，禁止录屏、传播、二次售卖"]
+        ],
+        referenceNote: "课程包为虚拟商品，以下卡片用于辅助理解课程定位、课时和学习方式。",
+        samples: [
+          { type: "image", title: "课程定位", desc: "AI 通识入门，覆盖设计、运营和创意人群。", ratio: "38课时", status: "课程权益", tone: ["#e7f0ff", "#f8f4e6"] },
+          { type: "image", title: "学习方式", desc: "站内录播视频课，随到随学，可反复观看。", ratio: "长期有效", status: "站内学习", tone: ["#e8f7e9", "#e7ebff"] },
+          { type: "image", title: "发码激活", desc: "购买后自动发码，用户凭兑换码激活课程。", ratio: "自动发码", status: "虚拟商品", tone: ["#fff0df", "#dce8ff"] }
+        ],
+        tiers: [
+          { id: "standard", name: "标准课程包", price: 188, unit: "席位", method: "平台自动发码", spec: "38 课时 · 站内录播 · 长期有效", revision: "不适用", days: 0, note: "AI 通识入门" }
+        ]
+      },
+      {
+        id: "course-film-creator", packageType: "ONLINE_COURSE", icon: "🎬", category: "影视创作", catKey: "film", accent: "#f2ecff",
+        name: "全能影视创作人", desc: "覆盖运营、剪辑、拍摄、包装与 AI 的一站式陪跑课程，适合内容创作者系统提升创作能力。",
+        scenarios: ["短视频创作", "影视后期", "自媒体运营", "MCN内容", "电商内容运营"],
+        specs: ["个人激活", "团队批量激活", "站内线上学习"],
+        durations: [], ratios: ["站内学习"],
+        deliverables: ["平台自动发送课程兑换码", "站内线上学习，不可下载", "85 课时，单节 8~15 分钟", "长期有效，可永久反复观看"],
+        materials: ["购买账户手机号/邮箱", "学员姓名或团队席位备注", "是否需要统一分配兑换码"],
+        detailProfile: {
+          audience: "短视频创作者、自媒体运营人员、影视后期从业者、MCN 机构从业者、电商内容运营、自由职业创作者",
+          scenes: "运营 / 剪辑 / 拍摄 / 包装 / AI / 一站式陪跑课程",
+          pricingFactor: "课程单价 × 购买席位",
+          specTitle: "课程规格"
+        },
+        specRows: [
+          ["价格", "¥599"],
+          ["核心权益", "运营、剪辑、拍摄、包装、AI、一站式陪跑课程"],
+          ["适用人群", "短视频创作者、自媒体运营人员、影视后期从业者、MCN 机构从业者、电商内容运营、自由职业创作者"],
+          ["发货形式", "平台发码，购买后自动发送课程兑换码至购买账户"],
+          ["学习平台", "站内线上学习（不可下载）"],
+          ["开课形式", "随到随学，激活后即可开始学习"],
+          ["课程有效期", "长期有效，购买激活后可永久反复观看"],
+          ["总课时", "85 课时（单节 8~15 分钟）"],
+          ["学习资料", "无"],
+          ["教学形式", "在线视频课（录播形式）"]
+        ],
+        uploadRows: [
+          ["支付成功", "生成课程兑换码", "发送至当前购买账户"],
+          ["课程激活", "用户凭兑换码激活课程", "站内线上学习，不支持下载"],
+          ["售后保障", "平台故障导致无法学习", "平台提供技术保障直至恢复正常"]
+        ],
+        deliveryRows: [
+          ["交付内容", "课程兑换码 + 站内课程访问权益"],
+          ["交付节点", "购买成功后自动发码；激活即视为课程开通"],
+          ["退款规则", "虚拟商品，不支持 7 天无理由退换货；开通后不支持退款"],
+          ["版权规则", "课程内容版权归出品方所有，禁止录屏、传播、二次售卖"]
+        ],
+        referenceNote: "课程包为虚拟商品，以下卡片用于辅助理解课程定位、课时和学习方式。",
+        samples: [
+          { type: "image", title: "课程定位", desc: "运营、剪辑、拍摄、包装与 AI 的一站式陪跑课程。", ratio: "85课时", status: "课程权益", tone: ["#f2ecff", "#ffe9d8"] },
+          { type: "image", title: "学习方式", desc: "站内录播视频课，随到随学，可反复观看。", ratio: "长期有效", status: "站内学习", tone: ["#e8f7e9", "#f7e7ff"] },
+          { type: "image", title: "发码激活", desc: "购买后自动发码，用户凭兑换码激活课程。", ratio: "自动发码", status: "虚拟商品", tone: ["#e7f0ff", "#fff6db"] }
+        ],
+        tiers: [
+          { id: "standard", name: "标准课程包", price: 599, unit: "席位", method: "平台自动发码", spec: "85 课时 · 站内录播 · 长期有效", revision: "不适用", days: 0, note: "影视创作一站式陪跑" }
+        ]
+      }
+    ];
+    products.splice(0, products.length, ...courseProducts);
+    categories.splice(0, categories.length,
+      { id: "all", label: "全部课程" },
+      { id: "painting", label: "AI 绘画" },
+      { id: "general", label: "AI 通识" },
+      { id: "film", label: "影视创作" }
+    );
     function product() { return products.find(p => p.id === state.productId) || products[0]; }
     function tier() { const p = product(); return p.tiers.find(t => t.id === state.tierId) || p.tiers[0]; }
     function durationPrice(t) { return t.priceByDuration ? (t.priceByDuration[state.duration] || t.price) : t.price; }
@@ -824,13 +966,14 @@
     function calc() {
       const p = product(), t = tier(), q = Math.max(1, Number(state.quantity) || 1);
       const unit = durationPrice(t);
-      const subtotal = unit * q * discount(q);
-      const copy = state.addons.copy && !t.name.includes("有脚本") ? Math.max(60, unit * .25) * q : 0;
-      const source = state.addons.source ? Math.max(30, unit * .18) * q : 0;
-      const rush = state.addons.rush ? subtotal * .6 : 0;
+      const isCourse = p.packageType === "ONLINE_COURSE";
+      const subtotal = unit * q * (isCourse ? 1 : discount(q));
+      const copy = !isCourse && state.addons.copy && !t.name.includes("有脚本") ? Math.max(60, unit * .25) * q : 0;
+      const source = !isCourse && state.addons.source ? Math.max(30, unit * .18) * q : 0;
+      const rush = !isCourse && state.addons.rush ? subtotal * .6 : 0;
       const total = subtotal + copy + source + rush;
-      const eta = Math.max(1, Number(t.days) || 1) + Math.floor(Math.max(0, q - 1) / 2);
-      return { p, t, q, unit, subtotal, copy, source, rush, addon: copy + source + rush, total, eta: state.addons.rush ? Math.max(1, Math.ceil(eta / 2)) : eta };
+      const eta = isCourse ? 0 : Math.max(1, Number(t.days) || 1) + Math.floor(Math.max(0, q - 1) / 2);
+      return { p, t, q, unit, subtotal, copy, source, rush, addon: copy + source + rush, total, eta: state.addons.rush && !isCourse ? Math.max(1, Math.ceil(eta / 2)) : eta };
     }
     function renderTabs() {
       $("categoryTabs").innerHTML = categories.map(c => `<button class="tab ${state.category === c.id ? "active" : ""}" data-cat="${c.id}">${c.label}</button>`).join("");
@@ -877,6 +1020,9 @@
     }
     function dealMeta(p) {
       const map = {
+        "course-ai-painting": { ribbon: "实战速成", benefit: "13 课时 · AI 绘画入门", note: "购买后自动发码，长期有效", a: "#f3eadf", b: "#eef5ff" },
+        "course-ai-general": { ribbon: "通识入门", benefit: "38 课时 · 人人都能学", note: "站内录播，可反复观看", a: "#e7f0ff", b: "#f8f4e6" },
+        "course-film-creator": { ribbon: "系统进阶", benefit: "85 课时 · 影视创作陪跑", note: "运营/剪辑/拍摄/包装/AI", a: "#efe6ff", b: "#ffe9d8" },
         "ai-image": { ribbon: "低价试单", benefit: "最多生成 10 张图片", note: "轻量需求可快速验证风格", a: "#f3eadf", b: "#eef5ff" },
         "ecommerce-set": { ribbon: "首购加赠 1 张", benefit: "一套覆盖主图/场景/细节图", note: "电商上新高频采购首选", a: "#fff0df", b: "#f7e9df" },
         "detail-page": { ribbon: "转化提升包", benefit: "含详情页长图和卖点模块", note: "适合非标品和品牌商品", a: "#e6f9e0", b: "#f8f4e6" },
@@ -948,22 +1094,19 @@
         ["验收依据", "以需求描述、上传素材和购买配置为准"]
       ];
     }
-    const DEFAULT_DEMAND_DESCRIPTION = `订单用途：
-- 个人使用 / 社交媒体发布 / 商务用途 / 其他
+    const DEFAULT_DEMAND_DESCRIPTION = `购买用途：
+- 个人学习 / 团队培训 / 企业内训 / 其他
 
-服务类型（选一项或多项）：
-- AI人物转绘 / 头像制作 / 证件照精修 / 风景图生成 / 图片扩图 / 图片融合 / LOGO设计 / 其他
+学员信息：
+- 购买账户：
+- 学员姓名或团队名称：
+- 接收兑换码手机号/邮箱：
 
-风格偏好：
-- 风格：2D插画风格 / 3D立体风格 / 真人写实风格
-- 细分标签（最多3项）：赛博朋克 / 复古胶片感 / 极简高级感 / 梦幻浪漫风 / 国潮水墨风 / 二次元日系 / 油画艺术风 / 蒸汽波 / 写实商业风 / 其他
+激活方式：
+- 立即由购买账户激活 / 先发放兑换码后分配给学员 / 其他
 
-背景要求：
-- 纯色（请注明颜色）/ 场景背景 / 透明背景 / 其他
-- 色调偏好：暖色 / 冷色 / 黑白 / 鲜艳 / 柔和 / 不限
-
-参考图：
-- 强烈建议上传1~3张风格参考图或效果参考图`;
+发票或备注：
+- 如需开票，请在资金中心或订单详情中继续处理`;
     function ensureDemandDescriptionTemplate() {
       const input = $("remarkInput");
       if (!input) return;
@@ -992,6 +1135,11 @@
       const summary = $("materialUploadSummary");
       const list = $("materialFilesList");
       if (!summary || !list) return;
+      if (product().packageType === "ONLINE_COURSE") {
+        summary.textContent = "课程包无需上传附件，购买成功后系统自动发送兑换码。";
+        list.innerHTML = `<div class="material-empty">无需上传素材。请在上方学习账户信息中确认兑换码接收账户。</div>`;
+        return;
+      }
       summary.textContent = state.materialFiles.length
         ? `已上传 ${state.materialFiles.length}/${MAX_MATERIAL_FILES} 个附件，单个文件需小于 2GB。`
         : "未上传附件。支持图片、视频、参考图、压缩包等本地文件。";
@@ -1021,6 +1169,7 @@
       renderMaterialFiles();
     }
     function validateMaterialFiles() {
+      if (product().packageType === "ONLINE_COURSE") return true;
       if (state.materialFiles.length) return true;
       renderMaterialFiles();
       window.demoToast("请先上传素材附件后再购买", "warn");
@@ -1036,6 +1185,13 @@
       return false;
     }
     function validateAddons() {
+      if (product().packageType === "ONLINE_COURSE") {
+        if (state.addons.source) return true;
+        window.demoToast("请先确认虚拟商品规则", "warn");
+        const agreeBtn = document.querySelector('[data-addon="source"]');
+        if (agreeBtn) agreeBtn.focus();
+        return false;
+      }
       const hasAddon = Object.keys(state.addons).some(key => state.addons[key]);
       if (hasAddon) return true;
       window.demoToast("请至少选择一个增项", "warn");
@@ -1048,7 +1204,7 @@
       const value = input ? input.value.trim() : "";
       const isTemplateOnly = value === DEFAULT_DEMAND_DESCRIPTION.trim();
       if (value && !isTemplateOnly) return true;
-      window.demoToast("请先填写需求描述，并删除或修改提示文字", "warn");
+      window.demoToast("请先填写学习账户信息，并删除或修改提示文字", "warn");
       if (input) input.focus();
       return false;
     }
@@ -1065,17 +1221,17 @@
         <p class="tier-note">${t.note}</p>
         <div class="tier-price"><b>${tierPriceRange(t)}</b><span>/${t.unit || "项"}</span></div>
         ${durationPriceHtml(t)}
-        <div class="tier-meta">${t.spec}<br>${t.revision}修改 · ${t.days} 天起交付</div>
+        <div class="tier-meta">${t.spec}<br>${p.packageType === "ONLINE_COURSE" ? "长期有效 · 自动发码" : `${t.revision}修改 · ${t.days} 天起交付`}</div>
       </article>`).join("");
     }
     function tierRowsHtml(p) {
-      return p.tiers.map(t => `<tr><td><b>${t.name}</b><br><span style="color:var(--muted)">${t.note}</span></td><td>${tablePriceHtml(t)}</td><td>${t.method}</td><td>${t.spec}</td><td>${t.revision}</td><td>${t.days} 天起</td></tr>`).join("");
+      return p.tiers.map(t => `<tr><td><b>${t.name}</b><br><span style="color:var(--muted)">${t.note}</span></td><td>${tablePriceHtml(t)}</td><td>${t.method}</td><td>${t.spec}</td><td>${p.packageType === "ONLINE_COURSE" ? "长期有效" : t.revision}</td><td>${p.packageType === "ONLINE_COURSE" ? "自动发码" : t.days + " 天起"}</td></tr>`).join("");
     }
     function sampleCardsHtml(samples) {
       return (samples || []).map(s => {
         const tone = s.tone || ["#dce8ff", "#fff0df"];
         const icon = s.type === "video" ? "" : "▧";
-        const kind = s.type === "video" ? "视频" : "图片";
+        const kind = product().packageType === "ONLINE_COURSE" ? "课程" : (s.type === "video" ? "视频" : "图片");
         return `<article class="sample-card ${s.type}" style="--sample-a:${tone[0]};--sample-b:${tone[1]}">
           <div class="sample-frame">
             <span class="sample-badge">${s.status}</span>
@@ -1098,13 +1254,13 @@
       const p = products.find(x => x.id === productId) || product();
       const profile = detailProfile(p);
       $("modalDetailTitle").textContent = p.name;
-      $("modalDetailSub").textContent = "查看规格参数、对标示例、交付要求和修改要求。";
+      $("modalDetailSub").textContent = p.packageType === "ONLINE_COURSE" ? "查看课程权益、适用人群、发码规则和保障条款。" : "查看规格参数、对标示例、交付要求和修改要求。";
       $("modalDetailScenes").textContent = profile.scenes;
       $("modalDetailSpecTitle").textContent = profile.specTitle || "产品规格";
       $("modalDetailSpecTable").innerHTML = tableRowsHtml(specRows(p));
       $("modalDetailDeliveryTable").innerHTML = tableRowsHtml(deliveryRows(p));
       $("modalDetailReferenceNote").textContent = p.referenceNote || "以下为本产品包的参考案例，可帮助您理解出品效果。";
-      $("modalDetailSampleCount").textContent = (p.samples || []).length + " 个样例位";
+      $("modalDetailSampleCount").textContent = (p.samples || []).length + (p.packageType === "ONLINE_COURSE" ? " 个预览位" : " 个样例位");
       $("modalDetailSamples").innerHTML = sampleCardsHtml(p.samples);
       $("detailChooseBtn").dataset.product = p.id;
       $("productDetailModal").classList.add("open");
@@ -1123,7 +1279,9 @@
       renderAll();
       ensureDemandDescriptionTemplate();
       const c = calc();
-      $("purchaseModalSub").textContent = `${c.p.name} · ${c.t.name}，继续选择数量、规格和增项后确认价格。`;
+      $("purchaseModalSub").textContent = c.p.packageType === "ONLINE_COURSE"
+        ? `${c.p.name} · ${c.t.name}，继续确认席位、激活方式和虚拟商品规则。`
+        : `${c.p.name} · ${c.t.name}，继续选择数量、规格和增项后确认价格。`;
       $("purchaseModal").classList.add("open");
       $("purchaseModal").setAttribute("aria-hidden", "false");
     }
@@ -1137,10 +1295,14 @@
       if (!state.spec || !p.specs.includes(state.spec)) state.spec = p.specs[0];
       if (p.durations.length && !p.durations.includes(Number(state.duration))) state.duration = p.durations[0];
       if (p.ratios.length && !p.ratios.includes(state.ratio)) state.ratio = p.ratios[0];
-      $("tierOptions").innerHTML = p.tiers.map(t => `<div class="option ${t.id === state.tierId ? "active" : ""}" data-tier="${t.id}"><strong><span>${t.name}</span><span>${fmt(t.price)} 起</span></strong><span>${t.note} · ${t.revision}修改 · ${t.days}天起</span></div>`).join("");
+      $("tierOptions").innerHTML = p.tiers.map(t => {
+        const meta = p.packageType === "ONLINE_COURSE" ? `${t.note} · ${t.spec}` : `${t.note} · ${t.revision}修改 · ${t.days}天起`;
+        return `<div class="option ${t.id === state.tierId ? "active" : ""}" data-tier="${t.id}"><strong><span>${t.name}</span><span>${fmt(t.price)} 起</span></strong><span>${meta}</span></div>`;
+      }).join("");
       $("purchaseUploadTable").innerHTML = tableRowsHtml(uploadRows(p));
       $("quantityInput").value = state.quantity;
-      $("quantityInput").max = p.id.includes("image") ? 10 : 10;
+      $("quantityInput").max = p.packageType === "ONLINE_COURSE" ? 99 : 10;
+      $("specLabel").textContent = p.packageType === "ONLINE_COURSE" ? "激活方式" : "规格";
       $("specSelect").innerHTML = p.specs.map(s => `<option ${s === state.spec ? "selected" : ""}>${s}</option>`).join("");
       $("videoOptions").style.display = p.durations.length ? "grid" : "none";
       $("durationSelect").innerHTML = p.durations.map(d => `<option value="${d}" ${Number(state.duration) === d ? "selected" : ""}>${d} 秒</option>`).join("");
@@ -1151,7 +1313,7 @@
       $("qtyPrice").textContent = `${c.q} ${c.t.unit} ${discount(c.q) < 1 ? "· 已折扣" : ""} ${fmt(c.subtotal)}`;
       $("addonPrice").textContent = fmt(c.addon);
       $("totalPrice").textContent = fmt(c.total);
-      $("etaText").textContent = c.eta + (c.p.id === "brand-film" ? " 个工作日" : " 天");
+      $("etaText").textContent = c.p.packageType === "ONLINE_COURSE" ? "自动发码" : c.eta + (c.p.id === "brand-film" ? " 个工作日" : " 天");
       renderMaterialFiles();
     }
     function renderAll() { renderTabs(); renderPackages(); renderConfig(); }
@@ -1172,12 +1334,18 @@
       $("confirmPkg").textContent = c.p.name;
       $("confirmTier").textContent = c.t.name;
       $("confirmSpec").textContent = `${c.q} ${c.t.unit} · ${state.spec}${c.p.durations.length ? " · " + state.duration + "秒 · " + state.ratio : ""}`;
-      $("confirmAddon").textContent = [
-        state.addons.copy ? "文案" : "",
-        state.addons.rush ? "加急" : "",
-        state.addons.source ? "源文件" : ""
-      ].filter(Boolean).join(" / ") || "无";
-      $("confirmMaterials").textContent = `${state.materialFiles.length} 个附件`;
+      $("confirmAddon").textContent = c.p.packageType === "ONLINE_COURSE"
+        ? [
+            state.addons.copy ? "长期有效" : "",
+            state.addons.rush ? "自动发码" : "",
+            state.addons.source ? "已同意虚拟商品规则" : ""
+          ].filter(Boolean).join(" / ")
+        : [
+            state.addons.copy ? "文案" : "",
+            state.addons.rush ? "加急" : "",
+            state.addons.source ? "源文件" : ""
+          ].filter(Boolean).join(" / ") || "无";
+      $("confirmMaterials").textContent = c.p.packageType === "ONLINE_COURSE" ? "付款成功后自动生成" : `${state.materialFiles.length} 个附件`;
       $("confirmEta").textContent = $("etaText").textContent;
       $("confirmAccount").textContent = (ws.payer && ws.payer.name) || ws.payerLabel;
       $("confirmBalance").textContent = fmt(available);
@@ -1185,7 +1353,9 @@
       const shortage = Math.max(0, c.total - available);
       $("confirmNote").innerHTML = shortage > 0
         ? `当前账户余额不足，还差 <b>${fmt(shortage)}</b>。可先去资金中心充值，或切换团队账户。`
-        : `支付后冻结 <b>${fmt(c.total)}</b>，进入平台托管；服务完成、验收确认并完成发票流程后结算。`;
+        : c.p.packageType === "ONLINE_COURSE"
+          ? `支付后冻结 <b>${fmt(c.total)}</b> 并自动发放课程兑换码；虚拟商品购买开通后不支持 7 天无理由退换货。`
+          : `支付后冻结 <b>${fmt(c.total)}</b>，进入平台托管；服务完成、验收确认并完成发票流程后结算。`;
       $("confirmOrderBtn").dataset.shortage = shortage > 0 ? "1" : "0";
       $("confirmOrderBtn").textContent = shortage > 0 ? "余额不足，去充值" : "确认付款并提交";
       $("orderModal").classList.add("open");
@@ -1201,12 +1371,13 @@
       const id = "DM-" + new Date().toISOString().slice(0, 10).replace(/-/g, "") + Math.floor(Math.random() * 90 + 10);
       const projectSpaceId = "PS-" + new Date().toISOString().slice(0, 10).replace(/-/g, "") + Math.floor(Math.random() * 9000 + 1000);
       const title = c.p.name + " · " + c.t.name;
+      const redemptionCode = c.p.packageType === "ONLINE_COURSE" ? "CRS-" + Math.random().toString(36).slice(2, 6).toUpperCase() + "-" + Math.random().toString(36).slice(2, 6).toUpperCase() : null;
       const result = window.demoApp.tccTry({
         walletKey: ws.walletKey,
         amount: c.total,
         demandId: id,
         orderTitle: title,
-        biz_type: "standard_package_lock",
+        biz_type: c.p.packageType === "ONLINE_COURSE" ? "online_course_package_lock" : "standard_package_lock",
         operator: "昭岚",
         expireDays: 7
       });
@@ -1217,9 +1388,28 @@
       window.demoApp.addDemand({
         id,
         requirementType: "PLATFORM_SKU",
+        packageType: c.p.packageType || "STANDARD_SERVICE",
         spuId: c.p.id,
         skuId: c.t.id,
-        skuSnapshot: JSON.parse(JSON.stringify({ product: c.p.name, tier: c.t, quantity: c.q, spec: state.spec, duration: state.duration, ratio: state.ratio, addons: state.addons, materials: materialFilesSnapshot(), total: c.total })),
+        skuSnapshot: JSON.parse(JSON.stringify({
+          packageType: c.p.packageType || "STANDARD_SERVICE",
+          product: c.p.name,
+          tier: c.t,
+          quantity: c.q,
+          spec: state.spec,
+          duration: state.duration,
+          ratio: state.ratio,
+          addons: state.addons,
+          materials: materialFilesSnapshot(),
+          courseAccess: c.p.packageType === "ONLINE_COURSE" ? {
+            deliveryMethod: "platform_redemption_code",
+            redemptionCode,
+            learningPlatform: "站内线上学习",
+            validity: "长期有效",
+            refundPolicy: "虚拟商品，不支持 7 天无理由退换货"
+          } : null,
+          total: c.total
+        })),
         title,
         category: c.p.category + " / " + c.p.name,
         desc: demandDescriptionValue(c.p.desc),
@@ -1227,7 +1417,7 @@
         budgetMin: c.total,
         budgetMax: c.total,
         deadline: $("etaText").textContent,
-        refs: materialFilesSnapshot(),
+        refs: c.p.packageType === "ONLINE_COURSE" ? [] : materialFilesSnapshot(),
         workspace: ws.id,
         workspaceName: ws.name,
         walletKey: ws.walletKey,
@@ -1247,8 +1437,8 @@
       });
       closeOrderModal();
       closePurchaseModal();
-      window.demoToast("✅ 标准产品包已下单，预算已冻结", "ok");
-      setTimeout(() => window.demoToast("🤝 项目协同空间已创建，可在我的需求查看", "info"), 800);
+      window.demoToast(c.p.packageType === "ONLINE_COURSE" ? "✅ 在线课程包已下单，兑换码已生成" : "✅ 标准产品包已下单，预算已冻结", "ok");
+      setTimeout(() => window.demoToast(c.p.packageType === "ONLINE_COURSE" ? "🎓 可在我的需求查看课程订单与兑换码快照" : "🤝 项目协同空间已创建，可在我的需求查看", "info"), 800);
       setTimeout(() => { location.href = "demand-list.html?highlight=" + id + "&paid=1"; }, 1800);
     }
     document.addEventListener("click", (e) => {
@@ -1281,7 +1471,11 @@
         return;
       }
     });
-    $("quantityInput").addEventListener("input", (e) => { state.quantity = Math.max(1, Math.min(10, Number(e.target.value) || 1)); renderConfig(); });
+    $("quantityInput").addEventListener("input", (e) => {
+      const max = product().packageType === "ONLINE_COURSE" ? 99 : 10;
+      state.quantity = Math.max(1, Math.min(max, Number(e.target.value) || 1));
+      renderConfig();
+    });
     $("specSelect").addEventListener("change", (e) => { state.spec = e.target.value; renderConfig(); });
     $("durationSelect").addEventListener("change", (e) => { state.duration = Number(e.target.value); renderConfig(); });
     $("ratioSelect").addEventListener("change", (e) => { state.ratio = e.target.value; renderConfig(); });
@@ -1323,21 +1517,6 @@
     });
     SharedHeader.mount({ activeNav: "publish" });
     renderAll();
-    (function applyEntryParams() {
-      const params = new URLSearchParams(location.search);
-      const productId = params.get("product");
-      if (!productId || !products.some(p => p.id === productId)) return;
-      state.productId = productId;
-      state.tierId = "";
-      state.materialFiles = [];
-      renderAll();
-      const action = params.get("action");
-      setTimeout(() => {
-        if (action === "buy") openPurchaseModal(productId);
-        else if (action === "detail") openProductDetail(productId);
-        else document.getElementById("catalogPanel").scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 0);
-    })();
   })();
   </script>
 </body>

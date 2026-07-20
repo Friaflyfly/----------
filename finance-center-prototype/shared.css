@@ -1511,6 +1511,201 @@ body.modal-open {
   box-shadow: 0 24px 60px rgba(18, 28, 52, .18);
 }
 
+.reconciliation-batch-modal {
+  width: min(1320px, calc(100vw - 32px));
+  max-height: calc(100dvh - 28px);
+  border-radius: 28px;
+  padding: 24px 24px 20px;
+}
+
+.reconciliation-batch-modal .recharge-modal-body {
+  padding-right: 0;
+}
+
+.reconciliation-batch-modal .surface {
+  box-shadow: 0 12px 32px rgba(18, 28, 52, .06);
+}
+
+.reconciliation-batch-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(320px, 1fr);
+  gap: 16px;
+  align-items: start;
+  margin-bottom: 16px;
+}
+
+.reconciliation-batch-hero {
+  margin-bottom: 0;
+}
+
+.reconciliation-batch-hero-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.reconciliation-batch-hero-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.reconciliation-batch-subtitle {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.reconciliation-batch-facts .detail-item {
+  background: rgba(255,255,255,.86);
+}
+
+.reconciliation-batch-summary-grid {
+  margin-top: 6px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.reconciliation-batch-summary-grid .list-item {
+  padding: 14px 16px;
+  border: 1px solid rgba(18,28,52,.05);
+  background: rgba(255,255,255,.86);
+}
+
+.reconciliation-batch-actions {
+  margin-top: 14px;
+}
+
+.reconciliation-batch-metrics {
+  margin-bottom: 16px;
+}
+
+.reconciliation-mini-metric {
+  padding: 16px 18px;
+}
+
+.reconciliation-mini-metric .big {
+  margin-bottom: 8px;
+  font-size: 28px;
+}
+
+.reconciliation-panel-list {
+  display: grid;
+  gap: 12px;
+}
+
+.reconciliation-list-card {
+  padding: 16px 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(18,28,52,.05);
+  background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(246,248,253,.94));
+}
+
+.reconciliation-list-card.warn {
+  border-color: rgba(217,119,6,.16);
+  background: linear-gradient(180deg, rgba(255,251,245,.98), rgba(255,247,236,.94));
+}
+
+.reconciliation-list-card.blue {
+  border-color: rgba(31,87,255,.12);
+  background: linear-gradient(180deg, rgba(247,250,255,.98), rgba(241,246,255,.94));
+}
+
+.reconciliation-list-card.danger {
+  border-color: rgba(207,46,46,.12);
+  background: linear-gradient(180deg, rgba(255,248,248,.98), rgba(255,242,242,.94));
+}
+
+.reconciliation-list-card.success {
+  border-color: rgba(23,128,61,.14);
+  background: linear-gradient(180deg, rgba(246,252,248,.98), rgba(239,249,243,.94));
+}
+
+.reconciliation-list-card.neutral {
+  border-color: rgba(18,28,52,.07);
+  background: linear-gradient(180deg, rgba(251,252,255,.98), rgba(245,247,252,.94));
+}
+
+.reconciliation-list-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.reconciliation-list-card-head strong {
+  margin-bottom: 0;
+  font-size: 15px;
+}
+
+.reconciliation-list-card p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.reconciliation-detail-head {
+  margin-bottom: 12px;
+}
+
+.reconciliation-detail-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.reconciliation-detail-filters {
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(18,28,52,.05);
+  background: linear-gradient(180deg, rgba(250,252,255,.98), rgba(244,247,252,.94));
+}
+
+.reconciliation-detail-filter-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.reconciliation-detail-filters .field {
+  margin-top: 0;
+}
+
+.reconciliation-detail-filters .field label {
+  margin-bottom: 4px;
+  font-size: 11px;
+}
+
+.reconciliation-detail-filters .field input,
+.reconciliation-detail-filters .field select {
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.92);
+  font-size: 13px;
+}
+
+.reconciliation-detail-filter-actions {
+  margin-top: 12px;
+}
+
+.reconciliation-detail-table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  font-size: 12px;
+  letter-spacing: .01em;
+}
+
+.reconciliation-detail-table td {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
 .reconciliation-drawer-mask {
   justify-content: flex-end;
   padding: 12px 0 12px 12px;
@@ -1552,6 +1747,30 @@ body.modal-open {
 .compact-detail-grid .detail-item {
   padding: 14px 16px;
   min-height: auto;
+}
+
+@media (max-width: 1180px) {
+  .reconciliation-batch-modal {
+    width: calc(100vw - 20px);
+    padding: 20px 18px 16px;
+  }
+
+  .reconciliation-batch-top {
+    grid-template-columns: 1fr;
+  }
+
+  .reconciliation-batch-hero-side {
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .reconciliation-batch-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .reconciliation-detail-filter-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .config-modal {
